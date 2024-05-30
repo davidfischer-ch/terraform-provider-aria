@@ -1,4 +1,4 @@
-module github.com/hashicorp/terraform-provider-scaffolding-framework
+module github.com/davidfischer-ch/terraform-provider-aria
 
 go 1.21
 
