@@ -1,3 +1,7 @@
-## 0.1.0 (Unreleased)
+# Release v0.1.0 (Unreleased)
 
-FEATURES:
+## Major compatibility breaks
+## Minor compatibilty breaks
+## Migrations
+## Features
+## Fix and enhancements

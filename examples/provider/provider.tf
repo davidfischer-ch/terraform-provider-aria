@@ -1,3 +1,3 @@
-provider "scaffolding" {
+provider "aria" {
   # example configuration here
 }
