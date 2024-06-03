@@ -16,7 +16,7 @@ type AriaClientConfig struct {
 	Host string
 
 	RefreshToken string `datapolicy:"token"`
-	AccessToken string `datapolicy:"token"`
+	AccessToken  string `datapolicy:"token"`
 
 	// Transport Layer.
 	Insecure bool
@@ -43,14 +43,14 @@ func (cfg *AriaClientConfig) Check() error {
 func (cfg *AriaClientConfig) Client() *resty.Client {
 	client := resty.New()
 	client.SetBaseURL(cfg.Host)
-	client.SetTLSClientConfig(&tls.Config{ InsecureSkipVerify: cfg.Insecure })
+	client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: cfg.Insecure})
 	if len(cfg.AccessToken) > 0 {
 		client.SetAuthToken(cfg.AccessToken)
 	}
 	return client
 }
 
-func (cfg *AriaClientConfig) GetAccessToken() (error) {
+func (cfg *AriaClientConfig) GetAccessToken() error {
 	// FIXME Handle refreshing token when required
 
 	// Refresh access token if refresh token is set and access token is empty
@@ -82,7 +82,7 @@ func (cfg *AriaClientConfig) GetAccessToken() (error) {
 
 func handleAPIResponse(response *resty.Response, err error, statusCode int) error {
 
-	if /* logging.IsDebugOrHigher() && */ (err != nil || response.StatusCode() != statusCode) {
+	if /* logging.IsDebugOrHigher() && */ err != nil || response.StatusCode() != statusCode {
 		log.Println("[DEBUG] Response Info:")
 		log.Println("[DEBUG]   Error      :", err)
 		log.Println("[DEBUG]   Status Code:", response.StatusCode())

@@ -50,7 +50,7 @@ func (p *AriaProvider) Schema(ctx context.Context, req provider.SchemaRequest, r
 			},
 			"refresh_token": schema.StringAttribute{
 				Optional:            true,
-				Sensitive:			 true,
+				Sensitive:           true,
 				MarkdownDescription: "The refresh token to use for making API requests. May also be provided via ARIA_REFRESH_TOKEN environment variable.",
 			},
 			"insecure": schema.BoolAttribute{
@@ -81,8 +81,8 @@ func (p *AriaProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 		resp.Diagnostics.AddAttributeError(
 			path.Root("host"),
 			"Missing Aria API Host",
-			"Set the host in the provider configuration " +
-			"or use the ARIA_HOST and ensure its not empty.",
+			"Set the host in the provider configuration "+
+				"or use the ARIA_HOST and ensure its not empty.",
 		)
 	}
 
@@ -94,8 +94,8 @@ func (p *AriaProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 		resp.Diagnostics.AddAttributeError(
 			path.Root("refresh_token"),
 			"Missing Aria API Refresh Token",
-			"Set the refresh token in the provider configuration " +
-			"or use the ARIA_REFRESH_TOKEN and ensure its not empty.",
+			"Set the refresh token in the provider configuration "+
+				"or use the ARIA_REFRESH_TOKEN and ensure its not empty.",
 		)
 	}
 
@@ -122,9 +122,9 @@ func (p *AriaProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 
 	// Create a new Aria client using the configuration values
 	cfg := AriaClientConfig{
-		Host: host,
+		Host:         host,
 		RefreshToken: refresh_token,
-		Insecure: insecure,
+		Insecure:     insecure,
 	}
 
 	err = cfg.Check()
