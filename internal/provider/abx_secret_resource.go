@@ -10,6 +10,7 @@ import (
 	"github.com/go-resty/resty/v2"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -80,6 +81,7 @@ func (r *ABXSecretResource) Schema(
 			"encrypted": schema.BoolAttribute{
 				MarkdownDescription: "Secret should be always encrypted!",
 				Computed:            true,
+				Default:             booldefault.StaticBool(true),
 			},
 			"org_id": schema.StringAttribute{
 				MarkdownDescription: "Secret organisation ID",
@@ -116,7 +118,7 @@ func (r *ABXSecretResource) Create(
 		SetBody(ABXSecretResourceAPIModel{
 			Name:      secret.Name.ValueString(),
 			Value:     secret.Value.ValueString(),
-			Encrypted: true,
+			Encrypted: secret.Encrypted.ValueBool(),
 		}).
 		SetResult(&secretRaw).
 		Post("abx/api/resources/action-secrets")
@@ -201,7 +203,7 @@ func (r *ABXSecretResource) Update(
 		SetBody(ABXSecretResourceAPIModel{
 			Name:      secret.Name.ValueString(),
 			Value:     secret.Value.ValueString(),
-			Encrypted: true,
+			Encrypted: secret.Encrypted.ValueBool(),
 		}).
 		SetResult(&secretRaw).
 		Put("abx/api/resources/action-secrets/" + secretId)
