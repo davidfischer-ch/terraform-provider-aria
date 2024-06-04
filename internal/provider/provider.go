@@ -71,6 +71,36 @@ func (p *AriaProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 		return
 	}
 
+	// Prevent an unexpectedly misconfigured client, if Terraform configuration values are only
+	// known after another resource is applied.
+
+	if config.Host.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("host"),
+			"Unknown Aria API Host",
+			"Either set the host in the provider configuration to a static value, "+
+				"apply the source of the value first, or use ARIA_HOST.",
+		)
+	}
+
+	if config.RefreshToken.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("refresh_token"),
+			"Unknown Aria API Refresh Token",
+			"Either set the refresh token in the provider configuration to a static value, "+
+				"apply the source of the value first, or use ARIA_REFRESH_TOKEN.",
+		)
+	}
+
+	if config.Insecure.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("insecure"),
+			"Unknown Aria API Insecure Flag",
+			"Either set the insecure flag in the provider configuration to a static value, "+
+				"apply the source of the value first, or use ARIA_INSECURE.",
+		)
+	}
+
 	// Retrieve default values from environment variables if set
 
 	host := os.Getenv("ARIA_HOST")
@@ -82,7 +112,7 @@ func (p *AriaProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 			path.Root("host"),
 			"Missing Aria API Host",
 			"Set the host in the provider configuration "+
-				"or use the ARIA_HOST and ensure its not empty.",
+				"or use ARIA_HOST and ensure its not empty.",
 		)
 	}
 
@@ -95,7 +125,7 @@ func (p *AriaProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 			path.Root("refresh_token"),
 			"Missing Aria API Refresh Token",
 			"Set the refresh token in the provider configuration "+
-				"or use the ARIA_REFRESH_TOKEN and ensure its not empty.",
+				"or use ARIA_REFRESH_TOKEN and ensure its not empty.",
 		)
 	}
 
