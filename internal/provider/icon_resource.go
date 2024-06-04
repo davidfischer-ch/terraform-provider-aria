@@ -52,7 +52,7 @@ func (r *IconResource) Schema(
 ) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "Example resource",
+		MarkdownDescription: "Icon resource",
 
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
@@ -61,8 +61,9 @@ func (r *IconResource) Schema(
 				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"content": schema.StringAttribute{
-				MarkdownDescription: "Icon content",
+				MarkdownDescription: "Icon content (force recreation on change)",
 				Required:            true,
+				PlanModifiers:       []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
 		},
 	}
@@ -102,12 +103,14 @@ func (r *IconResource) Create(
 	}
 
 	tflog.Debug(ctx, fmt.Sprintf("icon created %s", response.Body()))
-	// -icon.Id =
-	// icon.Content = types.StringValue(response.String())
-
-	// Write logs using the tflog package
-	// Documentation: https://terraform.io/plugin/log
-	// tflog.Trace(ctx, "created a resource")
+	iconId, err := GetIdFromLocation(response)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to parse icon id, got error: %s", err))
+		return
+	}
+	icon.Id = types.StringValue(iconId)
 
 	// Save icon into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &icon)...)
@@ -156,16 +159,15 @@ func (r *IconResource) Update(
 ) {
 	var icon IconResourceModel
 
-	// Read Terraform plan data into the model
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &icon)...)
+	// Read Terraform prior state data into the model
+	resp.Diagnostics.Append(req.State.Get(ctx, &icon)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	// FIXME
-
-	// Save updated icon into Terraform state
-	resp.Diagnostics.Append(resp.State.Set(ctx, &icon)...)
+	resp.Diagnostics.AddError(
+		"Client error",
+		fmt.Sprintf("Unable to update icon %s, method is not implement.", icon.Id.ValueString()))
 }
 
 func (r *IconResource) Delete(
@@ -181,13 +183,17 @@ func (r *IconResource) Delete(
 		return
 	}
 
+	iconId := icon.Id.ValueString()
+	if len(iconId) == 0 {
+		return
+	}
+
 	response, err := r.client.R().Delete("icon/api/icons/" + icon.Id.ValueString())
 	err = handleAPIResponse(ctx, response, err, 204)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
 			fmt.Sprintf("Unable to delete icon %s, got error: %s", icon.Id.ValueString(), err))
-		return
 	}
 }
 

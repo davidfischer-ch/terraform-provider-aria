@@ -112,3 +112,13 @@ func handleAPIResponse(
 
 	return nil
 }
+
+func GetIdFromLocation(response *resty.Response) (string, error) {
+	location, err := url.Parse(response.Header().Get("Location"))
+	if err != nil {
+		return "", err
+	}
+
+	parts := strings.Split(location.Path, "/")
+	return parts[len(parts)-1], nil
+}
