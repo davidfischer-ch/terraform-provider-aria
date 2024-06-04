@@ -19,7 +19,7 @@ func GetDataSourceClient(
 	ctx context.Context,
 	req datasource.ConfigureRequest,
 	resp *datasource.ConfigureResponse,
-) (*resty.Client) {
+) *resty.Client {
 	// Prevent panic if the provider has not been configured.
 	if req.ProviderData == nil {
 		return nil
@@ -42,7 +42,7 @@ func GetResourceClient(
 	ctx context.Context,
 	req resource.ConfigureRequest,
 	resp *resource.ConfigureResponse,
-) (*resty.Client) {
+) *resty.Client {
 	// Prevent panic if the provider has not been configured.
 	if req.ProviderData == nil {
 		return nil

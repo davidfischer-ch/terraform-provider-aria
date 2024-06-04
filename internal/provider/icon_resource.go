@@ -58,7 +58,7 @@ func (r *IconResource) Schema(
 			"id": schema.StringAttribute{
 				MarkdownDescription: "Icon identifier",
 				Computed:            true,
-				PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"content": schema.StringAttribute{
 				MarkdownDescription: "Icon content",
