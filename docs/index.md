@@ -23,6 +23,7 @@ provider "aria" {
 
 ### Optional
 
+- `access_token` (String, Sensitive) The access token to use for making API requests. May also be provided via ARIA_ACCESS_TOKEN environment variable.
 - `host` (String) The URI to Aria. May also be provided via ARIA_HOST environment variable.
 - `insecure` (Boolean) Whether server should be accessed without verifying the TLS certificate. May also be provided via ARIA_INSECURE environment variable.
 - `refresh_token` (String, Sensitive) The refresh token to use for making API requests. May also be provided via ARIA_REFRESH_TOKEN environment variable.
