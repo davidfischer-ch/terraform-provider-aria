@@ -77,7 +77,7 @@ func (d *IconDataSource) Read(
 	}
 
 	response, err := d.client.R().Get("icon/api/icons/" + icon.Id.ValueString())
-	err = handleAPIResponse(response, err, 200)
+	err = handleAPIResponse(ctx, response, err, 200)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",

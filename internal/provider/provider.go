@@ -155,6 +155,7 @@ func (p *AriaProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 		Host:         host,
 		RefreshToken: refresh_token,
 		Insecure:     insecure,
+		Context:      ctx,
 	}
 
 	err = cfg.Check()

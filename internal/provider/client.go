@@ -1,10 +1,15 @@
 package provider
 
 import (
+	"context"
 	"crypto/tls"
 	"errors"
+	"fmt"
+	"net/url"
+	"strings"
+
 	"github.com/go-resty/resty/v2"
-	"log"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
 type AriaClientConfig struct {
@@ -23,6 +28,8 @@ type AriaClientConfig struct {
 
 	// UserAgent is an optional field that specifies the caller of this request.
 	UserAgent string
+
+	Context context.Context
 }
 
 type AccessTokenResponse struct {
@@ -55,9 +62,7 @@ func (cfg *AriaClientConfig) GetAccessToken() error {
 
 	// Refresh access token if refresh token is set and access token is empty
 	if len(cfg.RefreshToken) > 0 && len(cfg.AccessToken) == 0 {
-		if /* logging.IsDebugOrHigher() */ true {
-			log.Println("[DEBUG] Requesting a new API access token at", cfg.Host)
-		}
+		tflog.Debug(cfg.Context, "Requesting a new API access token at "+cfg.Host)
 
 		var token AccessTokenResponse
 		response, err := cfg.Client().R().
@@ -65,7 +70,7 @@ func (cfg *AriaClientConfig) GetAccessToken() error {
 			SetBody(map[string]string{"refreshToken": cfg.RefreshToken}).
 			SetResult(&token).
 			Post("iaas/api/login")
-		err = handleAPIResponse(response, err, 200)
+		err = handleAPIResponse(cfg.Context, response, err, 200)
 		if err != nil {
 			return err
 		}
@@ -80,17 +85,21 @@ func (cfg *AriaClientConfig) GetAccessToken() error {
 	return nil
 }
 
-func handleAPIResponse(response *resty.Response, err error, statusCode int) error {
-
-	if /* logging.IsDebugOrHigher() && */ err != nil || response.StatusCode() != statusCode {
-		log.Println("[DEBUG] Response Info:")
-		log.Println("[DEBUG]   Error      :", err)
-		log.Println("[DEBUG]   Status Code:", response.StatusCode())
-		log.Println("[DEBUG]   Status     :", response.Status())
-		log.Println("[DEBUG]   Proto      :", response.Proto())
-		log.Println("[DEBUG]   Time       :", response.Time())
-		log.Println("[DEBUG]   Received At:", response.ReceivedAt())
-		log.Println("[DEBUG]   Body       :", response.String())
+func handleAPIResponse(
+	ctx context.Context,
+	response *resty.Response,
+	err error,
+	statusCode int,
+) error {
+	if err != nil || response.StatusCode() != statusCode {
+		tflog.Debug(ctx, "Response Info:")
+		tflog.Debug(ctx, fmt.Sprintf("  Error      : %s", err))
+		tflog.Debug(ctx, fmt.Sprintf("  Status Code: %d", response.StatusCode()))
+		tflog.Debug(ctx, fmt.Sprintf("  Status     : %s", response.Status()))
+		tflog.Debug(ctx, fmt.Sprintf("  Proto      : %s", response.Proto()))
+		tflog.Debug(ctx, fmt.Sprintf("  Time       : %s", response.Time()))
+		tflog.Debug(ctx, fmt.Sprintf("  Received At: %s", response.ReceivedAt()))
+		tflog.Debug(ctx, fmt.Sprintf("  Body       : %s", response.String()))
 	}
 
 	if err != nil {

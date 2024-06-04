@@ -93,7 +93,7 @@ func (r *IconResource) Create(
 		SetFileReader("file", "file", strings.NewReader(icon.Content.ValueString())).
 		Post("icon/api/icons")
 
-	err = handleAPIResponse(response, err, 201)
+	err = handleAPIResponse(ctx, response, err, 201)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -135,7 +135,7 @@ func (r *IconResource) Read(
 		return
 	}
 
-	err = handleAPIResponse(response, err, 200)
+	err = handleAPIResponse(ctx, response, err, 200)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -182,7 +182,7 @@ func (r *IconResource) Delete(
 	}
 
 	response, err := r.client.R().Delete("icon/api/icons/" + icon.Id.ValueString())
-	err = handleAPIResponse(response, err, 204)
+	err = handleAPIResponse(ctx, response, err, 204)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
