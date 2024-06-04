@@ -14,7 +14,7 @@ description: |-
 
 ```terraform
 provider "aria" {
-  # example configuration here
+  host = "https://my.aria-instance.net"
 }
 ```
 
@@ -23,4 +23,6 @@ provider "aria" {
 
 ### Optional
 
-- `endpoint` (String) Example provider attribute
+- `host` (String) The URI to Aria. May also be provided via ARIA_HOST environment variable.
+- `insecure` (Boolean) Whether server should be accessed without verifying the TLS certificate. May also be provided via ARIA_INSECURE environment variable.
+- `refresh_token` (String, Sensitive) The refresh token to use for making API requests. May also be provided via ARIA_REFRESH_TOKEN environment variable.

@@ -1,3 +1,3 @@
 provider "aria" {
-  # example configuration here
+  host = "https://my.aria-instance.net"
 }
