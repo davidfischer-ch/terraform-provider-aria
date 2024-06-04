@@ -81,6 +81,8 @@ jobs:
           terraform_wrapper: false
       - run: go mod download
       - env:
-          TF_ACC: "0" # Aria is not available worldwide neither open source ...
+          TF_ACC: "" # Aria is not available worldwide neither open source ...
+          ARIA_HOST: "my-aria-instance.net"
+          ARIA_REFRESH_TOKEN: "faketokenhere"
         run: go test -v -cover ./internal/provider/
         timeout-minutes: 10
