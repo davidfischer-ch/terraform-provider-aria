@@ -32,8 +32,9 @@ type AriaProvider struct {
 // AriaProviderModel describes the provider data model.
 type AriaProviderModel struct {
 	Host         types.String `tfsdk:"host"`
-	RefreshToken types.String `tfsdk:"refresh_token"`
 	Insecure     types.Bool   `tfsdk:"insecure"`
+	RefreshToken types.String `tfsdk:"refresh_token"`
+	AccessToken  types.String `tfsdk:"access_token"`
 }
 
 func (p *AriaProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -52,6 +53,11 @@ func (p *AriaProvider) Schema(ctx context.Context, req provider.SchemaRequest, r
 				Optional:            true,
 				Sensitive:           true,
 				MarkdownDescription: "The refresh token to use for making API requests. May also be provided via ARIA_REFRESH_TOKEN environment variable.",
+			},
+			"access_token": schema.StringAttribute{
+				Optional:            true,
+				Sensitive:           true,
+				MarkdownDescription: "The access token to use for making API requests. May also be provided via ARIA_ACCESS_TOKEN environment variable.",
 			},
 			"insecure": schema.BoolAttribute{
 				Optional:            true,
@@ -92,6 +98,15 @@ func (p *AriaProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 		)
 	}
 
+	if config.AccessToken.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("access_token"),
+			"Unknown Aria API Access Token",
+			"Either set the access token in the provider configuration to a static value, "+
+				"apply the source of the value first, or use ARIA_ACCESS_TOKEN.",
+		)
+	}
+
 	if config.Insecure.IsUnknown() {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("insecure"),
@@ -116,19 +131,6 @@ func (p *AriaProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 		)
 	}
 
-	refresh_token := os.Getenv("ARIA_REFRESH_TOKEN")
-	if !config.RefreshToken.IsNull() {
-		refresh_token = config.RefreshToken.ValueString()
-	}
-	if len(refresh_token) == 0 {
-		resp.Diagnostics.AddAttributeError(
-			path.Root("refresh_token"),
-			"Missing Aria API Refresh Token",
-			"Set the refresh token in the provider configuration "+
-				"or use ARIA_REFRESH_TOKEN and ensure its not empty.",
-		)
-	}
-
 	var insecure bool
 	var err error
 	if !config.Insecure.IsNull() {
@@ -144,8 +146,28 @@ func (p *AriaProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 		}
 	}
 
+	refresh_token := os.Getenv("ARIA_REFRESH_TOKEN")
+	if !config.RefreshToken.IsNull() {
+		refresh_token = config.RefreshToken.ValueString()
+	}
+
+	access_token := os.Getenv("ARIA_ACCESS_TOKEN")
+	if !config.AccessToken.IsNull() {
+		access_token = config.AccessToken.ValueString()
+	}
+
+	if len(refresh_token) == 0 && len(access_token) == 0 {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("refresh_token"),
+			"Missing Aria API Token",
+			"Set either the refresh or access token in the provider configuration "+
+				"or use one of ARIA_{ACCESS,REFRESH}_TOKEN and ensure its not empty.",
+		)
+	}
+
 	ctx = tflog.SetField(ctx, "aria_host", host)
 	ctx = tflog.MaskFieldValuesWithFieldKeys(ctx, "aria_refresh_token", refresh_token)
+	ctx = tflog.MaskFieldValuesWithFieldKeys(ctx, "aria_access_token", access_token)
 	ctx = tflog.SetField(ctx, "aria_insecure", insecure)
 
 	tflog.Debug(ctx, "Creating Aria client")
@@ -154,6 +176,7 @@ func (p *AriaProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 	cfg := AriaClientConfig{
 		Host:         host,
 		RefreshToken: refresh_token,
+		AccessToken:  access_token,
 		Insecure:     insecure,
 		Context:      ctx,
 	}
