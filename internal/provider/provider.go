@@ -210,6 +210,7 @@ func (p *AriaProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 
 func (p *AriaProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
+		NewABXSecretResource,
 		NewIconResource,
 	}
 }
