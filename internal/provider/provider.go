@@ -156,14 +156,13 @@ func (p *AriaProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 
 func (p *AriaProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
-		NewExampleResource,
+		// NewIconResource,
 	}
 }
 
 func (p *AriaProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
-		NewExampleDataSource,
-		// NewIconDataSource,
+		NewIconDataSource,
 	}
 }
 

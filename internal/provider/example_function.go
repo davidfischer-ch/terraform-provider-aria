@@ -41,7 +41,6 @@ func (r ExampleFunction) Run(ctx context.Context, req function.RunRequest, resp 
 	var data string
 
 	resp.Error = function.ConcatFuncErrors(req.Arguments.Get(ctx, &data))
-
 	if resp.Error != nil {
 		return
 	}
