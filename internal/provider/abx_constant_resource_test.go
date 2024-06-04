@@ -29,12 +29,12 @@ resource "aria_abx_constant" "test" {
 					resource.TestCheckResourceAttr("aria_abx_constant.test", "encrypted", "false"),
 				),
 			},
-            // ImportState testing
-            {
-                ResourceName:      "aria_abx_constant.test",
-                ImportState:       true,
-                ImportStateVerify: true,
-            },
+			// ImportState testing
+			{
+				ResourceName:      "aria_abx_constant.test",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 			// Update and Read testing
 			{
 				Config: `
