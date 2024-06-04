@@ -19,11 +19,19 @@ func NewExampleFunction() function.Function {
 
 type ExampleFunction struct{}
 
-func (r ExampleFunction) Metadata(_ context.Context, req function.MetadataRequest, resp *function.MetadataResponse) {
+func (r ExampleFunction) Metadata(
+	_ context.Context,
+	req function.MetadataRequest,
+	resp *function.MetadataResponse,
+) {
 	resp.Name = "example"
 }
 
-func (r ExampleFunction) Definition(_ context.Context, _ function.DefinitionRequest, resp *function.DefinitionResponse) {
+func (r ExampleFunction) Definition(
+	_ context.Context,
+	_ function.DefinitionRequest,
+	resp *function.DefinitionResponse,
+) {
 	resp.Definition = function.Definition{
 		Summary:             "Example function",
 		MarkdownDescription: "Echoes given argument as result",
@@ -37,7 +45,11 @@ func (r ExampleFunction) Definition(_ context.Context, _ function.DefinitionRequ
 	}
 }
 
-func (r ExampleFunction) Run(ctx context.Context, req function.RunRequest, resp *function.RunResponse) {
+func (r ExampleFunction) Run(
+	ctx context.Context,
+	req function.RunRequest,
+	resp *function.RunResponse,
+) {
 	var data string
 
 	resp.Error = function.ConcatFuncErrors(req.Arguments.Get(ctx, &data))
