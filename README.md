@@ -52,6 +52,8 @@ To compile the provider, run `go install`. This will build the provider and put 
 To generate or update documentation, run `go generate ./...`.
 To format the code `make fmt` or `find . -name "*.go" -exec gofmt -s -w {} \;`
 
+You have to set the following environment variables `ARIA_HOST` and `ARIA_REFRESH_TOKEN` before running tests. For the unit tests you can set those to dummy values.
+
 To run the full suite of Unit tests, run `go test ./...`.
 
 In order to run the full suite of Acceptance tests, run `make testacc`.
