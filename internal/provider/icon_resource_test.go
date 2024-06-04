@@ -17,10 +17,10 @@ func TestAccIconResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: testAccIconResourceConfig(aSvgIcon),
+				Config: testAccIconResourceConfig(svgIcon),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("aria_icon.test", "id"),
-					resource.TestCheckResourceAttr("aria_icon.test", "content", aSvgIcon),
+					resource.TestCheckResourceAttr("aria_icon.test", "content", svgIcon),
 				),
 			},
 			// ImportState testing
@@ -51,13 +51,4 @@ resource "aria_icon" "test" {
 `, configurableAttribute)
 }
 
-const aSvgIcon = `<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 0c6.623 0 12 5.377 12 12s-5.377 12-12 12-12-5.377-12-12 5.377-12 12-12zm0 1c6.071 0 11 4.929 11 11s-4.929 11-11 11-11-4.929-11-11 4.929-11 11-11z"/></svg>`
-const bSvgIcon = `
-<?xml version="1.0" encoding="iso-8859-1"?>
-<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-<svg fill="#000000" height="800px" width="800px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-	 viewBox="0 0 330 330" xml:space="preserve">
-<path id="XMLID_523_" d="M315,0H15C6.716,0,0,6.716,0,15v300c0,8.284,6.716,15,15,15h300c8.284,0,15-6.716,15-15V15
-	C330,6.716,323.285,0,315,0z M300,300H30V30h270V300z"/>
-</svg>
-`
+const svgIcon = `<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 0c6.623 0 12 5.377 12 12s-5.377 12-12 12-12-5.377-12-12 5.377-12 12-12zm0 1c6.071 0 11 4.929 11 11s-4.929 11-11 11-11-4.929-11-11 4.929-11 11-11z"/></svg>`
