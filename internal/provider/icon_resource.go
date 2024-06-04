@@ -127,7 +127,8 @@ func (r *IconResource) Read(
 		return
 	}
 
-	response, err := r.client.R().Get("icon/api/icons/" + icon.Id.ValueString())
+	iconId := icon.Id.ValueString()
+	response, err := r.client.R().Get("icon/api/icons/" + iconId)
 
 	// Handle gracefully a resource that has vanished on the platform
 	// Beware that some APIs respond with HTTP 404 instead of 403 ...
@@ -140,7 +141,7 @@ func (r *IconResource) Read(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read icon %s, got error: %s", icon.Id.ValueString(), err))
+			fmt.Sprintf("Unable to read icon %s, got error: %s", iconId, err))
 		return
 	}
 
@@ -186,12 +187,12 @@ func (r *IconResource) Delete(
 		return
 	}
 
-	response, err := r.client.R().Delete("icon/api/icons/" + icon.Id.ValueString())
+	response, err := r.client.R().Delete("icon/api/icons/" + iconId)
 	err = handleAPIResponse(ctx, response, err, 204)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to delete icon %s, got error: %s", icon.Id.ValueString(), err))
+			fmt.Sprintf("Unable to delete icon %s, got error: %s", iconId, err))
 	}
 }
 
