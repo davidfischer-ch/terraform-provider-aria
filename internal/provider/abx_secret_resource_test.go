@@ -18,12 +18,13 @@ func TestAccABXSecretResource(t *testing.T) {
 			{
 				Config: `
 resource "aria_abx_secret" "test" {
-  name  = "THIS_IS_A_TEST"
+  name  = "ARIA_PROVIDER_TEST_SECRET"
   value = "pass1234"
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("aria_abx_secret.test", "id"),
-					resource.TestCheckResourceAttr("aria_abx_secret.test", "name", "THIS_IS_A_TEST"),
+					resource.TestCheckResourceAttrSet("aria_abx_secret.test", "org_id"),
+					resource.TestCheckResourceAttr("aria_abx_secret.test", "name", "ARIA_PROVIDER_TEST_SECRET"),
 					resource.TestCheckResourceAttr("aria_abx_secret.test", "value", "pass1234"),
 					resource.TestCheckResourceAttr("aria_abx_secret.test", "encrypted", "true"),
 				),
@@ -32,12 +33,13 @@ resource "aria_abx_secret" "test" {
 			{
 				Config: `
 resource "aria_abx_secret" "test" {
-  name  = "THIS_IS_A_TEST"
+  name  = "ARIA_PROVIDER_TEST_SECRET"
   value = "newvalue"
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("aria_abx_secret.test", "id"),
-					resource.TestCheckResourceAttr("aria_abx_secret.test", "name", "THIS_IS_A_TEST"),
+					resource.TestCheckResourceAttrSet("aria_abx_secret.test", "org_id"),
+					resource.TestCheckResourceAttr("aria_abx_secret.test", "name", "ARIA_PROVIDER_TEST_SECRET"),
 					resource.TestCheckResourceAttr("aria_abx_secret.test", "value", "newvalue"),
 					resource.TestCheckResourceAttr("aria_abx_secret.test", "encrypted", "true"),
 				),

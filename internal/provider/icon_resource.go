@@ -194,6 +194,8 @@ func (r *IconResource) Delete(
 			"Client error",
 			fmt.Sprintf("Unable to delete icon %s, got error: %s", iconId, err))
 	}
+
+	tflog.Debug(ctx, fmt.Sprintf("Icon %s deleted", iconId))
 }
 
 func (r *IconResource) ImportState(

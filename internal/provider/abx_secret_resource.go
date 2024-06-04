@@ -127,11 +127,11 @@ func (r *ABXSecretResource) Create(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to create secret, got error: %s", err))
+			fmt.Sprintf("Unable to create ABX secret, got error: %s", err))
 		return
 	}
 
-	tflog.Debug(ctx, fmt.Sprintf("Secret %s created", secretRaw.Id))
+	tflog.Debug(ctx, fmt.Sprintf("ABX secret %s created", secretRaw.Id))
 
 	secret.Id = types.StringValue(secretRaw.Id)
 	secret.Encrypted = types.BoolValue(secretRaw.Encrypted)
@@ -171,7 +171,7 @@ func (r *ABXSecretResource) Read(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read secret %s, got error: %s", secretId, err))
+			fmt.Sprintf("Unable to read ABX secret %s, got error: %s", secretId, err))
 		return
 	}
 
@@ -212,11 +212,11 @@ func (r *ABXSecretResource) Update(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to update secret %s, got error: %s", secretId, err))
+			fmt.Sprintf("Unable to update ABX secret %s, got error: %s", secretId, err))
 		return
 	}
 
-	tflog.Debug(ctx, fmt.Sprintf("Secret %s update", secretId))
+	tflog.Debug(ctx, fmt.Sprintf("Secret %s updated", secretId))
 
 	secret.Name = types.StringValue(secretRaw.Name)
 	// value is returned with the following '*****' awesome :)
@@ -250,6 +250,8 @@ func (r *ABXSecretResource) Delete(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to delete secret %s, got error: %s", secretId, err))
+			fmt.Sprintf("Unable to delete ABX secret %s, got error: %s", secretId, err))
 	}
+
+	tflog.Debug(ctx, fmt.Sprintf("ABX secret %s deleted", secretId))
 }
