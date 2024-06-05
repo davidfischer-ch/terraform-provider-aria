@@ -50,7 +50,7 @@ type ABXConstantResourceAPIModel struct {
 	CreatedMillis int64  `json:"createdMillis"`
 }
 
-func (r *ABXConstantResource) Metadata(
+func (self *ABXConstantResource) Metadata(
 	ctx context.Context,
 	req resource.MetadataRequest,
 	resp *resource.MetadataResponse,
@@ -58,7 +58,7 @@ func (r *ABXConstantResource) Metadata(
 	resp.TypeName = req.ProviderTypeName + "_abx_constant"
 }
 
-func (r *ABXConstantResource) Schema(
+func (self *ABXConstantResource) Schema(
 	ctx context.Context,
 	req resource.SchemaRequest,
 	resp *resource.SchemaResponse,
@@ -94,15 +94,15 @@ func (r *ABXConstantResource) Schema(
 	}
 }
 
-func (r *ABXConstantResource) Configure(
+func (self *ABXConstantResource) Configure(
 	ctx context.Context,
 	req resource.ConfigureRequest,
 	resp *resource.ConfigureResponse,
 ) {
-	r.client = GetResourceClient(ctx, req, resp)
+	self.client = GetResourceClient(ctx, req, resp)
 }
 
-func (r *ABXConstantResource) Create(
+func (self *ABXConstantResource) Create(
 	ctx context.Context,
 	req resource.CreateRequest,
 	resp *resource.CreateResponse,
@@ -116,7 +116,7 @@ func (r *ABXConstantResource) Create(
 		return
 	}
 
-	response, err := r.client.R().
+	response, err := self.client.R().
 		SetBody(ABXConstantResourceAPIModel{
 			Name:      constant.Name.ValueString(),
 			Value:     constant.Value.ValueString(),
@@ -145,7 +145,7 @@ func (r *ABXConstantResource) Create(
 	resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
 }
 
-func (r *ABXConstantResource) Read(
+func (self *ABXConstantResource) Read(
 	ctx context.Context,
 	req resource.ReadRequest,
 	resp *resource.ReadResponse,
@@ -160,7 +160,7 @@ func (r *ABXConstantResource) Read(
 	}
 
 	constantId := constant.Id.ValueString()
-	response, err := r.client.R().
+	response, err := self.client.R().
 		SetResult(&constantRaw).
 		Get("abx/api/resources/action-secrets/" + constantId)
 
@@ -188,7 +188,7 @@ func (r *ABXConstantResource) Read(
 	resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
 }
 
-func (r *ABXConstantResource) Update(
+func (self *ABXConstantResource) Update(
 	ctx context.Context,
 	req resource.UpdateRequest,
 	resp *resource.UpdateResponse,
@@ -203,7 +203,7 @@ func (r *ABXConstantResource) Update(
 	}
 
 	constantId := constant.Id.ValueString()
-	response, err := r.client.R().
+	response, err := self.client.R().
 		SetBody(ABXConstantResourceAPIModel{
 			Name:      constant.Name.ValueString(),
 			Value:     constant.Value.ValueString(),
@@ -231,7 +231,7 @@ func (r *ABXConstantResource) Update(
 	resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
 }
 
-func (r *ABXConstantResource) Delete(
+func (self *ABXConstantResource) Delete(
 	ctx context.Context,
 	req resource.DeleteRequest,
 	resp *resource.DeleteResponse,
@@ -249,7 +249,7 @@ func (r *ABXConstantResource) Delete(
 		return
 	}
 
-	response, err := r.client.R().Delete("abx/api/resources/action-secrets/" + constantId)
+	response, err := self.client.R().Delete("abx/api/resources/action-secrets/" + constantId)
 	err = handleAPIResponse(ctx, response, err, 200)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -260,7 +260,7 @@ func (r *ABXConstantResource) Delete(
 	tflog.Debug(ctx, fmt.Sprintf("ABX constant %s deleted", constantId))
 }
 
-func (r *ABXConstantResource) ImportState(
+func (self *ABXConstantResource) ImportState(
 	ctx context.Context,
 	req resource.ImportStateRequest,
 	resp *resource.ImportStateResponse,

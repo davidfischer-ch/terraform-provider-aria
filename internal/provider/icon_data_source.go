@@ -25,7 +25,7 @@ type IconDataSource struct {
 	client *resty.Client
 }
 
-func (d *IconDataSource) Metadata(
+func (self *IconDataSource) Metadata(
 	ctx context.Context,
 	req datasource.MetadataRequest,
 	resp *datasource.MetadataResponse,
@@ -33,15 +33,13 @@ func (d *IconDataSource) Metadata(
 	resp.TypeName = req.ProviderTypeName + "_icon"
 }
 
-func (d *IconDataSource) Schema(
+func (self *IconDataSource) Schema(
 	ctx context.Context,
 	req datasource.SchemaRequest,
 	resp *datasource.SchemaResponse,
 ) {
 	resp.Schema = schema.Schema{
-		// This description is used by the documentation generator and the language server.
 		MarkdownDescription: "Icon data source",
-
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "Icon identifier",
@@ -55,15 +53,15 @@ func (d *IconDataSource) Schema(
 	}
 }
 
-func (d *IconDataSource) Configure(
+func (self *IconDataSource) Configure(
 	ctx context.Context,
 	req datasource.ConfigureRequest,
 	resp *datasource.ConfigureResponse,
 ) {
-	d.client = GetDataSourceClient(ctx, req, resp)
+	self.client = GetDataSourceClient(ctx, req, resp)
 }
 
-func (d *IconDataSource) Read(
+func (self *IconDataSource) Read(
 	ctx context.Context,
 	req datasource.ReadRequest,
 	resp *datasource.ReadResponse,
@@ -76,7 +74,7 @@ func (d *IconDataSource) Read(
 		return
 	}
 
-	response, err := d.client.R().Get("icon/api/icons/" + icon.Id.ValueString())
+	response, err := self.client.R().Get("icon/api/icons/" + icon.Id.ValueString())
 	err = handleAPIResponse(ctx, response, err, 200)
 	if err != nil {
 		resp.Diagnostics.AddError(

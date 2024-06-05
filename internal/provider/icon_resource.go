@@ -37,7 +37,7 @@ type IconResourceModel struct {
 	Content types.String `tfsdk:"content"`
 }
 
-func (r *IconResource) Metadata(
+func (self *IconResource) Metadata(
 	ctx context.Context,
 	req resource.MetadataRequest,
 	resp *resource.MetadataResponse,
@@ -45,7 +45,7 @@ func (r *IconResource) Metadata(
 	resp.TypeName = req.ProviderTypeName + "_icon"
 }
 
-func (r *IconResource) Schema(
+func (self *IconResource) Schema(
 	ctx context.Context,
 	req resource.SchemaRequest,
 	resp *resource.SchemaResponse,
@@ -67,15 +67,15 @@ func (r *IconResource) Schema(
 	}
 }
 
-func (r *IconResource) Configure(
+func (self *IconResource) Configure(
 	ctx context.Context,
 	req resource.ConfigureRequest,
 	resp *resource.ConfigureResponse,
 ) {
-	r.client = GetResourceClient(ctx, req, resp)
+	self.client = GetResourceClient(ctx, req, resp)
 }
 
-func (r *IconResource) Create(
+func (self *IconResource) Create(
 	ctx context.Context,
 	req resource.CreateRequest,
 	resp *resource.CreateResponse,
@@ -88,7 +88,7 @@ func (r *IconResource) Create(
 		return
 	}
 
-	response, err := r.client.R().
+	response, err := self.client.R().
 		SetFileReader("file", "file", strings.NewReader(icon.Content.ValueString())).
 		Post("icon/api/icons")
 
@@ -114,7 +114,7 @@ func (r *IconResource) Create(
 	resp.Diagnostics.Append(resp.State.Set(ctx, &icon)...)
 }
 
-func (r *IconResource) Read(
+func (self *IconResource) Read(
 	ctx context.Context,
 	req resource.ReadRequest,
 	resp *resource.ReadResponse,
@@ -128,7 +128,7 @@ func (r *IconResource) Read(
 	}
 
 	iconId := icon.Id.ValueString()
-	response, err := r.client.R().Get("icon/api/icons/" + iconId)
+	response, err := self.client.R().Get("icon/api/icons/" + iconId)
 
 	// Handle gracefully a resource that has vanished on the platform
 	// Beware that some APIs respond with HTTP 404 instead of 403 ...
@@ -151,7 +151,7 @@ func (r *IconResource) Read(
 	resp.Diagnostics.Append(resp.State.Set(ctx, &icon)...)
 }
 
-func (r *IconResource) Update(
+func (self *IconResource) Update(
 	ctx context.Context,
 	req resource.UpdateRequest,
 	resp *resource.UpdateResponse,
@@ -169,7 +169,7 @@ func (r *IconResource) Update(
 		fmt.Sprintf("Unable to update icon %s, method is not implement.", icon.Id.ValueString()))
 }
 
-func (r *IconResource) Delete(
+func (self *IconResource) Delete(
 	ctx context.Context,
 	req resource.DeleteRequest,
 	resp *resource.DeleteResponse,
@@ -187,7 +187,7 @@ func (r *IconResource) Delete(
 		return
 	}
 
-	response, err := r.client.R().Delete("icon/api/icons/" + iconId)
+	response, err := self.client.R().Delete("icon/api/icons/" + iconId)
 	err = handleAPIResponse(ctx, response, err, 204)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -198,7 +198,7 @@ func (r *IconResource) Delete(
 	tflog.Debug(ctx, fmt.Sprintf("Icon %s deleted", iconId))
 }
 
-func (r *IconResource) ImportState(
+func (self *IconResource) ImportState(
 	ctx context.Context,
 	req resource.ImportStateRequest,
 	resp *resource.ImportStateResponse,

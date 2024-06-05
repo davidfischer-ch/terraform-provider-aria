@@ -48,7 +48,7 @@ type ABXSecretResourceAPIModel struct {
 	CreatedMillis int64  `json:"createdMillis"`
 }
 
-func (r *ABXSecretResource) Metadata(
+func (self *ABXSecretResource) Metadata(
 	ctx context.Context,
 	req resource.MetadataRequest,
 	resp *resource.MetadataResponse,
@@ -56,7 +56,7 @@ func (r *ABXSecretResource) Metadata(
 	resp.TypeName = req.ProviderTypeName + "_abx_secret"
 }
 
-func (r *ABXSecretResource) Schema(
+func (self *ABXSecretResource) Schema(
 	ctx context.Context,
 	req resource.SchemaRequest,
 	resp *resource.SchemaResponse,
@@ -92,15 +92,15 @@ func (r *ABXSecretResource) Schema(
 	}
 }
 
-func (r *ABXSecretResource) Configure(
+func (self *ABXSecretResource) Configure(
 	ctx context.Context,
 	req resource.ConfigureRequest,
 	resp *resource.ConfigureResponse,
 ) {
-	r.client = GetResourceClient(ctx, req, resp)
+	self.client = GetResourceClient(ctx, req, resp)
 }
 
-func (r *ABXSecretResource) Create(
+func (self *ABXSecretResource) Create(
 	ctx context.Context,
 	req resource.CreateRequest,
 	resp *resource.CreateResponse,
@@ -114,7 +114,7 @@ func (r *ABXSecretResource) Create(
 		return
 	}
 
-	response, err := r.client.R().
+	response, err := self.client.R().
 		SetBody(ABXSecretResourceAPIModel{
 			Name:      secret.Name.ValueString(),
 			Value:     secret.Value.ValueString(),
@@ -141,7 +141,7 @@ func (r *ABXSecretResource) Create(
 	resp.Diagnostics.Append(resp.State.Set(ctx, &secret)...)
 }
 
-func (r *ABXSecretResource) Read(
+func (self *ABXSecretResource) Read(
 	ctx context.Context,
 	req resource.ReadRequest,
 	resp *resource.ReadResponse,
@@ -156,7 +156,7 @@ func (r *ABXSecretResource) Read(
 	}
 
 	secretId := secret.Id.ValueString()
-	response, err := r.client.R().
+	response, err := self.client.R().
 		SetResult(&secretRaw).
 		Get("abx/api/resources/action-secrets/" + secretId)
 
@@ -184,7 +184,7 @@ func (r *ABXSecretResource) Read(
 	resp.Diagnostics.Append(resp.State.Set(ctx, &secret)...)
 }
 
-func (r *ABXSecretResource) Update(
+func (self *ABXSecretResource) Update(
 	ctx context.Context,
 	req resource.UpdateRequest,
 	resp *resource.UpdateResponse,
@@ -199,7 +199,7 @@ func (r *ABXSecretResource) Update(
 	}
 
 	secretId := secret.Id.ValueString()
-	response, err := r.client.R().
+	response, err := self.client.R().
 		SetBody(ABXSecretResourceAPIModel{
 			Name:      secret.Name.ValueString(),
 			Value:     secret.Value.ValueString(),
@@ -227,7 +227,7 @@ func (r *ABXSecretResource) Update(
 	resp.Diagnostics.Append(resp.State.Set(ctx, &secret)...)
 }
 
-func (r *ABXSecretResource) Delete(
+func (self *ABXSecretResource) Delete(
 	ctx context.Context,
 	req resource.DeleteRequest,
 	resp *resource.DeleteResponse,
@@ -245,7 +245,7 @@ func (r *ABXSecretResource) Delete(
 		return
 	}
 
-	response, err := r.client.R().Delete("abx/api/resources/action-secrets/" + secretId)
+	response, err := self.client.R().Delete("abx/api/resources/action-secrets/" + secretId)
 	err = handleAPIResponse(ctx, response, err, 200)
 	if err != nil {
 		resp.Diagnostics.AddError(

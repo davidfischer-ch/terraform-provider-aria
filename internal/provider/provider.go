@@ -37,12 +37,20 @@ type AriaProviderModel struct {
 	AccessToken  types.String `tfsdk:"access_token"`
 }
 
-func (p *AriaProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
+func (self *AriaProvider) Metadata(
+	ctx context.Context,
+	req provider.MetadataRequest,
+	resp *provider.MetadataResponse,
+) {
 	resp.TypeName = "aria"
-	resp.Version = p.version
+	resp.Version = self.version
 }
 
-func (p *AriaProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
+func (self *AriaProvider) Schema(
+	ctx context.Context,
+	req provider.SchemaRequest,
+	resp *provider.SchemaResponse,
+) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"host": schema.StringAttribute{
@@ -67,7 +75,11 @@ func (p *AriaProvider) Schema(ctx context.Context, req provider.SchemaRequest, r
 	}
 }
 
-func (p *AriaProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
+func (self *AriaProvider) Configure(
+	ctx context.Context,
+	req provider.ConfigureRequest,
+	resp *provider.ConfigureResponse,
+) {
 
 	// Retrieve provider data from configuration
 	var config AriaProviderModel
@@ -208,7 +220,7 @@ func (p *AriaProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 	tflog.Info(ctx, "Configured Aria client", map[string]any{"success": true})
 }
 
-func (p *AriaProvider) Resources(ctx context.Context) []func() resource.Resource {
+func (self *AriaProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewABXConstantResource,
 		NewABXSecretResource,
@@ -216,13 +228,13 @@ func (p *AriaProvider) Resources(ctx context.Context) []func() resource.Resource
 	}
 }
 
-func (p *AriaProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
+func (self *AriaProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		NewIconDataSource,
 	}
 }
 
-func (p *AriaProvider) Functions(ctx context.Context) []func() function.Function {
+func (self *AriaProvider) Functions(ctx context.Context) []func() function.Function {
 	return []func() function.Function{
 		NewExampleFunction,
 	}

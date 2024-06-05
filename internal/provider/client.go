@@ -37,48 +37,48 @@ type AccessTokenResponse struct {
 	Token     string `json:"token"`
 }
 
-func (cfg *AriaClientConfig) Check() error {
-	if len(cfg.Host) == 0 {
+func (self *AriaClientConfig) Check() error {
+	if len(self.Host) == 0 {
 		return errors.New("Host is required to request the API.")
 	}
-	if len(cfg.RefreshToken) == 0 {
+	if len(self.RefreshToken) == 0 {
 		return errors.New("Refresh token is required to request an access token.")
 	}
 	return nil
 }
 
-func (cfg *AriaClientConfig) Client() *resty.Client {
+func (self *AriaClientConfig) Client() *resty.Client {
 	client := resty.New()
-	client.SetBaseURL(cfg.Host)
-	client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: cfg.Insecure})
-	if len(cfg.AccessToken) > 0 {
-		client.SetAuthToken(cfg.AccessToken)
+	client.SetBaseURL(self.Host)
+	client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: self.Insecure})
+	if len(self.AccessToken) > 0 {
+		client.SetAuthToken(self.AccessToken)
 	}
 	return client
 }
 
-func (cfg *AriaClientConfig) GetAccessToken() error {
+func (self *AriaClientConfig) GetAccessToken() error {
 	// FIXME Handle refreshing token when required
 
 	// Refresh access token if refresh token is set and access token is empty
-	if len(cfg.RefreshToken) > 0 && len(cfg.AccessToken) == 0 {
-		tflog.Debug(cfg.Context, "Requesting a new API access token at "+cfg.Host)
+	if len(self.RefreshToken) > 0 && len(self.AccessToken) == 0 {
+		tflog.Debug(self.Context, "Requesting a new API access token at "+self.Host)
 
 		var token AccessTokenResponse
-		response, err := cfg.Client().R().
+		response, err := self.Client().R().
 			SetHeader("Content-Type", "application/json").
-			SetBody(map[string]string{"refreshToken": cfg.RefreshToken}).
+			SetBody(map[string]string{"refreshToken": self.RefreshToken}).
 			SetResult(&token).
 			Post("iaas/api/login")
-		err = handleAPIResponse(cfg.Context, response, err, 200)
+		err = handleAPIResponse(self.Context, response, err, 200)
 		if err != nil {
 			return err
 		}
 
-		cfg.AccessToken = token.Token
+		self.AccessToken = token.Token
 	}
 
-	if len(cfg.AccessToken) == 0 {
+	if len(self.AccessToken) == 0 {
 		return errors.New("Access Token cannot be empty")
 	}
 
