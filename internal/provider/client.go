@@ -1,3 +1,6 @@
+// Copyright (c) State of Geneva (Switzerland)
+// SPDX-License-Identifier: MPL-2.0
+
 package provider
 
 import (
