@@ -3,7 +3,7 @@
 
 package provider
 
-import (
+/* import (
 	"context"
 	"fmt"
 	"strings"
@@ -58,19 +58,41 @@ type ABXActionResourceModel struct {
 	OrgId     types.String `tfsdk:"org_id"`
 }
 
+// ABXActionResourceAPIModel describes the resource API model.
+type ABXActionResourceAPIModel struct {
+	Id           string `json:"id"`
+	Name         string `json:"name"`
+	Description  string `json:"description"`
+	FAASProvider string `json:"provider"`
+	Type         string `json:"actionType"`
+
+	RuntimeName    string            `json:"runtime"`
+	RuntimeVersion string            `json:"runtimeVersion"`
+	MemoryInMB     int64             `json:"memoryInMB"`
+	TimeoutSeconds int64             `json:"timeoutSeconds"`
+	Entrypoint     string            `json:"entrypoint"`
+	Dependencies   string            `json:"dependencies"`
+	Inputs         map[string]string `json:"inputs"`
+
+	Source string `json:"source"`
+
+	ProjectId string `json:"projectId"`
+	OrgId     string `json:"orgId"`
+}
+
 func (self *ABXActionResourceModel) FromAPI(
 	ctx context.Context,
 	raw ABXActionResourceAPIModel,
 ) diag.Diagnostics {
 
 	// https://go.dev/blog/maps
-	/* inputs := map[string]string{}
-	for key, value := range self.Constants.Elemets() {
-		inputs["secret:"+key] = value
-	}
-	for key, value := range self.Secrets.Elements() {
-		inputs["psecret:"+key] = value
-	} */
+	// inputs := map[string]string{}
+	// for key, value := range self.Constants.Elemets() {
+	//     inputs["secret:"+key] = value
+	// }
+	// for key, value := range self.Secrets.Elements() {
+	//     inputs["psecret:"+key] = value
+	// }
 
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
@@ -97,16 +119,17 @@ func (self *ABXActionResourceModel) FromAPI(
 
 	return diags
 }
+
 func (self *ABXActionResourceModel) ToAPI() ABXActionResourceAPIModel {
 
 	// https://go.dev/blog/maps
-	/* inputs := map[string]string{}
-	for key, value := range self.Constants.Elemets() {
-		inputs["secret:"+key] = value
-	}
-	for key, value := range self.Secrets.Elements() {
-		inputs["psecret:"+key] = value
-	} */
+    // inputs := map[string]string{}
+    // for key, value := range self.Constants.Elemets() {
+    //     inputs["secret:"+key] = value
+    // }
+    // for key, value := range self.Secrets.Elements() {
+    //     inputs["psecret:"+key] = value
+    // }
 
 	return ABXActionResourceAPIModel{
 		Name:           self.Name.ValueString(),
@@ -123,28 +146,6 @@ func (self *ABXActionResourceModel) ToAPI() ABXActionResourceAPIModel {
 		Source:         self.Source.ValueString(),
 		ProjectId:      self.ProjectId.ValueString(),
 	}
-}
-
-// ABXActionResourceAPIModel describes the resource API model.
-type ABXActionResourceAPIModel struct {
-	Id           string `json:"id"`
-	Name         string `json:"name"`
-	Description  string `json:"description"`
-	FAASProvider string `json:"provider"`
-	Type         string `json:"actionType"`
-
-	RuntimeName    string            `json:"runtime"`
-	RuntimeVersion string            `json:"runtimeVersion"`
-	MemoryInMB     int64             `json:"memoryInMB"`
-	TimeoutSeconds int64             `json:"timeoutSeconds"`
-	Entrypoint     string            `json:"entrypoint"`
-	Dependencies   string            `json:"dependencies"`
-	Inputs         map[string]string `json:"inputs"`
-
-	Source string `json:"source"`
-
-	ProjectId string `json:"projectId"`
-	OrgId     string `json:"orgId"`
 }
 
 func (self *ABXActionResource) Metadata(
@@ -233,7 +234,7 @@ func (self *ABXActionResource) Schema(
 			"secrets": schema.MapAttribute{
 				ElementType: types.StringType,
 				Required: true,
-			}, */
+			}, /
 
 			// TODO Validate is set to prevent 400!
 			"project_id": schema.StringAttribute{
@@ -252,7 +253,7 @@ func (self *ABXActionResource) Schema(
 				MarkdownDescription: "URL to the action",
 				Computed:            true,
 				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-			}, */
+			}, /
 		},
 	}
 }
@@ -408,4 +409,4 @@ func (self *ABXActionResource) ImportState(
 	resp *resource.ImportStateResponse,
 ) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
-}
+} */

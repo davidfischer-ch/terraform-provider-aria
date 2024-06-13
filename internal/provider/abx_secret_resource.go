@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/go-resty/resty/v2"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
@@ -38,6 +39,27 @@ type ABXSecretResourceModel struct {
 	OrgId     types.String `tfsdk:"org_id"`
 }
 
+func (self *ABXSecretResourceModel) FromAPI(
+	ctx context.Context,
+	raw ABXSecretResourceAPIModel,
+) diag.Diagnostics {
+	self.Id = types.StringValue(raw.Id)
+	self.Name = types.StringValue(raw.Name)
+	// The value is returned with the following '*****' awesome :)
+	// self.Value = types.StringValue(raw.Value)
+	self.Encrypted = types.BoolValue(raw.Encrypted)
+	self.OrgId = types.StringValue(raw.OrgId)
+	return diag.Diagnostics{}
+}
+
+func (self *ABXSecretResourceModel) ToAPI() ABXSecretResourceAPIModel {
+	return ABXSecretResourceAPIModel{
+		Name:      self.Name.ValueString(),
+		Value:     self.Value.ValueString(),
+		Encrypted: self.Encrypted.ValueBool(),
+	}
+}
+
 // ABXSecretResourceAPIModel describes the resource API model.
 type ABXSecretResourceAPIModel struct {
 	Id            string `json:"id"`
@@ -45,7 +67,7 @@ type ABXSecretResourceAPIModel struct {
 	Value         string `json:"value"`
 	Encrypted     bool   `json:"encrypted"`
 	OrgId         string `json:"orgId"`
-	CreatedMillis int64  `json:"createdMillis"`
+	CreatedMillis uint64 `json:"createdMillis"`
 }
 
 func (self *ABXSecretResource) Metadata(
@@ -115,11 +137,7 @@ func (self *ABXSecretResource) Create(
 	}
 
 	response, err := self.client.R().
-		SetBody(ABXSecretResourceAPIModel{
-			Name:      secret.Name.ValueString(),
-			Value:     secret.Value.ValueString(),
-			Encrypted: secret.Encrypted.ValueBool(),
-		}).
+		SetBody(secret.ToAPI()).
 		SetResult(&secretRaw).
 		Post("abx/api/resources/action-secrets")
 
@@ -133,11 +151,8 @@ func (self *ABXSecretResource) Create(
 
 	tflog.Debug(ctx, fmt.Sprintf("ABX secret %s created", secretRaw.Id))
 
-	secret.Id = types.StringValue(secretRaw.Id)
-	secret.Encrypted = types.BoolValue(secretRaw.Encrypted)
-	secret.OrgId = types.StringValue(secretRaw.OrgId)
-
 	// Save secret into Terraform state
+	resp.Diagnostics.Append(secret.FromAPI(ctx, secretRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &secret)...)
 }
 
@@ -175,12 +190,8 @@ func (self *ABXSecretResource) Read(
 		return
 	}
 
-	secret.Name = types.StringValue(secretRaw.Name)
-	// secret.Value = types.StringValue(secretRaw.Value)
-	secret.Encrypted = types.BoolValue(secretRaw.Encrypted)
-	secret.OrgId = types.StringValue(secretRaw.OrgId)
-
 	// Save updated secret into Terraform state
+	resp.Diagnostics.Append(secret.FromAPI(ctx, secretRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &secret)...)
 }
 
@@ -200,11 +211,7 @@ func (self *ABXSecretResource) Update(
 
 	secretId := secret.Id.ValueString()
 	response, err := self.client.R().
-		SetBody(ABXSecretResourceAPIModel{
-			Name:      secret.Name.ValueString(),
-			Value:     secret.Value.ValueString(),
-			Encrypted: secret.Encrypted.ValueBool(),
-		}).
+		SetBody(secret.ToAPI()).
 		SetResult(&secretRaw).
 		Put("abx/api/resources/action-secrets/" + secretId)
 
@@ -218,12 +225,8 @@ func (self *ABXSecretResource) Update(
 
 	tflog.Debug(ctx, fmt.Sprintf("Secret %s updated", secretId))
 
-	secret.Name = types.StringValue(secretRaw.Name)
-	// value is returned with the following '*****' awesome :)
-	secret.Encrypted = types.BoolValue(secretRaw.Encrypted)
-	secret.OrgId = types.StringValue(secretRaw.OrgId)
-
 	// Save secret into Terraform state
+	resp.Diagnostics.Append(secret.FromAPI(ctx, secretRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &secret)...)
 }
 

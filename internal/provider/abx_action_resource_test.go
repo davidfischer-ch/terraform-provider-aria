@@ -3,7 +3,7 @@
 
 package provider
 
-import (
+/* import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -72,9 +72,10 @@ EOT
 								resource.TestCheckResourceAttr("aria_abx_action.test", "value", "newvalue"),
 								resource.TestCheckResourceAttr("aria_abx_action.test", "encrypted", "false"),
 							),
-						},*/
+						} /
 			// Delete testing automatically occurs in TestCase
 			// TODO Check https://developer.hashicorp.com/terraform/plugin/sdkv2/testing/acceptance-tests/testcase#checkdestroy
 		},
 	})
 }
+*/
