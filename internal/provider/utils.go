@@ -10,6 +10,7 @@ import (
 	"github.com/go-resty/resty/v2"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 // TODO How to deduplicate code without introducing more loc?
@@ -58,4 +59,12 @@ func GetResourceClient(
 	}
 
 	return client
+}
+
+func StringOrNullValue(value string) types.String {
+	// Replace empty value by nil
+	if len(value) == 0 {
+		return types.StringNull()
+	}
+	return types.StringValue(value)
 }

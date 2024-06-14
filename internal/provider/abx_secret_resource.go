@@ -8,13 +8,11 @@ import (
 	"fmt"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -28,46 +26,6 @@ func NewABXSecretResource() resource.Resource {
 // ABXSecretResource defines the resource implementation.
 type ABXSecretResource struct {
 	client *resty.Client
-}
-
-// ABXSecretResourceModel describes the resource data model.
-type ABXSecretResourceModel struct {
-	Id        types.String `tfsdk:"id"`
-	Name      types.String `tfsdk:"name"`
-	Value     types.String `tfsdk:"value"`
-	Encrypted types.Bool   `tfsdk:"encrypted"`
-	OrgId     types.String `tfsdk:"org_id"`
-}
-
-func (self *ABXSecretResourceModel) FromAPI(
-	ctx context.Context,
-	raw ABXSecretResourceAPIModel,
-) diag.Diagnostics {
-	self.Id = types.StringValue(raw.Id)
-	self.Name = types.StringValue(raw.Name)
-	// The value is returned with the following '*****' awesome :)
-	// self.Value = types.StringValue(raw.Value)
-	self.Encrypted = types.BoolValue(raw.Encrypted)
-	self.OrgId = types.StringValue(raw.OrgId)
-	return diag.Diagnostics{}
-}
-
-func (self *ABXSecretResourceModel) ToAPI() ABXSecretResourceAPIModel {
-	return ABXSecretResourceAPIModel{
-		Name:      self.Name.ValueString(),
-		Value:     self.Value.ValueString(),
-		Encrypted: self.Encrypted.ValueBool(),
-	}
-}
-
-// ABXSecretResourceAPIModel describes the resource API model.
-type ABXSecretResourceAPIModel struct {
-	Id            string `json:"id"`
-	Name          string `json:"name"`
-	Value         string `json:"value"`
-	Encrypted     bool   `json:"encrypted"`
-	OrgId         string `json:"orgId"`
-	CreatedMillis uint64 `json:"createdMillis"`
 }
 
 func (self *ABXSecretResource) Metadata(
@@ -127,8 +85,8 @@ func (self *ABXSecretResource) Create(
 	req resource.CreateRequest,
 	resp *resource.CreateResponse,
 ) {
-	var secret ABXSecretResourceModel
-	var secretRaw ABXSecretResourceAPIModel
+	var secret ABXSecretModel
+	var secretRaw ABXSecretAPIModel
 
 	// Read Terraform plan data into the model
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &secret)...)
@@ -161,8 +119,8 @@ func (self *ABXSecretResource) Read(
 	req resource.ReadRequest,
 	resp *resource.ReadResponse,
 ) {
-	var secret ABXSecretResourceModel
-	var secretRaw ABXSecretResourceAPIModel
+	var secret ABXSecretModel
+	var secretRaw ABXSecretAPIModel
 
 	// Read Terraform prior state data into the model
 	resp.Diagnostics.Append(req.State.Get(ctx, &secret)...)
@@ -200,8 +158,8 @@ func (self *ABXSecretResource) Update(
 	req resource.UpdateRequest,
 	resp *resource.UpdateResponse,
 ) {
-	var secret ABXSecretResourceModel
-	var secretRaw ABXSecretResourceAPIModel
+	var secret ABXSecretModel
+	var secretRaw ABXSecretAPIModel
 
 	// Read Terraform plan data into the model
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &secret)...)
@@ -235,7 +193,7 @@ func (self *ABXSecretResource) Delete(
 	req resource.DeleteRequest,
 	resp *resource.DeleteResponse,
 ) {
-	var secret ABXSecretResourceModel
+	var secret ABXSecretModel
 
 	// Read Terraform prior state data into the model
 	resp.Diagnostics.Append(req.State.Get(ctx, &secret)...)

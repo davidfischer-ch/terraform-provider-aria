@@ -16,17 +16,15 @@ func TestAccIconDataSource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Read testing
 			{
-				Config: testAccIconDataSourceConfig,
+				Config: `
+data "aria_icon" "test" {
+  id = "72a9a2c7-494e-31d7-afe8-cd27479c407e"
+}`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.aria_icon.test", "id", "72a9a2c7-494e-31d7-afe8-cd27479c407e"),
+					resource.TestCheckResourceAttrSet("data.aria_icon.test", "content"),
 				),
 			},
 		},
 	})
 }
-
-const testAccIconDataSourceConfig = `
-data "aria_icon" "test" {
-  id = "72a9a2c7-494e-31d7-afe8-cd27479c407e"
-}
-`

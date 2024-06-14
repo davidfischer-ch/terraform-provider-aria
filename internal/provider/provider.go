@@ -226,11 +226,13 @@ func (self *AriaProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewABXConstantResource,
 		NewABXSecretResource,
 		NewIconResource,
+		NewSubscriptionResource,
 	}
 }
 
 func (self *AriaProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
+		NewCatalogTypeDataSource,
 		NewIconDataSource,
 	}
 }

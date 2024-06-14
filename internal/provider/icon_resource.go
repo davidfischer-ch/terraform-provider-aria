@@ -31,12 +31,6 @@ type IconResource struct {
 	client *resty.Client
 }
 
-// IconResourceModel describes the resource data model.
-type IconResourceModel struct {
-	Id      types.String `tfsdk:"id"`
-	Content types.String `tfsdk:"content"`
-}
-
 func (self *IconResource) Metadata(
 	ctx context.Context,
 	req resource.MetadataRequest,
@@ -80,7 +74,7 @@ func (self *IconResource) Create(
 	req resource.CreateRequest,
 	resp *resource.CreateResponse,
 ) {
-	var icon IconResourceModel
+	var icon IconModel
 
 	// Read Terraform plan data into the model
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &icon)...)
@@ -119,7 +113,7 @@ func (self *IconResource) Read(
 	req resource.ReadRequest,
 	resp *resource.ReadResponse,
 ) {
-	var icon IconResourceModel
+	var icon IconModel
 
 	// Read Terraform prior state data into the model
 	resp.Diagnostics.Append(req.State.Get(ctx, &icon)...)
@@ -156,7 +150,7 @@ func (self *IconResource) Update(
 	req resource.UpdateRequest,
 	resp *resource.UpdateResponse,
 ) {
-	var icon IconResourceModel
+	var icon IconModel
 
 	// Read Terraform prior state data into the model
 	resp.Diagnostics.Append(req.State.Get(ctx, &icon)...)
@@ -174,7 +168,7 @@ func (self *IconResource) Delete(
 	req resource.DeleteRequest,
 	resp *resource.DeleteResponse,
 ) {
-	var icon IconResourceModel
+	var icon IconModel
 
 	// Read Terraform prior state data into the model
 	resp.Diagnostics.Append(req.State.Get(ctx, &icon)...)
