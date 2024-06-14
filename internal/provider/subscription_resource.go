@@ -193,6 +193,14 @@ func (self *SubscriptionResource) Create(
 		SetResult(&subscriptionRaw).
 		Get("event-broker/api/subscriptions/" + subscriptionId)
 
+	err = handleAPIResponse(ctx, response, err, 200)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to read subscription %s, got error: %s", subscriptionId, err))
+		return
+	}
+
 	// Save subscription into Terraform state
 	resp.Diagnostics.Append(subscription.FromAPI(ctx, subscriptionRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &subscription)...)
@@ -270,6 +278,14 @@ func (self *SubscriptionResource) Update(
 	response, err = self.client.R().
 		SetResult(&subscriptionRaw).
 		Get("event-broker/api/subscriptions/" + subscriptionId)
+
+	err = handleAPIResponse(ctx, response, err, 200)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to read subscription %s, got error: %s", subscriptionId, err))
+		return
+	}
 
 	// Save subscription into Terraform state
 	resp.Diagnostics.Append(subscription.FromAPI(ctx, subscriptionRaw)...)
