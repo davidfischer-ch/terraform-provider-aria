@@ -21,10 +21,6 @@ variable "test_project_id" {
 
 # main.tf
 
-data "aria_catalog_type" "abx_actions" {
-  id = "com.vmw.abx.actions"
-}
-
 // Not yet implemented
 resource "aria_abx_action" "hello_world" {
   name         = "Hello World"
@@ -58,7 +54,6 @@ resource "aria_subscription" "hello_world" {
   runnable_type  = "extensibility.abx"
   runnable_id    = aria_abx_action.hello_world.id
   event_topic_id = "compute.provision.post"
-  subscriber_id  = data.aria_catalog_type.abx_actions.created_by
   blocking       = true
   contextual     = false
   disabled       = false
@@ -89,7 +84,6 @@ resource "aria_subscription" "hello_world" {
 - `disabled` (Boolean) TODO
 - `recover_runnable_id` (String) TODO
 - `recover_runnable_type` (String) TODO
-- `subscriber_id` (String) Subscriber ID
 
 ### Read-Only
 
@@ -97,4 +91,5 @@ resource "aria_subscription" "hello_world" {
 - `id` (String) Subscription identifier
 - `org_id` (String) Subscription organisation ID
 - `owner_id` (String) Subscription owner ID
+- `subscriber_id` (String) Subscriber ID
 - `system` (Boolean) TODO

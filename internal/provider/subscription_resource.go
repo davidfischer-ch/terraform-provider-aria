@@ -89,12 +89,13 @@ func (self *SubscriptionResource) Schema(
 				MarkdownDescription: "Event topic ID",
 				Required:            true,
 			},
-			"subscriber_id": schema.StringAttribute{
-				MarkdownDescription: "Subscriber ID",
-				Computed:            true,
-				Optional:            true,
-				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-			},
+
+			/*"project_ids": schema.SetAttribute{
+				MarkdownDescription: "Restrict to given projects (an empty list means all)",
+				ElementType:         types.StringType,
+				Required:            true,
+			},*/
+
 			"blocking": schema.BoolAttribute{
 				MarkdownDescription: "TODO",
 				Required:            true,
@@ -141,6 +142,11 @@ func (self *SubscriptionResource) Schema(
 			},
 			"owner_id": schema.StringAttribute{
 				MarkdownDescription: "Subscription owner ID",
+				Computed:            true,
+				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
+			"subscriber_id": schema.StringAttribute{
+				MarkdownDescription: "Subscriber ID",
 				Computed:            true,
 				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},

@@ -21,6 +21,10 @@ data "aria_catalog_type" "abx_actions" {
   id = "com.vmw.abx.actions"
 }
 
+locals {
+	subscriber_id = data.aria_catalog_type.abx_actions.created_by
+}
+
 resource "aria_subscription" "hello_world" {
   name           = "ARIA_PROVIDER_TEST_SUBSCRIPTION"
   description    = "Say hello when some machine is provisionned"
@@ -28,14 +32,21 @@ resource "aria_subscription" "hello_world" {
   runnable_type  = "extensibility.abx"
   runnable_id    = "8a7480d38e535332018e857e0d4f3437"
   event_topic_id = "compute.provision.post"
-  subscriber_id  = data.aria_catalog_type.abx_actions.created_by
   blocking       = true
   contextual     = false
   disabled       = true # Its safer
   timeout        = 0
   priority       = 10
   # constraints
-}`,
+
+  lifecycle {
+  	postcondition {
+  		condition     = self.subscriber_id == local.subscriber_id
+  		error_message = "Expected ${local.subscriber_id}, actual ${self.subscriber_id}"
+  	}
+  }
+}
+`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("aria_subscription.hello_world", "id"),
 					resource.TestCheckResourceAttr("aria_subscription.hello_world", "name", "ARIA_PROVIDER_TEST_SUBSCRIPTION"),
@@ -46,7 +57,6 @@ resource "aria_subscription" "hello_world" {
 					//resource.TestCheckResourceAttr("aria_subscription.hello_world", "recover_runnable_type", ""),
 					//resource.TestCheckResourceAttr("aria_subscription.hello_world", "recover_runnable_id", ""),
 					resource.TestCheckResourceAttr("aria_subscription.hello_world", "event_topic_id", "compute.provision.post"),
-					resource.TestCheckResourceAttrSet("aria_subscription.hello_world", "subscriber_id"),
 					resource.TestCheckResourceAttr("aria_subscription.hello_world", "blocking", "true"),
 					resource.TestCheckResourceAttr("aria_subscription.hello_world", "broadcast", "false"),
 					resource.TestCheckResourceAttr("aria_subscription.hello_world", "contextual", "false"),
@@ -57,6 +67,7 @@ resource "aria_subscription" "hello_world" {
 					resource.TestCheckResourceAttr("aria_subscription.hello_world", "timeout", "0"),
 					resource.TestCheckResourceAttrSet("aria_subscription.hello_world", "org_id"),
 					resource.TestCheckResourceAttrSet("aria_subscription.hello_world", "owner_id"),
+					resource.TestCheckResourceAttrSet("aria_subscription.hello_world", "subscriber_id"),
 				),
 			},
 			// ImportState testing
@@ -68,10 +79,6 @@ resource "aria_subscription" "hello_world" {
 			// Update and Read testing
 			{
 				Config: `
-data "aria_catalog_type" "abx_actions" {
-  id = "com.vmw.abx.actions"
-}
-
 resource "aria_subscription" "hello_world" {
   name           = "ARIA_PROVIDER_TEST_SUBSCRIPTION"
   description    = "Say hello when a machine is provisionned"
@@ -79,7 +86,6 @@ resource "aria_subscription" "hello_world" {
   runnable_type  = "extensibility.abx"
   runnable_id    = "8a7480d38e535332018e857e0d4f3437"
   event_topic_id = "compute.provision.post"
-  subscriber_id  = data.aria_catalog_type.abx_actions.created_by
   blocking       = false
   contextual     = false
   disabled       = true # Its safer
@@ -105,6 +111,7 @@ resource "aria_subscription" "hello_world" {
 					resource.TestCheckResourceAttr("aria_subscription.hello_world", "timeout", "60"),
 					resource.TestCheckResourceAttrSet("aria_subscription.hello_world", "org_id"),
 					resource.TestCheckResourceAttrSet("aria_subscription.hello_world", "owner_id"),
+					resource.TestCheckResourceAttrSet("aria_subscription.hello_world", "subscriber_id"),
 				),
 			},
 			// Delete testing automatically occurs in TestCase

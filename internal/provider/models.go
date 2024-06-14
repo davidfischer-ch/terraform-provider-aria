@@ -141,7 +141,8 @@ type SubscriptionModel struct {
 	RecoverRunnableType types.String `tfsdk:"recover_runnable_type"`
 	RecoverRunnableId   types.String `tfsdk:"recover_runnable_id"`
 	EventTopicId        types.String `tfsdk:"event_topic_id"`
-	SubscriberId        types.String `tfsdk:"subscriber_id"`
+
+	/*ProjectIds types.Set `tfsdk:"project_ids"`*/
 
 	Blocking   types.Bool   `tfsdk:"blocking"`
 	Broadcast  types.Bool   `tfsdk:"broadcast"`
@@ -152,20 +153,9 @@ type SubscriptionModel struct {
 	System     types.Bool   `tfsdk:"system"`
 	Timeout    types.Int64  `tfsdk:"timeout"`
 
-	// "constraints": {
-	//     "projectId": [
-	//         "5f491cc6-7123-41d7-89c9-ad1b8f5d87d9",
-	//         "175e378c-3450-475e-a1f6-86bd34345434",
-	//         "d2e58f11-8959-43cd-95a4-560f8de02da0",
-	//         "3562e6ba-6060-4235-b2a7-75dfe8c08c18",
-	//         "f93df228-d84d-4208-b9f7-b24f3545f391",
-	//         "04d27449-ea7a-49c9-b6cd-17daf6b9ac25",
-	//         "0275a1b5-a5d9-461d-9daa-a26689d0c71d"
-	//     ]
-	// },
-
-	OrgId   types.String `tfsdk:"org_id"`
-	OwnerId types.String `tfsdk:"owner_id"`
+	OrgId        types.String `tfsdk:"org_id"`
+	OwnerId      types.String `tfsdk:"owner_id"`
+	SubscriberId types.String `tfsdk:"subscriber_id"`
 }
 
 // SubscriptionAPIModel describes the resource API model.
@@ -179,7 +169,8 @@ type SubscriptionAPIModel struct {
 	RecoverRunnableType string `json:"recoverRunnableType"`
 	RecoverRunnableId   string `json:"recoverRunnableId"`
 	EventTopicId        string `json:"eventTopicId"`
-	SubscriberId        string `json:"subscriberId"`
+
+	/*Constraints map[string][]string `json:"constraints"`*/
 
 	Blocking   bool   `json:"blocking"`
 	Broadcast  bool   `json:"broadcast"`
@@ -190,8 +181,9 @@ type SubscriptionAPIModel struct {
 	System     bool   `json:"system"`
 	Timeout    int64  `json:"timeout"`
 
-	OrgId   string `json:"orgId"`
-	OwnerId string `json:"ownerId"`
+	OrgId        string `json:"orgId"`
+	OwnerId      string `json:"ownerId"`
+	SubscriberId string `json:"subscriberId"`
 }
 
 func (self *SubscriptionModel) GenerateId() {
@@ -213,7 +205,6 @@ func (self *SubscriptionModel) FromAPI(
 	self.RecoverRunnableType = StringOrNullValue(raw.RecoverRunnableType)
 	self.RecoverRunnableId = StringOrNullValue(raw.RecoverRunnableId)
 	self.EventTopicId = types.StringValue(raw.EventTopicId)
-	self.SubscriberId = types.StringValue(raw.SubscriberId)
 	self.Blocking = types.BoolValue(raw.Blocking)
 	self.Broadcast = types.BoolValue(raw.Broadcast)
 	self.Contextual = types.BoolValue(raw.Contextual)
@@ -224,6 +215,11 @@ func (self *SubscriptionModel) FromAPI(
 	self.Timeout = types.Int64Value(raw.Timeout)
 	self.OrgId = types.StringValue(raw.OrgId)
 	self.OwnerId = types.StringValue(raw.OwnerId)
+	self.SubscriberId = types.StringValue(raw.SubscriberId)
+
+	/*self.projectIds, diags := types.SetValueFrom(
+	ctx, types.StringType, raw.Constraints["projectId"])*/
+
 	return diag.Diagnostics{}
 }
 
@@ -238,12 +234,11 @@ func (self *SubscriptionModel) ToAPI() SubscriptionAPIModel {
 		RecoverRunnableType: self.RecoverRunnableType.ValueString(),
 		RecoverRunnableId:   self.RecoverRunnableId.ValueString(),
 		EventTopicId:        self.EventTopicId.ValueString(),
-		// SubscriberId:        self.SubscriberId.ValueString(),
-		Blocking:   self.Blocking.ValueBool(),
-		Contextual: self.Contextual.ValueBool(),
-		Criteria:   self.Criteria.ValueString(),
-		Disabled:   self.Disabled.ValueBool(),
-		Priority:   self.Priority.ValueInt64(),
-		Timeout:    self.Timeout.ValueInt64(),
+		Blocking:            self.Blocking.ValueBool(),
+		Contextual:          self.Contextual.ValueBool(),
+		Criteria:            self.Criteria.ValueString(),
+		Disabled:            self.Disabled.ValueBool(),
+		Priority:            self.Priority.ValueInt64(),
+		Timeout:             self.Timeout.ValueInt64(),
 	}
 }
