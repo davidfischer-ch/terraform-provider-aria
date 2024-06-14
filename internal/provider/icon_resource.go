@@ -102,9 +102,9 @@ func (self *IconResource) Create(
 			fmt.Sprintf("Unable to parse icon id, got error: %s", err))
 		return
 	}
-	icon.Id = types.StringValue(iconId)
 
 	// Save icon into Terraform state
+	icon.Id = types.StringValue(iconId)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &icon)...)
 }
 
@@ -139,9 +139,8 @@ func (self *IconResource) Read(
 		return
 	}
 
-	icon.Content = types.StringValue(response.String())
-
 	// Save updated icon into Terraform state
+	icon.Content = types.StringValue(response.String())
 	resp.Diagnostics.Append(resp.State.Set(ctx, &icon)...)
 }
 
