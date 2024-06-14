@@ -66,7 +66,7 @@ func (self *IconDataSource) Read(
 	req datasource.ReadRequest,
 	resp *datasource.ReadResponse,
 ) {
-	var icon IconResourceModel
+	var icon IconModel
 
 	// Read Terraform configuration data into the model
 	resp.Diagnostics.Append(req.Config.Get(ctx, &icon)...)
@@ -83,8 +83,7 @@ func (self *IconDataSource) Read(
 		return
 	}
 
+	// Save updated icon into Terraform state
 	icon.Content = types.StringValue(response.String())
-
-	// Save icon into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &icon)...)
 }

@@ -31,12 +31,6 @@ type IconResource struct {
 	client *resty.Client
 }
 
-// IconResourceModel describes the resource data model.
-type IconResourceModel struct {
-	Id      types.String `tfsdk:"id"`
-	Content types.String `tfsdk:"content"`
-}
-
 func (self *IconResource) Metadata(
 	ctx context.Context,
 	req resource.MetadataRequest,
@@ -80,7 +74,7 @@ func (self *IconResource) Create(
 	req resource.CreateRequest,
 	resp *resource.CreateResponse,
 ) {
-	var icon IconResourceModel
+	var icon IconModel
 
 	// Read Terraform plan data into the model
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &icon)...)
@@ -108,9 +102,9 @@ func (self *IconResource) Create(
 			fmt.Sprintf("Unable to parse icon id, got error: %s", err))
 		return
 	}
-	icon.Id = types.StringValue(iconId)
 
 	// Save icon into Terraform state
+	icon.Id = types.StringValue(iconId)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &icon)...)
 }
 
@@ -119,7 +113,7 @@ func (self *IconResource) Read(
 	req resource.ReadRequest,
 	resp *resource.ReadResponse,
 ) {
-	var icon IconResourceModel
+	var icon IconModel
 
 	// Read Terraform prior state data into the model
 	resp.Diagnostics.Append(req.State.Get(ctx, &icon)...)
@@ -145,9 +139,8 @@ func (self *IconResource) Read(
 		return
 	}
 
-	icon.Content = types.StringValue(response.String())
-
 	// Save updated icon into Terraform state
+	icon.Content = types.StringValue(response.String())
 	resp.Diagnostics.Append(resp.State.Set(ctx, &icon)...)
 }
 
@@ -156,7 +149,7 @@ func (self *IconResource) Update(
 	req resource.UpdateRequest,
 	resp *resource.UpdateResponse,
 ) {
-	var icon IconResourceModel
+	var icon IconModel
 
 	// Read Terraform prior state data into the model
 	resp.Diagnostics.Append(req.State.Get(ctx, &icon)...)
@@ -174,7 +167,7 @@ func (self *IconResource) Delete(
 	req resource.DeleteRequest,
 	resp *resource.DeleteResponse,
 ) {
-	var icon IconResourceModel
+	var icon IconModel
 
 	// Read Terraform prior state data into the model
 	resp.Diagnostics.Append(req.State.Get(ctx, &icon)...)
@@ -188,6 +181,7 @@ func (self *IconResource) Delete(
 	}
 
 	response, err := self.client.R().Delete("icon/api/icons/" + iconId)
+
 	err = handleAPIResponse(ctx, response, err, 204)
 	if err != nil {
 		resp.Diagnostics.AddError(

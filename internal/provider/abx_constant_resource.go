@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -29,25 +28,6 @@ func NewABXConstantResource() resource.Resource {
 // ABXConstantResource defines the resource implementation.
 type ABXConstantResource struct {
 	client *resty.Client
-}
-
-// ABXConstantResourceModel describes the resource data model.
-type ABXConstantResourceModel struct {
-	Id        types.String `tfsdk:"id"`
-	Name      types.String `tfsdk:"name"`
-	Value     types.String `tfsdk:"value"`
-	Encrypted types.Bool   `tfsdk:"encrypted"`
-	OrgId     types.String `tfsdk:"org_id"`
-}
-
-// ABXConstantResourceAPIModel describes the resource API model.
-type ABXConstantResourceAPIModel struct {
-	Id            string `json:"id"`
-	Name          string `json:"name"`
-	Value         string `json:"value"`
-	Encrypted     bool   `json:"encrypted"`
-	OrgId         string `json:"orgId"`
-	CreatedMillis int64  `json:"createdMillis"`
 }
 
 func (self *ABXConstantResource) Metadata(
@@ -107,8 +87,8 @@ func (self *ABXConstantResource) Create(
 	req resource.CreateRequest,
 	resp *resource.CreateResponse,
 ) {
-	var constant ABXConstantResourceModel
-	var constantRaw ABXConstantResourceAPIModel
+	var constant ABXConstantModel
+	var constantRaw ABXConstantAPIModel
 
 	// Read Terraform plan data into the model
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &constant)...)
@@ -117,11 +97,7 @@ func (self *ABXConstantResource) Create(
 	}
 
 	response, err := self.client.R().
-		SetBody(ABXConstantResourceAPIModel{
-			Name:      constant.Name.ValueString(),
-			Value:     constant.Value.ValueString(),
-			Encrypted: constant.Encrypted.ValueBool(),
-		}).
+		SetBody(constant.ToAPI()).
 		SetResult(&constantRaw).
 		Post("abx/api/resources/action-secrets")
 
@@ -135,13 +111,8 @@ func (self *ABXConstantResource) Create(
 
 	tflog.Debug(ctx, fmt.Sprintf("ABX constant %s created", constantRaw.Id))
 
-	constant.Id = types.StringValue(constantRaw.Id)
-	constant.Name = types.StringValue(constantRaw.Name)
-	constant.Value = types.StringValue(constantRaw.Value)
-	constant.Encrypted = types.BoolValue(constantRaw.Encrypted)
-	constant.OrgId = types.StringValue(constantRaw.OrgId)
-
 	// Save constant into Terraform state
+	resp.Diagnostics.Append(constant.FromAPI(ctx, constantRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
 }
 
@@ -150,8 +121,8 @@ func (self *ABXConstantResource) Read(
 	req resource.ReadRequest,
 	resp *resource.ReadResponse,
 ) {
-	var constant ABXConstantResourceModel
-	var constantRaw ABXConstantResourceAPIModel
+	var constant ABXConstantModel
+	var constantRaw ABXConstantAPIModel
 
 	// Read Terraform prior state data into the model
 	resp.Diagnostics.Append(req.State.Get(ctx, &constant)...)
@@ -179,12 +150,8 @@ func (self *ABXConstantResource) Read(
 		return
 	}
 
-	constant.Name = types.StringValue(constantRaw.Name)
-	constant.Value = types.StringValue(constantRaw.Value)
-	constant.Encrypted = types.BoolValue(constantRaw.Encrypted)
-	constant.OrgId = types.StringValue(constantRaw.OrgId)
-
 	// Save updated constant into Terraform state
+	resp.Diagnostics.Append(constant.FromAPI(ctx, constantRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
 }
 
@@ -193,8 +160,8 @@ func (self *ABXConstantResource) Update(
 	req resource.UpdateRequest,
 	resp *resource.UpdateResponse,
 ) {
-	var constant ABXConstantResourceModel
-	var constantRaw ABXConstantResourceAPIModel
+	var constant ABXConstantModel
+	var constantRaw ABXConstantAPIModel
 
 	// Read Terraform plan data into the model
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &constant)...)
@@ -204,11 +171,7 @@ func (self *ABXConstantResource) Update(
 
 	constantId := constant.Id.ValueString()
 	response, err := self.client.R().
-		SetBody(ABXConstantResourceAPIModel{
-			Name:      constant.Name.ValueString(),
-			Value:     constant.Value.ValueString(),
-			Encrypted: constant.Encrypted.ValueBool(),
-		}).
+		SetBody(constant.ToAPI()).
 		SetResult(&constantRaw).
 		Put("abx/api/resources/action-secrets/" + constantId)
 
@@ -222,12 +185,8 @@ func (self *ABXConstantResource) Update(
 
 	tflog.Debug(ctx, fmt.Sprintf("ABX constant %s updated", constantId))
 
-	constant.Name = types.StringValue(constantRaw.Name)
-	constant.Value = types.StringValue(constantRaw.Value)
-	constant.Encrypted = types.BoolValue(constantRaw.Encrypted)
-	constant.OrgId = types.StringValue(constantRaw.OrgId)
-
 	// Save constant into Terraform state
+	resp.Diagnostics.Append(constant.FromAPI(ctx, constantRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
 }
 
@@ -236,7 +195,7 @@ func (self *ABXConstantResource) Delete(
 	req resource.DeleteRequest,
 	resp *resource.DeleteResponse,
 ) {
-	var constant ABXConstantResourceModel
+	var constant ABXConstantModel
 
 	// Read Terraform prior state data into the model
 	resp.Diagnostics.Append(req.State.Get(ctx, &constant)...)
@@ -250,6 +209,7 @@ func (self *ABXConstantResource) Delete(
 	}
 
 	response, err := self.client.R().Delete("abx/api/resources/action-secrets/" + constantId)
+
 	err = handleAPIResponse(ctx, response, err, 200)
 	if err != nil {
 		resp.Diagnostics.AddError(

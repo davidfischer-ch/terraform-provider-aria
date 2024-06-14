@@ -13,7 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -27,25 +26,6 @@ func NewABXSecretResource() resource.Resource {
 // ABXSecretResource defines the resource implementation.
 type ABXSecretResource struct {
 	client *resty.Client
-}
-
-// ABXSecretResourceModel describes the resource data model.
-type ABXSecretResourceModel struct {
-	Id        types.String `tfsdk:"id"`
-	Name      types.String `tfsdk:"name"`
-	Value     types.String `tfsdk:"value"`
-	Encrypted types.Bool   `tfsdk:"encrypted"`
-	OrgId     types.String `tfsdk:"org_id"`
-}
-
-// ABXSecretResourceAPIModel describes the resource API model.
-type ABXSecretResourceAPIModel struct {
-	Id            string `json:"id"`
-	Name          string `json:"name"`
-	Value         string `json:"value"`
-	Encrypted     bool   `json:"encrypted"`
-	OrgId         string `json:"orgId"`
-	CreatedMillis int64  `json:"createdMillis"`
 }
 
 func (self *ABXSecretResource) Metadata(
@@ -105,8 +85,8 @@ func (self *ABXSecretResource) Create(
 	req resource.CreateRequest,
 	resp *resource.CreateResponse,
 ) {
-	var secret ABXSecretResourceModel
-	var secretRaw ABXSecretResourceAPIModel
+	var secret ABXSecretModel
+	var secretRaw ABXSecretAPIModel
 
 	// Read Terraform plan data into the model
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &secret)...)
@@ -115,11 +95,7 @@ func (self *ABXSecretResource) Create(
 	}
 
 	response, err := self.client.R().
-		SetBody(ABXSecretResourceAPIModel{
-			Name:      secret.Name.ValueString(),
-			Value:     secret.Value.ValueString(),
-			Encrypted: secret.Encrypted.ValueBool(),
-		}).
+		SetBody(secret.ToAPI()).
 		SetResult(&secretRaw).
 		Post("abx/api/resources/action-secrets")
 
@@ -133,11 +109,8 @@ func (self *ABXSecretResource) Create(
 
 	tflog.Debug(ctx, fmt.Sprintf("ABX secret %s created", secretRaw.Id))
 
-	secret.Id = types.StringValue(secretRaw.Id)
-	secret.Encrypted = types.BoolValue(secretRaw.Encrypted)
-	secret.OrgId = types.StringValue(secretRaw.OrgId)
-
 	// Save secret into Terraform state
+	resp.Diagnostics.Append(secret.FromAPI(ctx, secretRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &secret)...)
 }
 
@@ -146,8 +119,8 @@ func (self *ABXSecretResource) Read(
 	req resource.ReadRequest,
 	resp *resource.ReadResponse,
 ) {
-	var secret ABXSecretResourceModel
-	var secretRaw ABXSecretResourceAPIModel
+	var secret ABXSecretModel
+	var secretRaw ABXSecretAPIModel
 
 	// Read Terraform prior state data into the model
 	resp.Diagnostics.Append(req.State.Get(ctx, &secret)...)
@@ -175,12 +148,8 @@ func (self *ABXSecretResource) Read(
 		return
 	}
 
-	secret.Name = types.StringValue(secretRaw.Name)
-	// secret.Value = types.StringValue(secretRaw.Value)
-	secret.Encrypted = types.BoolValue(secretRaw.Encrypted)
-	secret.OrgId = types.StringValue(secretRaw.OrgId)
-
 	// Save updated secret into Terraform state
+	resp.Diagnostics.Append(secret.FromAPI(ctx, secretRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &secret)...)
 }
 
@@ -189,8 +158,8 @@ func (self *ABXSecretResource) Update(
 	req resource.UpdateRequest,
 	resp *resource.UpdateResponse,
 ) {
-	var secret ABXSecretResourceModel
-	var secretRaw ABXSecretResourceAPIModel
+	var secret ABXSecretModel
+	var secretRaw ABXSecretAPIModel
 
 	// Read Terraform plan data into the model
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &secret)...)
@@ -200,11 +169,7 @@ func (self *ABXSecretResource) Update(
 
 	secretId := secret.Id.ValueString()
 	response, err := self.client.R().
-		SetBody(ABXSecretResourceAPIModel{
-			Name:      secret.Name.ValueString(),
-			Value:     secret.Value.ValueString(),
-			Encrypted: secret.Encrypted.ValueBool(),
-		}).
+		SetBody(secret.ToAPI()).
 		SetResult(&secretRaw).
 		Put("abx/api/resources/action-secrets/" + secretId)
 
@@ -218,12 +183,8 @@ func (self *ABXSecretResource) Update(
 
 	tflog.Debug(ctx, fmt.Sprintf("Secret %s updated", secretId))
 
-	secret.Name = types.StringValue(secretRaw.Name)
-	// value is returned with the following '*****' awesome :)
-	secret.Encrypted = types.BoolValue(secretRaw.Encrypted)
-	secret.OrgId = types.StringValue(secretRaw.OrgId)
-
 	// Save secret into Terraform state
+	resp.Diagnostics.Append(secret.FromAPI(ctx, secretRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &secret)...)
 }
 
@@ -232,7 +193,7 @@ func (self *ABXSecretResource) Delete(
 	req resource.DeleteRequest,
 	resp *resource.DeleteResponse,
 ) {
-	var secret ABXSecretResourceModel
+	var secret ABXSecretModel
 
 	// Read Terraform prior state data into the model
 	resp.Diagnostics.Append(req.State.Get(ctx, &secret)...)
@@ -246,6 +207,7 @@ func (self *ABXSecretResource) Delete(
 	}
 
 	response, err := self.client.R().Delete("abx/api/resources/action-secrets/" + secretId)
+
 	err = handleAPIResponse(ctx, response, err, 200)
 	if err != nil {
 		resp.Diagnostics.AddError(
