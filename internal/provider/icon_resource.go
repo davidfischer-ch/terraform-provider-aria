@@ -182,6 +182,7 @@ func (self *IconResource) Delete(
 	}
 
 	response, err := self.client.R().Delete("icon/api/icons/" + iconId)
+
 	err = handleAPIResponse(ctx, response, err, 204)
 	if err != nil {
 		resp.Diagnostics.AddError(

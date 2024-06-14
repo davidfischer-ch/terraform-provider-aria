@@ -209,6 +209,7 @@ func (self *ABXConstantResource) Delete(
 	}
 
 	response, err := self.client.R().Delete("abx/api/resources/action-secrets/" + constantId)
+
 	err = handleAPIResponse(ctx, response, err, 200)
 	if err != nil {
 		resp.Diagnostics.AddError(

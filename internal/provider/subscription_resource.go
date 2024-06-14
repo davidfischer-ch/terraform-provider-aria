@@ -310,8 +310,8 @@ func (self *SubscriptionResource) Delete(
 		return
 	}
 
-	response, err := self.client.R().
-		Delete("event-broker/api/subscriptions/" + subscriptionId)
+	response, err := self.client.R().Delete("event-broker/api/subscriptions/" + subscriptionId)
+
 	err = handleAPIResponse(ctx, response, err, 204)
 	if err != nil {
 		resp.Diagnostics.AddError(
