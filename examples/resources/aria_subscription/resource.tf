@@ -39,6 +39,7 @@ resource "aria_subscription" "hello_world" {
   runnable_type  = "extensibility.abx"
   runnable_id    = aria_abx_action.hello_world.id
   event_topic_id = "compute.provision.post"
+  project_ids    = [] # All projects
   blocking       = true
   contextual     = false
   disabled       = false

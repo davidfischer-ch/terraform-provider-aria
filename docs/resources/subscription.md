@@ -54,6 +54,7 @@ resource "aria_subscription" "hello_world" {
   runnable_type  = "extensibility.abx"
   runnable_id    = aria_abx_action.hello_world.id
   event_topic_id = "compute.provision.post"
+  project_ids    = [] # All projects
   blocking       = true
   contextual     = false
   disabled       = false
@@ -73,6 +74,7 @@ resource "aria_subscription" "hello_world" {
 - `event_topic_id` (String) Event topic ID
 - `name` (String) Subscription name
 - `priority` (Number) TODO
+- `project_ids` (Set of String) Restrict to given projects (an empty list means all)
 - `runnable_id` (String) TODO
 - `runnable_type` (String) TODO
 - `timeout` (Number) TODO

@@ -142,7 +142,7 @@ type SubscriptionModel struct {
 	RecoverRunnableId   types.String `tfsdk:"recover_runnable_id"`
 	EventTopicId        types.String `tfsdk:"event_topic_id"`
 
-	/*ProjectIds types.Set `tfsdk:"project_ids"`*/
+	ProjectIds types.Set `tfsdk:"project_ids"`
 
 	Blocking   types.Bool   `tfsdk:"blocking"`
 	Broadcast  types.Bool   `tfsdk:"broadcast"`
@@ -170,7 +170,7 @@ type SubscriptionAPIModel struct {
 	RecoverRunnableId   string `json:"recoverRunnableId"`
 	EventTopicId        string `json:"eventTopicId"`
 
-	/*Constraints map[string][]string `json:"constraints"`*/
+	Constraints map[string][]string `json:"constraints"`
 
 	Blocking   bool   `json:"blocking"`
 	Broadcast  bool   `json:"broadcast"`
@@ -196,6 +196,8 @@ func (self *SubscriptionModel) FromAPI(
 	ctx context.Context,
 	raw SubscriptionAPIModel,
 ) diag.Diagnostics {
+	projectIds, diags := types.SetValueFrom(ctx, types.StringType, raw.Constraints["projectId"])
+
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
 	self.Description = types.StringValue(raw.Description)
@@ -205,6 +207,7 @@ func (self *SubscriptionModel) FromAPI(
 	self.RecoverRunnableType = StringOrNullValue(raw.RecoverRunnableType)
 	self.RecoverRunnableId = StringOrNullValue(raw.RecoverRunnableId)
 	self.EventTopicId = types.StringValue(raw.EventTopicId)
+	self.ProjectIds = projectIds
 	self.Blocking = types.BoolValue(raw.Blocking)
 	self.Broadcast = types.BoolValue(raw.Broadcast)
 	self.Contextual = types.BoolValue(raw.Contextual)
@@ -217,13 +220,29 @@ func (self *SubscriptionModel) FromAPI(
 	self.OwnerId = types.StringValue(raw.OwnerId)
 	self.SubscriberId = types.StringValue(raw.SubscriberId)
 
-	/*self.projectIds, diags := types.SetValueFrom(
-	ctx, types.StringType, raw.Constraints["projectId"])*/
-
-	return diag.Diagnostics{}
+	return diags
 }
 
-func (self *SubscriptionModel) ToAPI() SubscriptionAPIModel {
+func (self *SubscriptionModel) ToAPI(ctx context.Context) (SubscriptionAPIModel, diag.Diagnostics) {
+
+	var diags diag.Diagnostics
+
+	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/set
+	if self.ProjectIds.IsNull() || self.ProjectIds.IsUnknown() {
+		diags.AddError(
+			"Configuration error",
+			fmt.Sprintf(
+				"Unable to manage subscription %s, project_ids is either null or unknown",
+				self.Id.ValueString()))
+		return SubscriptionAPIModel{}, diags
+	}
+
+	projectIds := make([]string, 0, len(self.ProjectIds.Elements()))
+	diags = self.ProjectIds.ElementsAs(ctx, &projectIds, false)
+	if diags.HasError() {
+		return SubscriptionAPIModel{}, diags
+	}
+
 	return SubscriptionAPIModel{
 		Id:                  self.Id.ValueString(),
 		Name:                self.Name.ValueString(),
@@ -234,11 +253,12 @@ func (self *SubscriptionModel) ToAPI() SubscriptionAPIModel {
 		RecoverRunnableType: self.RecoverRunnableType.ValueString(),
 		RecoverRunnableId:   self.RecoverRunnableId.ValueString(),
 		EventTopicId:        self.EventTopicId.ValueString(),
+		Constraints:         map[string][]string{"projectId": projectIds},
 		Blocking:            self.Blocking.ValueBool(),
 		Contextual:          self.Contextual.ValueBool(),
 		Criteria:            self.Criteria.ValueString(),
 		Disabled:            self.Disabled.ValueBool(),
 		Priority:            self.Priority.ValueInt64(),
 		Timeout:             self.Timeout.ValueInt64(),
-	}
+	}, diags
 }
