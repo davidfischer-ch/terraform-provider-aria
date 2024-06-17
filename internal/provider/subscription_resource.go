@@ -16,6 +16,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -89,13 +90,11 @@ func (self *SubscriptionResource) Schema(
 				MarkdownDescription: "Event topic ID",
 				Required:            true,
 			},
-
-			/*"project_ids": schema.SetAttribute{
+			"project_ids": schema.SetAttribute{
 				MarkdownDescription: "Restrict to given projects (an empty list means all)",
 				ElementType:         types.StringType,
 				Required:            true,
-			},*/
-
+			},
 			"blocking": schema.BoolAttribute{
 				MarkdownDescription: "TODO",
 				Required:            true,
@@ -134,7 +133,6 @@ func (self *SubscriptionResource) Schema(
 				MarkdownDescription: "TODO",
 				Required:            true,
 			},
-
 			"org_id": schema.StringAttribute{
 				MarkdownDescription: "Subscription organisation ID",
 				Computed:            true,
@@ -167,10 +165,8 @@ func (self *SubscriptionResource) Create(
 	req resource.CreateRequest,
 	resp *resource.CreateResponse,
 ) {
-	var subscription SubscriptionModel
-	var subscriptionRaw SubscriptionAPIModel
-
 	// Read Terraform plan data into the model
+	var subscription SubscriptionModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &subscription)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -178,12 +174,13 @@ func (self *SubscriptionResource) Create(
 
 	subscription.GenerateId()
 	subscriptionId := subscription.Id.ValueString()
+	subscriptionRaw, diags := subscription.ToAPI(ctx)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
-	response, err := self.client.R().
-		SetBody(subscription.ToAPI()).
-		Post("event-broker/api/subscriptions")
-		// Response contains a subscription with all fields set to "" or false ...
-
+	response, err := self.client.R().SetBody(subscriptionRaw).Post("event-broker/api/subscriptions")
 	err = handleAPIResponse(ctx, response, err, 201)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -217,16 +214,15 @@ func (self *SubscriptionResource) Read(
 	req resource.ReadRequest,
 	resp *resource.ReadResponse,
 ) {
-	var subscription SubscriptionModel
-	var subscriptionRaw SubscriptionAPIModel
-
 	// Read Terraform prior state data into the model
+	var subscription SubscriptionModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &subscription)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	subscriptionId := subscription.Id.ValueString()
+	var subscriptionRaw SubscriptionAPIModel
 	response, err := self.client.R().
 		SetResult(&subscriptionRaw).
 		Get("event-broker/api/subscriptions/" + subscriptionId)
@@ -256,20 +252,21 @@ func (self *SubscriptionResource) Update(
 	req resource.UpdateRequest,
 	resp *resource.UpdateResponse,
 ) {
-	var subscription SubscriptionModel
-	var subscriptionRaw SubscriptionAPIModel
-
 	// Read Terraform plan data into the model
+	var subscription SubscriptionModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &subscription)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	subscriptionId := subscription.Id.ValueString()
-	response, err := self.client.R().
-		SetBody(subscription.ToAPI()).
-		Post("event-broker/api/subscriptions")
+	subscriptionRaw, diags := subscription.ToAPI(ctx)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
+	response, err := self.client.R().SetBody(subscriptionRaw).Post("event-broker/api/subscriptions")
 	err = handleAPIResponse(ctx, response, err, 201)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -317,7 +314,6 @@ func (self *SubscriptionResource) Delete(
 	}
 
 	response, err := self.client.R().Delete("event-broker/api/subscriptions/" + subscriptionId)
-
 	err = handleAPIResponse(ctx, response, err, 204)
 	if err != nil {
 		resp.Diagnostics.AddError(

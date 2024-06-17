@@ -17,11 +17,20 @@ func TestAccIconDataSource(t *testing.T) {
 			// Read testing
 			{
 				Config: `
+variable "test_icon_id" {
+	description = "ABX action to use for testing subscriptions."
+  type        = string
+}
+
 data "aria_icon" "test" {
-  id = "72a9a2c7-494e-31d7-afe8-cd27479c407e"
+  id = var.test_icon_id
+
+  	postcondition {
+  		condition     = self.id == var.test_icon_id
+  		error_message = "Identifier must be ${var.test_icon_id}, actual ${self.id}"
+  	}
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.aria_icon.test", "id", "72a9a2c7-494e-31d7-afe8-cd27479c407e"),
 					resource.TestCheckResourceAttrSet("data.aria_icon.test", "content"),
 				),
 			},
