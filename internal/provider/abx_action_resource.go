@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/go-resty/resty/v2"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -15,6 +16,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -66,14 +68,18 @@ func (self *ABXActionResource) Schema(
 				Computed:            true,
 				Optional:            true,
 				Default:             stringdefault.StaticString("auto"),
-				// "auto" "on-prem" "aws" "azure"
+				Validators: []validator.String{
+					stringvalidator.OneOf([]string{"auto", "on-prem", "aws", "azure"}...),
+				},
 			},
 			"type": schema.StringAttribute{
 				MarkdownDescription: "Type of action",
 				Computed:            true,
 				Optional:            true,
 				Default:             stringdefault.StaticString("SCRIPT"),
-				// SCRIPT, REST_CALL, REST_POLL, FLOW, VAULT, CYBERARK
+				Validators: []validator.String{
+					stringvalidator.OneOf([]string{"SCRIPT", "REST_CALL", "REST_POLL", "FLOW", "VAULT", "CYBERARK"}...),
+				},
 			},
 			"runtime_name": schema.StringAttribute{
 				MarkdownDescription: "Runtime name (python, nodejs, ...)",

@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/go-resty/resty/v2"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -16,6 +17,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -67,12 +69,16 @@ func (self *SubscriptionResource) Schema(
 			"type": schema.StringAttribute{
 				MarkdownDescription: "Subscription type",
 				Required:            true,
-				// Validators:          stringvalidator.OneOf()
-				// TODO https://developer.hashicorp.com/terraform/plugin/framework/migrating/attributes-blocks/validators-predefined
+				Validators: []validator.String{
+					stringvalidator.OneOf([]string{"RUNNABLE", "SUBSCRIBABLE"}...),
+				},
 			},
 			"runnable_type": schema.StringAttribute{
 				MarkdownDescription: "TODO",
 				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.OneOf([]string{"extensibility.abx", "extensibility.vro"}...),
+				},
 			},
 			"runnable_id": schema.StringAttribute{
 				MarkdownDescription: "TODO",
@@ -81,6 +87,9 @@ func (self *SubscriptionResource) Schema(
 			"recover_runnable_type": schema.StringAttribute{
 				MarkdownDescription: "TODO",
 				Optional:            true,
+				Validators: []validator.String{
+					stringvalidator.OneOf([]string{"extensibility.abx", "extensibility.vro"}...),
+				},
 			},
 			"recover_runnable_id": schema.StringAttribute{
 				MarkdownDescription: "TODO",
