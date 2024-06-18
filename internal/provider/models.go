@@ -6,11 +6,140 @@ package provider
 import (
 	"context"
 	"fmt"
-	"time"
+	"strings"
 
+	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
+
+// ABXActionModel describes the resource data model.
+type ABXActionModel struct {
+	Id           types.String `tfsdk:"id"`
+	Name         types.String `tfsdk:"name"`
+	Description  types.String `tfsdk:"description"`
+	FAASProvider types.String `tfsdk:"faas_provider"`
+	Type         types.String `tfsdk:"type"`
+
+	RuntimeName    types.String `tfsdk:"runtime_name"`
+	RuntimeVersion types.String `tfsdk:"runtime_version"`
+	MemoryInMB     types.Int64  `tfsdk:"memory_in_mb"`
+	TimeoutSeconds types.Int64  `tfsdk:"timeout_seconds"`
+	Entrypoint     types.String `tfsdk:"entrypoint"`
+	Dependencies   types.List   `tfsdk:"dependencies"`
+	// Constants types.List[String] `tfsdk:"constants"`
+	// Secrets types.List[String] `tfsdk:"secrets"`
+
+	Source types.String `tfsdk:"source"`
+
+	ProjectId types.String `tfsdk:"project_id"`
+	OrgId     types.String `tfsdk:"org_id"`
+}
+
+// ABXActionAPIModel describes the resource API model.
+type ABXActionAPIModel struct {
+	Id           string `json:"id"`
+	Name         string `json:"name"`
+	Description  string `json:"description"`
+	FAASProvider string `json:"provider"`
+	Type         string `json:"actionType"`
+
+	RuntimeName    string            `json:"runtime"`
+	RuntimeVersion string            `json:"runtimeVersion"`
+	MemoryInMB     int64             `json:"memoryInMB"`
+	TimeoutSeconds int64             `json:"timeoutSeconds"`
+	Entrypoint     string            `json:"entrypoint"`
+	Dependencies   string            `json:"dependencies"`
+	Inputs         map[string]string `json:"inputs"`
+
+	Source string `json:"source"`
+
+	ProjectId string `json:"projectId"`
+	OrgId     string `json:"orgId"`
+}
+
+func (self *ABXActionModel) FromAPI(
+	ctx context.Context,
+	raw ABXActionAPIModel,
+) diag.Diagnostics {
+
+	// https://go.dev/blog/maps
+	// inputs := map[string]string{}
+	// for key, value := range self.Constants.Elemets() {
+	//     inputs["secret:"+key] = value
+	// }
+	// for key, value := range self.Secrets.Elements() {
+	//     inputs["psecret:"+key] = value
+	// }
+
+	dependencies, diags := types.ListValueFrom(
+		ctx,
+		types.StringType,
+		SkipEmpty(strings.Split(raw.Dependencies, "\n")),
+	)
+
+	self.Id = types.StringValue(raw.Id)
+	self.Name = types.StringValue(raw.Name)
+	self.Description = types.StringValue(raw.Description)
+	self.FAASProvider = types.StringValue(strings.Replace(raw.FAASProvider, "", "auto", 1))
+	self.RuntimeName = types.StringValue(raw.RuntimeName)
+	self.RuntimeVersion = types.StringValue(raw.RuntimeVersion)
+	self.MemoryInMB = types.Int64Value(raw.MemoryInMB)
+	self.TimeoutSeconds = types.Int64Value(raw.TimeoutSeconds)
+	self.Entrypoint = types.StringValue(raw.Entrypoint)
+	self.Dependencies = dependencies
+	self.Source = types.StringValue(CleanString(raw.Source))
+	self.ProjectId = types.StringValue(raw.ProjectId)
+	self.OrgId = types.StringValue(raw.OrgId)
+
+	return diags
+}
+
+func (self *ABXActionModel) ToAPI(ctx context.Context) (ABXActionAPIModel, diag.Diagnostics) {
+
+	var diags diag.Diagnostics
+
+	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/list
+	if self.Dependencies.IsNull() || self.Dependencies.IsUnknown() {
+		diags.AddError(
+			"Configuration error",
+			fmt.Sprintf(
+				"Unable to manage subscription %s, project_ids is either null or unknown",
+				self.Id.ValueString()))
+		return ABXActionAPIModel{}, diags
+	}
+
+	dependencies := make([]string, 0, len(self.Dependencies.Elements()))
+	diags = self.Dependencies.ElementsAs(ctx, &dependencies, false)
+	if diags.HasError() {
+		return ABXActionAPIModel{}, diags
+	}
+
+	// https://go.dev/blog/maps
+	// inputs := map[string]string{}
+	// for key, value := range self.Constants.Elemets() {
+	//     inputs["secret:"+key] = value
+	// }
+	// for key, value := range self.Secrets.Elements() {
+	//     inputs["psecret:"+key] = value
+	// }
+
+	return ABXActionAPIModel{
+		Name:           self.Name.ValueString(),
+		Description:    self.Description.ValueString(),
+		FAASProvider:   strings.Replace(self.FAASProvider.ValueString(), "auto", "", 1),
+		Type:           self.Type.ValueString(),
+		RuntimeName:    self.RuntimeName.ValueString(),
+		RuntimeVersion: self.RuntimeVersion.ValueString(),
+		MemoryInMB:     self.MemoryInMB.ValueInt64(),
+		TimeoutSeconds: self.TimeoutSeconds.ValueInt64(),
+		Entrypoint:     self.Entrypoint.ValueString(),
+		Dependencies:   strings.Join(SkipEmpty(dependencies), "\n"),
+		Inputs:         map[string]string{}, // FIXME
+		Source:         CleanString(self.Source.ValueString()),
+		ProjectId:      self.ProjectId.ValueString(),
+	}, diags
+}
 
 // ABXConstantModel describes the resource data model.
 type ABXConstantModel struct {
@@ -188,7 +317,7 @@ type SubscriptionAPIModel struct {
 
 func (self *SubscriptionModel) GenerateId() {
 	if len(self.Id.ValueString()) == 0 {
-		self.Id = types.StringValue(fmt.Sprintf("sub_%d", time.Now().UnixMilli()))
+		self.Id = types.StringValue(uuid.New().String())
 	}
 }
 

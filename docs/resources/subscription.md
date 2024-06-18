@@ -26,7 +26,7 @@ resource "aria_abx_action" "hello_world" {
   name         = "Hello World"
   description  = "Say hello and display nice contextual data."
   runtime_name = "python"
-  memory_in_mb = "128"
+  memory_in_mb = 128
   entrypoint   = "handler"
   dependencies = []
 

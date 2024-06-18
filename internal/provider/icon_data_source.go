@@ -66,9 +66,8 @@ func (self *IconDataSource) Read(
 	req datasource.ReadRequest,
 	resp *datasource.ReadResponse,
 ) {
-	var icon IconModel
-
 	// Read Terraform configuration data into the model
+	var icon IconModel
 	resp.Diagnostics.Append(req.Config.Get(ctx, &icon)...)
 	if resp.Diagnostics.HasError() {
 		return

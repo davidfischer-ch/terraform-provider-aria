@@ -222,7 +222,7 @@ func (self *AriaProvider) Configure(
 
 func (self *AriaProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
-		/* NewABXActionResource, */
+		NewABXActionResource,
 		NewABXConstantResource,
 		NewABXSecretResource,
 		NewIconResource,

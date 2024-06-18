@@ -87,15 +87,14 @@ func (self *ABXConstantResource) Create(
 	req resource.CreateRequest,
 	resp *resource.CreateResponse,
 ) {
-	var constant ABXConstantModel
-	var constantRaw ABXConstantAPIModel
-
 	// Read Terraform plan data into the model
+	var constant ABXConstantModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &constant)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	var constantRaw ABXConstantAPIModel
 	response, err := self.client.R().
 		SetBody(constant.ToAPI()).
 		SetResult(&constantRaw).
@@ -121,15 +120,14 @@ func (self *ABXConstantResource) Read(
 	req resource.ReadRequest,
 	resp *resource.ReadResponse,
 ) {
-	var constant ABXConstantModel
-	var constantRaw ABXConstantAPIModel
-
 	// Read Terraform prior state data into the model
+	var constant ABXConstantModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &constant)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	var constantRaw ABXConstantAPIModel
 	constantId := constant.Id.ValueString()
 	response, err := self.client.R().
 		SetResult(&constantRaw).
@@ -160,15 +158,14 @@ func (self *ABXConstantResource) Update(
 	req resource.UpdateRequest,
 	resp *resource.UpdateResponse,
 ) {
-	var constant ABXConstantModel
-	var constantRaw ABXConstantAPIModel
-
 	// Read Terraform plan data into the model
+	var constant ABXConstantModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &constant)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	var constantRaw ABXConstantAPIModel
 	constantId := constant.Id.ValueString()
 	response, err := self.client.R().
 		SetBody(constant.ToAPI()).
@@ -195,9 +192,8 @@ func (self *ABXConstantResource) Delete(
 	req resource.DeleteRequest,
 	resp *resource.DeleteResponse,
 ) {
-	var constant ABXConstantModel
-
 	// Read Terraform prior state data into the model
+	var constant ABXConstantModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &constant)...)
 	if resp.Diagnostics.HasError() {
 		return

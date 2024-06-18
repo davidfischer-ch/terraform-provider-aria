@@ -31,18 +31,3 @@ def handler(*args, **kwargs) -> None:
 EOT
 
 }
-
-resource "aria_subscription" "hello_world" {
-  name           = "Hello World"
-  description    = "Say hello when a machine is provisionned"
-  type           = "RUNNABLE"
-  runnable_type  = "extensibility.abx"
-  runnable_id    = aria_abx_action.hello_world.id
-  event_topic_id = "compute.provision.post"
-  project_ids    = [] # All projects
-  blocking       = true
-  contextual     = false
-  disabled       = false
-  timeout        = 0
-  priority       = 10
-}

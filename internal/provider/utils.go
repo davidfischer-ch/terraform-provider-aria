@@ -6,6 +6,8 @@ package provider
 import (
 	"context"
 	"fmt"
+	"slices"
+	"strings"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
@@ -59,6 +61,14 @@ func GetResourceClient(
 	}
 
 	return client
+}
+
+func SkipEmpty(value []string) []string {
+	return slices.DeleteFunc(value, func(e string) bool { return e == "" })
+}
+
+func CleanString(value string) string {
+	return strings.Replace(value, "\r", "", -1)
 }
 
 func StringOrNullValue(value string) types.String {

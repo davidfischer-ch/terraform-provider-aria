@@ -85,15 +85,14 @@ func (self *ABXSecretResource) Create(
 	req resource.CreateRequest,
 	resp *resource.CreateResponse,
 ) {
-	var secret ABXSecretModel
-	var secretRaw ABXSecretAPIModel
-
 	// Read Terraform plan data into the model
+	var secret ABXSecretModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &secret)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	var secretRaw ABXSecretAPIModel
 	response, err := self.client.R().
 		SetBody(secret.ToAPI()).
 		SetResult(&secretRaw).
@@ -119,15 +118,14 @@ func (self *ABXSecretResource) Read(
 	req resource.ReadRequest,
 	resp *resource.ReadResponse,
 ) {
-	var secret ABXSecretModel
-	var secretRaw ABXSecretAPIModel
-
 	// Read Terraform prior state data into the model
+	var secret ABXSecretModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &secret)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	var secretRaw ABXSecretAPIModel
 	secretId := secret.Id.ValueString()
 	response, err := self.client.R().
 		SetResult(&secretRaw).
@@ -158,15 +156,14 @@ func (self *ABXSecretResource) Update(
 	req resource.UpdateRequest,
 	resp *resource.UpdateResponse,
 ) {
-	var secret ABXSecretModel
-	var secretRaw ABXSecretAPIModel
-
 	// Read Terraform plan data into the model
+	var secret ABXSecretModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &secret)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	var secretRaw ABXSecretAPIModel
 	secretId := secret.Id.ValueString()
 	response, err := self.client.R().
 		SetBody(secret.ToAPI()).
@@ -193,9 +190,8 @@ func (self *ABXSecretResource) Delete(
 	req resource.DeleteRequest,
 	resp *resource.DeleteResponse,
 ) {
-	var secret ABXSecretModel
-
 	// Read Terraform prior state data into the model
+	var secret ABXSecretModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &secret)...)
 	if resp.Diagnostics.HasError() {
 		return

@@ -57,8 +57,8 @@ resource "aria_subscription" "hello_world" {
 
   lifecycle {
     postcondition {
-      condition     = can(regex("sub_[0-9]{12}", self.id))
-      error_message = "Identifier must match regex regex sub_[0-9]{12}, actual ${self.id}"
+      condition     = can(regex("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", self.id))
+      error_message = "Identifier must be a valid UUID string, actual ${self.id}"
     }
     postcondition {
       condition     = self.runnable_id == var.test_abx_action_id
@@ -91,8 +91,8 @@ resource "aria_subscription" "hello_world_scoped" {
 
   lifecycle {
     postcondition {
-      condition     = can(regex("sub_[0-9]{12}", self.id))
-      error_message = "Identifier must match regex regex sub_[0-9]{12}, actual ${self.id}"
+      condition     = can(regex("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", self.id))
+      error_message = "Identifier must be a valid UUID string, actual ${self.id}"
     }
     postcondition {
       condition     = self.runnable_id == var.test_abx_action_id
@@ -195,8 +195,8 @@ resource "aria_subscription" "hello_world" {
 
   lifecycle {
     postcondition {
-      condition     = can(regex("sub_[0-9]{12}", self.id))
-      error_message = "Identifier must match regex regex sub_[0-9]{12}, actual ${self.id}"
+      condition     = can(regex("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}", self.id))
+      error_message = "Identifier must be a valid UUID string, actual ${self.id}"
     }
     postcondition {
       condition     = self.runnable_id == var.test_abx_action_id

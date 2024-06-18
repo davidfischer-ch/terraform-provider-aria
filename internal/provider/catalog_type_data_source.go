@@ -81,15 +81,14 @@ func (self *CatalogTypeDataSource) Read(
 	req datasource.ReadRequest,
 	resp *datasource.ReadResponse,
 ) {
-	var catalogType CatalogTypeModel
-	var catalogTypeRaw CatalogTypeAPIModel
-
 	// Read Terraform configuration data into the model
+	var catalogType CatalogTypeModel
 	resp.Diagnostics.Append(req.Config.Get(ctx, &catalogType)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	var catalogTypeRaw CatalogTypeAPIModel
 	catalogTypeId := catalogType.Id.ValueString()
 	response, err := self.client.R().
 		SetResult(&catalogTypeRaw).
