@@ -65,10 +65,15 @@ func (self *ABXActionModel) FromAPI(
 
 	diags := diag.Diagnostics{}
 
+	faasProvider := raw.FAASProvider
+	if faasProvider == "" {
+		faasProvider = "auto"
+	}
+
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
 	self.Description = types.StringValue(raw.Description)
-	self.FAASProvider = types.StringValue(strings.Replace(raw.FAASProvider, "", "auto", 1))
+	self.FAASProvider = types.StringValue(faasProvider)
 	self.RuntimeName = types.StringValue(raw.RuntimeName)
 	self.RuntimeVersion = types.StringValue(raw.RuntimeVersion)
 	self.MemoryInMB = types.Int64Value(raw.MemoryInMB)
@@ -176,10 +181,15 @@ func (self *ABXActionModel) ToAPI(ctx context.Context) (ABXActionAPIModel, diag.
 		inputs["psecret:"+secret] = ""
 	}
 
+	faasProvider := self.FAASProvider.ValueString()
+	if faasProvider == "auto" {
+		faasProvider = ""
+	}
+
 	return ABXActionAPIModel{
 		Name:           self.Name.ValueString(),
 		Description:    self.Description.ValueString(),
-		FAASProvider:   strings.Replace(self.FAASProvider.ValueString(), "auto", "", 1),
+		FAASProvider:   faasProvider,
 		Type:           self.Type.ValueString(),
 		RuntimeName:    self.RuntimeName.ValueString(),
 		RuntimeVersion: self.RuntimeVersion.ValueString(),
