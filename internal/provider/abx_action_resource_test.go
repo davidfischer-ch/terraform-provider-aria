@@ -22,7 +22,22 @@ variable "test_project_id" {
   type        = string
 }
 
+resource "aria_abx_constant" "test" {
+	count = 3
+  name  = "ARIA_PROVIDER_TEST_ACTION_CONSTANT_${count.index}"
+  value = "Some value."
+}
+
+resource "aria_abx_secret" "test" {
+	count = 2
+  name  = "ARIA_PROVIDER_TEST_ACTION_SECRET_${count.index}"
+  value = "sensitive stuff."
+}
+
 locals {
+	constants = [for constant in aria_abx_constant.test: constant.id]
+	secrets   = [for secret in aria_abx_secret.test: secret.id]
+
 	source = <<EOT
 import os
 
@@ -40,6 +55,8 @@ resource "aria_abx_action" "test" {
   memory_in_mb = 128
   entrypoint   = "handler"
   dependencies = []
+  constants    = local.constants
+  secrets      = local.secrets
 
 	project_id = var.test_project_id
 
@@ -48,7 +65,15 @@ resource "aria_abx_action" "test" {
   lifecycle {
     postcondition {
       condition     = length(self.dependencies) == 0
-      error_message = "Dependencies must be [], actual [${join(", ", self.dependencies)}]"
+      error_message = "Dependencies must be empty, actual [${join(", ", self.dependencies)}]"
+    }
+    postcondition {
+      condition     = self.constants == toset(local.constants)
+      error_message = "Constants must be [${join(", ", local.constants)}], actual [${join(", ", self.constants)}]"
+    }
+    postcondition {
+      condition     = self.secrets == toset(local.secrets)
+      error_message = "Secrets must be [${join(", ", local.secrets)}], actual [${join(", ", self.secrets)}]"
     }
     postcondition {
       condition     = self.project_id == var.test_project_id
@@ -84,17 +109,34 @@ variable "test_project_id" {
   type        = string
 }
 
+resource "aria_abx_constant" "test" {
+	count = 3
+  name  = "ARIA_PROVIDER_TEST_ACTION_CONSTANT_${count.index}"
+  value = "Some value."
+}
+
+resource "aria_abx_secret" "test" {
+	count = 2
+  name  = "ARIA_PROVIDER_TEST_ACTION_SECRET_${count.index}"
+  value = "sensitive stuff."
+}
+
 locals {
+	dependencies = ["requests", "pytoolbox==14.8.2"]
+
 	source = <<EOT
 from __future__ import annotations
 
 import os
+
+import requests
 
 
 def handler(*args, **kwargs) -> None:
 		print('Global symbols :', globals())
 		print('Environment variables :', os.environ)
 		print('Call Arguments: ', args, kwargs)
+		print('Requests module: ', requests)
 EOT
 }
 
@@ -104,7 +146,9 @@ resource "aria_abx_action" "test" {
   runtime_name = "python"
   memory_in_mb = 64
   entrypoint   = "handler"
-  dependencies = []
+  dependencies = local.dependencies
+  constants    = []
+  secrets      = []
 
 	project_id = var.test_project_id
 
@@ -112,8 +156,16 @@ resource "aria_abx_action" "test" {
 
   lifecycle {
     postcondition {
-      condition     = length(self.dependencies) == 0
-      error_message = "Dependencies must be [], actual [${join(", ", self.dependencies)}]"
+      condition     = self.dependencies == tolist(local.dependencies)
+      error_message = "Dependencies must be [${join(", ", local.dependencies)}], actual [${join(", ", self.dependencies)}]"
+    }
+    postcondition {
+      condition     = length(self.constants) == 0
+      error_message = "Constants must be empty, actual [${join(", ", self.constants)}]"
+    }
+    postcondition {
+      condition     = length(self.secrets) == 0
+      error_message = "Secrets must be empty, actual [${join(", ", self.secrets)}]"
     }
     postcondition {
       condition     = self.project_id == var.test_project_id

@@ -53,6 +53,7 @@ EOT
 
 ### Required
 
+- `constants` (Set of String) Constants to expose to the action
 - `dependencies` (List of String) Dependencies (python packages, ...)
 - `description` (String) Describe the action in few sentences
 - `entrypoint` (String) Main function's name
@@ -60,6 +61,7 @@ EOT
 - `name` (String) A name (must be unique)
 - `project_id` (String) Required for non-system actions
 - `runtime_name` (String) Runtime name (python, nodejs, ...)
+- `secrets` (Set of String) Secrets to expose to the action
 - `source` (String) Action source code
 
 ### Optional

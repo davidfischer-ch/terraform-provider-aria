@@ -27,8 +27,8 @@ type ABXActionModel struct {
 	TimeoutSeconds types.Int64  `tfsdk:"timeout_seconds"`
 	Entrypoint     types.String `tfsdk:"entrypoint"`
 	Dependencies   types.List   `tfsdk:"dependencies"`
-	// Constants types.List[String] `tfsdk:"constants"`
-	// Secrets types.List[String] `tfsdk:"secrets"`
+	Constants      types.Set    `tfsdk:"constants"`
+	Secrets        types.Set    `tfsdk:"secrets"`
 
 	Source types.String `tfsdk:"source"`
 
@@ -63,20 +63,7 @@ func (self *ABXActionModel) FromAPI(
 	raw ABXActionAPIModel,
 ) diag.Diagnostics {
 
-	// https://go.dev/blog/maps
-	// inputs := map[string]string{}
-	// for key, value := range self.Constants.Elemets() {
-	//     inputs["secret:"+key] = value
-	// }
-	// for key, value := range self.Secrets.Elements() {
-	//     inputs["psecret:"+key] = value
-	// }
-
-	dependencies, diags := types.ListValueFrom(
-		ctx,
-		types.StringType,
-		SkipEmpty(strings.Split(raw.Dependencies, "\n")),
-	)
+	diags := diag.Diagnostics{}
 
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
@@ -87,42 +74,107 @@ func (self *ABXActionModel) FromAPI(
 	self.MemoryInMB = types.Int64Value(raw.MemoryInMB)
 	self.TimeoutSeconds = types.Int64Value(raw.TimeoutSeconds)
 	self.Entrypoint = types.StringValue(raw.Entrypoint)
-	self.Dependencies = dependencies
 	self.Source = types.StringValue(CleanString(raw.Source))
 	self.ProjectId = types.StringValue(raw.ProjectId)
 	self.OrgId = types.StringValue(raw.OrgId)
+
+	constantsIds := []string{}
+	secretsIds := []string{}
+	inputsKeys := []string{}
+
+	for key := range raw.Inputs {
+		res := strings.SplitN(key, ":", 2)
+		if len(res) == 1 {
+			inputsKeys = append(inputsKeys, key)
+		} else if res[0] == "secret" {
+			constantsIds = append(constantsIds, res[1])
+		} else if res[0] == "psecret" {
+			secretsIds = append(secretsIds, res[1])
+		} else {
+			// Unhandled -> inputsKeys
+			inputsKeys = append(inputsKeys, key)
+		}
+	}
+
+	if len(inputsKeys) > 0 {
+		diags.AddError(
+			"Client error",
+			fmt.Sprintf(
+				"Unable to manage ABX action %s, unhandled inputs keys %s",
+				self.Id.ValueString(), strings.Join(inputsKeys, ", ")))
+	}
+
+	constants, constantsDiags := types.SetValueFrom(ctx, types.StringType, constantsIds)
+	self.Constants = constants
+	diags.Append(constantsDiags...)
+
+	secrets, secretsDiags := types.SetValueFrom(ctx, types.StringType, secretsIds)
+	self.Secrets = secrets
+	diags.Append(secretsDiags...)
+
+	dependencies, dependenciesDiags := types.ListValueFrom(
+		ctx, types.StringType, SkipEmpty(strings.Split(raw.Dependencies, "\n")),
+	)
+	self.Dependencies = dependencies
+	diags.Append(dependenciesDiags...)
 
 	return diags
 }
 
 func (self *ABXActionModel) ToAPI(ctx context.Context) (ABXActionAPIModel, diag.Diagnostics) {
 
-	var diags diag.Diagnostics
+	diags := diag.Diagnostics{}
 
 	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/list
 	if self.Dependencies.IsNull() || self.Dependencies.IsUnknown() {
 		diags.AddError(
 			"Configuration error",
 			fmt.Sprintf(
-				"Unable to manage subscription %s, project_ids is either null or unknown",
+				"Unable to manage ABX action %s, dependencies is either null or unknown",
+				self.Id.ValueString()))
+		return ABXActionAPIModel{}, diags
+	}
+
+	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/list
+	if self.Constants.IsNull() || self.Constants.IsUnknown() {
+		diags.AddError(
+			"Configuration error",
+			fmt.Sprintf(
+				"Unable to manage ABX action %s, constants is either null or unknown",
+				self.Id.ValueString()))
+		return ABXActionAPIModel{}, diags
+	}
+
+	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/list
+	if self.Secrets.IsNull() || self.Secrets.IsUnknown() {
+		diags.AddError(
+			"Configuration error",
+			fmt.Sprintf(
+				"Unable to manage ABX action %s, secrets is either null or unknown",
 				self.Id.ValueString()))
 		return ABXActionAPIModel{}, diags
 	}
 
 	dependencies := make([]string, 0, len(self.Dependencies.Elements()))
-	diags = self.Dependencies.ElementsAs(ctx, &dependencies, false)
+	diags.Append(self.Dependencies.ElementsAs(ctx, &dependencies, false)...)
+
+	constants := make([]string, 0, len(self.Constants.Elements()))
+	diags.Append(self.Constants.ElementsAs(ctx, &constants, false)...)
+
+	secrets := make([]string, 0, len(self.Secrets.Elements()))
+	diags.Append(self.Secrets.ElementsAs(ctx, &secrets, false)...)
+
 	if diags.HasError() {
 		return ABXActionAPIModel{}, diags
 	}
 
-	// https://go.dev/blog/maps
-	// inputs := map[string]string{}
-	// for key, value := range self.Constants.Elemets() {
-	//     inputs["secret:"+key] = value
-	// }
-	// for key, value := range self.Secrets.Elements() {
-	//     inputs["psecret:"+key] = value
-	// }
+	inputs := map[string]string{}
+	for _, constant := range constants {
+		inputs["secret:"+constant] = ""
+	}
+	for _, secret := range secrets {
+		inputs["psecret:"+secret] = ""
+	}
 
 	return ABXActionAPIModel{
 		Name:           self.Name.ValueString(),
@@ -135,7 +187,7 @@ func (self *ABXActionModel) ToAPI(ctx context.Context) (ABXActionAPIModel, diag.
 		TimeoutSeconds: self.TimeoutSeconds.ValueInt64(),
 		Entrypoint:     self.Entrypoint.ValueString(),
 		Dependencies:   strings.Join(SkipEmpty(dependencies), "\n"),
-		Inputs:         map[string]string{}, // FIXME
+		Inputs:         inputs,
 		Source:         CleanString(self.Source.ValueString()),
 		ProjectId:      self.ProjectId.ValueString(),
 	}, diags

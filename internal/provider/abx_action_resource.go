@@ -109,18 +109,26 @@ func (self *ABXActionResource) Schema(
 				ElementType:         types.StringType,
 				Required:            true,
 			},
+			"constants": schema.SetAttribute{
+				MarkdownDescription: "Constants to expose to the action",
+				ElementType:         types.StringType,
+				Required:            true,
+			},
+			"secrets": schema.SetAttribute{
+				MarkdownDescription: "Secrets to expose to the action",
+				ElementType:         types.StringType,
+				Required:            true,
+			},
+			/* "inputs": schema.MapAttribute{
+				// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/dynamic-data
+				MarkdownDescription: "Inputs to expose to the action",
+				ElementType: types.DynamicType,
+				Required: true,
+			}, */
 			"source": schema.StringAttribute{
 				MarkdownDescription: "Action source code",
 				Required:            true,
 			},
-			/* "constants": schema.MapAttribute{
-				ElementType: types.StringType,
-				Required: true,
-			},
-			"secrets": schema.MapAttribute{
-				ElementType: types.StringType,
-				Required: true,
-			}, */
 			"project_id": schema.StringAttribute{
 				MarkdownDescription: "Required for non-system actions",
 				Required:            true,
