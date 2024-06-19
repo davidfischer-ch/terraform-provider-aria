@@ -63,36 +63,36 @@ func (self *SubscriptionResource) Schema(
 				Required:            true,
 			},
 			"description": schema.StringAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Describe the subscription in few sentences",
 				Required:            true,
 			},
 			"type": schema.StringAttribute{
-				MarkdownDescription: "Subscription type",
+				MarkdownDescription: "Subscription type, either RUNNABLE or SUBSCRIBABLE",
 				Required:            true,
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{"RUNNABLE", "SUBSCRIBABLE"}...),
 				},
 			},
 			"runnable_type": schema.StringAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Runnable type, either extensibility.abx or extensibility.vro",
 				Required:            true,
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{"extensibility.abx", "extensibility.vro"}...),
 				},
 			},
 			"runnable_id": schema.StringAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Runnable ID",
 				Required:            true,
 			},
 			"recover_runnable_type": schema.StringAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Recovery runnable type, either extensibility.abx or extensibility.vro",
 				Optional:            true,
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{"extensibility.abx", "extensibility.vro"}...),
 				},
 			},
 			"recover_runnable_id": schema.StringAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Recovery runnable ID",
 				Optional:            true,
 			},
 			"event_topic_id": schema.StringAttribute{

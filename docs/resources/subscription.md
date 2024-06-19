@@ -21,7 +21,6 @@ variable "test_project_id" {
 
 # main.tf
 
-// Not yet implemented
 resource "aria_abx_action" "hello_world" {
   name         = "Hello World"
   description  = "Say hello and display nice contextual data."
@@ -29,6 +28,8 @@ resource "aria_abx_action" "hello_world" {
   memory_in_mb = 128
   entrypoint   = "handler"
   dependencies = []
+  constants    = []
+  secrets      = []
 
   project_id = var.test_project_id
 
@@ -70,22 +71,22 @@ resource "aria_subscription" "hello_world" {
 
 - `blocking` (Boolean) TODO
 - `contextual` (Boolean) TODO
-- `description` (String) TODO
+- `description` (String) Describe the subscription in few sentences
 - `event_topic_id` (String) Event topic ID
 - `name` (String) Subscription name
 - `priority` (Number) TODO
 - `project_ids` (Set of String) Restrict to given projects (an empty list means all)
-- `runnable_id` (String) TODO
-- `runnable_type` (String) TODO
+- `runnable_id` (String) Runnable ID
+- `runnable_type` (String) Runnable type, either extensibility.abx or extensibility.vro
 - `timeout` (Number) TODO
-- `type` (String) Subscription type
+- `type` (String) Subscription type, either RUNNABLE or SUBSCRIBABLE
 
 ### Optional
 
 - `criteria` (String) TODO
 - `disabled` (Boolean) TODO
-- `recover_runnable_id` (String) TODO
-- `recover_runnable_type` (String) TODO
+- `recover_runnable_id` (String) Recovery runnable ID
+- `recover_runnable_type` (String) Recovery runnable type, either extensibility.abx or extensibility.vro
 
 ### Read-Only
 

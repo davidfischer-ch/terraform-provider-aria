@@ -64,7 +64,7 @@ func (self *ABXActionResource) Schema(
 				Required:            true,
 			},
 			"faas_provider": schema.StringAttribute{
-				MarkdownDescription: "FaaS provider used for code execution",
+				MarkdownDescription: "FaaS provider used for code execution, one of auto (default), on-prem, aws and azure",
 				Computed:            true,
 				Optional:            true,
 				Default:             stringdefault.StaticString("auto"),
@@ -73,7 +73,7 @@ func (self *ABXActionResource) Schema(
 				},
 			},
 			"type": schema.StringAttribute{
-				MarkdownDescription: "Type of action",
+				MarkdownDescription: "Type of action, one of SCRIPT (default), REST_CALL, REST_POLL, FLOW, VAULT and CYBERARK",
 				Computed:            true,
 				Optional:            true,
 				Default:             stringdefault.StaticString("SCRIPT"),
@@ -95,7 +95,7 @@ func (self *ABXActionResource) Schema(
 				Required:            true,
 			},
 			"timeout_seconds": schema.Int64Attribute{
-				MarkdownDescription: "How long an action can run (default 600)",
+				MarkdownDescription: "How long an action can run (default to 600)",
 				Computed:            true,
 				Optional:            true,
 				Default:             int64default.StaticInt64(600),

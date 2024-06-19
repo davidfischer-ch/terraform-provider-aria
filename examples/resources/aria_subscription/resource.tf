@@ -6,7 +6,6 @@ variable "test_project_id" {
 
 # main.tf
 
-// Not yet implemented
 resource "aria_abx_action" "hello_world" {
   name         = "Hello World"
   description  = "Say hello and display nice contextual data."
@@ -14,6 +13,8 @@ resource "aria_abx_action" "hello_world" {
   memory_in_mb = 128
   entrypoint   = "handler"
   dependencies = []
+  constants    = []
+  secrets      = []
 
   project_id = var.test_project_id
 
