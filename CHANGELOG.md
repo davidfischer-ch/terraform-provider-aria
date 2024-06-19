@@ -2,7 +2,7 @@
 
 ## Release v0.1.2 (2024-06-19)
 
-Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.1.1...v0.1.0
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.1.2...v0.1.1
 
 ### Fix and enhancements
 
