@@ -11,7 +11,7 @@ resource "aria_abx_constant" "hello_message" {
   value = "Hello World!"
 }
 
-resource "aria_abx_secret" "some_secret" {
+resource "aria_abx_sensitive_constant" "some_secret" {
   name  = "SOME_SECRET"
   value = "sensitive stuff."
 }
@@ -23,8 +23,11 @@ resource "aria_abx_action" "hello_world" {
   memory_in_mb = 128
   entrypoint   = "handler"
   dependencies = []
-  constants    = [aria_abx_constant.hello_message.id]
-  secrets      = [aria_abx_secret.some_secret.id]
+  constants = [
+    aria_abx_constant.hello_message.id,
+    aria_abx_sensitive_constant.some_secret.id
+  ]
+  secrets = []
 
   project_id = var.test_project_id
 

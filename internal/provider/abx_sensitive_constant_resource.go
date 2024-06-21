@@ -17,54 +17,54 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &ABXSecretResource{}
+var _ resource.Resource = &ABXSensitiveConstantResource{}
 
-func NewABXSecretResource() resource.Resource {
-	return &ABXSecretResource{}
+func NewABXSensitiveConstantResource() resource.Resource {
+	return &ABXSensitiveConstantResource{}
 }
 
-// ABXSecretResource defines the resource implementation.
-type ABXSecretResource struct {
+// ABXSensitiveConstantResource defines the resource implementation.
+type ABXSensitiveConstantResource struct {
 	client *resty.Client
 }
 
-func (self *ABXSecretResource) Metadata(
+func (self *ABXSensitiveConstantResource) Metadata(
 	ctx context.Context,
 	req resource.MetadataRequest,
 	resp *resource.MetadataResponse,
 ) {
-	resp.TypeName = req.ProviderTypeName + "_abx_secret"
+	resp.TypeName = req.ProviderTypeName + "_abx_sensitive_constant"
 }
 
-func (self *ABXSecretResource) Schema(
+func (self *ABXSensitiveConstantResource) Schema(
 	ctx context.Context,
 	req resource.SchemaRequest,
 	resp *resource.SchemaResponse,
 ) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "ABX secret resource",
+		MarkdownDescription: "ABX sensitive constant resource",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				MarkdownDescription: "Secret identifier",
+				MarkdownDescription: "Constant identifier",
 				Computed:            true,
 				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"name": schema.StringAttribute{
-				MarkdownDescription: "Secret name",
+				MarkdownDescription: "Constant name",
 				Required:            true,
 			},
 			"value": schema.StringAttribute{
-				MarkdownDescription: "Secret value (cannot be enforced since API don't return it)",
+				MarkdownDescription: "Constant value (cannot be enforced since API don't return it)",
 				Required:            true,
 				Sensitive:           true,
 			},
 			"encrypted": schema.BoolAttribute{
-				MarkdownDescription: "Secret should be always encrypted!",
+				MarkdownDescription: "Constant should be always encrypted!",
 				Computed:            true,
 				Default:             booldefault.StaticBool(true),
 			},
 			"org_id": schema.StringAttribute{
-				MarkdownDescription: "Secret organisation ID",
+				MarkdownDescription: "Constant organisation ID",
 				Computed:            true,
 				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
@@ -72,7 +72,7 @@ func (self *ABXSecretResource) Schema(
 	}
 }
 
-func (self *ABXSecretResource) Configure(
+func (self *ABXSensitiveConstantResource) Configure(
 	ctx context.Context,
 	req resource.ConfigureRequest,
 	resp *resource.ConfigureResponse,
@@ -80,19 +80,19 @@ func (self *ABXSecretResource) Configure(
 	self.client = GetResourceClient(ctx, req, resp)
 }
 
-func (self *ABXSecretResource) Create(
+func (self *ABXSensitiveConstantResource) Create(
 	ctx context.Context,
 	req resource.CreateRequest,
 	resp *resource.CreateResponse,
 ) {
 	// Read Terraform plan data into the model
-	var secret ABXSecretModel
+	var secret ABXSensitiveConstantModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &secret)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	var secretRaw ABXSecretAPIModel
+	var secretRaw ABXSensitiveConstantAPIModel
 	response, err := self.client.R().
 		SetBody(secret.ToAPI()).
 		SetResult(&secretRaw).
@@ -102,30 +102,30 @@ func (self *ABXSecretResource) Create(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to create ABX secret, got error: %s", err))
+			fmt.Sprintf("Unable to create ABX sensitive constant, got error: %s", err))
 		return
 	}
 
-	tflog.Debug(ctx, fmt.Sprintf("ABX secret %s created", secretRaw.Id))
+	tflog.Debug(ctx, fmt.Sprintf("ABX sensitive constant %s created", secretRaw.Id))
 
 	// Save secret into Terraform state
 	resp.Diagnostics.Append(secret.FromAPI(ctx, secretRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &secret)...)
 }
 
-func (self *ABXSecretResource) Read(
+func (self *ABXSensitiveConstantResource) Read(
 	ctx context.Context,
 	req resource.ReadRequest,
 	resp *resource.ReadResponse,
 ) {
 	// Read Terraform prior state data into the model
-	var secret ABXSecretModel
+	var secret ABXSensitiveConstantModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &secret)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	var secretRaw ABXSecretAPIModel
+	var secretRaw ABXSensitiveConstantAPIModel
 	secretId := secret.Id.ValueString()
 	response, err := self.client.R().
 		SetResult(&secretRaw).
@@ -142,7 +142,7 @@ func (self *ABXSecretResource) Read(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read ABX secret %s, got error: %s", secretId, err))
+			fmt.Sprintf("Unable to read ABX sensitive constant %s, got error: %s", secretId, err))
 		return
 	}
 
@@ -151,19 +151,19 @@ func (self *ABXSecretResource) Read(
 	resp.Diagnostics.Append(resp.State.Set(ctx, &secret)...)
 }
 
-func (self *ABXSecretResource) Update(
+func (self *ABXSensitiveConstantResource) Update(
 	ctx context.Context,
 	req resource.UpdateRequest,
 	resp *resource.UpdateResponse,
 ) {
 	// Read Terraform plan data into the model
-	var secret ABXSecretModel
+	var secret ABXSensitiveConstantModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &secret)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	var secretRaw ABXSecretAPIModel
+	var secretRaw ABXSensitiveConstantAPIModel
 	secretId := secret.Id.ValueString()
 	response, err := self.client.R().
 		SetBody(secret.ToAPI()).
@@ -174,7 +174,7 @@ func (self *ABXSecretResource) Update(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to update ABX secret %s, got error: %s", secretId, err))
+			fmt.Sprintf("Unable to update ABX sensitive constant %s, got error: %s", secretId, err))
 		return
 	}
 
@@ -185,13 +185,13 @@ func (self *ABXSecretResource) Update(
 	resp.Diagnostics.Append(resp.State.Set(ctx, &secret)...)
 }
 
-func (self *ABXSecretResource) Delete(
+func (self *ABXSensitiveConstantResource) Delete(
 	ctx context.Context,
 	req resource.DeleteRequest,
 	resp *resource.DeleteResponse,
 ) {
 	// Read Terraform prior state data into the model
-	var secret ABXSecretModel
+	var secret ABXSensitiveConstantModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &secret)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -208,8 +208,8 @@ func (self *ABXSecretResource) Delete(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to delete ABX secret %s, got error: %s", secretId, err))
+			fmt.Sprintf("Unable to delete ABX sensitive constant %s, got error: %s", secretId, err))
 	}
 
-	tflog.Debug(ctx, fmt.Sprintf("ABX secret %s deleted", secretId))
+	tflog.Debug(ctx, fmt.Sprintf("ABX sensitive constant %s deleted", secretId))
 }

@@ -242,8 +242,8 @@ func (self *ABXConstantModel) ToAPI() ABXConstantAPIModel {
 	}
 }
 
-// ABXSecretModel describes the resource data model.
-type ABXSecretModel struct {
+// ABXSensitiveConstantModel describes the resource data model.
+type ABXSensitiveConstantModel struct {
 	Id        types.String `tfsdk:"id"`
 	Name      types.String `tfsdk:"name"`
 	Value     types.String `tfsdk:"value"`
@@ -251,8 +251,8 @@ type ABXSecretModel struct {
 	OrgId     types.String `tfsdk:"org_id"`
 }
 
-// ABXSecretAPIModel describes the resource API model.
-type ABXSecretAPIModel struct {
+// ABXSensitiveConstantAPIModel describes the resource API model.
+type ABXSensitiveConstantAPIModel struct {
 	Id            string `json:"id"`
 	Name          string `json:"name"`
 	Value         string `json:"value"`
@@ -261,9 +261,9 @@ type ABXSecretAPIModel struct {
 	CreatedMillis uint64 `json:"createdMillis"`
 }
 
-func (self *ABXSecretModel) FromAPI(
+func (self *ABXSensitiveConstantModel) FromAPI(
 	ctx context.Context,
-	raw ABXSecretAPIModel,
+	raw ABXSensitiveConstantAPIModel,
 ) diag.Diagnostics {
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
@@ -274,8 +274,8 @@ func (self *ABXSecretModel) FromAPI(
 	return diag.Diagnostics{}
 }
 
-func (self *ABXSecretModel) ToAPI() ABXSecretAPIModel {
-	return ABXSecretAPIModel{
+func (self *ABXSensitiveConstantModel) ToAPI() ABXSensitiveConstantAPIModel {
+	return ABXSensitiveConstantAPIModel{
 		Name:      self.Name.ValueString(),
 		Value:     self.Value.ValueString(),
 		Encrypted: self.Encrypted.ValueBool(),

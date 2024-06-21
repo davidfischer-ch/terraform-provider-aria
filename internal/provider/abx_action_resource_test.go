@@ -28,15 +28,16 @@ resource "aria_abx_constant" "test" {
   value = "Some value."
 }
 
-resource "aria_abx_secret" "test" {
+resource "aria_abx_sensitive_constant" "test" {
 	count = 2
   name  = "ARIA_PROVIDER_TEST_ACTION_SECRET_${count.index}"
   value = "sensitive stuff."
 }
 
 locals {
-	constants = [for constant in aria_abx_constant.test: constant.id]
-	secrets   = [for secret in aria_abx_secret.test: secret.id]
+	constants = concat(
+		[for constant in aria_abx_constant.test: constant.id],
+		[for constant in aria_abx_sensitive_constant.test: constant.id])
 
 	source = <<EOT
 import os
@@ -56,7 +57,7 @@ resource "aria_abx_action" "test" {
   entrypoint   = "handler"
   dependencies = []
   constants    = local.constants
-  secrets      = local.secrets
+  secrets      = [] # TODO Test this once secret is available
 
 	project_id = var.test_project_id
 
@@ -72,8 +73,8 @@ resource "aria_abx_action" "test" {
       error_message = "Constants must be [${join(", ", local.constants)}], actual [${join(", ", self.constants)}]"
     }
     postcondition {
-      condition     = self.secrets == toset(local.secrets)
-      error_message = "Secrets must be [${join(", ", local.secrets)}], actual [${join(", ", self.secrets)}]"
+      condition     = length(self.secrets) == 0
+      error_message = "Secrets must be empty, actual [${join(", ", self.secrets)}]"
     }
     postcondition {
       condition     = self.project_id == var.test_project_id
@@ -115,7 +116,7 @@ resource "aria_abx_constant" "test" {
   value = "Some value."
 }
 
-resource "aria_abx_secret" "test" {
+resource "aria_abx_sensitive_constant" "test" {
 	count = 2
   name  = "ARIA_PROVIDER_TEST_ACTION_SECRET_${count.index}"
   value = "sensitive stuff."

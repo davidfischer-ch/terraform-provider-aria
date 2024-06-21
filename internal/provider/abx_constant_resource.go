@@ -58,7 +58,6 @@ func (self *ABXConstantResource) Schema(
 			"value": schema.StringAttribute{
 				MarkdownDescription: "Constant value",
 				Required:            true,
-				Sensitive:           true,
 			},
 			"encrypted": schema.BoolAttribute{
 				MarkdownDescription: "Constant should be always unencrypted!",

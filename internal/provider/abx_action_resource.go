@@ -110,7 +110,7 @@ func (self *ABXActionResource) Schema(
 				Required:            true,
 			},
 			"constants": schema.SetAttribute{
-				MarkdownDescription: "Constants to expose to the action",
+				MarkdownDescription: "ABX Constants to expose to the action",
 				ElementType:         types.StringType,
 				Required:            true,
 			},
