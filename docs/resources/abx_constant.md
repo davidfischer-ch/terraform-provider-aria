@@ -29,7 +29,7 @@ output "example_constant" {
 ### Required
 
 - `name` (String) Constant name
-- `value` (String, Sensitive) Constant value
+- `value` (String) Constant value
 
 ### Read-Only
 
