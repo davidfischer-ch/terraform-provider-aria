@@ -1,5 +1,13 @@
 # Changelog
 
+## Release v0.2.0 (2024-06-21)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.0...v0.1.2
+
+### Minor compatibility breaks
+
+* Rename resource `aria_abx_secret` to `aria_abx_sensitive_constant`
+
 ## Release v0.1.2 (2024-06-19)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.1.2...v0.1.1
