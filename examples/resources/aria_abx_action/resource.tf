@@ -31,6 +31,8 @@ resource "aria_abx_action" "hello_world" {
 
   project_id = var.test_project_id
 
+  shared = true
+
   source = <<EOT
 from __future__ import annotations
 
