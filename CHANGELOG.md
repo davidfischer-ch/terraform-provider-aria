@@ -1,5 +1,13 @@
 # Changelog
 
+## Release v0.2.2 (2024-06-24)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.2...v0.2.1
+
+### Features
+
+* Add data source `aria_secret`
+
 ## Release v0.2.1 (2204-06-24)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.1...v0.2.0
