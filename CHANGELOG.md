@@ -1,5 +1,13 @@
 # Changelog
 
+## Release v0.2.1 (2204-06-24)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.1...v0.2.0
+
+### Features
+
+* Resource `aria_abx_action`: Add attributes `cpu_shares`, `deployment_timeout_seconds`, `shared`, `system`, `async_deployed`
+
 ## Release v0.2.0 (2024-06-21)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.0...v0.1.2
