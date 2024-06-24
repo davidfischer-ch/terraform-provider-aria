@@ -23,14 +23,22 @@ type ABXActionModel struct {
 
 	RuntimeName    types.String `tfsdk:"runtime_name"`
 	RuntimeVersion types.String `tfsdk:"runtime_version"`
-	MemoryInMB     types.Int64  `tfsdk:"memory_in_mb"`
-	TimeoutSeconds types.Int64  `tfsdk:"timeout_seconds"`
-	Entrypoint     types.String `tfsdk:"entrypoint"`
-	Dependencies   types.List   `tfsdk:"dependencies"`
-	Constants      types.Set    `tfsdk:"constants"`
-	Secrets        types.Set    `tfsdk:"secrets"`
+
+	CPUShares                types.Int64 `tfsdk:"cpu_shares"`
+	MemoryInMB               types.Int64 `tfsdk:"memory_in_mb"`
+	TimeoutSeconds           types.Int64 `tfsdk:"timeout_seconds"`
+	DeploymentTimeoutSeconds types.Int64 `tfsdk:"deployment_timeout_seconds"`
+
+	Entrypoint   types.String `tfsdk:"entrypoint"`
+	Dependencies types.List   `tfsdk:"dependencies"`
+	Constants    types.Set    `tfsdk:"constants"`
+	Secrets      types.Set    `tfsdk:"secrets"`
 
 	Source types.String `tfsdk:"source"`
+
+	Shared        types.Bool `tfsdk:"shared"`
+	System        types.Bool `tfsdk:"system"`
+	AsyncDeployed types.Bool `tfsdk:"async_deployed"`
 
 	ProjectId types.String `tfsdk:"project_id"`
 	OrgId     types.String `tfsdk:"org_id"`
@@ -44,15 +52,23 @@ type ABXActionAPIModel struct {
 	FAASProvider string `json:"provider"`
 	Type         string `json:"actionType"`
 
-	RuntimeName    string            `json:"runtime"`
-	RuntimeVersion string            `json:"runtimeVersion"`
-	MemoryInMB     int64             `json:"memoryInMB"`
-	TimeoutSeconds int64             `json:"timeoutSeconds"`
-	Entrypoint     string            `json:"entrypoint"`
-	Dependencies   string            `json:"dependencies"`
-	Inputs         map[string]string `json:"inputs"`
+	RuntimeName    string `json:"runtime"`
+	RuntimeVersion string `json:"runtimeVersion"`
+
+	CPUShares                int64 `json:"cpuShares"`
+	MemoryInMB               int64 `json:"memoryInMB"`
+	TimeoutSeconds           int64 `json:"timeoutSeconds"`
+	DeploymentTimeoutSeconds int64 `json:"deploymentTimeoutSeconds"`
+
+	Entrypoint   string            `json:"entrypoint"`
+	Dependencies string            `json:"dependencies"`
+	Inputs       map[string]string `json:"inputs"`
 
 	Source string `json:"source"`
+
+	Shared        bool `json:"shared"`
+	System        bool `json:"system"`
+	AsyncDeployed bool `json:"asyncDeployed"`
 
 	ProjectId string `json:"projectId"`
 	OrgId     string `json:"orgId"`
@@ -76,10 +92,15 @@ func (self *ABXActionModel) FromAPI(
 	self.FAASProvider = types.StringValue(faasProvider)
 	self.RuntimeName = types.StringValue(raw.RuntimeName)
 	self.RuntimeVersion = types.StringValue(raw.RuntimeVersion)
+	self.CPUShares = types.Int64Value(raw.CPUShares)
 	self.MemoryInMB = types.Int64Value(raw.MemoryInMB)
 	self.TimeoutSeconds = types.Int64Value(raw.TimeoutSeconds)
+	self.DeploymentTimeoutSeconds = types.Int64Value(raw.DeploymentTimeoutSeconds)
 	self.Entrypoint = types.StringValue(raw.Entrypoint)
 	self.Source = types.StringValue(CleanString(raw.Source))
+	self.Shared = types.BoolValue(raw.Shared)
+	self.System = types.BoolValue(raw.System)
+	self.AsyncDeployed = types.BoolValue(raw.AsyncDeployed)
 	self.ProjectId = types.StringValue(raw.ProjectId)
 	self.OrgId = types.StringValue(raw.OrgId)
 
@@ -187,19 +208,24 @@ func (self *ABXActionModel) ToAPI(ctx context.Context) (ABXActionAPIModel, diag.
 	}
 
 	return ABXActionAPIModel{
-		Name:           self.Name.ValueString(),
-		Description:    self.Description.ValueString(),
-		FAASProvider:   faasProvider,
-		Type:           self.Type.ValueString(),
-		RuntimeName:    self.RuntimeName.ValueString(),
-		RuntimeVersion: self.RuntimeVersion.ValueString(),
-		MemoryInMB:     self.MemoryInMB.ValueInt64(),
-		TimeoutSeconds: self.TimeoutSeconds.ValueInt64(),
-		Entrypoint:     self.Entrypoint.ValueString(),
-		Dependencies:   strings.Join(SkipEmpty(dependencies), "\n"),
-		Inputs:         inputs,
-		Source:         CleanString(self.Source.ValueString()),
-		ProjectId:      self.ProjectId.ValueString(),
+		Name:                     self.Name.ValueString(),
+		Description:              self.Description.ValueString(),
+		FAASProvider:             faasProvider,
+		Type:                     self.Type.ValueString(),
+		RuntimeName:              self.RuntimeName.ValueString(),
+		RuntimeVersion:           self.RuntimeVersion.ValueString(),
+		CPUShares:                self.CPUShares.ValueInt64(),
+		MemoryInMB:               self.MemoryInMB.ValueInt64(),
+		TimeoutSeconds:           self.TimeoutSeconds.ValueInt64(),
+		DeploymentTimeoutSeconds: self.DeploymentTimeoutSeconds.ValueInt64(),
+		Entrypoint:               self.Entrypoint.ValueString(),
+		Dependencies:             strings.Join(SkipEmpty(dependencies), "\n"),
+		Inputs:                   inputs,
+		Source:                   CleanString(self.Source.ValueString()),
+		Shared:                   self.Shared.ValueBool(),
+		System:                   self.System.ValueBool(),
+		AsyncDeployed:            self.AsyncDeployed.ValueBool(),
+		ProjectId:                self.ProjectId.ValueString(),
 	}, diags
 }
 

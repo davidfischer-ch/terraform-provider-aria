@@ -82,12 +82,17 @@ EOT
 
 ### Optional
 
-- `faas_provider` (String) FaaS provider used for code execution, one of auto (default), on-prem, aws and azure
+- `cpu_shares` (Number) Runtime CPU shares
+- `deployment_timeout_seconds` (Number) How long ??
+- `faas_provider` (String) FaaS provider used for code execution, one of auto (default), on-prem, aws and azure (automatically set by the platform if unset)
 - `runtime_version` (String) Runtime version (3.10, ...)
+- `shared` (Boolean) Flag indicating if the action can be shared across projects
 - `timeout_seconds` (Number) How long an action can run (default to 600)
 - `type` (String) Type of action, one of SCRIPT (default), REST_CALL, REST_POLL, FLOW, VAULT and CYBERARK
 
 ### Read-Only
 
+- `async_deployed` (Boolean) TODO
 - `id` (String) Action identifier
 - `org_id` (String) Organisation ID
+- `system` (Boolean) Flag indicating if the action is a system action

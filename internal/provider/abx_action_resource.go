@@ -12,6 +12,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
@@ -64,7 +66,7 @@ func (self *ABXActionResource) Schema(
 				Required:            true,
 			},
 			"faas_provider": schema.StringAttribute{
-				MarkdownDescription: "FaaS provider used for code execution, one of auto (default), on-prem, aws and azure",
+				MarkdownDescription: "FaaS provider used for code execution, one of auto (default), on-prem, aws and azure (automatically set by the platform if unset)",
 				Computed:            true,
 				Optional:            true,
 				Default:             stringdefault.StaticString("auto"),
@@ -90,6 +92,12 @@ func (self *ABXActionResource) Schema(
 				Computed:            true,
 				Optional:            true,
 			},
+			"cpu_shares": schema.Int64Attribute{
+				MarkdownDescription: "Runtime CPU shares",
+				Computed:            true,
+				Optional:            true,
+				Default:             int64default.StaticInt64(1024),
+			},
 			"memory_in_mb": schema.Int64Attribute{
 				MarkdownDescription: "Runtime memory constraint in MB",
 				Required:            true,
@@ -99,6 +107,12 @@ func (self *ABXActionResource) Schema(
 				Computed:            true,
 				Optional:            true,
 				Default:             int64default.StaticInt64(600),
+			},
+			"deployment_timeout_seconds": schema.Int64Attribute{
+				MarkdownDescription: "How long ??",
+				Computed:            true,
+				Optional:            true,
+				Default:             int64default.StaticInt64(900),
 			},
 			"entrypoint": schema.StringAttribute{
 				MarkdownDescription: "Main function's name",
@@ -134,11 +148,31 @@ func (self *ABXActionResource) Schema(
 				Required:            true,
 				PlanModifiers:       []planmodifier.String{stringplanmodifier.RequiresReplace()},
 			},
+			"shared": schema.BoolAttribute{
+				MarkdownDescription: "Flag indicating if the action can be shared across projects",
+				Computed:            true,
+				Optional:            true,
+				Default:             booldefault.StaticBool(false),
+			},
+			"system": schema.BoolAttribute{
+				MarkdownDescription: "Flag indicating if the action is a system action",
+				Computed:            true,
+				PlanModifiers:       []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+			},
+			"async_deployed": schema.BoolAttribute{
+				MarkdownDescription: "TODO",
+				Computed:            true,
+				PlanModifiers:       []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+			},
 			"org_id": schema.StringAttribute{
 				MarkdownDescription: "Organisation ID",
 				Computed:            true,
 				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
+			/* created_millis int64 */
+			/* updated_millis int64 */
+			/* metadata {} */
+			/* configuration {} */
 			/* "self_link": schema.StringAttribute{
 				MarkdownDescription: "URL to the action",
 				Computed:            true,
