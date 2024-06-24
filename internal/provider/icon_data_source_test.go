@@ -18,7 +18,7 @@ func TestAccIconDataSource(t *testing.T) {
 			{
 				Config: `
 variable "test_icon_id" {
-	description = "ABX action to use for testing subscriptions."
+  description = "ABX action to use for testing the data source."
   type        = string
 }
 
