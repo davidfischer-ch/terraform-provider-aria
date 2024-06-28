@@ -17,10 +17,14 @@ Custom Resource resource
 
 ### Required
 
+- `create` (Attributes) Resource's create action (see [below for nested schema](#nestedatt--create))
+- `delete` (Attributes) Resource's delete action (see [below for nested schema](#nestedatt--delete))
 - `description` (String) Describe the resource in few sentences
 - `display_name` (String) A friendly name
 - `project_id` (String) Project ID
+- `read` (Attributes) Resource's read action (see [below for nested schema](#nestedatt--read))
 - `resource_type` (String) Define the type (must be unique, e.g. Custom.DB.PostgreSQL)
+- `update` (Attributes) Resource's update action (see [below for nested schema](#nestedatt--update))
 
 ### Optional
 
@@ -31,3 +35,62 @@ Custom Resource resource
 
 - `id` (String) Resource identifier
 - `org_id` (String) Organisation ID
+
+<a id="nestedatt--create"></a>
+### Nested Schema for `create`
+
+Required:
+
+- `id` (String) Runnable ID
+- `name` (String) Runnable name
+- `project_id` (String) Runnable's project ID
+- `type` (String) Runnable type, either abx.action or vro.workflow
+
+Optional:
+
+- `input_parameters` (List of String) TODO
+
+
+<a id="nestedatt--delete"></a>
+### Nested Schema for `delete`
+
+Required:
+
+- `id` (String) Runnable ID
+- `name` (String) Runnable name
+- `project_id` (String) Runnable's project ID
+- `type` (String) Runnable type, either abx.action or vro.workflow
+
+Optional:
+
+- `input_parameters` (List of String) TODO
+
+
+<a id="nestedatt--read"></a>
+### Nested Schema for `read`
+
+Required:
+
+- `id` (String) Runnable ID
+- `name` (String) Runnable name
+- `project_id` (String) Runnable's project ID
+- `type` (String) Runnable type, either abx.action or vro.workflow
+
+Optional:
+
+- `input_parameters` (List of String) TODO
+
+
+<a id="nestedatt--update"></a>
+### Nested Schema for `update`
+
+Required:
+
+- `id` (String) Runnable ID
+- `name` (String) Runnable name
+- `project_id` (String) Runnable's project ID
+- `type` (String) Runnable type, either abx.action or vro.workflow
+
+Optional:
+
+- `input_parameters` (List of String) TODO

@@ -8,18 +8,19 @@ import (
 	"fmt"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	//"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	//"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
-	//"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	//"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -88,10 +89,134 @@ func (self *CustomResourceResource) Schema(
 				},
 			},
 			// FIXME "properties": {},
-			// FIXME "create": {},
-			// FIXME "read": {},
-			// FIXME "update": {},
-			// FIXME "delete": {},
+			"create": schema.SingleNestedAttribute{
+				MarkdownDescription: "Resource's create action",
+				Attributes: map[string]schema.Attribute{
+					"id": schema.StringAttribute{
+						MarkdownDescription: "Runnable ID",
+						Required:            true,
+					},
+					"name": schema.StringAttribute{
+						MarkdownDescription: "Runnable name",
+						Required:            true,
+					},
+					"type": schema.StringAttribute{
+						MarkdownDescription: "Runnable type, either abx.action or vro.workflow",
+						Required:            true,
+						Validators: []validator.String{
+							stringvalidator.OneOf([]string{"abx.action", "vro.workflow"}...),
+						},
+					},
+					"project_id": schema.StringAttribute{
+						MarkdownDescription: "Runnable's project ID",
+						Required:            true,
+					},
+					"input_parameters": schema.ListAttribute{
+						MarkdownDescription: "TODO",
+						ElementType:         types.StringType,
+						Computed:            true,
+						Optional:            true,
+						Default:             listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{})),
+					},
+				},
+				Required: true,
+			},
+			"read": schema.SingleNestedAttribute{
+				MarkdownDescription: "Resource's read action",
+				Attributes: map[string]schema.Attribute{
+					"id": schema.StringAttribute{
+						MarkdownDescription: "Runnable ID",
+						Required:            true,
+					},
+					"name": schema.StringAttribute{
+						MarkdownDescription: "Runnable name",
+						Required:            true,
+					},
+					"type": schema.StringAttribute{
+						MarkdownDescription: "Runnable type, either abx.action or vro.workflow",
+						Required:            true,
+						Validators: []validator.String{
+							stringvalidator.OneOf([]string{"abx.action", "vro.workflow"}...),
+						},
+					},
+					"project_id": schema.StringAttribute{
+						MarkdownDescription: "Runnable's project ID",
+						Required:            true,
+					},
+					"input_parameters": schema.ListAttribute{
+						MarkdownDescription: "TODO",
+						ElementType:         types.StringType,
+						Computed:            true,
+						Optional:            true,
+						Default:             listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{})),
+					},
+				},
+				Required: true,
+			},
+			"update": schema.SingleNestedAttribute{
+				MarkdownDescription: "Resource's update action",
+				Attributes: map[string]schema.Attribute{
+					"id": schema.StringAttribute{
+						MarkdownDescription: "Runnable ID",
+						Required:            true,
+					},
+					"name": schema.StringAttribute{
+						MarkdownDescription: "Runnable name",
+						Required:            true,
+					},
+					"type": schema.StringAttribute{
+						MarkdownDescription: "Runnable type, either abx.action or vro.workflow",
+						Required:            true,
+						Validators: []validator.String{
+							stringvalidator.OneOf([]string{"abx.action", "vro.workflow"}...),
+						},
+					},
+					"project_id": schema.StringAttribute{
+						MarkdownDescription: "Runnable's project ID",
+						Required:            true,
+					},
+					"input_parameters": schema.ListAttribute{
+						MarkdownDescription: "TODO",
+						ElementType:         types.StringType,
+						Computed:            true,
+						Optional:            true,
+						Default:             listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{})),
+					},
+				},
+				Required: true,
+			},
+			"delete": schema.SingleNestedAttribute{
+				MarkdownDescription: "Resource's delete action",
+				Attributes: map[string]schema.Attribute{
+					"id": schema.StringAttribute{
+						MarkdownDescription: "Runnable ID",
+						Required:            true,
+					},
+					"name": schema.StringAttribute{
+						MarkdownDescription: "Runnable name",
+						Required:            true,
+					},
+					"type": schema.StringAttribute{
+						MarkdownDescription: "Runnable type, either abx.action or vro.workflow",
+						Required:            true,
+						Validators: []validator.String{
+							stringvalidator.OneOf([]string{"abx.action", "vro.workflow"}...),
+						},
+					},
+					"project_id": schema.StringAttribute{
+						MarkdownDescription: "Runnable's project ID",
+						Required:            true,
+					},
+					"input_parameters": schema.ListAttribute{
+						MarkdownDescription: "TODO",
+						ElementType:         types.StringType,
+						Computed:            true,
+						Optional:            true,
+						Default:             listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{})),
+					},
+				},
+				Required: true,
+			},
 			// FIXME "additional_actions": {},
 			"project_id": schema.StringAttribute{
 				MarkdownDescription: "Project ID",

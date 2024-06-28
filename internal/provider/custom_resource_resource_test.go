@@ -100,6 +100,35 @@ resource "aria_custom_resource" "test" {
   schema_type   = "ABX_USER_DEFINED"
   status        = "DRAFT"
   project_id    = var.test_project_id
+
+  // TODO Create a function to simplify this
+  create = {
+    id         = aria_abx_action.create.id
+    name       = aria_abx_action.create.name
+    project_id = aria_abx_action.create.project_id
+    type       = "abx.action"
+  }
+
+  read = {
+    id         = aria_abx_action.read.id
+    name       = aria_abx_action.read.name
+    project_id = aria_abx_action.read.project_id
+    type       = "abx.action"
+  }
+
+  update = {
+    id         = aria_abx_action.update.id
+    name       = aria_abx_action.update.name
+    project_id = aria_abx_action.update.project_id
+    type       = "abx.action"
+  }
+
+  delete = {
+    id         = aria_abx_action.delete.id
+    name       = aria_abx_action.delete.name
+    project_id = aria_abx_action.delete.project_id
+    type       = "abx.action"
+  }
 }
 `,
 				/*Check: resource.ComposeAggregateTestCheckFunc(
