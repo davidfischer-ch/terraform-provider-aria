@@ -25,7 +25,7 @@ import (
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &ABXActionResource{}
-var _ resource.ResourceWithImportState = &IconResource{}
+var _ resource.ResourceWithImportState = &ABXActionResource{}
 
 func NewABXActionResource() resource.Resource {
 	return &ABXActionResource{}
