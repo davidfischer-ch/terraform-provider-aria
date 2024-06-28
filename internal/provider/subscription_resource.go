@@ -24,7 +24,7 @@ import (
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &SubscriptionResource{}
-var _ resource.ResourceWithImportState = &IconResource{}
+var _ resource.ResourceWithImportState = &SubscriptionResource{}
 
 func NewSubscriptionResource() resource.Resource {
 	return &SubscriptionResource{}

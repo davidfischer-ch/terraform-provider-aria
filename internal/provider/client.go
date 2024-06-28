@@ -110,7 +110,9 @@ func handleAPIResponse(
 	}
 
 	if response.StatusCode() != statusCode {
-		return errors.New(response.String())
+		return errors.New(
+			fmt.Sprintf("API response status code %d (expected %d), Body: %s",
+				response.StatusCode(), statusCode, response.String()))
 	}
 
 	return nil
