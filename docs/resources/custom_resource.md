@@ -21,7 +21,7 @@ Custom Resource resource
 - `delete` (Attributes) Resource's delete action (see [below for nested schema](#nestedatt--delete))
 - `description` (String) Describe the resource in few sentences
 - `display_name` (String) A friendly name
-- `project_id` (String) Project ID
+- `properties` (Attributes) Resource's properties (see [below for nested schema](#nestedatt--properties))
 - `read` (Attributes) Resource's read action (see [below for nested schema](#nestedatt--read))
 - `resource_type` (String) Define the type (must be unique, e.g. Custom.DB.PostgreSQL)
 - `update` (Attributes) Resource's update action (see [below for nested schema](#nestedatt--update))
@@ -34,21 +34,23 @@ Custom Resource resource
 ### Read-Only
 
 - `id` (String) Resource identifier
-- `org_id` (String) Organisation ID
 
 <a id="nestedatt--create"></a>
 ### Nested Schema for `create`
 
 Required:
 
-- `id` (String) Runnable ID
-- `name` (String) Runnable name
-- `project_id` (String) Runnable's project ID
+- `id` (String) Runnable identifier
+- `project_id` (String) Runnable's project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
 
 Optional:
 
 - `input_parameters` (List of String) TODO
+
+Read-Only:
+
+- `name` (String) Runnable name
 
 
 <a id="nestedatt--delete"></a>
@@ -56,14 +58,50 @@ Optional:
 
 Required:
 
-- `id` (String) Runnable ID
-- `name` (String) Runnable name
-- `project_id` (String) Runnable's project ID
+- `id` (String) Runnable identifier
+- `project_id` (String) Runnable's project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
 
 Optional:
 
 - `input_parameters` (List of String) TODO
+
+Read-Only:
+
+- `name` (String) Runnable name
+
+
+<a id="nestedatt--properties"></a>
+### Nested Schema for `properties`
+
+Required:
+
+- `description` (String) Description
+- `encrypted` (Boolean) Encrypted?
+- `read_only` (Boolean) Mark this field as computed (not settable in config)
+- `recreate_on_update` (Boolean) Changing this field requires the resource to be recreated?
+- `title` (String) Title
+- `type` (String) Type, one of string, integer, number, boolean, object, array
+
+Optional:
+
+- `default` (Dynamic) Default value
+- `max_length` (Number) Maximum length (valid for a string)
+- `maximum` (Number) Maximum value (incluse, valid for an integer)
+- `min_length` (Number) Minimum length (valid for a string)
+- `minimum` (Number) Minimum value (incluse, valid for an integer)
+- `one_of` (Attributes List) (see [below for nested schema](#nestedatt--properties--one_of))
+- `pattern` (String) Pattern (valid for a string)
+
+<a id="nestedatt--properties--one_of"></a>
+### Nested Schema for `properties.one_of`
+
+Required:
+
+- `const` (String) Technical value
+- `encrypted` (Boolean) Encrypted?
+- `title` (String) Display value
+
 
 
 <a id="nestedatt--read"></a>
@@ -71,14 +109,17 @@ Optional:
 
 Required:
 
-- `id` (String) Runnable ID
-- `name` (String) Runnable name
-- `project_id` (String) Runnable's project ID
+- `id` (String) Runnable identifier
+- `project_id` (String) Runnable's project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
 
 Optional:
 
 - `input_parameters` (List of String) TODO
+
+Read-Only:
+
+- `name` (String) Runnable name
 
 
 <a id="nestedatt--update"></a>
@@ -86,11 +127,14 @@ Optional:
 
 Required:
 
-- `id` (String) Runnable ID
-- `name` (String) Runnable name
-- `project_id` (String) Runnable's project ID
+- `id` (String) Runnable identifier
+- `project_id` (String) Runnable's project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
 
 Optional:
 
 - `input_parameters` (List of String) TODO
+
+Read-Only:
+
+- `name` (String) Runnable name

@@ -65,7 +65,7 @@ func (self *ABXConstantResource) Schema(
 				Default:             booldefault.StaticBool(false),
 			},
 			"org_id": schema.StringAttribute{
-				MarkdownDescription: "Constant organisation ID",
+				MarkdownDescription: "Constant organisation identifier",
 				Computed:            true,
 				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},

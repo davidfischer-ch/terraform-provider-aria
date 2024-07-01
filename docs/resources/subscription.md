@@ -72,11 +72,11 @@ resource "aria_subscription" "hello_world" {
 - `blocking` (Boolean) TODO
 - `contextual` (Boolean) TODO
 - `description` (String) Describe the subscription in few sentences
-- `event_topic_id` (String) Event topic ID
+- `event_topic_id` (String) Event topic identifier
 - `name` (String) Subscription name
 - `priority` (Number) TODO
 - `project_ids` (Set of String) Restrict to given projects (an empty list means all)
-- `runnable_id` (String) Runnable ID
+- `runnable_id` (String) Runnable identifier
 - `runnable_type` (String) Runnable type, either extensibility.abx or extensibility.vro
 - `timeout` (Number) TODO
 - `type` (String) Subscription type, either RUNNABLE or SUBSCRIBABLE
@@ -85,14 +85,14 @@ resource "aria_subscription" "hello_world" {
 
 - `criteria` (String) TODO
 - `disabled` (Boolean) TODO
-- `recover_runnable_id` (String) Recovery runnable ID
+- `recover_runnable_id` (String) Recovery runnable identifier
 - `recover_runnable_type` (String) Recovery runnable type, either extensibility.abx or extensibility.vro
 
 ### Read-Only
 
 - `broadcast` (Boolean) TODO
 - `id` (String) Subscription identifier
-- `org_id` (String) Subscription organisation ID
-- `owner_id` (String) Subscription owner ID
-- `subscriber_id` (String) Subscriber ID
+- `org_id` (String) Subscription organisation identifier
+- `owner_id` (String) Subscription owner identifier
+- `subscriber_id` (String) Subscriber identifier
 - `system` (Boolean) TODO

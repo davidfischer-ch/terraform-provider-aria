@@ -81,7 +81,7 @@ func (self *SubscriptionResource) Schema(
 				},
 			},
 			"runnable_id": schema.StringAttribute{
-				MarkdownDescription: "Runnable ID",
+				MarkdownDescription: "Runnable identifier",
 				Required:            true,
 			},
 			"recover_runnable_type": schema.StringAttribute{
@@ -92,11 +92,11 @@ func (self *SubscriptionResource) Schema(
 				},
 			},
 			"recover_runnable_id": schema.StringAttribute{
-				MarkdownDescription: "Recovery runnable ID",
+				MarkdownDescription: "Recovery runnable identifier",
 				Optional:            true,
 			},
 			"event_topic_id": schema.StringAttribute{
-				MarkdownDescription: "Event topic ID",
+				MarkdownDescription: "Event topic identifier",
 				Required:            true,
 			},
 			"project_ids": schema.SetAttribute{
@@ -143,17 +143,17 @@ func (self *SubscriptionResource) Schema(
 				Required:            true,
 			},
 			"org_id": schema.StringAttribute{
-				MarkdownDescription: "Subscription organisation ID",
+				MarkdownDescription: "Subscription organisation identifier",
 				Computed:            true,
 				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"owner_id": schema.StringAttribute{
-				MarkdownDescription: "Subscription owner ID",
+				MarkdownDescription: "Subscription owner identifier",
 				Computed:            true,
 				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"subscriber_id": schema.StringAttribute{
-				MarkdownDescription: "Subscriber ID",
+				MarkdownDescription: "Subscriber identifier",
 				Computed:            true,
 				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},

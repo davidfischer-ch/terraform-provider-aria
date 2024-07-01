@@ -64,7 +64,7 @@ func (self *ABXSensitiveConstantResource) Schema(
 				Default:             booldefault.StaticBool(true),
 			},
 			"org_id": schema.StringAttribute{
-				MarkdownDescription: "Constant organisation ID",
+				MarkdownDescription: "Constant organisation identifier",
 				Computed:            true,
 				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},

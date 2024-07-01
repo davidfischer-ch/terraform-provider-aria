@@ -88,17 +88,100 @@ func (self *CustomResourceResource) Schema(
 					stringvalidator.OneOf([]string{"DRAFT", "ON", "RELEASED"}...),
 				},
 			},
-			// FIXME "properties": {},
+			"properties": schema.SingleNestedAttribute{
+				MarkdownDescription: "Resource's properties",
+				Attributes: map[string]schema.Attribute{
+					"title": schema.StringAttribute{
+						MarkdownDescription: "Title",
+						Required:            true,
+					},
+					"description": schema.StringAttribute{
+						MarkdownDescription: "Description",
+						Required:            true,
+					},
+					"type": schema.StringAttribute{
+						MarkdownDescription: "Type, one of string, integer, number, boolean, object, array",
+						Required:            true,
+						Validators: []validator.String{
+							stringvalidator.OneOf([]string{"boolean", "integer", "object", "string"}...),
+						},
+					},
+					"default": schema.DynamicAttribute{
+						MarkdownDescription: "Default value",
+						Computed:            true,
+						Optional:            true,
+					},
+					"encrypted": schema.BoolAttribute{
+						MarkdownDescription: "Encrypted?",
+						Required:            true,
+					},
+					"read_only": schema.BoolAttribute{
+						MarkdownDescription: "Mark this field as computed (not settable in config)",
+						Required:            true,
+					},
+					"recreate_on_update": schema.BoolAttribute{
+						MarkdownDescription: "Changing this field requires the resource to be recreated?",
+						Required:            true,
+					},
+					"minimum": schema.Int64Attribute{
+						MarkdownDescription: "Minimum value (incluse, valid for an integer)",
+						Computed:            true,
+						Optional:            true,
+					},
+					"maximum": schema.Int64Attribute{
+						MarkdownDescription: "Maximum value (incluse, valid for an integer)",
+						Computed:            true,
+						Optional:            true,
+					},
+					"min_length": schema.Int64Attribute{
+						MarkdownDescription: "Minimum length (valid for a string)",
+						Computed:            true,
+						Optional:            true,
+					},
+					"max_length": schema.Int64Attribute{
+						MarkdownDescription: "Maximum length (valid for a string)",
+						Computed:            true,
+						Optional:            true,
+					},
+					"pattern": schema.StringAttribute{
+						MarkdownDescription: "Pattern (valid for a string)",
+						Computed:            true,
+						Optional:            true,
+						Default:             stringdefault.StaticString(""),
+					},
+					"one_of": schema.ListNestedAttribute{
+						Computed: true,
+						Optional: true,
+						NestedObject: schema.NestedAttributeObject{
+							Attributes: map[string]schema.Attribute{
+								"const": schema.StringAttribute{
+									MarkdownDescription: "Technical value",
+									Required:            true,
+								},
+								"title": schema.StringAttribute{
+									MarkdownDescription: "Display value",
+									Required:            true,
+								},
+								"encrypted": schema.BoolAttribute{
+									MarkdownDescription: "Encrypted?",
+									Required:            true,
+								},
+							},
+						},
+					},
+				},
+				Required: true,
+			},
 			"create": schema.SingleNestedAttribute{
 				MarkdownDescription: "Resource's create action",
 				Attributes: map[string]schema.Attribute{
 					"id": schema.StringAttribute{
-						MarkdownDescription: "Runnable ID",
+						MarkdownDescription: "Runnable identifier",
 						Required:            true,
 					},
 					"name": schema.StringAttribute{
 						MarkdownDescription: "Runnable name",
-						Required:            true,
+						Computed:            true,
 					},
 					"type": schema.StringAttribute{
 						MarkdownDescription: "Runnable type, either abx.action or vro.workflow",
@@ -108,7 +191,7 @@ func (self *CustomResourceResource) Schema(
 						},
 					},
 					"project_id": schema.StringAttribute{
-						MarkdownDescription: "Runnable's project ID",
+						MarkdownDescription: "Runnable's project identifier",
 						Required:            true,
 					},
 					"input_parameters": schema.ListAttribute{
@@ -125,12 +208,12 @@ func (self *CustomResourceResource) Schema(
 				MarkdownDescription: "Resource's read action",
 				Attributes: map[string]schema.Attribute{
 					"id": schema.StringAttribute{
-						MarkdownDescription: "Runnable ID",
+						MarkdownDescription: "Runnable identifier",
 						Required:            true,
 					},
 					"name": schema.StringAttribute{
 						MarkdownDescription: "Runnable name",
-						Required:            true,
+						Computed:            true,
 					},
 					"type": schema.StringAttribute{
 						MarkdownDescription: "Runnable type, either abx.action or vro.workflow",
@@ -140,7 +223,7 @@ func (self *CustomResourceResource) Schema(
 						},
 					},
 					"project_id": schema.StringAttribute{
-						MarkdownDescription: "Runnable's project ID",
+						MarkdownDescription: "Runnable's project identifier",
 						Required:            true,
 					},
 					"input_parameters": schema.ListAttribute{
@@ -157,12 +240,12 @@ func (self *CustomResourceResource) Schema(
 				MarkdownDescription: "Resource's update action",
 				Attributes: map[string]schema.Attribute{
 					"id": schema.StringAttribute{
-						MarkdownDescription: "Runnable ID",
+						MarkdownDescription: "Runnable identifier",
 						Required:            true,
 					},
 					"name": schema.StringAttribute{
 						MarkdownDescription: "Runnable name",
-						Required:            true,
+						Computed:            true,
 					},
 					"type": schema.StringAttribute{
 						MarkdownDescription: "Runnable type, either abx.action or vro.workflow",
@@ -172,7 +255,7 @@ func (self *CustomResourceResource) Schema(
 						},
 					},
 					"project_id": schema.StringAttribute{
-						MarkdownDescription: "Runnable's project ID",
+						MarkdownDescription: "Runnable's project identifier",
 						Required:            true,
 					},
 					"input_parameters": schema.ListAttribute{
@@ -189,12 +272,12 @@ func (self *CustomResourceResource) Schema(
 				MarkdownDescription: "Resource's delete action",
 				Attributes: map[string]schema.Attribute{
 					"id": schema.StringAttribute{
-						MarkdownDescription: "Runnable ID",
+						MarkdownDescription: "Runnable identifier",
 						Required:            true,
 					},
 					"name": schema.StringAttribute{
 						MarkdownDescription: "Runnable name",
-						Required:            true,
+						Computed:            true,
 					},
 					"type": schema.StringAttribute{
 						MarkdownDescription: "Runnable type, either abx.action or vro.workflow",
@@ -204,7 +287,7 @@ func (self *CustomResourceResource) Schema(
 						},
 					},
 					"project_id": schema.StringAttribute{
-						MarkdownDescription: "Runnable's project ID",
+						MarkdownDescription: "Runnable's project identifier",
 						Required:            true,
 					},
 					"input_parameters": schema.ListAttribute{
@@ -217,17 +300,142 @@ func (self *CustomResourceResource) Schema(
 				},
 				Required: true,
 			},
-			// FIXME "additional_actions": {},
-			"project_id": schema.StringAttribute{
-				MarkdownDescription: "Project ID",
-				Required:            true,
-				// Yes or no? PlanModifiers: []planmodifier.String{stringplanmodifier.RequiresReplace()},
-			},
-			"org_id": schema.StringAttribute{
-				MarkdownDescription: "Organisation ID",
-				Computed:            true,
-				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-			},
+			/* "additional_actions": schema.ListNestedAttribute{
+				MarkdownDescription: "Additional actions (aka Day 2)",
+				Computed: true,
+				Optional: true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"id": schema.StringAttribute{
+							MarkdownDescription: "Action identifier",
+							Computed:            true,
+							PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						},
+						"name": schema.StringAttribute{
+							MarkdownDescription: "Action name",
+							Required: true,
+						},
+						"display_name": schema.StringAttribute{
+							MarkdownDescription: "Action display name",
+							Required: true,
+						},
+						"provider_name": schema.StringAttribute{
+							MarkdownDescription: "Provider name, one of xaas (and that's all, maybe)",
+							Computed: true,
+							Optional: true,
+							Default:             stringdefault.StaticString("xaas"),
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						},
+						"project_id": schema.StringAttribute{
+							MarkdownDescription: "Action's project identifier",
+							Computed: true,
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						},
+						"resource_type": schema.StringAttribute{
+							MarkdownDescription: "Resource type (e.g. Custom.DB.PostgreSQL)",
+							Computed:            true,
+							PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						},
+						"runnable_item": schema.SingleNestedAttribute{
+							MarkdownDescription: "Additional action's runnable",
+							Attributes: map[string]schema.Attribute{
+								"id": schema.StringAttribute{
+									MarkdownDescription: "Runnable identifier",
+									Required:            true,
+								},
+								"name": schema.StringAttribute{
+									MarkdownDescription: "Runnable name",
+									Computed: true,
+								},
+								"type": schema.StringAttribute{
+									MarkdownDescription: "Runnable type, either abx.action or vro.workflow",
+									Required:            true,
+									Validators: []validator.String{
+										stringvalidator.OneOf([]string{"abx.action", "vro.workflow"}...),
+									},
+								},
+								"project_id": schema.StringAttribute{
+									MarkdownDescription: "Runnable's project identifier",
+									Required:            true,
+								},
+								"input_parameters": schema.ListAttribute{
+									MarkdownDescription: "TODO",
+									ElementType:         types.StringType,
+									Computed:            true,
+									Optional:            true,
+									Default:             listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{})),
+								},
+							},
+							Required: true,
+						},
+						"status": schema.StringAttribute{
+							MarkdownDescription: "Resource status",
+							Computed:            true,
+						},
+						"org_id": schema.StringAttribute{
+							MarkdownDescription: "Organisation identifier",
+							Computed:            true,
+							PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						},
+						"form_definition": schema.SingleNestedAttribute{
+							MarkdownDescription: "Additional action's custom form",
+							Attributes: map[string]schema.Attribute{
+								"id": schema.StringAttribute{
+									MarkdownDescription: "Form identifier",
+									Computed: true,
+								},
+								"name": schema.StringAttribute{
+									MarkdownDescription: "Form name",
+									Required:            true,
+								},
+								"type": schema.StringAttribute{
+									MarkdownDescription: "Form type, requestForm",
+									Computed:            true,
+									Optional:            true,
+									Default:             stringdefault.StaticString("requestForm"),
+									PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+									Validators: []validator.String{
+										stringvalidator.OneOf([]string{"requestForm"}...),
+									},
+								},
+								"form": schema.StringAttribute{
+									MarkdownDescription: "Form content in JSON (TODO nested attribute to define this instead of messing with JSON)",
+									Required:            true,
+								},
+								"form_format": schema.StringAttribute{
+									MarkdownDescription: "Form format either JSON or YAML, will be forced to JSON by Aria ...",
+									Computed:            true,
+									Default:             stringdefault.StaticString("JSON"),
+								},
+								"styles": schema.StringAttribute{
+									MarkdownDescription: "Form stylesheet",
+									Computed: true,
+									Optional: true,
+									Default:             stringdefault.StaticString(""),
+									PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+								}
+								"source_type": schema.StringAttribute{
+									MarkdownDescription: "Form source type",
+									Computed: true,
+									Default: stringdefault.StaticString("resource.action"),
+									PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+								}
+								"status": schema.StringAttribute{
+									MarkdownDescription: "Resource status, one of DRAFT, ON, or RELEASED",
+									Computed:            true,
+									Optional:            true,
+									Validators: []validator.String{
+										stringvalidator.OneOf([]string{"DRAFT", "ON", "RELEASED"}...),
+									},
+								},
+							},
+							Computed: true,
+							Optional: true,
+							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+						},
+					},
+				},
+			}, */
 		},
 	}
 }

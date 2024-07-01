@@ -165,7 +165,7 @@ func (self *ABXActionResource) Schema(
 				PlanModifiers:       []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
 			},
 			"org_id": schema.StringAttribute{
-				MarkdownDescription: "Organisation ID",
+				MarkdownDescription: "Organisation identifier",
 				Computed:            true,
 				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},

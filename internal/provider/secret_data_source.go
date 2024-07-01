@@ -54,7 +54,7 @@ func (self *SecretDataSource) Schema(
 				Computed:            true,
 			},
 			"org_id": schema.StringAttribute{
-				MarkdownDescription: "Organisation ID",
+				MarkdownDescription: "Organisation identifier",
 				Computed:            true,
 			},
 			"org_scoped": schema.BoolAttribute{
