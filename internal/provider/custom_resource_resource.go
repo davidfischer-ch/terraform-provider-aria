@@ -9,11 +9,11 @@ import (
 	"strings"
 
 	"github.com/go-resty/resty/v2"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
@@ -89,7 +89,7 @@ func (self *CustomResourceResource) Schema(
 			},
 			"properties": schema.ListNestedAttribute{
 				MarkdownDescription: "Resource's properties",
-				Required: true,
+				Required:            true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"title": schema.StringAttribute{
@@ -180,7 +180,7 @@ func (self *CustomResourceResource) Schema(
 			},
 			"create": schema.SingleNestedAttribute{
 				MarkdownDescription: "Resource's create action",
-				Required: true,
+				Required:            true,
 				Attributes: map[string]schema.Attribute{
 					"id": schema.StringAttribute{
 						MarkdownDescription: "Runnable identifier",
@@ -212,7 +212,7 @@ func (self *CustomResourceResource) Schema(
 			},
 			"read": schema.SingleNestedAttribute{
 				MarkdownDescription: "Resource's read action",
-				Required: true,
+				Required:            true,
 				Attributes: map[string]schema.Attribute{
 					"id": schema.StringAttribute{
 						MarkdownDescription: "Runnable identifier",
@@ -244,7 +244,7 @@ func (self *CustomResourceResource) Schema(
 			},
 			"update": schema.SingleNestedAttribute{
 				MarkdownDescription: "Resource's update action",
-				Required: true,
+				Required:            true,
 				Attributes: map[string]schema.Attribute{
 					"id": schema.StringAttribute{
 						MarkdownDescription: "Runnable identifier",
@@ -276,7 +276,7 @@ func (self *CustomResourceResource) Schema(
 			},
 			"delete": schema.SingleNestedAttribute{
 				MarkdownDescription: "Resource's delete action",
-				Required: true,
+				Required:            true,
 				Attributes: map[string]schema.Attribute{
 					"id": schema.StringAttribute{
 						MarkdownDescription: "Runnable identifier",
@@ -600,9 +600,9 @@ func (self *CustomResourceResource) Delete(
 		DeleteIt(
 			self.client,
 			ctx,
-			"Custom Resource " + resourceId,
-			"form-service/api/custom/resource-types/" + resourceId,
-		)...
+			"Custom Resource "+resourceId,
+			"form-service/api/custom/resource-types/"+resourceId,
+		)...,
 	)
 }
 
