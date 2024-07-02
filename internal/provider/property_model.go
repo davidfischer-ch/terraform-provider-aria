@@ -98,7 +98,14 @@ func (self *PropertyModel) ToAPI(
 	}*/
 
 	var defaultRaw any
-	json.Unmarshal([]byte(self.Default.ValueString()), &defaultRaw)
+	err := json.Unmarshal([]byte(self.Default.ValueString()), &defaultRaw)
+	if err != nil {
+		diags.AddError(
+			"Internal error",
+			fmt.Sprintf("Unable to JSON decode default value for property %s, got error: %s",
+				self.Title.ValueString(), err))
+		return PropertyAPIModel{}, diags
+	}
 
 	return PropertyAPIModel{
 		Title:            self.Title.ValueString(),
