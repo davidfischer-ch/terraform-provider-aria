@@ -159,11 +159,11 @@ func handleAPIResponse(
 		for _, i := range statusCodes {
 			statusCodesString = append(statusCodesString, strconv.Itoa(i))
 		}
-		return errors.New(
-			fmt.Sprintf("API response status code %d (expected %s), Body: %s",
-				response.StatusCode(),
-				strings.Join(statusCodesString, ", "),
-				response.String()))
+		return fmt.Errorf(
+			"API response status code %d (expected %s), Body: %s",
+			response.StatusCode(),
+			strings.Join(statusCodesString, ", "),
+			response.String())
 	}
 
 	return nil
