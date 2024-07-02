@@ -6,6 +6,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
@@ -88,92 +89,100 @@ func (self *CustomResourceResource) Schema(
 					stringvalidator.OneOf([]string{"DRAFT", "ON", "RELEASED"}...),
 				},
 			},
-			"properties": schema.SingleNestedAttribute{
+			"properties": schema.ListNestedAttribute{
 				MarkdownDescription: "Resource's properties",
-				Attributes: map[string]schema.Attribute{
-					"title": schema.StringAttribute{
-						MarkdownDescription: "Title",
-						Required:            true,
-					},
-					"description": schema.StringAttribute{
-						MarkdownDescription: "Description",
-						Required:            true,
-					},
-					"type": schema.StringAttribute{
-						MarkdownDescription: "Type, one of string, integer, number, boolean, object, array",
-						Required:            true,
-						Validators: []validator.String{
-							stringvalidator.OneOf([]string{"boolean", "integer", "object", "string"}...),
+				Required:            true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"title": schema.StringAttribute{
+							MarkdownDescription: "Title",
+							Required:            true,
 						},
-					},
-					"default": schema.DynamicAttribute{
-						MarkdownDescription: "Default value",
-						Computed:            true,
-						Optional:            true,
-					},
-					"encrypted": schema.BoolAttribute{
-						MarkdownDescription: "Encrypted?",
-						Required:            true,
-					},
-					"read_only": schema.BoolAttribute{
-						MarkdownDescription: "Mark this field as computed (not settable in config)",
-						Required:            true,
-					},
-					"recreate_on_update": schema.BoolAttribute{
-						MarkdownDescription: "Changing this field requires the resource to be recreated?",
-						Required:            true,
-					},
-					"minimum": schema.Int64Attribute{
-						MarkdownDescription: "Minimum value (incluse, valid for an integer)",
-						Computed:            true,
-						Optional:            true,
-					},
-					"maximum": schema.Int64Attribute{
-						MarkdownDescription: "Maximum value (incluse, valid for an integer)",
-						Computed:            true,
-						Optional:            true,
-					},
-					"min_length": schema.Int64Attribute{
-						MarkdownDescription: "Minimum length (valid for a string)",
-						Computed:            true,
-						Optional:            true,
-					},
-					"max_length": schema.Int64Attribute{
-						MarkdownDescription: "Maximum length (valid for a string)",
-						Computed:            true,
-						Optional:            true,
-					},
-					"pattern": schema.StringAttribute{
-						MarkdownDescription: "Pattern (valid for a string)",
-						Computed:            true,
-						Optional:            true,
-						Default:             stringdefault.StaticString(""),
-					},
-					"one_of": schema.ListNestedAttribute{
-						Computed: true,
-						Optional: true,
-						NestedObject: schema.NestedAttributeObject{
-							Attributes: map[string]schema.Attribute{
-								"const": schema.StringAttribute{
-									MarkdownDescription: "Technical value",
-									Required:            true,
-								},
-								"title": schema.StringAttribute{
-									MarkdownDescription: "Display value",
-									Required:            true,
-								},
-								"encrypted": schema.BoolAttribute{
-									MarkdownDescription: "Encrypted?",
-									Required:            true,
+						"description": schema.StringAttribute{
+							MarkdownDescription: "Description",
+							Required:            true,
+						},
+						"type": schema.StringAttribute{
+							MarkdownDescription: "Type, one of string, integer, number, boolean, object, array",
+							Required:            true,
+							Validators: []validator.String{
+								stringvalidator.OneOf([]string{"array", "boolean", "integer", "number", "object", "string"}...),
+							},
+						},
+						"default": schema.StringAttribute{
+							MarkdownDescription: strings.Join([]string{
+								"Default value (JSON encoded default value).",
+								"Should be a dynamic type, but Terraform SDK returns this issue:",
+								"Dynamic types inside of collections are not currently supported in terraform-plugin-framework.",
+								"If underlying dynamic values are required, replace the 'properties' attribute definition with DynamicAttribute instead.",
+							}, "\n"),
+							Computed: true,
+							Optional: true,
+						},
+						"encrypted": schema.BoolAttribute{
+							MarkdownDescription: "Encrypted?",
+							Required:            true,
+						},
+						"read_only": schema.BoolAttribute{
+							MarkdownDescription: "Make the field read-only (in the form)",
+							Required:            true,
+						},
+						"recreate_on_update": schema.BoolAttribute{
+							MarkdownDescription: "Mark this field as writable once (resource will be recreated on change)",
+							Required:            true,
+						},
+						"minimum": schema.Int64Attribute{
+							MarkdownDescription: "Minimum value (incluse, valid for an integer)",
+							Computed:            true,
+							Optional:            true,
+						},
+						"maximum": schema.Int64Attribute{
+							MarkdownDescription: "Maximum value (incluse, valid for an integer)",
+							Computed:            true,
+							Optional:            true,
+						},
+						"min_length": schema.Int64Attribute{
+							MarkdownDescription: "Minimum length (valid for a string)",
+							Computed:            true,
+							Optional:            true,
+						},
+						"max_length": schema.Int64Attribute{
+							MarkdownDescription: "Maximum length (valid for a string)",
+							Computed:            true,
+							Optional:            true,
+						},
+						"pattern": schema.StringAttribute{
+							MarkdownDescription: "Pattern (valid for a string)",
+							Computed:            true,
+							Optional:            true,
+							Default:             stringdefault.StaticString(""),
+						},
+						"one_of": schema.ListNestedAttribute{
+							Computed: true,
+							Optional: true,
+							NestedObject: schema.NestedAttributeObject{
+								Attributes: map[string]schema.Attribute{
+									"const": schema.StringAttribute{
+										MarkdownDescription: "Technical value",
+										Required:            true,
+									},
+									"title": schema.StringAttribute{
+										MarkdownDescription: "Display value",
+										Required:            true,
+									},
+									"encrypted": schema.BoolAttribute{
+										MarkdownDescription: "Encrypted?",
+										Required:            true,
+									},
 								},
 							},
 						},
 					},
 				},
-				Required: true,
 			},
 			"create": schema.SingleNestedAttribute{
 				MarkdownDescription: "Resource's create action",
+				Required:            true,
 				Attributes: map[string]schema.Attribute{
 					"id": schema.StringAttribute{
 						MarkdownDescription: "Runnable identifier",
@@ -202,10 +211,10 @@ func (self *CustomResourceResource) Schema(
 						Default:             listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{})),
 					},
 				},
-				Required: true,
 			},
 			"read": schema.SingleNestedAttribute{
 				MarkdownDescription: "Resource's read action",
+				Required:            true,
 				Attributes: map[string]schema.Attribute{
 					"id": schema.StringAttribute{
 						MarkdownDescription: "Runnable identifier",
@@ -234,10 +243,10 @@ func (self *CustomResourceResource) Schema(
 						Default:             listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{})),
 					},
 				},
-				Required: true,
 			},
 			"update": schema.SingleNestedAttribute{
 				MarkdownDescription: "Resource's update action",
+				Required:            true,
 				Attributes: map[string]schema.Attribute{
 					"id": schema.StringAttribute{
 						MarkdownDescription: "Runnable identifier",
@@ -266,10 +275,10 @@ func (self *CustomResourceResource) Schema(
 						Default:             listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{})),
 					},
 				},
-				Required: true,
 			},
 			"delete": schema.SingleNestedAttribute{
 				MarkdownDescription: "Resource's delete action",
+				Required:            true,
 				Attributes: map[string]schema.Attribute{
 					"id": schema.StringAttribute{
 						MarkdownDescription: "Runnable identifier",
@@ -298,7 +307,6 @@ func (self *CustomResourceResource) Schema(
 						Default:             listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{})),
 					},
 				},
-				Required: true,
 			},
 			/* "additional_actions": schema.ListNestedAttribute{
 				MarkdownDescription: "Additional actions (aka Day 2)",
@@ -436,6 +444,16 @@ func (self *CustomResourceResource) Schema(
 					},
 				},
 			}, */
+			"project_id": schema.StringAttribute{
+				MarkdownDescription: "Project ID",
+				Required:            true,
+				PlanModifiers:       []planmodifier.String{stringplanmodifier.RequiresReplace()},
+			},
+			"org_id": schema.StringAttribute{
+				MarkdownDescription: "Constant organisation identifier",
+				Computed:            true,
+				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			},
 		},
 	}
 }
@@ -470,15 +488,15 @@ func (self *CustomResourceResource) Create(
 		SetBody(resourceRaw).
 		SetResult(&resourceRaw).
 		Post("form-service/api/custom/resource-types")
-	err = handleAPIResponse(ctx, response, err, 200)
+	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to create custom resource, got error: %s", err))
+			fmt.Sprintf("Unable to create Custom Resource, got error: %s", err))
 		return
 	}
 
-	tflog.Debug(ctx, fmt.Sprintf("Custom resource %s created", resourceRaw.Id))
+	tflog.Debug(ctx, fmt.Sprintf("Custom Resource %s created", resourceRaw.Id))
 
 	// Save custom resource into Terraform state
 	resp.Diagnostics.Append(resource.FromAPI(ctx, resourceRaw)...)
@@ -501,21 +519,21 @@ func (self *CustomResourceResource) Read(
 	var resourceRaw CustomResourceAPIModel
 	response, err := self.client.R().
 		SetResult(&resourceRaw).
-		Get(fmt.Sprintf("form-service/api/custom/resource-types/%s", resourceId))
+		Get("form-service/api/custom/resource-types/" + resourceId)
 
 	// Handle gracefully a resource that has vanished on the platform
 	// Beware that some APIs respond with HTTP 404 instead of 403 ...
 	if response.StatusCode() == 404 {
-		tflog.Debug(ctx, fmt.Sprintf("Custom resource %s not found", resourceId))
+		tflog.Debug(ctx, fmt.Sprintf("Custom Resource %s not found", resourceId))
 		resp.State.RemoveResource(ctx)
 		return
 	}
 
-	err = handleAPIResponse(ctx, response, err, 200)
+	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read custom resource %s, got error: %s", resourceId, err))
+			fmt.Sprintf("Unable to read Custom Resource %s, got error: %s", resourceId, err))
 		return
 	}
 
@@ -548,15 +566,15 @@ func (self *CustomResourceResource) Update(
 		SetResult(&resourceRaw).
 		Post("form-service/api/custom/resource-types") // Its not a mistake...
 
-	err = handleAPIResponse(ctx, response, err, 200)
+	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to update custom resource %s, got error: %s", resourceId, err))
+			fmt.Sprintf("Unable to update Custom Resource %s, got error: %s", resourceId, err))
 		return
 	}
 
-	tflog.Debug(ctx, fmt.Sprintf("Custom resource %s updated", resourceId))
+	tflog.Debug(ctx, fmt.Sprintf("Custom Resource %s updated", resourceId))
 
 	// Save updated custom resource into Terraform state
 	resp.Diagnostics.Append(resource.FromAPI(ctx, resourceRaw)...)
@@ -580,16 +598,14 @@ func (self *CustomResourceResource) Delete(
 		return
 	}
 
-	response, err := self.client.R().
-		Delete(fmt.Sprintf("form-service/api/custom/resource-types/%s", resourceId))
-	err = handleAPIResponse(ctx, response, err, 200)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to delete custom resource %s, got error: %s", resourceId, err))
-	}
-
-	tflog.Debug(ctx, fmt.Sprintf("Custom resource %s deleted", resourceId))
+	resp.Diagnostics.Append(
+		DeleteIt(
+			self.client,
+			ctx,
+			"Custom Resource "+resourceId,
+			"form-service/api/custom/resource-types/"+resourceId,
+		)...,
+	)
 }
 
 func (self *CustomResourceResource) ImportState(

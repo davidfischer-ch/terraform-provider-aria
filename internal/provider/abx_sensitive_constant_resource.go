@@ -86,31 +86,31 @@ func (self *ABXSensitiveConstantResource) Create(
 	resp *resource.CreateResponse,
 ) {
 	// Read Terraform plan data into the model
-	var secret ABXSensitiveConstantModel
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &secret)...)
+	var constant ABXSensitiveConstantModel
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &constant)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	var secretRaw ABXSensitiveConstantAPIModel
+	var constantRaw ABXSensitiveConstantAPIModel
 	response, err := self.client.R().
-		SetBody(secret.ToAPI()).
-		SetResult(&secretRaw).
+		SetBody(constant.ToAPI()).
+		SetResult(&constantRaw).
 		Post("abx/api/resources/action-secrets")
 
-	err = handleAPIResponse(ctx, response, err, 200)
+	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to create ABX sensitive constant, got error: %s", err))
+			fmt.Sprintf("Unable to create ABX Sensitive Constant, got error: %s", err))
 		return
 	}
 
-	tflog.Debug(ctx, fmt.Sprintf("ABX sensitive constant %s created", secretRaw.Id))
+	tflog.Debug(ctx, fmt.Sprintf("ABX Sensitive Constant %s created", constantRaw.Id))
 
-	// Save secret into Terraform state
-	resp.Diagnostics.Append(secret.FromAPI(ctx, secretRaw)...)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &secret)...)
+	// Save sensitive constant into Terraform state
+	resp.Diagnostics.Append(constant.FromAPI(ctx, constantRaw)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
 }
 
 func (self *ABXSensitiveConstantResource) Read(
@@ -119,17 +119,17 @@ func (self *ABXSensitiveConstantResource) Read(
 	resp *resource.ReadResponse,
 ) {
 	// Read Terraform prior state data into the model
-	var secret ABXSensitiveConstantModel
-	resp.Diagnostics.Append(req.State.Get(ctx, &secret)...)
+	var constant ABXSensitiveConstantModel
+	resp.Diagnostics.Append(req.State.Get(ctx, &constant)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	var secretRaw ABXSensitiveConstantAPIModel
-	secretId := secret.Id.ValueString()
+	var constantRaw ABXSensitiveConstantAPIModel
+	constantId := constant.Id.ValueString()
 	response, err := self.client.R().
-		SetResult(&secretRaw).
-		Get("abx/api/resources/action-secrets/" + secretId)
+		SetResult(&constantRaw).
+		Get("abx/api/resources/action-secrets/" + constantId)
 
 	// Handle gracefully a resource that has vanished on the platform
 	// Beware that some APIs respond with HTTP 404 instead of 403 ...
@@ -138,17 +138,17 @@ func (self *ABXSensitiveConstantResource) Read(
 		return
 	}
 
-	err = handleAPIResponse(ctx, response, err, 200)
+	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read ABX sensitive constant %s, got error: %s", secretId, err))
+			fmt.Sprintf("Unable to read ABX Sensitive Constant %s, got error: %s", constantId, err))
 		return
 	}
 
 	// Save updated secret into Terraform state
-	resp.Diagnostics.Append(secret.FromAPI(ctx, secretRaw)...)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &secret)...)
+	resp.Diagnostics.Append(constant.FromAPI(ctx, constantRaw)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
 }
 
 func (self *ABXSensitiveConstantResource) Update(
@@ -157,32 +157,34 @@ func (self *ABXSensitiveConstantResource) Update(
 	resp *resource.UpdateResponse,
 ) {
 	// Read Terraform plan data into the model
-	var secret ABXSensitiveConstantModel
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &secret)...)
+	var constant ABXSensitiveConstantModel
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &constant)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	var secretRaw ABXSensitiveConstantAPIModel
-	secretId := secret.Id.ValueString()
+	var constantRaw ABXSensitiveConstantAPIModel
+	constantId := constant.Id.ValueString()
 	response, err := self.client.R().
-		SetBody(secret.ToAPI()).
-		SetResult(&secretRaw).
-		Put("abx/api/resources/action-secrets/" + secretId)
+		SetBody(constant.ToAPI()).
+		SetResult(&constantRaw).
+		Put("abx/api/resources/action-secrets/" + constantId)
 
-	err = handleAPIResponse(ctx, response, err, 200)
+	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to update ABX sensitive constant %s, got error: %s", secretId, err))
+			fmt.Sprintf(
+				"Unable to update ABX Sensitive Constant %s, got error: %s",
+				constantId, err))
 		return
 	}
 
-	tflog.Debug(ctx, fmt.Sprintf("Secret %s updated", secretId))
+	tflog.Debug(ctx, fmt.Sprintf("ABX Sensitive Constant %s updated", constantId))
 
-	// Save secret into Terraform state
-	resp.Diagnostics.Append(secret.FromAPI(ctx, secretRaw)...)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &secret)...)
+	// Save sensitive constant into Terraform state
+	resp.Diagnostics.Append(constant.FromAPI(ctx, constantRaw)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
 }
 
 func (self *ABXSensitiveConstantResource) Delete(
@@ -191,25 +193,23 @@ func (self *ABXSensitiveConstantResource) Delete(
 	resp *resource.DeleteResponse,
 ) {
 	// Read Terraform prior state data into the model
-	var secret ABXSensitiveConstantModel
-	resp.Diagnostics.Append(req.State.Get(ctx, &secret)...)
+	var constant ABXSensitiveConstantModel
+	resp.Diagnostics.Append(req.State.Get(ctx, &constant)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	secretId := secret.Id.ValueString()
-	if len(secretId) == 0 {
+	constantId := constant.Id.ValueString()
+	if len(constantId) == 0 {
 		return
 	}
 
-	response, err := self.client.R().Delete("abx/api/resources/action-secrets/" + secretId)
-
-	err = handleAPIResponse(ctx, response, err, 200)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to delete ABX sensitive constant %s, got error: %s", secretId, err))
-	}
-
-	tflog.Debug(ctx, fmt.Sprintf("ABX sensitive constant %s deleted", secretId))
+	resp.Diagnostics.Append(
+		DeleteIt(
+			self.client,
+			ctx,
+			"ABX Sensitive Constant "+constantId,
+			"abx/api/resources/action-secrets/"+constantId,
+		)...,
+	)
 }

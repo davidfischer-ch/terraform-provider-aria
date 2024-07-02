@@ -85,20 +85,20 @@ func (self *IconResource) Create(
 		SetFileReader("file", "file", strings.NewReader(icon.Content.ValueString())).
 		Post("icon/api/icons")
 
-	err = handleAPIResponse(ctx, response, err, 201)
+	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to create icon, got error: %s", err))
+			fmt.Sprintf("Unable to create Icon, got error: %s", err))
 		return
 	}
 
-	tflog.Debug(ctx, fmt.Sprintf("icon created %s", response.Body()))
+	tflog.Debug(ctx, fmt.Sprintf("Icon created %s", response.Body()))
 	iconId, err := GetIdFromLocation(response)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to parse icon id, got error: %s", err))
+			fmt.Sprintf("Unable to parse Icon ID, got error: %s", err))
 		return
 	}
 
@@ -129,11 +129,11 @@ func (self *IconResource) Read(
 		return
 	}
 
-	err = handleAPIResponse(ctx, response, err, 200)
+	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read icon %s, got error: %s", iconId, err))
+			fmt.Sprintf("Unable to read Icon %s, got error: %s", iconId, err))
 		return
 	}
 
@@ -156,7 +156,7 @@ func (self *IconResource) Update(
 
 	resp.Diagnostics.AddError(
 		"Client error",
-		fmt.Sprintf("Unable to update icon %s, method is not implement.", icon.Id.ValueString()))
+		fmt.Sprintf("Unable to update Icon %s, method is not implement.", icon.Id.ValueString()))
 }
 
 func (self *IconResource) Delete(
@@ -176,16 +176,14 @@ func (self *IconResource) Delete(
 		return
 	}
 
-	response, err := self.client.R().Delete("icon/api/icons/" + iconId)
-
-	err = handleAPIResponse(ctx, response, err, 204)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to delete icon %s, got error: %s", iconId, err))
-	}
-
-	tflog.Debug(ctx, fmt.Sprintf("Icon %s deleted", iconId))
+	resp.Diagnostics.Append(
+		DeleteIt(
+			self.client,
+			ctx,
+			"Icon "+iconId,
+			"icon/api/icons/"+iconId,
+		)...,
+	)
 }
 
 func (self *IconResource) ImportState(

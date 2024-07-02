@@ -5,6 +5,8 @@ package provider
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -12,12 +14,12 @@ import (
 
 // CustomResourcPropertyeModel describes the resource data model.
 type PropertyModel struct {
-	Title            types.String  `tfsdk:"title"`
-	Description      types.String  `tfsdk:"description"`
-	Type             types.String  `tfsdk:"type"`
-	Default          types.Dynamic `tfsdk:"default"`
-	Encrypted        types.Bool    `tfsdk:"encrypted"`
-	RecreateOnUpdate types.Bool    `tfsdk:"recreate_on_update"`
+	Title            types.String `tfsdk:"title"`
+	Description      types.String `tfsdk:"description"`
+	Type             types.String `tfsdk:"type"`
+	Default          types.String `tfsdk:"default"`
+	Encrypted        types.Bool   `tfsdk:"encrypted"`
+	RecreateOnUpdate types.Bool   `tfsdk:"recreate_on_update"`
 
 	// Specifications
 	Minimum   types.Int64  `tfsdk:"minimum"`
@@ -56,7 +58,6 @@ func (self *PropertyModel) FromAPI(
 	self.Title = types.StringValue(raw.Title)
 	self.Description = types.StringValue(raw.Description)
 	self.Type = types.StringValue(raw.Type)
-	// FIXME self.Default =
 	self.Encrypted = types.BoolValue(raw.Encrypted)
 	self.RecreateOnUpdate = types.BoolValue(raw.RecreateOnUpdate)
 	self.Minimum = types.Int64Value(raw.Minimum)
@@ -65,6 +66,18 @@ func (self *PropertyModel) FromAPI(
 	self.MaxLength = types.Int64Value(raw.MaxLength)
 	self.Pattern = types.StringValue(raw.Pattern)
 	// FIXME self.OneOf =
+
+	defaultJSON, err := json.Marshal(raw.Default)
+	if err != nil {
+		diags.AddError(
+			"Internal error",
+			fmt.Sprintf(
+				"Unable to JSON encode default value for property %s, got error: %s",
+				raw.Title, err))
+		return diags
+	}
+
+	self.Default = types.StringValue(string(defaultJSON))
 
 	return diags
 }
@@ -84,11 +97,14 @@ func (self *PropertyModel) ToAPI(
 	    return PropertyAPIModel{}, diags
 	}*/
 
+	var defaultRaw any
+	json.Unmarshal([]byte(self.Default.ValueString()), &defaultRaw)
+
 	return PropertyAPIModel{
-		Title:       self.Title.ValueString(),
-		Description: self.Description.ValueString(),
-		Type:        self.Type.ValueString(),
-		// FIXME Default:
+		Title:            self.Title.ValueString(),
+		Description:      self.Description.ValueString(),
+		Type:             self.Type.ValueString(),
+		Default:          defaultRaw,
 		Encrypted:        self.Encrypted.ValueBool(),
 		RecreateOnUpdate: self.RecreateOnUpdate.ValueBool(),
 		Minimum:          self.Minimum.ValueInt64(),

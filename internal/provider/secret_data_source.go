@@ -112,7 +112,7 @@ func (self *SecretDataSource) Read(
 		SetResult(&secretRaw).
 		Get("/platform/api/secrets/" + secretId)
 
-	err = handleAPIResponse(ctx, response, err, 200)
+	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",

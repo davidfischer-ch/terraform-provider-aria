@@ -5,7 +5,6 @@ package provider
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -20,20 +19,23 @@ type CustomResourceModel struct {
 	SchemaType   types.String `tfsdk:"schema_type"`
 	Status       types.String `tfsdk:"status"`
 
-	// List of PropertyModel
-	Properties types.List `tfsdk:"properties"`
+	Properties []PropertyModel `tfsdk:"properties"`
 
-	// Of type CustomResourceActionModel
-	Create types.Object `tfsdk:"create"`
-	Read   types.Object `tfsdk:"read"`
-	Update types.Object `tfsdk:"update"`
-	Delete types.Object `tfsdk:"delete"`
+	Create CustomResourceActionModel `tfsdk:"create"`
+	Read   CustomResourceActionModel `tfsdk:"read"`
+	Update CustomResourceActionModel `tfsdk:"update"`
+	Delete CustomResourceActionModel `tfsdk:"delete"`
 
 	// Set of CustomResourceAdditionalActionModel
-	AdditionalActions types.Set `tfsdk:"additional_actions"`
+	/* AdditionalActions types.Set `tfsdk:"additional_actions"` */
 
 	ProjectId types.String `tfsdk:"project_id"`
 	OrgId     types.String `tfsdk:"org_id"`
+}
+
+// CustomResourcePropertiesAPIModel describes the resource API model.
+type CustomResourcePropertiesAPIModel struct {
+	Properties map[string]PropertyAPIModel `json:"properties"`
 }
 
 // CustomResourceAPIModel describes the resource API model.
@@ -45,14 +47,20 @@ type CustomResourceAPIModel struct {
 	SchemaType   string `json:"schemaType"`
 	Status       string `json:"status"`
 
-	Properties map[string]map[string]PropertyAPIModel `json:"properties"`
+	Properties CustomResourcePropertiesAPIModel `json:"properties"`
 
-	MainActions       map[string]CustomResourceActionAPIModel  `json:"mainActions"`
-	AdditionalActions []CustomResourceAdditionalActionAPIModel `json:"additionalActions"`
+	MainActions map[string]CustomResourceActionAPIModel `json:"mainActions"`
+
+	/* AdditionalActions []CustomResourceAdditionalActionAPIModel `json:"additionalActions"` */
 
 	ProjectId string `json:"projectId"`
 	OrgId     string `json:"orgId"`
 }
+
+// https://stackoverflow.com/questions/47339542/defining-custom-unmarshalling-for-non-built-in-types
+/*func (self *CustomResourceAPIModel) UnmarshalJSON(bytes []byte) error {
+	panic(errors.New(string(bytes)))
+}*/
 
 func (self *CustomResourceModel) FromAPI(
 	ctx context.Context,
@@ -70,12 +78,21 @@ func (self *CustomResourceModel) FromAPI(
 	self.ProjectId = types.StringValue(raw.ProjectId)
 	self.OrgId = types.StringValue(raw.OrgId)
 
-	// FIXME self.Properties
-	// FIXME self.Create
-	// FIXME self.Read
-	// FIXME self.Update
-	// FIXME self.Delete
-	// FIXME self.AdditionalActions
+	self.Properties = []PropertyModel{}
+
+	self.Create = CustomResourceActionModel{}
+	diags.Append(self.Create.FromAPI(ctx, raw.MainActions["create"])...)
+
+	self.Read = CustomResourceActionModel{}
+	diags.Append(self.Read.FromAPI(ctx, raw.MainActions["read"])...)
+
+	self.Update = CustomResourceActionModel{}
+	diags.Append(self.Update.FromAPI(ctx, raw.MainActions["update"])...)
+
+	self.Delete = CustomResourceActionModel{}
+	diags.Append(self.Delete.FromAPI(ctx, raw.MainActions["delete"])...)
+
+	/* self.AdditionalActions */
 
 	return diags
 }
@@ -86,65 +103,20 @@ func (self *CustomResourceModel) ToAPI(
 
 	diags := diag.Diagnostics{}
 
-	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/list
-	if self.Properties.IsNull() || self.Properties.IsUnknown() {
-		diags.AddError(
-			"Configuration error",
-			fmt.Sprintf(
-				"Unable to manage custom resource %s, properties is either null or unknown",
-				self.Id.ValueString()))
-		return CustomResourceAPIModel{}, diags
-	}
+	// FIXME TODO THIS
+	properties := map[string]PropertyAPIModel{}
 
-	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/list
-	if self.Create.IsNull() || self.Create.IsUnknown() {
-		diags.AddError(
-			"Configuration error",
-			fmt.Sprintf(
-				"Unable to manage custom resource %s, create is either null or unknown",
-				self.Id.ValueString()))
-		return CustomResourceAPIModel{}, diags
-	}
+	createRaw, createDiags := self.Create.ToAPI(ctx)
+	diags.Append(createDiags...)
 
-	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/list
-	if self.Read.IsNull() || self.Read.IsUnknown() {
-		diags.AddError(
-			"Configuration error",
-			fmt.Sprintf(
-				"Unable to manage custom resource %s, read is either null or unknown",
-				self.Id.ValueString()))
-		return CustomResourceAPIModel{}, diags
-	}
+	readRaw, readDiags := self.Read.ToAPI(ctx)
+	diags.Append(readDiags...)
 
-	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/list
-	if self.Update.IsNull() || self.Update.IsUnknown() {
-		diags.AddError(
-			"Configuration error",
-			fmt.Sprintf(
-				"Unable to manage custom resource %s, update is either null or unknown",
-				self.Id.ValueString()))
-		return CustomResourceAPIModel{}, diags
-	}
+	updateRaw, updateDiags := self.Update.ToAPI(ctx)
+	diags.Append(updateDiags...)
 
-	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/list
-	if self.Delete.IsNull() || self.Delete.IsUnknown() {
-		diags.AddError(
-			"Configuration error",
-			fmt.Sprintf(
-				"Unable to manage custom resource %s, delete is either null or unknown",
-				self.Id.ValueString()))
-		return CustomResourceAPIModel{}, diags
-	}
-
-	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/list
-	if self.AdditionalActions.IsNull() || self.AdditionalActions.IsUnknown() {
-		diags.AddError(
-			"Configuration error",
-			fmt.Sprintf(
-				"Unable to manage custom resource %s, additional_actions is either null or unknown",
-				self.Id.ValueString()))
-		return CustomResourceAPIModel{}, diags
-	}
+	deleteRaw, deleteDiags := self.Delete.ToAPI(ctx)
+	diags.Append(deleteDiags...)
 
 	raw := CustomResourceAPIModel{
 		DisplayName:  self.DisplayName.ValueString(),
@@ -152,11 +124,18 @@ func (self *CustomResourceModel) ToAPI(
 		ResourceType: self.ResourceType.ValueString(),
 		SchemaType:   self.SchemaType.ValueString(),
 		Status:       self.Status.ValueString(),
-		// FIXME Properties
-		// FIXME MainActions
-		// FIXME AdditionalActions
-		ProjectId: self.ProjectId.ValueString(),
-		// Let platform manage this field
+		ProjectId:    self.ProjectId.ValueString(),
+		OrgId:        self.OrgId.ValueString(),
+		Properties: CustomResourcePropertiesAPIModel{
+			Properties: properties,
+		},
+		MainActions: map[string]CustomResourceActionAPIModel{
+			"create": createRaw,
+			"read":   readRaw,
+			"update": updateRaw,
+			"delete": deleteRaw,
+		},
+		/* AdditionalActions */
 	}
 
 	// When updating resource

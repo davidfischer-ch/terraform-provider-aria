@@ -9,9 +9,13 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"slices"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/go-resty/resty/v2"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -73,7 +77,7 @@ func (self *AriaClientConfig) GetAccessToken() error {
 			SetBody(map[string]string{"refreshToken": self.RefreshToken}).
 			SetResult(&token).
 			Post("iaas/api/login")
-		err = handleAPIResponse(self.Context, response, err, 200)
+		err = handleAPIResponse(self.Context, response, err, []int{200})
 		if err != nil {
 			return err
 		}
@@ -88,31 +92,78 @@ func (self *AriaClientConfig) GetAccessToken() error {
 	return nil
 }
 
+// There is not default in Golang, ... So less is better (not defining delay neither ...)
+// https://stackoverflow.com/questions/19612449
+func DeleteIt(
+	client *resty.Client,
+	ctx context.Context,
+	name string,
+	path string,
+) diag.Diagnostics {
+	diags := diag.Diagnostics{}
+
+	tflog.Debug(ctx, fmt.Sprintf("Deleting %s...", name))
+	response, err := client.R().Delete(path)
+	err = handleAPIResponse(ctx, response, err, []int{200, 204})
+	if err != nil {
+		diags.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to delete %s, got error: %s", name, err))
+		return diags
+	}
+
+	for retry := range []int{0, 1, 2, 3, 4} {
+		time.Sleep(time.Duration(retry) * time.Second)
+		tflog.Debug(ctx, fmt.Sprintf("Poll %d of 5 - Check %s is deleted...", retry+1, name))
+		response, err := client.R().Get(path)
+		err = handleAPIResponse(ctx, response, err, []int{200, 404})
+		if err != nil {
+			diags.AddError(
+				"Client error",
+				fmt.Sprintf("Unable to poll %s will deleting it, got error: %s", name, err))
+			return diags
+		}
+		if response.StatusCode() == 404 {
+			tflog.Debug(ctx, fmt.Sprintf("Deleted %s successfully", name))
+			return diags
+		}
+	}
+	time.Sleep(5 * time.Second)
+
+	diags.AddError("Client error", fmt.Sprintf("Unable to delete %s, its still available!", name))
+	return diags
+}
+
 func handleAPIResponse(
 	ctx context.Context,
 	response *resty.Response,
 	err error,
-	statusCode int,
+	statusCodes []int,
 ) error {
-	if err != nil || response.StatusCode() != statusCode {
-		tflog.Debug(ctx, "Response Info:")
-		tflog.Debug(ctx, fmt.Sprintf("  Error      : %s", err))
-		tflog.Debug(ctx, fmt.Sprintf("  Status Code: %d", response.StatusCode()))
-		tflog.Debug(ctx, fmt.Sprintf("  Status     : %s", response.Status()))
-		tflog.Debug(ctx, fmt.Sprintf("  Proto      : %s", response.Proto()))
-		tflog.Debug(ctx, fmt.Sprintf("  Time       : %s", response.Time()))
-		tflog.Debug(ctx, fmt.Sprintf("  Received At: %s", response.ReceivedAt()))
-		tflog.Debug(ctx, fmt.Sprintf("  Body       : %s", response.String()))
-	}
+	tflog.Debug(ctx, "Response Info:")
+	tflog.Debug(ctx, fmt.Sprintf("  Error      : %s", err))
+	tflog.Debug(ctx, fmt.Sprintf("  Status Code: %d", response.StatusCode()))
+	tflog.Debug(ctx, fmt.Sprintf("  Status     : %s", response.Status()))
+	tflog.Debug(ctx, fmt.Sprintf("  Proto      : %s", response.Proto()))
+	tflog.Debug(ctx, fmt.Sprintf("  Time       : %s", response.Time()))
+	tflog.Debug(ctx, fmt.Sprintf("  Received At: %s", response.ReceivedAt()))
+	tflog.Debug(ctx, fmt.Sprintf("  Body       : %s", response.String()))
 
 	if err != nil {
 		return err
 	}
 
-	if response.StatusCode() != statusCode {
+	if !slices.Contains(statusCodes, response.StatusCode()) {
+		// https://stackoverflow.com/questions/39595045/convert-int-array-to-string-separated-by
+		var statusCodesString []string
+		for _, i := range statusCodes {
+			statusCodesString = append(statusCodesString, strconv.Itoa(i))
+		}
 		return errors.New(
-			fmt.Sprintf("API response status code %d (expected %d), Body: %s",
-				response.StatusCode(), statusCode, response.String()))
+			fmt.Sprintf("API response status code %d (expected %s), Body: %s",
+				response.StatusCode(),
+				strings.Join(statusCodesString, ", "),
+				response.String()))
 	}
 
 	return nil

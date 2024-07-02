@@ -94,7 +94,7 @@ func (self *CatalogTypeDataSource) Read(
 		SetResult(&catalogTypeRaw).
 		Get("/catalog/api/types/" + catalogTypeId)
 
-	err = handleAPIResponse(ctx, response, err, 200)
+	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",

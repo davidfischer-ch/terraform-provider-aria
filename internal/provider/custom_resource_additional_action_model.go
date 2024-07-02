@@ -19,11 +19,8 @@ type CustomResourceAdditionalActionModel struct {
 	ResourceType types.String `tfsdk:"resource_type"`
 	Status       types.String `tfsdk:"status"`
 
-	// Of type CustomResourceActionModel
-	RunnableItem types.Object `tfsdk:"runnable_item"`
-
-	// Of type CustomFormModel
-	FormDefinition types.Object `tfsdk:"form_definition"`
+	RunnableItem   CustomResourceActionModel `tfsdk:"runnable_item"`
+	FormDefinition CustomFormModel           `tfsdk:"form_definition"`
 
 	OrgId types.String `tfsdk:"org_id"`
 }
@@ -37,9 +34,8 @@ type CustomResourceAdditionalActionAPIModel struct {
 	ResourceType string `json:"resourceType"`
 	Status       string `json:"status"`
 
-	RunnableItem CustomResourceActionAPIModel `json:"runnableItem"`
-
-	FormDefinition CustomFormAPIModel `json:"formDefinition"`
+	RunnableItem   CustomResourceActionAPIModel `json:"runnableItem"`
+	FormDefinition CustomFormAPIModel           `json:"formDefinition"`
 
 	OrgId string `json:"orgId"`
 }

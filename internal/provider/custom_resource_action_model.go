@@ -5,6 +5,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -32,22 +33,58 @@ func (self *CustomResourceActionModel) FromAPI(
 	ctx context.Context,
 	raw CustomResourceActionAPIModel,
 ) diag.Diagnostics {
+	InputParameters, diags := types.ListValueFrom(ctx, types.StringType, raw.InputParameters)
+
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
 	self.Type = types.StringValue(raw.Type)
 	self.ProjectId = types.StringValue(raw.ProjectId)
-	// FIXME self.InputParameters =
-	return diag.Diagnostics{}
+	self.InputParameters = InputParameters
+
+	return diags
 }
 
 func (self *CustomResourceActionModel) ToAPI(
 	ctx context.Context,
 ) (CustomResourceActionAPIModel, diag.Diagnostics) {
+
+	var diags diag.Diagnostics
+
+	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/list
+	if self.InputParameters.IsNull() || self.InputParameters.IsUnknown() {
+		diags.AddError(
+			"Configuration error",
+			fmt.Sprintf(
+				"Unable to manage custom resource %s, input_parameters is either null or unknown",
+				self.Id.ValueString()))
+		return CustomResourceActionAPIModel{}, diags
+	}
+
+	InputParameters := make([]string, 0, len(self.InputParameters.Elements()))
+	diags = self.InputParameters.ElementsAs(ctx, &InputParameters, false)
+	if diags.HasError() {
+		return CustomResourceActionAPIModel{}, diags
+	}
+
 	return CustomResourceActionAPIModel{
-		Id:        self.Id.ValueString(),
-		Name:      self.Name.ValueString(),
-		Type:      self.Type.ValueString(),
-		ProjectId: self.ProjectId.ValueString(),
-		// FIXME InputParameters:
+		Id:              self.Id.ValueString(),
+		Name:            self.Name.ValueString(),
+		Type:            self.Type.ValueString(),
+		ProjectId:       self.ProjectId.ValueString(),
+		InputParameters: InputParameters,
 	}, diag.Diagnostics{}
 }
+
+/* func (self *CustomResourceActionModel) ToObject(
+    ctx context.Context,
+) (types.Object, diag.Diagnostics) {
+    return types.ObjectValueFrom(ctx, map[string]attr.Type{
+        "id": types.StringType,
+        "name": types.StringType,
+        "type": types.StringType,
+        "project_id": types.StringType,
+        "input_parameters": types.ListType{
+            ElemType: types.StringType,
+        },
+    }, self)
+} */

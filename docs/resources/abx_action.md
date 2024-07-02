@@ -15,7 +15,7 @@ ABX action resource
 ```terraform
 # variables.tf
 
-variable "test_project_id" {
+variable "project_id" {
   type = string
 }
 
@@ -44,7 +44,7 @@ resource "aria_abx_action" "hello_world" {
   ]
   secrets = []
 
-  project_id = var.test_project_id
+  project_id = var.project_id
 
   shared = true
 

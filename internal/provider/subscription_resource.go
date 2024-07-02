@@ -190,11 +190,11 @@ func (self *SubscriptionResource) Create(
 	}
 
 	response, err := self.client.R().SetBody(subscriptionRaw).Post("event-broker/api/subscriptions")
-	err = handleAPIResponse(ctx, response, err, 201)
+	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to create subscription, got error: %s", err))
+			fmt.Sprintf("Unable to create Subscription, got error: %s", err))
 		return
 	}
 
@@ -205,11 +205,11 @@ func (self *SubscriptionResource) Create(
 		SetResult(&subscriptionRaw).
 		Get("event-broker/api/subscriptions/" + subscriptionId)
 
-	err = handleAPIResponse(ctx, response, err, 200)
+	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read subscription %s, got error: %s", subscriptionId, err))
+			fmt.Sprintf("Unable to read Subscription %s, got error: %s", subscriptionId, err))
 		return
 	}
 
@@ -243,11 +243,11 @@ func (self *SubscriptionResource) Read(
 		return
 	}
 
-	err = handleAPIResponse(ctx, response, err, 200)
+	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read subscription %s, got error: %s", subscriptionId, err))
+			fmt.Sprintf("Unable to read Subscription %s, got error: %s", subscriptionId, err))
 		return
 	}
 
@@ -276,11 +276,11 @@ func (self *SubscriptionResource) Update(
 	}
 
 	response, err := self.client.R().SetBody(subscriptionRaw).Post("event-broker/api/subscriptions")
-	err = handleAPIResponse(ctx, response, err, 201)
+	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to update subscription %s, got error: %s", subscriptionId, err))
+			fmt.Sprintf("Unable to update Subscription %s, got error: %s", subscriptionId, err))
 		return
 	}
 
@@ -291,11 +291,11 @@ func (self *SubscriptionResource) Update(
 		SetResult(&subscriptionRaw).
 		Get("event-broker/api/subscriptions/" + subscriptionId)
 
-	err = handleAPIResponse(ctx, response, err, 200)
+	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read subscription %s, got error: %s", subscriptionId, err))
+			fmt.Sprintf("Unable to read Subscription %s, got error: %s", subscriptionId, err))
 		return
 	}
 
@@ -322,15 +322,14 @@ func (self *SubscriptionResource) Delete(
 		return
 	}
 
-	response, err := self.client.R().Delete("event-broker/api/subscriptions/" + subscriptionId)
-	err = handleAPIResponse(ctx, response, err, 204)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to delete subscription %s, got error: %s", subscriptionId, err))
-	}
-
-	tflog.Debug(ctx, fmt.Sprintf("Subscription %s deleted", subscriptionId))
+	resp.Diagnostics.Append(
+		DeleteIt(
+			self.client,
+			ctx,
+			"Subscription "+subscriptionId,
+			"event-broker/api/subscriptions/"+subscriptionId,
+		)...,
+	)
 }
 
 func (self *SubscriptionResource) ImportState(

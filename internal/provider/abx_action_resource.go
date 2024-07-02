@@ -212,15 +212,15 @@ func (self *ABXActionResource) Create(
 		SetBody(actionRaw).
 		SetResult(&actionRaw).
 		Post("abx/api/resources/actions")
-	err = handleAPIResponse(ctx, response, err, 200)
+	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to create ABX action, got error: %s", err))
+			fmt.Sprintf("Unable to create ABX Action, got error: %s", err))
 		return
 	}
 
-	tflog.Debug(ctx, fmt.Sprintf("ABX action %s created", actionRaw.Id))
+	tflog.Debug(ctx, fmt.Sprintf("ABX Action %s created", actionRaw.Id))
 
 	// Save action into Terraform state
 	resp.Diagnostics.Append(action.FromAPI(ctx, actionRaw)...)
@@ -249,16 +249,16 @@ func (self *ABXActionResource) Read(
 	// Handle gracefully a resource that has vanished on the platform
 	// Beware that some APIs respond with HTTP 404 instead of 403 ...
 	if response.StatusCode() == 404 {
-		tflog.Debug(ctx, fmt.Sprintf("ABX action %s (project %s) not found", actionId, projectId))
+		tflog.Debug(ctx, fmt.Sprintf("ABX Action %s (project %s) not found", actionId, projectId))
 		resp.State.RemoveResource(ctx)
 		return
 	}
 
-	err = handleAPIResponse(ctx, response, err, 200)
+	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read ABX action %s, got error: %s", actionId, err))
+			fmt.Sprintf("Unable to read ABX Action %s, got error: %s", actionId, err))
 		return
 	}
 
@@ -292,15 +292,15 @@ func (self *ABXActionResource) Update(
 		SetResult(&actionRaw).
 		Put(fmt.Sprintf("abx/api/resources/actions/%s?projectId=%s", actionId, projectId))
 
-	err = handleAPIResponse(ctx, response, err, 200)
+	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to update ABX action %s, got error: %s", actionId, err))
+			fmt.Sprintf("Unable to update ABX Action %s, got error: %s", actionId, err))
 		return
 	}
 
-	tflog.Debug(ctx, fmt.Sprintf("ABX action %s updated", actionId))
+	tflog.Debug(ctx, fmt.Sprintf("ABX Action %s updated", actionId))
 
 	// Save updated action into Terraform state
 	resp.Diagnostics.Append(action.FromAPI(ctx, actionRaw)...)
@@ -325,16 +325,14 @@ func (self *ABXActionResource) Delete(
 		return
 	}
 
-	response, err := self.client.R().
-		Delete(fmt.Sprintf("abx/api/resources/actions/%s?projectId=%s", actionId, projectId))
-	err = handleAPIResponse(ctx, response, err, 200)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to delete ABX action %s, got error: %s", actionId, err))
-	}
-
-	tflog.Debug(ctx, fmt.Sprintf("ABX action %s deleted", actionId))
+	resp.Diagnostics.Append(
+		DeleteIt(
+			self.client,
+			ctx,
+			"ABX Action "+actionId,
+			fmt.Sprintf("abx/api/resources/actions/%s?projectId=%s", actionId, projectId),
+		)...,
+	)
 }
 
 func (self *ABXActionResource) ImportState(
