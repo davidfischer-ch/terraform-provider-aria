@@ -101,16 +101,16 @@ func (self *CustomResourceResource) Schema(
 							Required:            true,
 						},
 						"type": schema.StringAttribute{
-							MarkdownDescription: "Type, one of string, integer, number, boolean, object, array",
+							MarkdownDescription: "Type, one of string, integer, number or boolean. (handling object and array is not yet implemented)",
 							Required:            true,
 							Validators: []validator.String{
-								stringvalidator.OneOf([]string{"array", "boolean", "integer", "number", "object", "string"}...),
+								stringvalidator.OneOf([]string{"boolean", "integer", "number", "string"}...),
 							},
 						},
 						"default": schema.StringAttribute{
 							MarkdownDescription: strings.Join([]string{
-								"Default value (JSON encoded default value).",
-								"Should be a dynamic type, but Terraform SDK returns this issue:",
+								"Default value as string (will be seamlessly converted to appropriate type).",
+								"This attribute should be a dynamic type, but Terraform SDK returns this issue:",
 								"Dynamic types inside of collections are not currently supported in terraform-plugin-framework.",
 								"If underlying dynamic values are required, replace the 'properties' attribute definition with DynamicAttribute instead.",
 							}, "\n"),

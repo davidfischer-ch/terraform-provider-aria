@@ -5,8 +5,8 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
+	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -67,24 +67,27 @@ func (self *PropertyModel) FromAPI(
 	self.Pattern = types.StringValue(raw.Pattern)
 	// FIXME self.OneOf =
 
-	defaultJSON, err := json.Marshal(raw.Default)
-	if err != nil {
+	// Convert default value from any to string
+	switch raw.Default.(type) {
+	case bool:
+		self.Default = types.StringValue(strconv.FormatBool(raw.Default.(bool)))
+	case int:
+		self.Default = types.StringValue(strconv.FormatInt(raw.Default.(int64), 10))
+	case string:
+		self.Default = types.StringValue(raw.Default.(string))
+	default:
+		// Not implemented or wrong type
 		diags.AddError(
-			"Internal error",
+			"Configuration error",
 			fmt.Sprintf(
-				"Unable to JSON encode default value for property %s, got error: %s",
-				raw.Title, err))
-		return diags
+				"Managing property %s with default value %s is not yet implemented.",
+				raw.Title, raw.Default))
 	}
-
-	self.Default = types.StringValue(string(defaultJSON))
-
 	return diags
 }
 
 func (self *PropertyModel) ToAPI(
 	ctx context.Context,
-	resource string,
 ) (PropertyAPIModel, diag.Diagnostics) {
 
 	diags := diag.Diagnostics{}
@@ -93,24 +96,55 @@ func (self *PropertyModel) ToAPI(
 	/*if self.OneOf.IsNull() || self.OneOf.IsUnknown() {
 	    diags.AddError(
 	        "Configuration error",
-	        fmt.Sprintf("Unable to manage %s, one_of is either null or unknown", resource))
+	        fmt.Sprintf("Unable to manage %s, one_of is either null or unknown", name))
 	    return PropertyAPIModel{}, diags
 	}*/
 
+	// Convert defautl value string to appropriate type
+	titleRaw := self.Title.ValueString()
+	typeRaw := self.Type.ValueString()
+	defaultString := self.Default.ValueString()
 	var defaultRaw any
-	err := json.Unmarshal([]byte(self.Default.ValueString()), &defaultRaw)
+	var err error
+	switch typeRaw {
+	case "boolean":
+		// Must be a boolean
+		defaultRaw, err = strconv.ParseBool(defaultString)
+	case "integer":
+		// Must be an ineger
+		defaultRaw, err = strconv.ParseInt(defaultString, 10, 64)
+	case "number":
+		// Try integer first, then float
+		if defaultRaw, err = strconv.ParseInt(defaultString, 10, 64); err != nil {
+			defaultRaw, err = strconv.ParseFloat(defaultString, 10)
+		}
+	case "string":
+		// Nothing to do
+		defaultRaw = defaultString
+		err = nil
+	default:
+		// Not implemented or wrong type
+		diags.AddError(
+			"Configuration error",
+			fmt.Sprintf(
+				"Managing property %s of type %s is not yet implemented.",
+				titleRaw, typeRaw))
+	}
 	if err != nil {
 		diags.AddError(
-			"Internal error",
-			fmt.Sprintf("Unable to JSON decode default value for property %s, got error: %s",
-				self.Title.ValueString(), err))
+			"Configuration error",
+			fmt.Sprintf(
+				"Unable to convert property %s value \"%s\" to type %s, got error: %s",
+				titleRaw, defaultString, typeRaw, err))
+	}
+	if diags.HasError() {
 		return PropertyAPIModel{}, diags
 	}
 
 	return PropertyAPIModel{
-		Title:            self.Title.ValueString(),
+		Title:            titleRaw,
 		Description:      self.Description.ValueString(),
-		Type:             self.Type.ValueString(),
+		Type:             typeRaw,
 		Default:          defaultRaw,
 		Encrypted:        self.Encrypted.ValueBool(),
 		RecreateOnUpdate: self.RecreateOnUpdate.ValueBool(),
