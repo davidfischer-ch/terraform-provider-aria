@@ -67,24 +67,54 @@ func (self *PropertyModel) FromAPI(
 	self.Pattern = types.StringValue(raw.Pattern)
 	// FIXME self.OneOf =
 
-	// Convert default value from any to string
-	switch raw.Default.(type) {
-	case bool:
-		//nolint:forcetypeassert // already checked by the switch case
-		self.Default = types.StringValue(strconv.FormatBool(raw.Default.(bool)))
-	case int:
-		//nolint:forcetypeassert // already checked by the switch case
-		self.Default = types.StringValue(strconv.FormatInt(raw.Default.(int64), 10))
-	case string:
-		//nolint:forcetypeassert // already checked by the switch case
-		self.Default = types.StringValue(raw.Default.(string))
+	// Convert default value from any to string, warn if default type mismatch
+	self.Default = types.StringValue(fmt.Sprintf("%s", raw.Default)) // Do a messy conversion first
+	switch raw.Type {
+	case "boolean":
+		// Must be a boolean
+		if defaultBool, ok := raw.Default.(bool); ok {
+			self.Default = types.StringValue(strconv.FormatBool(defaultBool))
+		} else {
+			diags.AddWarning(
+				"Configuration warning",
+				fmt.Sprintf("Property %s default \"%s\" is not a boolean", raw.Title, raw.Default))
+		}
+	case "integer":
+		// Must be an ineger
+		if defaultInt, ok := raw.Default.(int64); ok {
+			self.Default = types.StringValue(strconv.FormatInt(defaultInt, 10))
+		} else {
+			diags.AddWarning(
+				"Configuration warning",
+				fmt.Sprintf("Property %s default \"%s\" is not an integer", raw.Title, raw.Default))
+		}
+	case "number":
+		// Try integer first, then float
+		if defaultInt, ok := raw.Default.(int64); ok {
+			self.Default = types.StringValue(strconv.FormatInt(defaultInt, 10))
+		} else if defaultFloat, ok := raw.Default.(float64); ok {
+			self.Default = types.StringValue(strconv.FormatFloat(defaultFloat, 'g', -1, 64))
+		} else {
+			diags.AddWarning(
+				"Configuration warning",
+				fmt.Sprintf("Property %s default \"%s\" is not a number", raw.Title, raw.Default))
+		}
+	case "string":
+		// Nothing to do
+		if defaultString, ok := raw.Default.(string); ok {
+			self.Default = types.StringValue(defaultString)
+		} else {
+			diags.AddWarning(
+				"Configuration warning",
+				fmt.Sprintf("Property %s default \"%s\" is not a string", raw.Title, raw.Default))
+		}
 	default:
 		// Not implemented or wrong type
 		diags.AddError(
 			"Configuration error",
 			fmt.Sprintf(
-				"Managing property %s with default value %s is not yet implemented.",
-				raw.Title, raw.Default))
+				"Managing property %s of type %s is not yet implemented.",
+				raw.Title, raw.Type))
 	}
 	return diags
 }
@@ -103,7 +133,7 @@ func (self *PropertyModel) ToAPI(
 	    return PropertyAPIModel{}, diags
 	}*/
 
-	// Convert defautl value string to appropriate type
+	// Convert default value string to appropriate type
 	titleRaw := self.Title.ValueString()
 	typeRaw := self.Type.ValueString()
 	defaultString := self.Default.ValueString()
@@ -137,7 +167,7 @@ func (self *PropertyModel) ToAPI(
 		diags.AddError(
 			"Configuration error",
 			fmt.Sprintf(
-				"Unable to convert property %s value \"%s\" to type %s, got error: %s",
+				"Unable to convert property %s default value \"%s\" to type %s, got error: %s",
 				titleRaw, defaultString, typeRaw, err))
 	}
 	if diags.HasError() {

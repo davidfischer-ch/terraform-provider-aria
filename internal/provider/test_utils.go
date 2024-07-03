@@ -11,19 +11,44 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 )
 
-func CheckDiagnostics(t *testing.T, diags diag.Diagnostics, errorMessage string) {
+func CheckDiagnostics(
+	t *testing.T,
+	diags diag.Diagnostics,
+	warningMessage string,
+	errorMessage string,
+) {
+
+	warnings := diags.Warnings()
+	if warningMessage != "" {
+		detail := warnings[len(warnings)-1].Detail()
+		if strings.Contains(detail, warningMessage) {
+			warnings = diag.Diagnostics{} // Warnings are processed
+		} else {
+			t.Errorf("Message \"%s\" not found in latest warning \"%s\".", warningMessage, detail)
+		}
+	}
+
 	errors := diags.Errors()
 	if errorMessage != "" {
 		detail := errors[len(errors)-1].Detail()
 		if strings.Contains(detail, errorMessage) {
-			return
+			errors = diag.Diagnostics{} // Errors are processed
+		} else {
+			t.Errorf("Message \"%s\" not found in latest error \"%s\".", errorMessage, detail)
 		}
-		t.Errorf("Message \"%s\" not found in latest error detail \"%s\".", errorMessage, detail)
 	}
+
+	if len(warnings) > 0 {
+		t.Errorf("Diagnostics contains unexpected warnings.")
+		for counter, warning := range warnings {
+			t.Errorf("Diagnostic Warning %d - %s", counter+1, warning.Detail())
+		}
+	}
+
 	if len(errors) > 0 {
 		t.Errorf("Diagnostics contains unexpected errors.")
-		for counter, error := range diags.Errors() {
-			t.Errorf("Diagnostic Error %d - %s", counter, error.Detail())
+		for counter, error := range errors {
+			t.Errorf("Diagnostic Error %d - %s", counter+1, error.Detail())
 		}
 	}
 }
