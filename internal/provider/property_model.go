@@ -70,10 +70,13 @@ func (self *PropertyModel) FromAPI(
 	// Convert default value from any to string
 	switch raw.Default.(type) {
 	case bool:
+		//nolint:forcetypeassert // already checked by the switch case
 		self.Default = types.StringValue(strconv.FormatBool(raw.Default.(bool)))
 	case int:
+		//nolint:forcetypeassert // already checked by the switch case
 		self.Default = types.StringValue(strconv.FormatInt(raw.Default.(int64), 10))
 	case string:
+		//nolint:forcetypeassert // already checked by the switch case
 		self.Default = types.StringValue(raw.Default.(string))
 	default:
 		// Not implemented or wrong type
@@ -116,7 +119,7 @@ func (self *PropertyModel) ToAPI(
 	case "number":
 		// Try integer first, then float
 		if defaultRaw, err = strconv.ParseInt(defaultString, 10, 64); err != nil {
-			defaultRaw, err = strconv.ParseFloat(defaultString, 10)
+			defaultRaw, err = strconv.ParseFloat(defaultString, 64)
 		}
 	case "string":
 		// Nothing to do

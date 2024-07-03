@@ -4,6 +4,7 @@
 package provider
 
 import (
+	"context"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -84,12 +85,13 @@ func TestPropertyModelDefaultToAPI(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
+
 			property := PropertyModel{
 				Title:   types.StringValue("P"),
 				Type:    types.StringValue(tc.propertyType),
 				Default: types.StringValue(tc.propertyInternal),
 			}
-			raw, diags := property.ToAPI(nil)
+			raw, diags := property.ToAPI(context.Background())
 			CheckDiagnostics(t, diags, tc.errorMessage)
 			CheckEqual(t, raw.Default, tc.propertyRaw)
 		})
@@ -172,7 +174,7 @@ func TestPropertyModelDefaultFromAPI(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			property := PropertyModel{}
-			diags := property.FromAPI(nil, PropertyAPIModel{
+			diags := property.FromAPI(context.Background(), PropertyAPIModel{
 				Title:   "P",
 				Type:    tc.propertyType,
 				Default: tc.propertyRaw,
