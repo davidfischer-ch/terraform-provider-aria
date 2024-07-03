@@ -92,8 +92,6 @@ func (self *AriaClientConfig) GetAccessToken() error {
 	return nil
 }
 
-// There is not default in Golang, ... So less is better (not defining delay neither ...)
-// https://stackoverflow.com/questions/19612449
 func DeleteIt(
 	client *resty.Client,
 	ctx context.Context,
@@ -128,7 +126,6 @@ func DeleteIt(
 			return diags
 		}
 	}
-	time.Sleep(5 * time.Second)
 
 	diags.AddError("Client error", fmt.Sprintf("Unable to delete %s, its still available!", name))
 	return diags
