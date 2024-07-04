@@ -75,6 +75,15 @@ func TestCustomResourceModelToAPI(t *testing.T) {
 	CheckEqual(t, raw.ResourceType, "Custom.MyCustom")
 	CheckEqual(t, raw.SchemaType, "ABX_USER_DEFINED")
 	CheckEqual(t, raw.Status, "RELEASED")
+	CheckEqual(t, raw.Properties.Properties["identifier"].Title, "Identifier")
+	CheckEqual(t, raw.Properties.Properties["identifier"].Type, "string")
+	CheckEqual(t, raw.Properties.Properties["identifier"].Default, nil)
+	CheckEqual(t, raw.Properties.Properties["replicas"].Title, "Replicas")
+	CheckEqual(t, raw.Properties.Properties["replicas"].Type, "integer")
+	CheckEqual(t, raw.Properties.Properties["replicas"].Default, int64(2))
+	CheckEqual(t, raw.Properties.Properties["enabled"].Title, "Enabled")
+	CheckEqual(t, raw.Properties.Properties["enabled"].Type, "boolean")
+	CheckEqual(t, raw.Properties.Properties["enabled"].Default, true)
 	CheckEqual(t, raw.MainActions["create"].Id, "c974e486-9039-4b84-9152-0e5aa2074d26")
 	CheckEqual(t, raw.MainActions["create"].Name, "")
 	CheckEqual(t, raw.MainActions["create"].Type, "abx.action")
@@ -128,6 +137,15 @@ func TestCustomResourceModelFromAPI(t *testing.T) {
 					Type:    "boolean",
 					Default: true,
 				},
+				"other": {
+					Title:   "Other",
+					Type:    "boolean",
+					Default: false,
+				},
+				"else": {
+					Title: "Else",
+					Type:  "boolean",
+				},
 			},
 		},
 		MainActions: map[string]CustomResourceActionAPIModel{
@@ -172,6 +190,26 @@ func TestCustomResourceModelFromAPI(t *testing.T) {
 	CheckEqual(t, resource.ResourceType.ValueString(), "Custom.MyCustom")
 	CheckEqual(t, resource.SchemaType.ValueString(), "ABX_USER_DEFINED")
 	CheckEqual(t, resource.Status.ValueString(), "RELEASED")
+	CheckEqual(t, resource.Properties[0].Name.ValueString(), "identifier")
+	CheckEqual(t, resource.Properties[0].Title.ValueString(), "Identifier")
+	CheckEqual(t, resource.Properties[0].Type.ValueString(), "string")
+	CheckEqual(t, resource.Properties[0].Default, types.StringNull())
+	CheckEqual(t, resource.Properties[1].Name.ValueString(), "replicas")
+	CheckEqual(t, resource.Properties[1].Title.ValueString(), "Replicas")
+	CheckEqual(t, resource.Properties[1].Type.ValueString(), "integer")
+	CheckEqual(t, resource.Properties[1].Default.ValueString(), "2")
+	CheckEqual(t, resource.Properties[2].Name.ValueString(), "enabled")
+	CheckEqual(t, resource.Properties[2].Title.ValueString(), "Enabled")
+	CheckEqual(t, resource.Properties[2].Type.ValueString(), "boolean")
+	CheckEqual(t, resource.Properties[2].Default.ValueString(), "true")
+	CheckEqual(t, resource.Properties[3].Name.ValueString(), "other")
+	CheckEqual(t, resource.Properties[3].Title.ValueString(), "Other")
+	CheckEqual(t, resource.Properties[3].Type.ValueString(), "boolean")
+	CheckEqual(t, resource.Properties[3].Default.ValueString(), "true")
+	CheckEqual(t, resource.Properties[4].Name.ValueString(), "else")
+	CheckEqual(t, resource.Properties[4].Title.ValueString(), "Else")
+	CheckEqual(t, resource.Properties[4].Type.ValueString(), "boolean")
+	CheckEqual(t, resource.Properties[4].Default, types.StringNull())
 	CheckEqual(t, resource.Create.Id.ValueString(), "c974e486-9039-4b84-9152-0e5aa2074d26")
 	CheckEqual(t, resource.Create.Name.ValueString(), "SomeCreateFunction")
 	CheckEqual(t, resource.Create.Type.ValueString(), "abx.action")
