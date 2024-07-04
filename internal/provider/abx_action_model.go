@@ -208,7 +208,7 @@ func (self *ABXActionModel) ToAPI(ctx context.Context) (ABXActionAPIModel, diag.
 
 	return ABXActionAPIModel{
 		Name:                     self.Name.ValueString(),
-		Description:              self.Description.ValueString(),
+		Description:              CleanString(self.Description.ValueString()),
 		FAASProvider:             faasProvider,
 		Type:                     self.Type.ValueString(),
 		RuntimeName:              self.RuntimeName.ValueString(),

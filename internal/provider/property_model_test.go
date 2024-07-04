@@ -14,80 +14,87 @@ func TestPropertyModelDefaultToAPI(t *testing.T) {
 	cases := []struct {
 		name             string
 		propertyType     string
-		propertyInternal string
+		propertyInternal types.String
 		propertyRaw      any
 		warningMessage   string
 		errorMessage     string
 	}{
 		{
-			name:             "boolean value",
+			name:             "boolean value (false)",
 			propertyType:     "boolean",
-			propertyInternal: "false",
+			propertyInternal: types.StringValue("false"),
 			propertyRaw:      false,
 		},
 		{
-			name:             "boolean value",
+			name:             "boolean value (true)",
 			propertyType:     "boolean",
-			propertyInternal: "true",
+			propertyInternal: types.StringValue("true"),
 			propertyRaw:      true,
 		},
 		{
-			name:             "wrong boolean value",
+			name:             "boolean value (string)",
 			propertyType:     "boolean",
-			propertyInternal: "not really a boolean",
+			propertyInternal: types.StringValue("not really a boolean"),
 			propertyRaw:      nil,
 			errorMessage:     "invalid syntax",
 		},
 		{
-			name:             "integer value",
+			name:             "boolean value (nil)",
+			propertyType:     "boolean",
+			propertyInternal: types.StringNull(),
+			propertyRaw:      nil,
+		},
+		{
+			name:             "integer value (integer)",
 			propertyType:     "integer",
-			propertyInternal: "42",
+			propertyInternal: types.StringValue("42"),
 			propertyRaw:      int64(42),
 		},
 		{
-			name:             "wrong integer value",
+			name:             "integer value (float)",
 			propertyType:     "integer",
-			propertyInternal: "1.2",
+			propertyInternal: types.StringValue("1.2"),
 			propertyRaw:      nil,
 			errorMessage:     "invalid syntax",
 		},
 		{
 			name:             "number value (integer)",
 			propertyType:     "number",
-			propertyInternal: "-100",
+			propertyInternal: types.StringValue("-100"),
 			propertyRaw:      int64(-100),
 		},
 		{
 			name:             "number value (float)",
 			propertyType:     "number",
-			propertyInternal: "3.141592",
+			propertyInternal: types.StringValue("3.141592"),
 			propertyRaw:      3.141592,
 		},
 		{
-			name:             "string value",
+			name:             "string value (string)",
 			propertyType:     "string",
-			propertyInternal: "some text",
+			propertyInternal: types.StringValue("some text"),
 			propertyRaw:      "some text",
 		},
 		{
-			name:             "array value",
+			name:             "array value (array)",
 			propertyType:     "array",
-			propertyInternal: "[1, 2, 3]",
+			propertyInternal: types.StringValue("[1, 2, 3]"),
 			errorMessage:     "type array is not yet implemented",
 		},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-
 			property := PropertyModel{
+				Name:    types.StringValue("p"),
 				Title:   types.StringValue("P"),
 				Type:    types.StringValue(tc.propertyType),
-				Default: types.StringValue(tc.propertyInternal),
+				Default: tc.propertyInternal,
 			}
-			raw, diags := property.ToAPI(context.Background())
+			name, raw, diags := property.ToAPI(context.Background())
 			CheckDiagnostics(t, diags, tc.warningMessage, tc.errorMessage)
 			CheckEqual(t, raw.Default, tc.propertyRaw)
+			CheckEqual(t, name, "p")
 		})
 	}
 }
@@ -97,65 +104,71 @@ func TestPropertyModelDefaultFromAPI(t *testing.T) {
 		name             string
 		propertyType     string
 		propertyRaw      any
-		propertyInternal string
+		propertyInternal types.String
 		warningMessage   string
 		errorMessage     string
 	}{
 		{
-			name:             "boolean value",
+			name:             "boolean value (false)",
 			propertyType:     "boolean",
 			propertyRaw:      false,
-			propertyInternal: "false",
+			propertyInternal: types.StringValue("false"),
 		},
 		{
-			name:             "boolean value",
+			name:             "boolean value (true)",
 			propertyType:     "boolean",
 			propertyRaw:      true,
-			propertyInternal: "true",
+			propertyInternal: types.StringValue("true"),
 		},
 		{
-			name:             "wrong boolean value",
+			name:             "boolean value (string)",
 			propertyType:     "boolean",
 			propertyRaw:      "not really a boolean",
-			propertyInternal: "not really a boolean",
+			propertyInternal: types.StringValue("not really a boolean"),
 			warningMessage:   "Property P default \"not really a boolean\" is not a boolean",
 		},
 		{
-			name:             "integer value",
+			name:             "integer value (integer)",
 			propertyType:     "integer",
 			propertyRaw:      int64(42),
-			propertyInternal: "42",
+			propertyInternal: types.StringValue("42"),
 		},
 		{
-			name:             "wrong integer value",
+			name:             "integer value (float)",
 			propertyType:     "integer",
 			propertyRaw:      1.2,
-			propertyInternal: "%!s(float64=1.2)",
+			propertyInternal: types.StringValue("%!s(float64=1.2)"),
 			warningMessage:   "Property P default \"%!s(float64=1.2)\" is not an integer",
 		},
 		{
 			name:             "number value (integer)",
 			propertyType:     "number",
 			propertyRaw:      int64(-100),
-			propertyInternal: "-100",
+			propertyInternal: types.StringValue("-100"),
 		},
 		{
 			name:             "number value (float)",
 			propertyType:     "number",
 			propertyRaw:      3.141592,
-			propertyInternal: "3.141592",
+			propertyInternal: types.StringValue("3.141592"),
 		},
 		{
-			name:             "string value",
+			name:             "number value (nil)",
+			propertyType:     "number",
+			propertyRaw:      nil,
+			propertyInternal: types.StringNull(),
+		},
+		{
+			name:             "string value (string)",
 			propertyType:     "string",
 			propertyRaw:      "some text",
-			propertyInternal: "some text",
+			propertyInternal: types.StringValue("some text"),
 		},
 		{
-			name:             "array value",
+			name:             "array value (array)",
 			propertyType:     "array",
 			propertyRaw:      []int{1, 2, 3},
-			propertyInternal: "[%!s(int=1) %!s(int=2) %!s(int=3)]",
+			propertyInternal: types.StringValue("[%!s(int=1) %!s(int=2) %!s(int=3)]"),
 			errorMessage:     "type array is not yet implemented",
 		},
 	}
@@ -163,13 +176,14 @@ func TestPropertyModelDefaultFromAPI(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			property := PropertyModel{}
-			diags := property.FromAPI(context.Background(), PropertyAPIModel{
+			diags := property.FromAPI(context.Background(), "p", PropertyAPIModel{
 				Title:   "P",
 				Type:    tc.propertyType,
 				Default: tc.propertyRaw,
 			})
 			CheckDiagnostics(t, diags, tc.warningMessage, tc.errorMessage)
-			CheckEqual(t, property.Default.ValueString(), tc.propertyInternal)
+			CheckEqual(t, property.Default, tc.propertyInternal)
+			CheckEqual(t, property.Name.ValueString(), "p")
 		})
 	}
 }

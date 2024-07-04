@@ -103,7 +103,6 @@ resource "aria_custom_resource" "test" {
 
   properties = []
 
-  // TODO Create a function to simplify this
   create = {
     id         = aria_abx_action.create.id
     project_id = aria_abx_action.create.project_id
