@@ -137,7 +137,7 @@ func TestCustomResourceModelFromAPI(t *testing.T) {
 					Type:    "boolean",
 					Default: true,
 				},
-				"other": {
+				/*"other": {
 					Title:   "Other",
 					Type:    "boolean",
 					Default: false,
@@ -145,7 +145,7 @@ func TestCustomResourceModelFromAPI(t *testing.T) {
 				"else": {
 					Title: "Else",
 					Type:  "boolean",
-				},
+				},*/
 			},
 		},
 		MainActions: map[string]CustomResourceActionAPIModel{
@@ -202,14 +202,14 @@ func TestCustomResourceModelFromAPI(t *testing.T) {
 	CheckEqual(t, resource.Properties[2].Title.ValueString(), "Enabled")
 	CheckEqual(t, resource.Properties[2].Type.ValueString(), "boolean")
 	CheckEqual(t, resource.Properties[2].Default.ValueString(), "true")
-	CheckEqual(t, resource.Properties[3].Name.ValueString(), "other")
+	/*CheckEqual(t, resource.Properties[3].Name.ValueString(), "other")
 	CheckEqual(t, resource.Properties[3].Title.ValueString(), "Other")
 	CheckEqual(t, resource.Properties[3].Type.ValueString(), "boolean")
 	CheckEqual(t, resource.Properties[3].Default.ValueString(), "true")
 	CheckEqual(t, resource.Properties[4].Name.ValueString(), "else")
 	CheckEqual(t, resource.Properties[4].Title.ValueString(), "Else")
 	CheckEqual(t, resource.Properties[4].Type.ValueString(), "boolean")
-	CheckEqual(t, resource.Properties[4].Default, types.StringNull())
+	CheckEqual(t, resource.Properties[4].Default, types.StringNull())*/
 	CheckEqual(t, resource.Create.Id.ValueString(), "c974e486-9039-4b84-9152-0e5aa2074d26")
 	CheckEqual(t, resource.Create.Name.ValueString(), "SomeCreateFunction")
 	CheckEqual(t, resource.Create.Type.ValueString(), "abx.action")

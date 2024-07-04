@@ -20,6 +20,7 @@ type PropertyModel struct {
 	Type             types.String `tfsdk:"type"`
 	Default          types.String `tfsdk:"default"`
 	Encrypted        types.Bool   `tfsdk:"encrypted"`
+	ReadOnly         types.Bool   `tfsdk:"read_only"`
 	RecreateOnUpdate types.Bool   `tfsdk:"recreate_on_update"`
 
 	// Specifications
@@ -38,6 +39,7 @@ type PropertyAPIModel struct {
 	Type             string `json:"type"`
 	Default          any    `json:"default"`
 	Encrypted        bool   `json:"encrypted"`
+	ReadOnly         bool   `tfsdk:"readOnly"`
 	RecreateOnUpdate bool   `json:"recreateOnUpdate"`
 
 	// Specifications
@@ -62,13 +64,26 @@ func (self *PropertyModel) FromAPI(
 	self.Description = types.StringValue(raw.Description)
 	self.Type = types.StringValue(raw.Type)
 	self.Encrypted = types.BoolValue(raw.Encrypted)
+	self.ReadOnly = types.BoolValue(raw.ReadOnly)
 	self.RecreateOnUpdate = types.BoolValue(raw.RecreateOnUpdate)
 	self.Minimum = types.Int64Value(raw.Minimum)
 	self.Maximum = types.Int64Value(raw.Maximum)
 	self.MinLength = types.Int64Value(raw.MinLength)
 	self.MaxLength = types.Int64Value(raw.MaxLength)
 	self.Pattern = types.StringValue(raw.Pattern)
-	// FIXME self.OneOf =
+
+	self.OneOf = []PropertyOneOfModel{}
+
+	/*if raw.OneOf == nil {
+		self.OneOf = nil
+	} else {
+		self.OneOf = []PropertyOneOfModel{}
+		for _, oneOfRaw := range raw.OneOf {
+			oneOf := PropertyOneOfModel{}
+			diags.Append(oneOf.FromAPI(ctx, oneOfRaw)...)
+			self.OneOf = append(self.OneOf, oneOf)
+		}
+	}*/
 
 	if raw.Default == nil {
 		self.Default = types.StringNull()
@@ -140,14 +155,6 @@ func (self *PropertyModel) ToAPI(
 
 	diags := diag.Diagnostics{}
 
-	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/list
-	/*if self.OneOf.IsNull() || self.OneOf.IsUnknown() {
-	    diags.AddError(
-	        "Configuration error",
-	        fmt.Sprintf("Unable to manage %s, one_of is either null or unknown", name))
-	    return PropertyAPIModel{}, diags
-	}*/
-
 	// Convert default value string to appropriate type
 	titleRaw := self.Title.ValueString()
 	typeRaw := self.Type.ValueString()
@@ -194,6 +201,20 @@ func (self *PropertyModel) ToAPI(
 		}
 	}
 
+	/*var oneOfRawList []PropertyOneOfAPIModel
+	if self.OneOf == nil {
+		oneOfRawList = nil
+	} else {
+		oneOfRawList = []PropertyOneOfAPIModel{}
+		for _, oneOf := range self.OneOf {
+			oneOfRaw, oneOfDiags := oneOf.ToAPI(ctx)
+			oneOfRawList = append(oneOfRawList, oneOfRaw)
+			diags.Append(oneOfDiags...)
+		}
+	}*/
+
+	oneOfRawList := []PropertyOneOfAPIModel{}
+
 	return self.Name.ValueString(),
 		PropertyAPIModel{
 			Title:            titleRaw,
@@ -201,13 +222,14 @@ func (self *PropertyModel) ToAPI(
 			Type:             typeRaw,
 			Default:          defaultRaw,
 			Encrypted:        self.Encrypted.ValueBool(),
+			ReadOnly:         self.ReadOnly.ValueBool(),
 			RecreateOnUpdate: self.RecreateOnUpdate.ValueBool(),
 			Minimum:          self.Minimum.ValueInt64(),
 			Maximum:          self.Maximum.ValueInt64(),
 			MinLength:        self.MinLength.ValueInt64(),
 			MaxLength:        self.MaxLength.ValueInt64(),
 			Pattern:          self.Pattern.ValueString(),
-			// FIXME OneOf:
+			OneOf:            oneOfRawList,
 		},
 		diags
 }

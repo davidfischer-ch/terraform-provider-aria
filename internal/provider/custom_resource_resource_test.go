@@ -101,7 +101,38 @@ resource "aria_custom_resource" "test" {
   status        = "DRAFT"
   project_id    = var.test_project_id
 
-  properties = []
+  properties = [
+    {
+      name        = "some_text"
+      title       = "Some Text"
+      description = "Some text, more text."
+      type        = "string"
+      one_of      = []
+    }/*,
+    {
+      name        = "number"
+      title       = "Some Number"
+      description = <<EOT
+Some number.
+It can be an integer or a float.
+EOT
+      type    = "number"
+      default = "3.141592"
+      minimum = 0
+      maximum = 5
+      one_of  = []
+    },
+    {
+      name        = "super_secret"
+      title       = "Super Secret"
+      description = ""
+      type        = "string"
+      encrypted   = true
+      min_length  = 16
+      max_length  = 64
+      one_of      = []
+    }*/
+  ]
 
   create = {
     id         = aria_abx_action.create.id

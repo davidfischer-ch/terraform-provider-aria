@@ -14,7 +14,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
+	//"github.com/hashicorp/terraform-plugin-framework/resource/schema/listplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -92,6 +94,10 @@ func (self *CustomResourceResource) Schema(
 				Required:            true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
+						"name": schema.StringAttribute{
+							MarkdownDescription: "Name",
+							Required:            true,
+						},
 						"title": schema.StringAttribute{
 							MarkdownDescription: "Title",
 							Required:            true,
@@ -119,15 +125,21 @@ func (self *CustomResourceResource) Schema(
 						},
 						"encrypted": schema.BoolAttribute{
 							MarkdownDescription: "Encrypted?",
-							Required:            true,
+							Computed:            true,
+							Optional:            true,
+							Default:             booldefault.StaticBool(false),
 						},
 						"read_only": schema.BoolAttribute{
 							MarkdownDescription: "Make the field read-only (in the form)",
-							Required:            true,
+							Computed:            true,
+							Optional:            true,
+							Default:             booldefault.StaticBool(false),
 						},
 						"recreate_on_update": schema.BoolAttribute{
 							MarkdownDescription: "Mark this field as writable once (resource will be recreated on change)",
-							Required:            true,
+							Computed:            true,
+							Optional:            true,
+							Default:             booldefault.StaticBool(false),
 						},
 						"minimum": schema.Int64Attribute{
 							MarkdownDescription: "Minimum value (inclusive, valid for an integer)",
@@ -156,8 +168,10 @@ func (self *CustomResourceResource) Schema(
 							Default:             stringdefault.StaticString(""),
 						},
 						"one_of": schema.ListNestedAttribute{
-							Computed: true,
-							Optional: true,
+							Required: true,
+							/*PlanModifiers: []planmodifier.List{
+								listplanmodifier.UseStateForUnknown(),
+							},*/
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
 									"const": schema.StringAttribute{
@@ -206,7 +220,9 @@ func (self *CustomResourceResource) Schema(
 						ElementType:         types.StringType,
 						Computed:            true,
 						Optional:            true,
-						Default:             listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{})),
+						Default: listdefault.StaticValue(
+							types.ListValueMust(types.StringType, []attr.Value{}),
+						),
 					},
 				},
 			},
@@ -238,7 +254,9 @@ func (self *CustomResourceResource) Schema(
 						ElementType:         types.StringType,
 						Computed:            true,
 						Optional:            true,
-						Default:             listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{})),
+						Default: listdefault.StaticValue(
+							types.ListValueMust(types.StringType, []attr.Value{}),
+						),
 					},
 				},
 			},
@@ -270,7 +288,9 @@ func (self *CustomResourceResource) Schema(
 						ElementType:         types.StringType,
 						Computed:            true,
 						Optional:            true,
-						Default:             listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{})),
+						Default: listdefault.StaticValue(
+							types.ListValueMust(types.StringType, []attr.Value{}),
+						),
 					},
 				},
 			},
@@ -302,7 +322,9 @@ func (self *CustomResourceResource) Schema(
 						ElementType:         types.StringType,
 						Computed:            true,
 						Optional:            true,
-						Default:             listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{})),
+						Default: listdefault.StaticValue(
+							types.ListValueMust(types.StringType, []attr.Value{}),
+						),
 					},
 				},
 			},
@@ -445,12 +467,16 @@ func (self *CustomResourceResource) Schema(
 			"project_id": schema.StringAttribute{
 				MarkdownDescription: "Project ID",
 				Required:            true,
-				PlanModifiers:       []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"org_id": schema.StringAttribute{
 				MarkdownDescription: "Constant organisation identifier",
 				Computed:            true,
-				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 		},
 	}
