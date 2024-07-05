@@ -35,7 +35,7 @@ type CustomResourceModel struct {
 
 // CustomResourcePropertiesAPIModel describes the resource API model.
 type CustomResourcePropertiesAPIModel struct {
-	Properties map[string]PropertyAPIModel `json:"properties"`
+	Properties PropertiesAPIModel `json:"properties"`
 }
 
 // CustomResourceAPIModel describes the resource API model.
@@ -57,11 +57,6 @@ type CustomResourceAPIModel struct {
 	OrgId     string `json:"orgId"`
 }
 
-// https://stackoverflow.com/questions/47339542/defining-custom-unmarshalling-for-non-built-in-types
-/*func (self *CustomResourceAPIModel) UnmarshalJSON(bytes []byte) error {
-	panic(errors.New(string(bytes)))
-}*/
-
 func (self *CustomResourceModel) FromAPI(
 	ctx context.Context,
 	raw CustomResourceAPIModel,
@@ -79,9 +74,9 @@ func (self *CustomResourceModel) FromAPI(
 	self.OrgId = types.StringValue(raw.OrgId)
 
 	self.Properties = []PropertyModel{}
-	for propertyName, propertyRaw := range raw.Properties.Properties {
+	for _, propertyItem := range raw.Properties.Properties.Items() {
 		property := PropertyModel{}
-		diags.Append(property.FromAPI(ctx, propertyName, propertyRaw)...)
+		diags.Append(property.FromAPI(ctx, propertyItem.Name, propertyItem.Property)...)
 		self.Properties = append(self.Properties, property)
 	}
 
@@ -108,10 +103,11 @@ func (self *CustomResourceModel) ToAPI(
 
 	diags := diag.Diagnostics{}
 
-	propertiesRaw := map[string]PropertyAPIModel{}
+	propertiesRaw := PropertiesAPIModel{}
+	propertiesRaw.Init()
 	for _, property := range self.Properties {
 		propertyName, propertyRaw, propertyDiags := property.ToAPI(ctx)
-		propertiesRaw[propertyName] = propertyRaw
+		propertiesRaw.Set(propertyName, propertyRaw)
 		diags.Append(propertyDiags...)
 	}
 
