@@ -10,7 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-func TestPropertyModelDefaultToAPI(t *testing.T) {
+func TestPropertyModel_Default_ToAPI(t *testing.T) {
 	cases := []struct {
 		name             string
 		propertyType     string
@@ -99,7 +99,7 @@ func TestPropertyModelDefaultToAPI(t *testing.T) {
 	}
 }
 
-func TestPropertyModelDefaultFromAPI(t *testing.T) {
+func TestPropertyModel_Default_FromAPI(t *testing.T) {
 	cases := []struct {
 		name             string
 		propertyType     string
@@ -186,4 +186,83 @@ func TestPropertyModelDefaultFromAPI(t *testing.T) {
 			CheckEqual(t, property.Name.ValueString(), "p")
 		})
 	}
+}
+
+func TestPropertyModel_OneOf_ToAPI(t *testing.T) {
+	property := PropertyModel{
+		Name:  types.StringValue("p"),
+		Title: types.StringValue("P"),
+		Type:  types.StringValue("string"),
+		OneOf: []PropertyOneOfModel{
+			{
+				Const: types.StringValue("a"),
+				Title: types.StringValue("A"),
+			},
+			{
+				Const:     types.StringValue("b"),
+				Title:     types.StringValue("B"),
+				Encrypted: types.BoolValue(true),
+			},
+		},
+	}
+	name, raw, diags := property.ToAPI(context.Background())
+	CheckDiagnostics(t, diags, "", "")
+	CheckDeepEqual(t, raw.OneOf[0], PropertyOneOfAPIModel{Const: "a", Title: "A"})
+	CheckDeepEqual(t, raw.OneOf[1], PropertyOneOfAPIModel{
+		Const:     "b",
+		Title:     "B",
+		Encrypted: true,
+	})
+	CheckEqual(t, name, "p")
+}
+
+func TestPropertyModel_OneOf_ToAPI_nil(t *testing.T) {
+	property := PropertyModel{
+		Name:  types.StringValue("p"),
+		Title: types.StringValue("P"),
+		Type:  types.StringValue("string"),
+	}
+	_, raw, diags := property.ToAPI(context.Background())
+	CheckDiagnostics(t, diags, "", "")
+	CheckEqual(t, len(raw.OneOf), 0)
+}
+
+func TestPropertyModel_OneOf_FromAPI(t *testing.T) {
+	property := PropertyModel{}
+	diags := property.FromAPI(context.Background(), "p", PropertyAPIModel{
+		Title: "P",
+		Type:  "string",
+		OneOf: []PropertyOneOfAPIModel{
+			{
+				Const: "a",
+				Title: "A",
+			},
+			{
+				Const:     "b",
+				Title:     "B",
+				Encrypted: true,
+			},
+		},
+	})
+	CheckDiagnostics(t, diags, "", "")
+	CheckDeepEqual(t, property.OneOf[0], PropertyOneOfModel{
+		Const:     types.StringValue("a"),
+		Title:     types.StringValue("A"),
+		Encrypted: types.BoolValue(false),
+	})
+	CheckDeepEqual(t, property.OneOf[1], PropertyOneOfModel{
+		Const:     types.StringValue("b"),
+		Title:     types.StringValue("B"),
+		Encrypted: types.BoolValue(true),
+	})
+}
+
+func TestPropertyModel_OneOf_FromAPI_nil(t *testing.T) {
+	property := PropertyModel{}
+	diags := property.FromAPI(context.Background(), "p", PropertyAPIModel{
+		Title: "P",
+		Type:  "string",
+	})
+	CheckDiagnostics(t, diags, "", "")
+	CheckEqual(t, len(property.OneOf), 0)
 }

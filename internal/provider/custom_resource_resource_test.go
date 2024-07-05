@@ -107,8 +107,11 @@ resource "aria_custom_resource" "test" {
       title       = "Some Text"
       description = "Some text, more text."
       type        = "string"
-      one_of      = []
-    }/*,
+      one_of      = [
+        { const = "a", title = "A", encrypted = false },
+        { const = "b", title = "B", encrypted = false }
+      ]
+    },
     {
       name        = "number"
       title       = "Some Number"
@@ -131,7 +134,7 @@ EOT
       min_length  = 16
       max_length  = 64
       one_of      = []
-    }*/
+    }
   ]
 
   create = {

@@ -72,9 +72,9 @@ func (self *PropertyModel) FromAPI(
 	self.MaxLength = types.Int64Value(raw.MaxLength)
 	self.Pattern = types.StringValue(raw.Pattern)
 
-	self.OneOf = []PropertyOneOfModel{}
+	/*self.OneOf = []PropertyOneOfModel{}*/
 
-	/*if raw.OneOf == nil {
+	if raw.OneOf == nil {
 		self.OneOf = nil
 	} else {
 		self.OneOf = []PropertyOneOfModel{}
@@ -83,7 +83,7 @@ func (self *PropertyModel) FromAPI(
 			diags.Append(oneOf.FromAPI(ctx, oneOfRaw)...)
 			self.OneOf = append(self.OneOf, oneOf)
 		}
-	}*/
+	}
 
 	if raw.Default == nil {
 		self.Default = types.StringNull()
@@ -201,7 +201,7 @@ func (self *PropertyModel) ToAPI(
 		}
 	}
 
-	/*var oneOfRawList []PropertyOneOfAPIModel
+	var oneOfRawList []PropertyOneOfAPIModel
 	if self.OneOf == nil {
 		oneOfRawList = nil
 	} else {
@@ -211,9 +211,9 @@ func (self *PropertyModel) ToAPI(
 			oneOfRawList = append(oneOfRawList, oneOfRaw)
 			diags.Append(oneOfDiags...)
 		}
-	}*/
+	}
 
-	oneOfRawList := []PropertyOneOfAPIModel{}
+	/*oneOfRawList := []PropertyOneOfAPIModel{}*/
 
 	return self.Name.ValueString(),
 		PropertyAPIModel{
