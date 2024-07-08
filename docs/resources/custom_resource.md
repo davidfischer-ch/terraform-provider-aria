@@ -162,16 +162,34 @@ resource "aria_custom_resource" "redis" {
 Required:
 
 - `id` (String) Runnable identifier
+- `input_parameters` (Attributes List) (see [below for nested schema](#nestedatt--create--input_parameters))
+- `output_parameters` (Attributes List) (see [below for nested schema](#nestedatt--create--output_parameters))
 - `project_id` (String) Runnable's project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
-
-Optional:
-
-- `input_parameters` (List of String) TODO
 
 Read-Only:
 
 - `name` (String) Runnable name
+
+<a id="nestedatt--create--input_parameters"></a>
+### Nested Schema for `create.input_parameters`
+
+Required:
+
+- `description` (String) Description
+- `name` (String) Name
+- `type` (String) Type
+
+
+<a id="nestedatt--create--output_parameters"></a>
+### Nested Schema for `create.output_parameters`
+
+Required:
+
+- `description` (String) Description
+- `name` (String) Name
+- `type` (String) Type
+
 
 
 <a id="nestedatt--delete"></a>
@@ -180,16 +198,34 @@ Read-Only:
 Required:
 
 - `id` (String) Runnable identifier
+- `input_parameters` (Attributes List) (see [below for nested schema](#nestedatt--delete--input_parameters))
+- `output_parameters` (Attributes List) (see [below for nested schema](#nestedatt--delete--output_parameters))
 - `project_id` (String) Runnable's project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
-
-Optional:
-
-- `input_parameters` (List of String) TODO
 
 Read-Only:
 
 - `name` (String) Runnable name
+
+<a id="nestedatt--delete--input_parameters"></a>
+### Nested Schema for `delete.input_parameters`
+
+Required:
+
+- `description` (String) Description
+- `name` (String) Name
+- `type` (String) Type
+
+
+<a id="nestedatt--delete--output_parameters"></a>
+### Nested Schema for `delete.output_parameters`
+
+Required:
+
+- `description` (String) Description
+- `name` (String) Name
+- `type` (String) Type
+
 
 
 <a id="nestedatt--properties"></a>
@@ -235,16 +271,34 @@ Required:
 Required:
 
 - `id` (String) Runnable identifier
+- `input_parameters` (Attributes List) (see [below for nested schema](#nestedatt--read--input_parameters))
+- `output_parameters` (Attributes List) (see [below for nested schema](#nestedatt--read--output_parameters))
 - `project_id` (String) Runnable's project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
-
-Optional:
-
-- `input_parameters` (List of String) TODO
 
 Read-Only:
 
 - `name` (String) Runnable name
+
+<a id="nestedatt--read--input_parameters"></a>
+### Nested Schema for `read.input_parameters`
+
+Required:
+
+- `description` (String) Description
+- `name` (String) Name
+- `type` (String) Type
+
+
+<a id="nestedatt--read--output_parameters"></a>
+### Nested Schema for `read.output_parameters`
+
+Required:
+
+- `description` (String) Description
+- `name` (String) Name
+- `type` (String) Type
+
 
 
 <a id="nestedatt--update"></a>
@@ -253,13 +307,30 @@ Read-Only:
 Required:
 
 - `id` (String) Runnable identifier
+- `input_parameters` (Attributes List) (see [below for nested schema](#nestedatt--update--input_parameters))
+- `output_parameters` (Attributes List) (see [below for nested schema](#nestedatt--update--output_parameters))
 - `project_id` (String) Runnable's project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
-
-Optional:
-
-- `input_parameters` (List of String) TODO
 
 Read-Only:
 
 - `name` (String) Runnable name
+
+<a id="nestedatt--update--input_parameters"></a>
+### Nested Schema for `update.input_parameters`
+
+Required:
+
+- `description` (String) Description
+- `name` (String) Name
+- `type` (String) Type
+
+
+<a id="nestedatt--update--output_parameters"></a>
+### Nested Schema for `update.output_parameters`
+
+Required:
+
+- `description` (String) Description
+- `name` (String) Name
+- `type` (String) Type

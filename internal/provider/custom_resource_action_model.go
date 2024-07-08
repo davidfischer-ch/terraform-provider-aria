@@ -5,7 +5,6 @@ package provider
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -13,33 +12,49 @@ import (
 
 // CustomResourceActionModel describes the resource data model.
 type CustomResourceActionModel struct {
-	Id              types.String `tfsdk:"id"`
-	Name            types.String `tfsdk:"name"`
-	Type            types.String `tfsdk:"type"`
-	ProjectId       types.String `tfsdk:"project_id"`
-	InputParameters types.List   `tfsdk:"input_parameters"`
+	Id               types.String           `tfsdk:"id"`
+	Name             types.String           `tfsdk:"name"`
+	Type             types.String           `tfsdk:"type"`
+	ProjectId        types.String           `tfsdk:"project_id"`
+	InputParameters  []ActionParameterModel `tfsdk:"input_parameters"`
+	OutputParameters []ActionParameterModel `tfsdk:"output_parameters"`
 }
 
 // CustomResourceActionAPIModel describes the resource API model.
 type CustomResourceActionAPIModel struct {
-	Id              string   `json:"id"`
-	Name            string   `json:"name"`
-	Type            string   `json:"type"`
-	ProjectId       string   `json:"projectId"`
-	InputParameters []string `json:"inputParameters"`
+	Id               string                    `json:"id"`
+	Name             string                    `json:"name"`
+	Type             string                    `json:"type"`
+	ProjectId        string                    `json:"projectId"`
+	InputParameters  []ActionParameterAPIModel `json:"inputParameters"`
+	OutputParameters []ActionParameterAPIModel `json:"outputParameters"`
 }
 
 func (self *CustomResourceActionModel) FromAPI(
 	ctx context.Context,
 	raw CustomResourceActionAPIModel,
 ) diag.Diagnostics {
-	InputParameters, diags := types.ListValueFrom(ctx, types.StringType, raw.InputParameters)
+
+	diags := diag.Diagnostics{}
 
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
 	self.Type = types.StringValue(raw.Type)
 	self.ProjectId = types.StringValue(raw.ProjectId)
-	self.InputParameters = InputParameters
+
+	self.InputParameters = []ActionParameterModel{}
+	for _, parameterItem := range raw.InputParameters {
+		parameter := ActionParameterModel{}
+		diags.Append(parameter.FromAPI(ctx, parameterItem)...)
+		self.InputParameters = append(self.InputParameters, parameter)
+	}
+
+	self.OutputParameters = []ActionParameterModel{}
+	for _, parameterItem := range raw.OutputParameters {
+		parameter := ActionParameterModel{}
+		diags.Append(parameter.FromAPI(ctx, parameterItem)...)
+		self.OutputParameters = append(self.OutputParameters, parameter)
+	}
 
 	return diags
 }
@@ -48,43 +63,28 @@ func (self *CustomResourceActionModel) ToAPI(
 	ctx context.Context,
 ) (CustomResourceActionAPIModel, diag.Diagnostics) {
 
-	var diags diag.Diagnostics
+	diags := diag.Diagnostics{}
 
-	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/list
-	if self.InputParameters.IsNull() || self.InputParameters.IsUnknown() {
-		diags.AddError(
-			"Configuration error",
-			fmt.Sprintf(
-				"Unable to manage custom resource %s, input_parameters is either null or unknown",
-				self.Id.ValueString()))
-		return CustomResourceActionAPIModel{}, diags
+	inputParametersRaw := []ActionParameterAPIModel{}
+	for _, parameter := range self.InputParameters {
+		parameterRaw, parameterDiags := parameter.ToAPI(ctx)
+		inputParametersRaw = append(inputParametersRaw, parameterRaw)
+		diags.Append(parameterDiags...)
 	}
 
-	InputParameters := make([]string, 0, len(self.InputParameters.Elements()))
-	diags = self.InputParameters.ElementsAs(ctx, &InputParameters, false)
-	if diags.HasError() {
-		return CustomResourceActionAPIModel{}, diags
+	outputParametersRaw := []ActionParameterAPIModel{}
+	for _, parameter := range self.InputParameters {
+		parameterRaw, parameterDiags := parameter.ToAPI(ctx)
+		outputParametersRaw = append(outputParametersRaw, parameterRaw)
+		diags.Append(parameterDiags...)
 	}
 
 	return CustomResourceActionAPIModel{
-		Id:              self.Id.ValueString(),
-		Name:            self.Name.ValueString(),
-		Type:            self.Type.ValueString(),
-		ProjectId:       self.ProjectId.ValueString(),
-		InputParameters: InputParameters,
+		Id:               self.Id.ValueString(),
+		Name:             self.Name.ValueString(),
+		Type:             self.Type.ValueString(),
+		ProjectId:        self.ProjectId.ValueString(),
+		InputParameters:  inputParametersRaw,
+		OutputParameters: outputParametersRaw,
 	}, diag.Diagnostics{}
 }
-
-/* func (self *CustomResourceActionModel) ToObject(
-    ctx context.Context,
-) (types.Object, diag.Diagnostics) {
-    return types.ObjectValueFrom(ctx, map[string]attr.Type{
-        "id": types.StringType,
-        "name": types.StringType,
-        "type": types.StringType,
-        "project_id": types.StringType,
-        "input_parameters": types.ListType{
-            ElemType: types.StringType,
-        },
-    }, self)
-} */

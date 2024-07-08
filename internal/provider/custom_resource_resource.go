@@ -10,17 +10,14 @@ import (
 
 	"github.com/go-resty/resty/v2"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -168,9 +165,6 @@ func (self *CustomResourceResource) Schema(
 						},
 						"one_of": schema.ListNestedAttribute{
 							Required: true,
-							/*PlanModifiers: []planmodifier.List{
-								listplanmodifier.UseStateForUnknown(),
-							},*/
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
 									"const": schema.StringAttribute{
@@ -191,6 +185,7 @@ func (self *CustomResourceResource) Schema(
 					},
 				},
 			},
+			/* "allocate:" TODO one of the optional main actions */
 			"create": schema.SingleNestedAttribute{
 				MarkdownDescription: "Resource's create action",
 				Required:            true,
@@ -214,14 +209,43 @@ func (self *CustomResourceResource) Schema(
 						MarkdownDescription: "Runnable's project identifier",
 						Required:            true,
 					},
-					"input_parameters": schema.ListAttribute{
-						MarkdownDescription: "TODO",
-						ElementType:         types.StringType,
-						Computed:            true,
-						Optional:            true,
-						Default: listdefault.StaticValue(
-							types.ListValueMust(types.StringType, []attr.Value{}),
-						),
+					"input_parameters": schema.ListNestedAttribute{
+						Required: true,
+						NestedObject: schema.NestedAttributeObject{
+							Attributes: map[string]schema.Attribute{
+								"type": schema.StringAttribute{
+									MarkdownDescription: "Type",
+									Required:            true,
+								},
+								"name": schema.StringAttribute{
+									MarkdownDescription: "Name",
+									Required:            true,
+								},
+								"description": schema.StringAttribute{
+									MarkdownDescription: "Description",
+									Required:            true,
+								},
+							},
+						},
+					},
+					"output_parameters": schema.ListNestedAttribute{
+						Required: true,
+						NestedObject: schema.NestedAttributeObject{
+							Attributes: map[string]schema.Attribute{
+								"type": schema.StringAttribute{
+									MarkdownDescription: "Type",
+									Required:            true,
+								},
+								"name": schema.StringAttribute{
+									MarkdownDescription: "Name",
+									Required:            true,
+								},
+								"description": schema.StringAttribute{
+									MarkdownDescription: "Description",
+									Required:            true,
+								},
+							},
+						},
 					},
 				},
 			},
@@ -248,14 +272,43 @@ func (self *CustomResourceResource) Schema(
 						MarkdownDescription: "Runnable's project identifier",
 						Required:            true,
 					},
-					"input_parameters": schema.ListAttribute{
-						MarkdownDescription: "TODO",
-						ElementType:         types.StringType,
-						Computed:            true,
-						Optional:            true,
-						Default: listdefault.StaticValue(
-							types.ListValueMust(types.StringType, []attr.Value{}),
-						),
+					"input_parameters": schema.ListNestedAttribute{
+						Required: true,
+						NestedObject: schema.NestedAttributeObject{
+							Attributes: map[string]schema.Attribute{
+								"type": schema.StringAttribute{
+									MarkdownDescription: "Type",
+									Required:            true,
+								},
+								"name": schema.StringAttribute{
+									MarkdownDescription: "Name",
+									Required:            true,
+								},
+								"description": schema.StringAttribute{
+									MarkdownDescription: "Description",
+									Required:            true,
+								},
+							},
+						},
+					},
+					"output_parameters": schema.ListNestedAttribute{
+						Required: true,
+						NestedObject: schema.NestedAttributeObject{
+							Attributes: map[string]schema.Attribute{
+								"type": schema.StringAttribute{
+									MarkdownDescription: "Type",
+									Required:            true,
+								},
+								"name": schema.StringAttribute{
+									MarkdownDescription: "Name",
+									Required:            true,
+								},
+								"description": schema.StringAttribute{
+									MarkdownDescription: "Description",
+									Required:            true,
+								},
+							},
+						},
 					},
 				},
 			},
@@ -282,14 +335,43 @@ func (self *CustomResourceResource) Schema(
 						MarkdownDescription: "Runnable's project identifier",
 						Required:            true,
 					},
-					"input_parameters": schema.ListAttribute{
-						MarkdownDescription: "TODO",
-						ElementType:         types.StringType,
-						Computed:            true,
-						Optional:            true,
-						Default: listdefault.StaticValue(
-							types.ListValueMust(types.StringType, []attr.Value{}),
-						),
+					"input_parameters": schema.ListNestedAttribute{
+						Required: true,
+						NestedObject: schema.NestedAttributeObject{
+							Attributes: map[string]schema.Attribute{
+								"type": schema.StringAttribute{
+									MarkdownDescription: "Type",
+									Required:            true,
+								},
+								"name": schema.StringAttribute{
+									MarkdownDescription: "Name",
+									Required:            true,
+								},
+								"description": schema.StringAttribute{
+									MarkdownDescription: "Description",
+									Required:            true,
+								},
+							},
+						},
+					},
+					"output_parameters": schema.ListNestedAttribute{
+						Required: true,
+						NestedObject: schema.NestedAttributeObject{
+							Attributes: map[string]schema.Attribute{
+								"type": schema.StringAttribute{
+									MarkdownDescription: "Type",
+									Required:            true,
+								},
+								"name": schema.StringAttribute{
+									MarkdownDescription: "Name",
+									Required:            true,
+								},
+								"description": schema.StringAttribute{
+									MarkdownDescription: "Description",
+									Required:            true,
+								},
+							},
+						},
 					},
 				},
 			},
@@ -316,18 +398,47 @@ func (self *CustomResourceResource) Schema(
 						MarkdownDescription: "Runnable's project identifier",
 						Required:            true,
 					},
-					"input_parameters": schema.ListAttribute{
-						MarkdownDescription: "TODO",
-						ElementType:         types.StringType,
-						Computed:            true,
-						Optional:            true,
-						Default: listdefault.StaticValue(
-							types.ListValueMust(types.StringType, []attr.Value{}),
-						),
+					"input_parameters": schema.ListNestedAttribute{
+						Required: true,
+						NestedObject: schema.NestedAttributeObject{
+							Attributes: map[string]schema.Attribute{
+								"type": schema.StringAttribute{
+									MarkdownDescription: "Type",
+									Required:            true,
+								},
+								"name": schema.StringAttribute{
+									MarkdownDescription: "Name",
+									Required:            true,
+								},
+								"description": schema.StringAttribute{
+									MarkdownDescription: "Description",
+									Required:            true,
+								},
+							},
+						},
+					},
+					"output_parameters": schema.ListNestedAttribute{
+						Required: true,
+						NestedObject: schema.NestedAttributeObject{
+							Attributes: map[string]schema.Attribute{
+								"type": schema.StringAttribute{
+									MarkdownDescription: "Type",
+									Required:            true,
+								},
+								"name": schema.StringAttribute{
+									MarkdownDescription: "Name",
+									Required:            true,
+								},
+								"description": schema.StringAttribute{
+									MarkdownDescription: "Description",
+									Required:            true,
+								},
+							},
+						},
 					},
 				},
 			},
-			/* "additional_actions": schema.ListNestedAttribute{
+			/*"additional_actions": schema.ListNestedAttribute{
 				MarkdownDescription: "Additional actions (aka Day 2)",
 				Computed: true,
 				Optional: true,
@@ -346,18 +457,18 @@ func (self *CustomResourceResource) Schema(
 							MarkdownDescription: "Action display name",
 							Required: true,
 						},
+						"description": schema.StringAttribute{
+							MarkdownDescription: "Description",
+							Required:            true,
+						},
 						"provider_name": schema.StringAttribute{
 							MarkdownDescription: "Provider name, one of xaas (and that's all, maybe)",
-							Computed: true,
-							Optional: true,
+							Computed:            true,
+							Optional:            true,
 							Default:             stringdefault.StaticString("xaas"),
-							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+							PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						},
-						"project_id": schema.StringAttribute{
-							MarkdownDescription: "Action's project identifier",
-							Computed: true,
-							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						},
+
 						"resource_type": schema.StringAttribute{
 							MarkdownDescription: "Resource type (e.g. Custom.DB.PostgreSQL)",
 							Computed:            true,
@@ -372,7 +483,7 @@ func (self *CustomResourceResource) Schema(
 								},
 								"name": schema.StringAttribute{
 									MarkdownDescription: "Runnable name",
-									Computed: true,
+									Computed:            true,
 								},
 								"type": schema.StringAttribute{
 									MarkdownDescription: "Runnable type, either abx.action or vro.workflow",
@@ -398,6 +509,11 @@ func (self *CustomResourceResource) Schema(
 						"status": schema.StringAttribute{
 							MarkdownDescription: "Resource status",
 							Computed:            true,
+						},
+						"project_id": schema.StringAttribute{
+							MarkdownDescription: "Action's project identifier",
+							Computed:            true,
+							PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 						},
 						"org_id": schema.StringAttribute{
 							MarkdownDescription: "Organisation identifier",
@@ -462,7 +578,7 @@ func (self *CustomResourceResource) Schema(
 						},
 					},
 				},
-			}, */
+			},*/
 			"project_id": schema.StringAttribute{
 				MarkdownDescription: "Project ID",
 				Required:            true,
