@@ -22,10 +22,10 @@ type CustomResourceModel struct {
 
 	Properties []PropertyModel `tfsdk:"properties"`
 
-	Create CustomResourceActionModel `tfsdk:"create"`
-	Read   CustomResourceActionModel `tfsdk:"read"`
-	Update CustomResourceActionModel `tfsdk:"update"`
-	Delete CustomResourceActionModel `tfsdk:"delete"`
+	Create ResourceActionRunnableModel `tfsdk:"create"`
+	Read   ResourceActionRunnableModel `tfsdk:"read"`
+	Update ResourceActionRunnableModel `tfsdk:"update"`
+	Delete ResourceActionRunnableModel `tfsdk:"delete"`
 
 	ProjectId types.String `tfsdk:"project_id"`
 	OrgId     types.String `tfsdk:"org_id"`
@@ -47,7 +47,7 @@ type CustomResourceAPIModel struct {
 
 	Properties CustomResourcePropertiesAPIModel `json:"properties"`
 
-	MainActions map[string]CustomResourceActionAPIModel `json:"mainActions"`
+	MainActions map[string]ResourceActionRunnableAPIModel `json:"mainActions"`
 
 	ProjectId string `json:"projectId"`
 	OrgId     string `json:"orgId"`
@@ -83,16 +83,16 @@ func (self *CustomResourceModel) FromAPI(
 		self.Properties = append(self.Properties, property)
 	}
 
-	self.Create = CustomResourceActionModel{}
+	self.Create = ResourceActionRunnableModel{}
 	diags.Append(self.Create.FromAPI(ctx, raw.MainActions["create"])...)
 
-	self.Read = CustomResourceActionModel{}
+	self.Read = ResourceActionRunnableModel{}
 	diags.Append(self.Read.FromAPI(ctx, raw.MainActions["read"])...)
 
-	self.Update = CustomResourceActionModel{}
+	self.Update = ResourceActionRunnableModel{}
 	diags.Append(self.Update.FromAPI(ctx, raw.MainActions["update"])...)
 
-	self.Delete = CustomResourceActionModel{}
+	self.Delete = ResourceActionRunnableModel{}
 	diags.Append(self.Delete.FromAPI(ctx, raw.MainActions["delete"])...)
 
 	return diags
@@ -135,7 +135,7 @@ func (self *CustomResourceModel) ToAPI(
 		Properties: CustomResourcePropertiesAPIModel{
 			Properties: propertiesRaw,
 		},
-		MainActions: map[string]CustomResourceActionAPIModel{
+		MainActions: map[string]ResourceActionRunnableAPIModel{
 			"create": createRaw,
 			"read":   readRaw,
 			"update": updateRaw,

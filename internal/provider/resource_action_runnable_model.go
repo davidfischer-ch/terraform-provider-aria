@@ -10,8 +10,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-// CustomResourceActionModel describes the resource data model.
-type CustomResourceActionModel struct {
+// ResourceActionRunnableModel describes the resource data model.
+type ResourceActionRunnableModel struct {
 	Id               types.String           `tfsdk:"id"`
 	Name             types.String           `tfsdk:"name"`
 	Type             types.String           `tfsdk:"type"`
@@ -20,8 +20,8 @@ type CustomResourceActionModel struct {
 	OutputParameters []ActionParameterModel `tfsdk:"output_parameters"`
 }
 
-// CustomResourceActionAPIModel describes the resource API model.
-type CustomResourceActionAPIModel struct {
+// ResourceActionRunnableAPIModel describes the resource API model.
+type ResourceActionRunnableAPIModel struct {
 	Id               string                    `json:"id"`
 	Name             string                    `json:"name"`
 	Type             string                    `json:"type"`
@@ -30,9 +30,9 @@ type CustomResourceActionAPIModel struct {
 	OutputParameters []ActionParameterAPIModel `json:"outputParameters"`
 }
 
-func (self *CustomResourceActionModel) FromAPI(
+func (self *ResourceActionRunnableModel) FromAPI(
 	ctx context.Context,
-	raw CustomResourceActionAPIModel,
+	raw ResourceActionRunnableAPIModel,
 ) diag.Diagnostics {
 
 	diags := diag.Diagnostics{}
@@ -59,9 +59,9 @@ func (self *CustomResourceActionModel) FromAPI(
 	return diags
 }
 
-func (self *CustomResourceActionModel) ToAPI(
+func (self *ResourceActionRunnableModel) ToAPI(
 	ctx context.Context,
-) (CustomResourceActionAPIModel, diag.Diagnostics) {
+) (ResourceActionRunnableAPIModel, diag.Diagnostics) {
 
 	diags := diag.Diagnostics{}
 
@@ -79,7 +79,7 @@ func (self *CustomResourceActionModel) ToAPI(
 		diags.Append(parameterDiags...)
 	}
 
-	return CustomResourceActionAPIModel{
+	return ResourceActionRunnableAPIModel{
 		Id:               self.Id.ValueString(),
 		Name:             self.Name.ValueString(),
 		Type:             self.Type.ValueString(),

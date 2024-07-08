@@ -11,37 +11,37 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-// CustomResourceAdditionalActionModel describes the resource data model.
-type CustomResourceAdditionalActionModel struct {
-	Id           types.String              `tfsdk:"id"`
-	Name         types.String              `tfsdk:"name"`
-	DisplayName  types.String              `tfsdk:"display_name"`
-	Description  types.String              `tfsdk:"description"`
-	ProviderName types.String              `tfsdk:"provider_name"`
-	ResourceType types.String              `tfsdk:"resource_type"`
-	RunnableItem CustomResourceActionModel `tfsdk:"runnable_item"`
+// ResourceActionModel describes the resource data model.
+type ResourceActionModel struct {
+	Id           types.String                `tfsdk:"id"`
+	Name         types.String                `tfsdk:"name"`
+	DisplayName  types.String                `tfsdk:"display_name"`
+	Description  types.String                `tfsdk:"description"`
+	ProviderName types.String                `tfsdk:"provider_name"`
+	ResourceType types.String                `tfsdk:"resource_type"`
+	RunnableItem ResourceActionRunnableModel `tfsdk:"runnable_item"`
 	/*FormDefinition CustomFormModel           `tfsdk:"form_definition"`*/
 
 	ProjectId types.String `tfsdk:"project_id"`
 	OrgId     types.String `tfsdk:"org_id"`
 }
 
-// CustomResourceAdditionalActionAPIModel describes the resource API model.
-type CustomResourceAdditionalActionAPIModel struct {
-	Id           string                       `json:"id"`
-	Name         string                       `json:"name"`
-	DisplayName  string                       `json:"displayName"`
-	Description  string                       `json:"description"`
-	ProviderName string                       `json:"providerName"`
-	ResourceType string                       `json:"resourceType"`
-	RunnableItem CustomResourceActionAPIModel `json:"runnableItem"`
+// ResourceActionAPIModel describes the resource API model.
+type ResourceActionAPIModel struct {
+	Id           string                         `json:"id"`
+	Name         string                         `json:"name"`
+	DisplayName  string                         `json:"displayName"`
+	Description  string                         `json:"description"`
+	ProviderName string                         `json:"providerName"`
+	ResourceType string                         `json:"resourceType"`
+	RunnableItem ResourceActionRunnableAPIModel `json:"runnableItem"`
 	/*FormDefinition CustomFormAPIModel           `json:"formDefinition"`*/
 
 	ProjectId string `json:"projectId"`
 	OrgId     string `json:"orgId"`
 }
 
-func (self *CustomResourceAdditionalActionModel) String() string {
+func (self *ResourceActionModel) String() string {
 	return fmt.Sprintf(
 		"Custom Resource %s Additional Action %s (%s) project %s",
 		self.ResourceType.ValueString(),
@@ -50,9 +50,9 @@ func (self *CustomResourceAdditionalActionModel) String() string {
 		self.ProjectId.ValueString())
 }
 
-func (self *CustomResourceAdditionalActionModel) FromAPI(
+func (self *ResourceActionModel) FromAPI(
 	ctx context.Context,
-	raw CustomResourceAdditionalActionAPIModel,
+	raw ResourceActionAPIModel,
 ) diag.Diagnostics {
 
 	diags := diag.Diagnostics{}
@@ -66,7 +66,7 @@ func (self *CustomResourceAdditionalActionModel) FromAPI(
 	self.ProjectId = types.StringValue(raw.ProjectId)
 	self.OrgId = types.StringValue(raw.OrgId)
 
-	self.RunnableItem = CustomResourceActionModel{}
+	self.RunnableItem = ResourceActionRunnableModel{}
 	diags.Append(self.RunnableItem.FromAPI(ctx, raw.RunnableItem)...)
 
 	// FIXME self.FormDefinition =
@@ -74,16 +74,16 @@ func (self *CustomResourceAdditionalActionModel) FromAPI(
 	return diags
 }
 
-func (self *CustomResourceAdditionalActionModel) ToAPI(
+func (self *ResourceActionModel) ToAPI(
 	ctx context.Context,
-) (CustomResourceAdditionalActionAPIModel, diag.Diagnostics) {
+) (ResourceActionAPIModel, diag.Diagnostics) {
 
 	diags := diag.Diagnostics{}
 
 	runnableItemRaw, runnableItemDiags := self.RunnableItem.ToAPI(ctx)
 	diags.Append(runnableItemDiags...)
 
-	raw := CustomResourceAdditionalActionAPIModel{
+	raw := ResourceActionAPIModel{
 		Name:         self.Name.ValueString(),
 		DisplayName:  self.DisplayName.ValueString(),
 		Description:  self.Description.ValueString(),

@@ -38,28 +38,28 @@ func TestCustomResourceModelToAPI(t *testing.T) {
 				Default: types.StringValue("true"),
 			},
 		},
-		Create: CustomResourceActionModel{
+		Create: ResourceActionRunnableModel{
 			Id:               types.StringValue("c974e486-9039-4b84-9152-0e5aa2074d26"),
 			Type:             types.StringValue("abx.action"),
 			ProjectId:        types.StringValue("175bed78-dd9e-4999-8669-cc62388e9abb"),
 			InputParameters:  []ActionParameterModel{},
 			OutputParameters: []ActionParameterModel{},
 		},
-		Read: CustomResourceActionModel{
+		Read: ResourceActionRunnableModel{
 			Id:               types.StringValue("7d59017f-cf0d-4f74-8aac-ffa351ba54d8"),
 			Type:             types.StringValue("abx.action"),
 			ProjectId:        types.StringValue("175bed78-dd9e-4999-8669-cc62388e9abb"),
 			InputParameters:  []ActionParameterModel{},
 			OutputParameters: []ActionParameterModel{},
 		},
-		Update: CustomResourceActionModel{
+		Update: ResourceActionRunnableModel{
 			Id:               types.StringValue("edb1824c-ca47-4df4-8804-4de3c20a28a4"),
 			Type:             types.StringValue("abx.action"),
 			ProjectId:        types.StringValue("175bed78-dd9e-4999-8669-cc62388e9abb"),
 			InputParameters:  []ActionParameterModel{},
 			OutputParameters: []ActionParameterModel{},
 		},
-		Delete: CustomResourceActionModel{
+		Delete: ResourceActionRunnableModel{
 			Id:               types.StringValue("d40c0ca0-9d65-463e-a4ee-b1d99c0e23a8"),
 			Type:             types.StringValue("abx.action"),
 			ProjectId:        types.StringValue("175bed78-dd9e-4999-8669-cc62388e9abb"),
@@ -152,7 +152,7 @@ func TestCustomResourceModelFromAPI(t *testing.T) {
 		Properties: CustomResourcePropertiesAPIModel{
 			Properties: propertiesRaw,
 		},
-		MainActions: map[string]CustomResourceActionAPIModel{
+		MainActions: map[string]ResourceActionRunnableAPIModel{
 			"create": {
 				Id:               "c974e486-9039-4b84-9152-0e5aa2074d26",
 				Type:             "abx.action",

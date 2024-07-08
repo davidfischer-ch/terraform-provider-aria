@@ -20,36 +20,36 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &CustomResourceAdditionalActionResource{}
-var _ resource.ResourceWithImportState = &CustomResourceAdditionalActionResource{}
+var _ resource.Resource = &ResourceActionResource{}
+var _ resource.ResourceWithImportState = &ResourceActionResource{}
 
-func NewCustomResourceAdditionalActionResource() resource.Resource {
-	return &CustomResourceAdditionalActionResource{}
+func NewResourceActionResource() resource.Resource {
+	return &ResourceActionResource{}
 }
 
-// CustomResourceAdditionalActionResource defines the resource implementation.
-type CustomResourceAdditionalActionResource struct {
+// ResourceActionResource defines the resource implementation.
+type ResourceActionResource struct {
 	client *resty.Client
 }
 
-func (self *CustomResourceAdditionalActionResource) Metadata(
+func (self *ResourceActionResource) Metadata(
 	ctx context.Context,
 	req resource.MetadataRequest,
 	resp *resource.MetadataResponse,
 ) {
-	resp.TypeName = req.ProviderTypeName + "_custom_resource_additional_action"
+	resp.TypeName = req.ProviderTypeName + "_resource_action"
 }
 
-func (self *CustomResourceAdditionalActionResource) Schema(
+func (self *ResourceActionResource) Schema(
 	ctx context.Context,
 	req resource.SchemaRequest,
 	resp *resource.SchemaResponse,
 ) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Custom Resource's additional action resource",
+		MarkdownDescription: "Native resource's action resource",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
-				MarkdownDescription: "Additional action identifier",
+				MarkdownDescription: "Action identifier",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
@@ -77,14 +77,14 @@ func (self *CustomResourceAdditionalActionResource) Schema(
 				},
 			},
 			"resource_type": schema.StringAttribute{
-				MarkdownDescription: "Custom resource type",
+				MarkdownDescription: "Native resource type",
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"runnable_item": schema.SingleNestedAttribute{
-				MarkdownDescription: "Additional action's runnable",
+				MarkdownDescription: "Action's runnable",
 				Required:            true,
 				Attributes: map[string]schema.Attribute{
 					"id": schema.StringAttribute{
@@ -229,7 +229,7 @@ func (self *CustomResourceAdditionalActionResource) Schema(
 	}
 }
 
-func (self *CustomResourceAdditionalActionResource) Configure(
+func (self *ResourceActionResource) Configure(
 	ctx context.Context,
 	req resource.ConfigureRequest,
 	resp *resource.ConfigureResponse,
@@ -237,13 +237,13 @@ func (self *CustomResourceAdditionalActionResource) Configure(
 	self.client = GetResourceClient(ctx, req, resp)
 }
 
-func (self *CustomResourceAdditionalActionResource) Create(
+func (self *ResourceActionResource) Create(
 	ctx context.Context,
 	req resource.CreateRequest,
 	resp *resource.CreateResponse,
 ) {
 	// Read Terraform plan data into the model
-	var action CustomResourceAdditionalActionModel
+	var action ResourceActionModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &action)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -273,20 +273,20 @@ func (self *CustomResourceAdditionalActionResource) Create(
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", action.String()))
 }
 
-func (self *CustomResourceAdditionalActionResource) Read(
+func (self *ResourceActionResource) Read(
 	ctx context.Context,
 	req resource.ReadRequest,
 	resp *resource.ReadResponse,
 ) {
 	// Read Terraform prior state data into the model
-	var action CustomResourceAdditionalActionModel
+	var action ResourceActionModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &action)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	actionId := action.Id.ValueString()
-	var actionRaw CustomResourceAdditionalActionAPIModel
+	var actionRaw ResourceActionAPIModel
 	response, err := self.client.R().
 		SetResult(&actionRaw).
 		Get("form-service/api/custom/resource-actions/" + actionId)
@@ -312,13 +312,13 @@ func (self *CustomResourceAdditionalActionResource) Read(
 	resp.Diagnostics.Append(resp.State.Set(ctx, &action)...)
 }
 
-func (self *CustomResourceAdditionalActionResource) Update(
+func (self *ResourceActionResource) Update(
 	ctx context.Context,
 	req resource.UpdateRequest,
 	resp *resource.UpdateResponse,
 ) {
 	// Read Terraform plan data into the model
-	var action CustomResourceAdditionalActionModel
+	var action ResourceActionModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &action)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -349,13 +349,13 @@ func (self *CustomResourceAdditionalActionResource) Update(
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", action.String()))
 }
 
-func (self *CustomResourceAdditionalActionResource) Delete(
+func (self *ResourceActionResource) Delete(
 	ctx context.Context,
 	req resource.DeleteRequest,
 	resp *resource.DeleteResponse,
 ) {
 	// Read Terraform prior state data into the model
-	var action CustomResourceAdditionalActionModel
+	var action ResourceActionModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &action)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -376,7 +376,7 @@ func (self *CustomResourceAdditionalActionResource) Delete(
 	)
 }
 
-func (self *CustomResourceAdditionalActionResource) ImportState(
+func (self *ResourceActionResource) ImportState(
 	ctx context.Context,
 	req resource.ImportStateRequest,
 	resp *resource.ImportStateResponse,
