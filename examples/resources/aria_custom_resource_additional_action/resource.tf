@@ -34,9 +34,9 @@ resource "aria_abx_action" "redis_create" {
   project_id      = var.project_id
 }
 
-resource "aria_abx_action" "redis_read" {
-  name            = "Custom.Redis.read"
-  description     = "Refresh properties by gathering the actual Redis instance attributes."
+resource "aria_abx_action" "redis_snapshot" {
+  name            = "Custom.Redis.snapshot"
+  description     = "Snapshot an instance of a Redis server."
   runtime_name    = "python"
   memory_in_mb    = 128
   timeout_seconds = 60
@@ -49,35 +49,7 @@ resource "aria_abx_action" "redis_read" {
   project_id      = var.project_id
 }
 
-resource "aria_abx_action" "redis_update" {
-  name            = "Custom.Redis.update"
-  description     = "Update Redis instance's attributes."
-  runtime_name    = "python"
-  memory_in_mb    = 128
-  timeout_seconds = 60
-  entrypoint      = "handler"
-  dependencies    = []
-  constants       = []
-  secrets         = []
-  source          = local.source
-  shared          = true
-  project_id      = var.project_id
-}
-
-resource "aria_abx_action" "redis_delete" {
-  name            = "Custom.Redis.delete"
-  description     = "Destroy the Redis instance."
-  runtime_name    = "python"
-  memory_in_mb    = 128
-  timeout_seconds = 60
-  entrypoint      = "handler"
-  dependencies    = []
-  constants       = []
-  secrets         = []
-  source          = local.source
-  shared          = true
-  project_id      = var.project_id
-}
+# (...)
 
 resource "aria_custom_resource" "redis" {
   display_name  = "Redis"
@@ -128,25 +100,18 @@ resource "aria_custom_resource" "redis" {
     output_parameters = []
   }
 
-  read = {
-    id                = aria_abx_action.redis_read.id
-    project_id        = aria_abx_action.redis_read.project_id
-    type              = "abx.action"
-    input_parameters  = []
-    output_parameters = []
-  }
+  # (...)
+}
 
-  update = {
-    id                = aria_abx_action.redis_update.id
-    project_id        = aria_abx_action.redis_update.project_id
-    type              = "abx.action"
-    input_parameters  = []
-    output_parameters = []
-  }
-
-  delete = {
-    id                = aria_abx_action.redis_delete.id
-    project_id        = aria_abx_action.redis_delete.project_id
+resource "aria_custom_resource_additional_action" "redis_snapshot" {
+  name          = "snapshot"
+  display_name  = "Snaphsot"
+  description   = "Snapshot the instance."
+  resource_type = aria_custom_resource.redis.resource_type
+  project_id    = aria_custom_resource.redis.project_id
+  runnable_item = {
+    id                = aria_abx_action.redis_snapshot.id
+    project_id        = aria_abx_action.redis_snapshot.project_id
     type              = "abx.action"
     input_parameters  = []
     output_parameters = []

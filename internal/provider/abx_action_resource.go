@@ -216,15 +216,14 @@ func (self *ABXActionResource) Create(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to create ABX Action, got error: %s", err))
+			fmt.Sprintf("Unable to create %s, got error: %s", action.String(), err))
 		return
 	}
-
-	tflog.Debug(ctx, fmt.Sprintf("ABX Action %s created", actionRaw.Id))
 
 	// Save action into Terraform state
 	resp.Diagnostics.Append(action.FromAPI(ctx, actionRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &action)...)
+	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", action.String()))
 }
 
 func (self *ABXActionResource) Read(
@@ -249,7 +248,7 @@ func (self *ABXActionResource) Read(
 	// Handle gracefully a resource that has vanished on the platform
 	// Beware that some APIs respond with HTTP 404 instead of 403 ...
 	if response.StatusCode() == 404 {
-		tflog.Debug(ctx, fmt.Sprintf("ABX Action %s (project %s) not found", actionId, projectId))
+		tflog.Debug(ctx, fmt.Sprintf("%s not found", action.String()))
 		resp.State.RemoveResource(ctx)
 		return
 	}
@@ -258,7 +257,7 @@ func (self *ABXActionResource) Read(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read ABX Action %s, got error: %s", actionId, err))
+			fmt.Sprintf("Unable to read %s, got error: %s", action.String(), err))
 		return
 	}
 
@@ -296,15 +295,14 @@ func (self *ABXActionResource) Update(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to update ABX Action %s, got error: %s", actionId, err))
+			fmt.Sprintf("Unable to update %s, got error: %s", action.String(), err))
 		return
 	}
-
-	tflog.Debug(ctx, fmt.Sprintf("ABX Action %s updated", actionId))
 
 	// Save updated action into Terraform state
 	resp.Diagnostics.Append(action.FromAPI(ctx, actionRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &action)...)
+	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", action.String()))
 }
 
 func (self *ABXActionResource) Delete(
@@ -329,7 +327,7 @@ func (self *ABXActionResource) Delete(
 		DeleteIt(
 			self.client,
 			ctx,
-			"ABX Action "+actionId,
+			action.String(),
 			fmt.Sprintf("abx/api/resources/actions/%s?projectId=%s", actionId, projectId),
 		)...,
 	)

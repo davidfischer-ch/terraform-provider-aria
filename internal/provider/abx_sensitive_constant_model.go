@@ -5,6 +5,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -27,6 +28,13 @@ type ABXSensitiveConstantAPIModel struct {
 	Encrypted     bool   `json:"encrypted"`
 	OrgId         string `json:"orgId"`
 	CreatedMillis uint64 `json:"createdMillis"`
+}
+
+func (self *ABXSensitiveConstantModel) String() string {
+	return fmt.Sprintf(
+		"ABX Sensitive Constant %s (%s)",
+		self.Id.ValueString(),
+		self.Name.ValueString())
 }
 
 func (self *ABXSensitiveConstantModel) FromAPI(

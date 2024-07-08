@@ -43,6 +43,14 @@ type ABXActionModel struct {
 	OrgId     types.String `tfsdk:"org_id"`
 }
 
+func (self *ABXActionModel) String() string {
+	return fmt.Sprintf(
+		"ABX Action %s (%s) project %s",
+		self.Id.ValueString(),
+		self.Name.ValueString(),
+		self.ProjectId.ValueString())
+}
+
 // ABXActionAPIModel describes the resource API model.
 type ABXActionAPIModel struct {
 	Id           string `json:"id"`

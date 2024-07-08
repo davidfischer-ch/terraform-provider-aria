@@ -53,7 +53,9 @@ func (self *CustomResourceResource) Schema(
 			"id": schema.StringAttribute{
 				MarkdownDescription: "Resource identifier",
 				Computed:            true,
-				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"display_name": schema.StringAttribute{
 				MarkdownDescription: "A friendly name",
@@ -438,147 +440,6 @@ func (self *CustomResourceResource) Schema(
 					},
 				},
 			},
-			/*"additional_actions": schema.ListNestedAttribute{
-				MarkdownDescription: "Additional actions (aka Day 2)",
-				Computed: true,
-				Optional: true,
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"id": schema.StringAttribute{
-							MarkdownDescription: "Action identifier",
-							Computed:            true,
-							PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						},
-						"name": schema.StringAttribute{
-							MarkdownDescription: "Action name",
-							Required: true,
-						},
-						"display_name": schema.StringAttribute{
-							MarkdownDescription: "Action display name",
-							Required: true,
-						},
-						"description": schema.StringAttribute{
-							MarkdownDescription: "Description",
-							Required:            true,
-						},
-						"provider_name": schema.StringAttribute{
-							MarkdownDescription: "Provider name, one of xaas (and that's all, maybe)",
-							Computed:            true,
-							Optional:            true,
-							Default:             stringdefault.StaticString("xaas"),
-							PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						},
-
-						"resource_type": schema.StringAttribute{
-							MarkdownDescription: "Resource type (e.g. Custom.DB.PostgreSQL)",
-							Computed:            true,
-							PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						},
-						"runnable_item": schema.SingleNestedAttribute{
-							MarkdownDescription: "Additional action's runnable",
-							Attributes: map[string]schema.Attribute{
-								"id": schema.StringAttribute{
-									MarkdownDescription: "Runnable identifier",
-									Required:            true,
-								},
-								"name": schema.StringAttribute{
-									MarkdownDescription: "Runnable name",
-									Computed:            true,
-								},
-								"type": schema.StringAttribute{
-									MarkdownDescription: "Runnable type, either abx.action or vro.workflow",
-									Required:            true,
-									Validators: []validator.String{
-										stringvalidator.OneOf([]string{"abx.action", "vro.workflow"}...),
-									},
-								},
-								"project_id": schema.StringAttribute{
-									MarkdownDescription: "Runnable's project identifier",
-									Required:            true,
-								},
-								"input_parameters": schema.ListAttribute{
-									MarkdownDescription: "TODO",
-									ElementType:         types.StringType,
-									Computed:            true,
-									Optional:            true,
-									Default:             listdefault.StaticValue(types.ListValueMust(types.StringType, []attr.Value{})),
-								},
-							},
-							Required: true,
-						},
-						"status": schema.StringAttribute{
-							MarkdownDescription: "Resource status",
-							Computed:            true,
-						},
-						"project_id": schema.StringAttribute{
-							MarkdownDescription: "Action's project identifier",
-							Computed:            true,
-							PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						},
-						"org_id": schema.StringAttribute{
-							MarkdownDescription: "Organisation identifier",
-							Computed:            true,
-							PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						},
-						"form_definition": schema.SingleNestedAttribute{
-							MarkdownDescription: "Additional action's custom form",
-							Attributes: map[string]schema.Attribute{
-								"id": schema.StringAttribute{
-									MarkdownDescription: "Form identifier",
-									Computed: true,
-								},
-								"name": schema.StringAttribute{
-									MarkdownDescription: "Form name",
-									Required:            true,
-								},
-								"type": schema.StringAttribute{
-									MarkdownDescription: "Form type, requestForm",
-									Computed:            true,
-									Optional:            true,
-									Default:             stringdefault.StaticString("requestForm"),
-									PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-									Validators: []validator.String{
-										stringvalidator.OneOf([]string{"requestForm"}...),
-									},
-								},
-								"form": schema.StringAttribute{
-									MarkdownDescription: "Form content in JSON (TODO nested attribute to define this instead of messing with JSON)",
-									Required:            true,
-								},
-								"form_format": schema.StringAttribute{
-									MarkdownDescription: "Form format either JSON or YAML, will be forced to JSON by Aria ...",
-									Computed:            true,
-									Default:             stringdefault.StaticString("JSON"),
-								},
-								"styles": schema.StringAttribute{
-									MarkdownDescription: "Form stylesheet",
-									Computed: true,
-									Optional: true,
-									Default:             stringdefault.StaticString(""),
-									PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-								}
-								"source_type": schema.StringAttribute{
-									MarkdownDescription: "Form source type",
-									Computed: true,
-									Default: stringdefault.StaticString("resource.action"),
-									PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-								}
-								"status": schema.StringAttribute{
-									MarkdownDescription: "Resource status, one of DRAFT, ON, or RELEASED",
-									Computed:            true,
-									Optional:            true,
-									Validators: []validator.String{
-										stringvalidator.OneOf([]string{"DRAFT", "ON", "RELEASED"}...),
-									},
-								},
-							},
-							Computed: true,
-							Optional: true,
-							PlanModifiers: []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-						},
-					},
-				},
-			},*/
 			"project_id": schema.StringAttribute{
 				MarkdownDescription: "Project ID",
 				Computed:            true,
@@ -633,15 +494,14 @@ func (self *CustomResourceResource) Create(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to create Custom Resource, got error: %s", err))
+			fmt.Sprintf("Unable to create %s, got error: %s", resource.String(), err))
 		return
 	}
-
-	tflog.Debug(ctx, fmt.Sprintf("Custom Resource %s created", resourceRaw.Id))
 
 	// Save custom resource into Terraform state
 	resp.Diagnostics.Append(resource.FromAPI(ctx, resourceRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &resource)...)
+	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", resource.String()))
 }
 
 func (self *CustomResourceResource) Read(
@@ -665,7 +525,7 @@ func (self *CustomResourceResource) Read(
 	// Handle gracefully a resource that has vanished on the platform
 	// Beware that some APIs respond with HTTP 404 instead of 403 ...
 	if response.StatusCode() == 404 {
-		tflog.Debug(ctx, fmt.Sprintf("Custom Resource %s not found", resourceId))
+		tflog.Debug(ctx, fmt.Sprintf("%s not found", resource.String()))
 		resp.State.RemoveResource(ctx)
 		return
 	}
@@ -674,7 +534,7 @@ func (self *CustomResourceResource) Read(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read Custom Resource %s, got error: %s", resourceId, err))
+			fmt.Sprintf("Unable to read %s, got error: %s", resource.String(), err))
 		return
 	}
 
@@ -695,7 +555,6 @@ func (self *CustomResourceResource) Update(
 		return
 	}
 
-	resourceId := resource.Id.ValueString()
 	resourceRaw, diags := resource.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -711,15 +570,14 @@ func (self *CustomResourceResource) Update(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to update Custom Resource %s, got error: %s", resourceId, err))
+			fmt.Sprintf("Unable to update %s, got error: %s", resource.String(), err))
 		return
 	}
-
-	tflog.Debug(ctx, fmt.Sprintf("Custom Resource %s updated", resourceId))
 
 	// Save updated custom resource into Terraform state
 	resp.Diagnostics.Append(resource.FromAPI(ctx, resourceRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &resource)...)
+	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", resource.String()))
 }
 
 func (self *CustomResourceResource) Delete(
@@ -743,7 +601,7 @@ func (self *CustomResourceResource) Delete(
 		DeleteIt(
 			self.client,
 			ctx,
-			"Custom Resource "+resourceId,
+			resource.String(),
 			"form-service/api/custom/resource-types/"+resourceId,
 		)...,
 	)

@@ -194,11 +194,9 @@ func (self *SubscriptionResource) Create(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to create Subscription, got error: %s", err))
+			fmt.Sprintf("Unable to create %s, got error: %s", subscription.String(), err))
 		return
 	}
-
-	tflog.Debug(ctx, fmt.Sprintf("Subscription %s created", subscriptionId))
 
 	// Read (using API) to retrieve the subscription content (and not empty stuff)
 	response, err = self.client.R().
@@ -209,13 +207,14 @@ func (self *SubscriptionResource) Create(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read Subscription %s, got error: %s", subscriptionId, err))
+			fmt.Sprintf("Unable to read %s, got error: %s", subscription.String(), err))
 		return
 	}
 
 	// Save subscription into Terraform state
 	resp.Diagnostics.Append(subscription.FromAPI(ctx, subscriptionRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &subscription)...)
+	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", subscription.String()))
 }
 
 func (self *SubscriptionResource) Read(
@@ -239,6 +238,7 @@ func (self *SubscriptionResource) Read(
 	// Handle gracefully a resource that has vanished on the platform
 	// Beware that some APIs respond with HTTP 404 instead of 403 ...
 	if response.StatusCode() == 404 {
+		tflog.Debug(ctx, fmt.Sprintf("%s not found", subscription.String()))
 		resp.State.RemoveResource(ctx)
 		return
 	}
@@ -247,7 +247,7 @@ func (self *SubscriptionResource) Read(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read Subscription %s, got error: %s", subscriptionId, err))
+			fmt.Sprintf("Unable to read %s, got error: %s", subscription.String(), err))
 		return
 	}
 
@@ -280,11 +280,9 @@ func (self *SubscriptionResource) Update(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to update Subscription %s, got error: %s", subscriptionId, err))
+			fmt.Sprintf("Unable to update %s, got error: %s", subscription.String(), err))
 		return
 	}
-
-	tflog.Debug(ctx, fmt.Sprintf("Subscription %s updated", subscriptionId))
 
 	// Read (using API) to retrieve the subscription content (and not empty stuff)
 	response, err = self.client.R().
@@ -295,13 +293,14 @@ func (self *SubscriptionResource) Update(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read Subscription %s, got error: %s", subscriptionId, err))
+			fmt.Sprintf("Unable to read %s, got error: %s", subscription.String(), err))
 		return
 	}
 
 	// Save subscription into Terraform state
 	resp.Diagnostics.Append(subscription.FromAPI(ctx, subscriptionRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &subscription)...)
+	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", subscription.String()))
 }
 
 func (self *SubscriptionResource) Delete(
@@ -326,7 +325,7 @@ func (self *SubscriptionResource) Delete(
 		DeleteIt(
 			self.client,
 			ctx,
-			"Subscription "+subscriptionId,
+			subscription.String(),
 			"event-broker/api/subscriptions/"+subscriptionId,
 		)...,
 	)

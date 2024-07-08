@@ -106,11 +106,10 @@ func (self *ABXSensitiveConstantResource) Create(
 		return
 	}
 
-	tflog.Debug(ctx, fmt.Sprintf("ABX Sensitive Constant %s created", constantRaw.Id))
-
 	// Save sensitive constant into Terraform state
 	resp.Diagnostics.Append(constant.FromAPI(ctx, constantRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
+	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", constant.String()))
 }
 
 func (self *ABXSensitiveConstantResource) Read(
@@ -142,7 +141,7 @@ func (self *ABXSensitiveConstantResource) Read(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read ABX Sensitive Constant %s, got error: %s", constantId, err))
+			fmt.Sprintf("Unable to read %s, got error: %s", constant.String(), err))
 		return
 	}
 
@@ -174,17 +173,14 @@ func (self *ABXSensitiveConstantResource) Update(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf(
-				"Unable to update ABX Sensitive Constant %s, got error: %s",
-				constantId, err))
+			fmt.Sprintf("Unable to update %s, got error: %s", constant.String(), err))
 		return
 	}
-
-	tflog.Debug(ctx, fmt.Sprintf("ABX Sensitive Constant %s updated", constantId))
 
 	// Save sensitive constant into Terraform state
 	resp.Diagnostics.Append(constant.FromAPI(ctx, constantRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
+	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", constant.String()))
 }
 
 func (self *ABXSensitiveConstantResource) Delete(
@@ -208,7 +204,7 @@ func (self *ABXSensitiveConstantResource) Delete(
 		DeleteIt(
 			self.client,
 			ctx,
-			"ABX Sensitive Constant "+constantId,
+			constant.String(),
 			"abx/api/resources/action-secrets/"+constantId,
 		)...,
 	)

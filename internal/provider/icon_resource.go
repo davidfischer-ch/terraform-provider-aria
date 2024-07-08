@@ -89,11 +89,10 @@ func (self *IconResource) Create(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to create Icon, got error: %s", err))
+			fmt.Sprintf("Unable to create %s, got error: %s", icon.String(), err))
 		return
 	}
 
-	tflog.Debug(ctx, fmt.Sprintf("Icon created %s", response.Body()))
 	iconId, err := GetIdFromLocation(response)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -105,6 +104,7 @@ func (self *IconResource) Create(
 	// Save icon into Terraform state
 	icon.Id = types.StringValue(iconId)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &icon)...)
+	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", icon.String()))
 }
 
 func (self *IconResource) Read(
@@ -133,7 +133,7 @@ func (self *IconResource) Read(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read Icon %s, got error: %s", iconId, err))
+			fmt.Sprintf("Unable to read %s, got error: %s", icon.String(), err))
 		return
 	}
 
@@ -156,7 +156,7 @@ func (self *IconResource) Update(
 
 	resp.Diagnostics.AddError(
 		"Client error",
-		fmt.Sprintf("Unable to update Icon %s, method is not implement.", icon.Id.ValueString()))
+		fmt.Sprintf("Unable to update %s, method is not implement.", icon.String()))
 }
 
 func (self *IconResource) Delete(
@@ -180,7 +180,7 @@ func (self *IconResource) Delete(
 		DeleteIt(
 			self.client,
 			ctx,
-			"Icon "+iconId,
+			icon.String(),
 			"icon/api/icons/"+iconId,
 		)...,
 	)

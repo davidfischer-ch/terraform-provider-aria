@@ -5,6 +5,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -27,6 +28,13 @@ type ABXConstantAPIModel struct {
 	Encrypted     bool   `json:"encrypted"`
 	OrgId         string `json:"orgId"`
 	CreatedMillis uint64 `json:"createdMillis"`
+}
+
+func (self *ABXConstantModel) String() string {
+	return fmt.Sprintf(
+		"ABX Constant %s (%s)",
+		self.Id.ValueString(),
+		self.Name.ValueString())
 }
 
 func (self *ABXConstantModel) FromAPI(

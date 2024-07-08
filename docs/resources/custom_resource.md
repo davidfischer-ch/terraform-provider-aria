@@ -102,9 +102,39 @@ resource "aria_custom_resource" "redis" {
   status        = "DRAFT"
   project_id    = var.project_id
 
-  properties = []
+  properties = [
+    {
+      name        = "version"
+      title       = "Version"
+      description = "Instance version."
+      type        = "string"
+      one_of = [
+        { const = "7.4", title = "7.4", encrypted = false },
+        { const = "8.0", title = "8.0", encrypted = false }
+      ]
+    },
+    {
+      name        = "storage_size"
+      title       = "Storage Size"
+      description = "Storage size (MB)."
+      type        = "integer"
+      default     = tostring(10 * 1024)
+      minimum     = 1 * 1024
+      maximum     = 100 * 1024
+      one_of      = []
+    },
+    {
+      name        = "secret"
+      title       = "Secret"
+      description = "Secret key."
+      type        = "string"
+      encrypted   = true
+      min_length  = 16
+      max_length  = 64
+      one_of      = []
+    }
+  ]
 
-  // TODO Create a function to simplify this
   create = {
     id                = aria_abx_action.redis_create.id
     project_id        = aria_abx_action.redis_create.project_id

@@ -5,6 +5,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -25,9 +26,6 @@ type CustomResourceModel struct {
 	Read   CustomResourceActionModel `tfsdk:"read"`
 	Update CustomResourceActionModel `tfsdk:"update"`
 	Delete CustomResourceActionModel `tfsdk:"delete"`
-
-	// Set of CustomResourceAdditionalActionModel
-	/* AdditionalActions types.Set `tfsdk:"additional_actions"` */
 
 	ProjectId types.String `tfsdk:"project_id"`
 	OrgId     types.String `tfsdk:"org_id"`
@@ -51,10 +49,15 @@ type CustomResourceAPIModel struct {
 
 	MainActions map[string]CustomResourceActionAPIModel `json:"mainActions"`
 
-	/* AdditionalActions []CustomResourceAdditionalActionAPIModel `json:"additionalActions"` */
-
 	ProjectId string `json:"projectId"`
 	OrgId     string `json:"orgId"`
+}
+
+func (self *CustomResourceModel) String() string {
+	return fmt.Sprintf(
+		"ABX Custom Resource %s (%s)",
+		self.Id.ValueString(),
+		self.DisplayName.ValueString())
 }
 
 func (self *CustomResourceModel) FromAPI(
@@ -91,8 +94,6 @@ func (self *CustomResourceModel) FromAPI(
 
 	self.Delete = CustomResourceActionModel{}
 	diags.Append(self.Delete.FromAPI(ctx, raw.MainActions["delete"])...)
-
-	/* self.AdditionalActions */
 
 	return diags
 }
@@ -140,7 +141,6 @@ func (self *CustomResourceModel) ToAPI(
 			"update": updateRaw,
 			"delete": deleteRaw,
 		},
-		/* AdditionalActions */
 	}
 
 	// When updating resource
