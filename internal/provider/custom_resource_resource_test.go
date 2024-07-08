@@ -138,27 +138,35 @@ EOT
   ]
 
   create = {
-    id         = aria_abx_action.create.id
-    project_id = aria_abx_action.create.project_id
-    type       = "abx.action"
+    id                = aria_abx_action.create.id
+    project_id        = aria_abx_action.create.project_id
+    type              = "abx.action"
+    input_parameters  = []
+    output_parameters = []
   }
 
   read = {
-    id         = aria_abx_action.read.id
-    project_id = aria_abx_action.read.project_id
-    type       = "abx.action"
+    id                = aria_abx_action.read.id
+    project_id        = aria_abx_action.read.project_id
+    type              = "abx.action"
+    input_parameters  = []
+    output_parameters = []
   }
 
   update = {
-    id         = aria_abx_action.update.id
-    project_id = aria_abx_action.update.project_id
-    type       = "abx.action"
+    id                = aria_abx_action.update.id
+    project_id        = aria_abx_action.update.project_id
+    type              = "abx.action"
+    input_parameters  = []
+    output_parameters = []
   }
 
   delete = {
-    id         = aria_abx_action.delete.id
-    project_id = aria_abx_action.delete.project_id
-    type       = "abx.action"
+    id                = aria_abx_action.delete.id
+    project_id        = aria_abx_action.delete.project_id
+    type              = "abx.action"
+    input_parameters  = []
+    output_parameters = []
   }
 }
 `,

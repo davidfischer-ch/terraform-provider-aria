@@ -106,27 +106,35 @@ resource "aria_custom_resource" "redis" {
 
   // TODO Create a function to simplify this
   create = {
-    id         = aria_abx_action.redis_create.id
-    project_id = aria_abx_action.redis_create.project_id
-    type       = "abx.action"
+    id                = aria_abx_action.redis_create.id
+    project_id        = aria_abx_action.redis_create.project_id
+    type              = "abx.action"
+    input_parameters  = []
+    output_parameters = []
   }
 
   read = {
-    id         = aria_abx_action.redis_read.id
-    project_id = aria_abx_action.redis_read.project_id
-    type       = "abx.action"
+    id                = aria_abx_action.redis_read.id
+    project_id        = aria_abx_action.redis_read.project_id
+    type              = "abx.action"
+    input_parameters  = []
+    output_parameters = []
   }
 
   update = {
-    id         = aria_abx_action.redis_update.id
-    project_id = aria_abx_action.redis_update.project_id
-    type       = "abx.action"
+    id                = aria_abx_action.redis_update.id
+    project_id        = aria_abx_action.redis_update.project_id
+    type              = "abx.action"
+    input_parameters  = []
+    output_parameters = []
   }
 
   delete = {
-    id         = aria_abx_action.redis_delete.id
-    project_id = aria_abx_action.redis_delete.project_id
-    type       = "abx.action"
+    id                = aria_abx_action.redis_delete.id
+    project_id        = aria_abx_action.redis_delete.project_id
+    type              = "abx.action"
+    input_parameters  = []
+    output_parameters = []
   }
 }
 ```
