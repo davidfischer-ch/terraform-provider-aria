@@ -27,6 +27,7 @@ Native resource's action resource
 ### Optional
 
 - `provider_name` (String) Provider name, one of xaas (and that's all, maybe)
+- `status` (String) Action status, either DRAFT or RELEASED
 
 ### Read-Only
 

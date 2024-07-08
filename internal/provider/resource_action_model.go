@@ -96,7 +96,7 @@ func (self *ResourceActionModel) ToAPI(
 		ResourceType: self.ResourceType.ValueString(),
 		RunnableItem: runnableItemRaw,
 		// FIXME FormDefinition:
-		Status: self.Status.ValueString(),
+		Status:    self.Status.ValueString(),
 		ProjectId: self.ProjectId.ValueString(),
 		OrgId:     self.OrgId.ValueString(),
 	}

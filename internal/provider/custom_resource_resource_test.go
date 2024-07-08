@@ -179,6 +179,12 @@ EOT
       min_length  = 16
       max_length  = 64
       one_of      = []
+    },
+    {
+      name   = "other"
+      title  = "Other"
+      type   = "string"
+      one_of = []
     }
   ]
 
