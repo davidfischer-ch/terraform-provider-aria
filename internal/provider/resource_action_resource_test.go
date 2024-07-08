@@ -119,7 +119,7 @@ resource "aria_resource_action" "test" {
 `,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("aria_resource_action.test", "id"),
-					resource.TestCheckResourceAttr("aria_resource_action.test", "name", "ARIA_PROVIDER_MACHINE_RESET"),
+					resource.TestCheckResourceAttr("aria_resource_action.test", "name", "ARIA_PROVIDER_MACHINE_RESET_RENAMED"),
 					resource.TestCheckResourceAttr("aria_resource_action.test", "display_name", "RESET"),
 					resource.TestCheckResourceAttr("aria_resource_action.test", "description", "Reset the machine..."),
 					resource.TestCheckResourceAttr("aria_resource_action.test", "resource_type", "Cloud.vSphere.Machine"),
