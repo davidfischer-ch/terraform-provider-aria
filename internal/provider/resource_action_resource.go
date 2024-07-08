@@ -58,6 +58,9 @@ func (self *ResourceActionResource) Schema(
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Action name",
 				Required:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"display_name": schema.StringAttribute{
 				MarkdownDescription: "Action display name",
@@ -79,9 +82,6 @@ func (self *ResourceActionResource) Schema(
 			"resource_type": schema.StringAttribute{
 				MarkdownDescription: "Native resource type",
 				Required:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
-				},
 			},
 			"runnable_item": schema.SingleNestedAttribute{
 				MarkdownDescription: "Action's runnable",
@@ -90,9 +90,6 @@ func (self *ResourceActionResource) Schema(
 					"id": schema.StringAttribute{
 						MarkdownDescription: "Runnable identifier",
 						Required:            true,
-						PlanModifiers: []planmodifier.String{
-							stringplanmodifier.RequiresReplace(),
-						},
 					},
 					"name": schema.StringAttribute{
 						MarkdownDescription: "Runnable name",
@@ -101,9 +98,6 @@ func (self *ResourceActionResource) Schema(
 					"type": schema.StringAttribute{
 						MarkdownDescription: "Runnable type, either abx.action or vro.workflow",
 						Required:            true,
-						PlanModifiers: []planmodifier.String{
-							stringplanmodifier.RequiresReplace(),
-						},
 						Validators: []validator.String{
 							stringvalidator.OneOf([]string{"abx.action", "vro.workflow"}...),
 						},
@@ -111,9 +105,6 @@ func (self *ResourceActionResource) Schema(
 					"project_id": schema.StringAttribute{
 						MarkdownDescription: "Runnable's project identifier",
 						Required:            true,
-						PlanModifiers: []planmodifier.String{
-							stringplanmodifier.RequiresReplace(),
-						},
 					},
 					"input_parameters": schema.ListNestedAttribute{
 						Required: true,
@@ -155,12 +146,18 @@ func (self *ResourceActionResource) Schema(
 					},
 				},
 			},
+			"status": schema.StringAttribute{
+				MarkdownDescription: "Action status, either DRAFT or RELEASED",
+				Computed:            true,
+				Optional:            true,
+				Default:             stringdefault.StaticString("RELEASED"),
+				Validators: []validator.String{
+					stringvalidator.OneOf([]string{"DRAFT", "RELEASED"}...),
+				},
+			},
 			"project_id": schema.StringAttribute{
 				MarkdownDescription: "Project ID",
 				Required:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
-				},
 			},
 			"org_id": schema.StringAttribute{
 				MarkdownDescription: "Action organisation identifier",

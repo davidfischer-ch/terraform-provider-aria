@@ -20,6 +20,8 @@ type ResourceActionModel struct {
 	ProviderName types.String                `tfsdk:"provider_name"`
 	ResourceType types.String                `tfsdk:"resource_type"`
 	RunnableItem ResourceActionRunnableModel `tfsdk:"runnable_item"`
+	Status       types.String                `tfsdk:"status"`
+
 	/*FormDefinition CustomFormModel           `tfsdk:"form_definition"`*/
 
 	ProjectId types.String `tfsdk:"project_id"`
@@ -35,6 +37,8 @@ type ResourceActionAPIModel struct {
 	ProviderName string                         `json:"providerName"`
 	ResourceType string                         `json:"resourceType"`
 	RunnableItem ResourceActionRunnableAPIModel `json:"runnableItem"`
+	Status       string                         `json:"status"`
+
 	/*FormDefinition CustomFormAPIModel           `json:"formDefinition"`*/
 
 	ProjectId string `json:"projectId"`
@@ -63,6 +67,7 @@ func (self *ResourceActionModel) FromAPI(
 	self.Description = types.StringValue(raw.Description)
 	self.ProviderName = types.StringValue(raw.ProviderName)
 	self.ResourceType = types.StringValue(raw.ResourceType)
+	self.Status = types.StringValue(raw.Status)
 	self.ProjectId = types.StringValue(raw.ProjectId)
 	self.OrgId = types.StringValue(raw.OrgId)
 
@@ -91,6 +96,7 @@ func (self *ResourceActionModel) ToAPI(
 		ResourceType: self.ResourceType.ValueString(),
 		RunnableItem: runnableItemRaw,
 		// FIXME FormDefinition:
+		Status: self.Status.ValueString(),
 		ProjectId: self.ProjectId.ValueString(),
 		OrgId:     self.OrgId.ValueString(),
 	}
