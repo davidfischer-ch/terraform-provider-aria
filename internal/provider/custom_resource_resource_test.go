@@ -181,10 +181,11 @@ EOT
       one_of      = []
     },
     {
-      name   = "other"
-      title  = "Other"
-      type   = "string"
-      one_of = []
+      name        = "other"
+      title       = "Other"
+      description = ""
+      type        = "string"
+      one_of      = []
     }
   ]
 
