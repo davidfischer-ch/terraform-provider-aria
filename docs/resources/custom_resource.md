@@ -148,7 +148,6 @@ resource "aria_custom_resource" "redis" {
 - `delete` (Attributes) Resource's delete action (see [below for nested schema](#nestedatt--delete))
 - `description` (String) Describe the resource in few sentences
 - `display_name` (String) A friendly name
-- `project_id` (String) Project ID
 - `properties` (Attributes List) Resource's properties (see [below for nested schema](#nestedatt--properties))
 - `read` (Attributes) Resource's read action (see [below for nested schema](#nestedatt--read))
 - `resource_type` (String) Define the type (must be unique, e.g. Custom.DB.PostgreSQL)
@@ -156,6 +155,7 @@ resource "aria_custom_resource" "redis" {
 
 ### Optional
 
+- `project_id` (String) Project ID
 - `schema_type` (String) Type of resource, one of ABX_USER_DEFINED (and that's all, maybe)
 - `status` (String) Resource status, one of DRAFT, ON, or RELEASED
 

@@ -581,9 +581,11 @@ func (self *CustomResourceResource) Schema(
 			},*/
 			"project_id": schema.StringAttribute{
 				MarkdownDescription: "Project ID",
-				Required:            true,
+				Computed:            true,
+				Optional:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"org_id": schema.StringAttribute{
