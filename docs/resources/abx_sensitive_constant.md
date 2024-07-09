@@ -35,4 +35,4 @@ output "example_sensitive_constant" {
 
 - `encrypted` (Boolean) Constant should be always encrypted!
 - `id` (String) Constant identifier
-- `org_id` (String) Constant organisation ID
+- `org_id` (String) Constant organisation identifier

@@ -15,7 +15,7 @@ ABX action resource
 ```terraform
 # variables.tf
 
-variable "test_project_id" {
+variable "project_id" {
   type = string
 }
 
@@ -44,7 +44,7 @@ resource "aria_abx_action" "hello_world" {
   ]
   secrets = []
 
-  project_id = var.test_project_id
+  project_id = var.project_id
 
   shared = true
 
@@ -96,5 +96,5 @@ EOT
 
 - `async_deployed` (Boolean) TODO
 - `id` (String) Action identifier
-- `org_id` (String) Organisation ID
+- `org_id` (String) Organisation identifier
 - `system` (Boolean) Flag indicating if the action is a system action

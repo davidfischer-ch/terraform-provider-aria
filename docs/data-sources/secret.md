@@ -31,7 +31,7 @@ data "aria_secret" "example" {
 - `created_by` (String) Ask VMware
 - `description` (String) Describe the secret in few sentences
 - `name` (String) Secret name
-- `org_id` (String) Organisation ID
+- `org_id` (String) Organisation identifier
 - `org_scoped` (Boolean) Scoped to the organization?
 - `project_ids` (Set of String) Restrict to given projects (an empty list means all)
 - `updated_at` (String) Changed date-time

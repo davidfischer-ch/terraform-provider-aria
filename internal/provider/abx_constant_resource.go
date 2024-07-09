@@ -19,7 +19,7 @@ import (
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &ABXConstantResource{}
-var _ resource.ResourceWithImportState = &IconResource{}
+var _ resource.ResourceWithImportState = &ABXConstantResource{}
 
 func NewABXConstantResource() resource.Resource {
 	return &ABXConstantResource{}
@@ -65,7 +65,7 @@ func (self *ABXConstantResource) Schema(
 				Default:             booldefault.StaticBool(false),
 			},
 			"org_id": schema.StringAttribute{
-				MarkdownDescription: "Constant organisation ID",
+				MarkdownDescription: "Constant organisation identifier",
 				Computed:            true,
 				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
@@ -99,19 +99,18 @@ func (self *ABXConstantResource) Create(
 		SetResult(&constantRaw).
 		Post("abx/api/resources/action-secrets")
 
-	err = handleAPIResponse(ctx, response, err, 200)
+	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to create ABX constant, got error: %s", err))
+			fmt.Sprintf("Unable to create %s, got error: %s", constant.String(), err))
 		return
 	}
-
-	tflog.Debug(ctx, fmt.Sprintf("ABX constant %s created", constantRaw.Id))
 
 	// Save constant into Terraform state
 	resp.Diagnostics.Append(constant.FromAPI(ctx, constantRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
+	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", constant.String()))
 }
 
 func (self *ABXConstantResource) Read(
@@ -139,11 +138,11 @@ func (self *ABXConstantResource) Read(
 		return
 	}
 
-	err = handleAPIResponse(ctx, response, err, 200)
+	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read ABX constant %s, got error: %s", constantId, err))
+			fmt.Sprintf("Unable to read %s, got error: %s", constant.String(), err))
 		return
 	}
 
@@ -171,19 +170,18 @@ func (self *ABXConstantResource) Update(
 		SetResult(&constantRaw).
 		Put("abx/api/resources/action-secrets/" + constantId)
 
-	err = handleAPIResponse(ctx, response, err, 200)
+	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to update ABX constant %s, got error: %s", constantId, err))
+			fmt.Sprintf("Unable to update %s, got error: %s", constant.String(), err))
 		return
 	}
-
-	tflog.Debug(ctx, fmt.Sprintf("ABX constant %s updated", constantId))
 
 	// Save constant into Terraform state
 	resp.Diagnostics.Append(constant.FromAPI(ctx, constantRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
+	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", constant.String()))
 }
 
 func (self *ABXConstantResource) Delete(
@@ -203,16 +201,14 @@ func (self *ABXConstantResource) Delete(
 		return
 	}
 
-	response, err := self.client.R().Delete("abx/api/resources/action-secrets/" + constantId)
-
-	err = handleAPIResponse(ctx, response, err, 200)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to delete ABX constant %s, got error: %s", constantId, err))
-	}
-
-	tflog.Debug(ctx, fmt.Sprintf("ABX constant %s deleted", constantId))
+	resp.Diagnostics.Append(
+		DeleteIt(
+			self.client,
+			ctx,
+			constant.String(),
+			"abx/api/resources/action-secrets/"+constantId,
+		)...,
+	)
 }
 
 func (self *ABXConstantResource) ImportState(

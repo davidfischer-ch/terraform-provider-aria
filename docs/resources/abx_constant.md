@@ -35,4 +35,4 @@ output "example_constant" {
 
 - `encrypted` (Boolean) Constant should be always unencrypted!
 - `id` (String) Constant identifier
-- `org_id` (String) Constant organisation ID
+- `org_id` (String) Constant organisation identifier

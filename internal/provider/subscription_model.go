@@ -68,6 +68,13 @@ type SubscriptionAPIModel struct {
 	SubscriberId string `json:"subscriberId"`
 }
 
+func (self *SubscriptionModel) String() string {
+	return fmt.Sprintf(
+		"Subscription %s (%s)",
+		self.Id.ValueString(),
+		self.Name.ValueString())
+}
+
 func (self *SubscriptionModel) GenerateId() {
 	if len(self.Id.ValueString()) == 0 {
 		self.Id = types.StringValue(uuid.New().String())

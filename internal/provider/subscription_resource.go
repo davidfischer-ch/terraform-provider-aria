@@ -24,7 +24,7 @@ import (
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &SubscriptionResource{}
-var _ resource.ResourceWithImportState = &IconResource{}
+var _ resource.ResourceWithImportState = &SubscriptionResource{}
 
 func NewSubscriptionResource() resource.Resource {
 	return &SubscriptionResource{}
@@ -81,7 +81,7 @@ func (self *SubscriptionResource) Schema(
 				},
 			},
 			"runnable_id": schema.StringAttribute{
-				MarkdownDescription: "Runnable ID",
+				MarkdownDescription: "Runnable identifier",
 				Required:            true,
 			},
 			"recover_runnable_type": schema.StringAttribute{
@@ -92,11 +92,11 @@ func (self *SubscriptionResource) Schema(
 				},
 			},
 			"recover_runnable_id": schema.StringAttribute{
-				MarkdownDescription: "Recovery runnable ID",
+				MarkdownDescription: "Recovery runnable identifier",
 				Optional:            true,
 			},
 			"event_topic_id": schema.StringAttribute{
-				MarkdownDescription: "Event topic ID",
+				MarkdownDescription: "Event topic identifier",
 				Required:            true,
 			},
 			"project_ids": schema.SetAttribute{
@@ -143,17 +143,17 @@ func (self *SubscriptionResource) Schema(
 				Required:            true,
 			},
 			"org_id": schema.StringAttribute{
-				MarkdownDescription: "Subscription organisation ID",
+				MarkdownDescription: "Subscription organisation identifier",
 				Computed:            true,
 				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"owner_id": schema.StringAttribute{
-				MarkdownDescription: "Subscription owner ID",
+				MarkdownDescription: "Subscription owner identifier",
 				Computed:            true,
 				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
 			"subscriber_id": schema.StringAttribute{
-				MarkdownDescription: "Subscriber ID",
+				MarkdownDescription: "Subscriber identifier",
 				Computed:            true,
 				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
 			},
@@ -190,32 +190,31 @@ func (self *SubscriptionResource) Create(
 	}
 
 	response, err := self.client.R().SetBody(subscriptionRaw).Post("event-broker/api/subscriptions")
-	err = handleAPIResponse(ctx, response, err, 201)
+	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to create subscription, got error: %s", err))
+			fmt.Sprintf("Unable to create %s, got error: %s", subscription.String(), err))
 		return
 	}
-
-	tflog.Debug(ctx, fmt.Sprintf("Subscription %s created", subscriptionId))
 
 	// Read (using API) to retrieve the subscription content (and not empty stuff)
 	response, err = self.client.R().
 		SetResult(&subscriptionRaw).
 		Get("event-broker/api/subscriptions/" + subscriptionId)
 
-	err = handleAPIResponse(ctx, response, err, 200)
+	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read subscription %s, got error: %s", subscriptionId, err))
+			fmt.Sprintf("Unable to read %s, got error: %s", subscription.String(), err))
 		return
 	}
 
 	// Save subscription into Terraform state
 	resp.Diagnostics.Append(subscription.FromAPI(ctx, subscriptionRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &subscription)...)
+	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", subscription.String()))
 }
 
 func (self *SubscriptionResource) Read(
@@ -239,15 +238,16 @@ func (self *SubscriptionResource) Read(
 	// Handle gracefully a resource that has vanished on the platform
 	// Beware that some APIs respond with HTTP 404 instead of 403 ...
 	if response.StatusCode() == 404 {
+		tflog.Debug(ctx, fmt.Sprintf("%s not found", subscription.String()))
 		resp.State.RemoveResource(ctx)
 		return
 	}
 
-	err = handleAPIResponse(ctx, response, err, 200)
+	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read subscription %s, got error: %s", subscriptionId, err))
+			fmt.Sprintf("Unable to read %s, got error: %s", subscription.String(), err))
 		return
 	}
 
@@ -276,32 +276,31 @@ func (self *SubscriptionResource) Update(
 	}
 
 	response, err := self.client.R().SetBody(subscriptionRaw).Post("event-broker/api/subscriptions")
-	err = handleAPIResponse(ctx, response, err, 201)
+	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to update subscription %s, got error: %s", subscriptionId, err))
+			fmt.Sprintf("Unable to update %s, got error: %s", subscription.String(), err))
 		return
 	}
-
-	tflog.Debug(ctx, fmt.Sprintf("Subscription %s updated", subscriptionId))
 
 	// Read (using API) to retrieve the subscription content (and not empty stuff)
 	response, err = self.client.R().
 		SetResult(&subscriptionRaw).
 		Get("event-broker/api/subscriptions/" + subscriptionId)
 
-	err = handleAPIResponse(ctx, response, err, 200)
+	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read subscription %s, got error: %s", subscriptionId, err))
+			fmt.Sprintf("Unable to read %s, got error: %s", subscription.String(), err))
 		return
 	}
 
 	// Save subscription into Terraform state
 	resp.Diagnostics.Append(subscription.FromAPI(ctx, subscriptionRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &subscription)...)
+	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", subscription.String()))
 }
 
 func (self *SubscriptionResource) Delete(
@@ -322,15 +321,14 @@ func (self *SubscriptionResource) Delete(
 		return
 	}
 
-	response, err := self.client.R().Delete("event-broker/api/subscriptions/" + subscriptionId)
-	err = handleAPIResponse(ctx, response, err, 204)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to delete subscription %s, got error: %s", subscriptionId, err))
-	}
-
-	tflog.Debug(ctx, fmt.Sprintf("Subscription %s deleted", subscriptionId))
+	resp.Diagnostics.Append(
+		DeleteIt(
+			self.client,
+			ctx,
+			subscription.String(),
+			"event-broker/api/subscriptions/"+subscriptionId,
+		)...,
+	)
 }
 
 func (self *SubscriptionResource) ImportState(
