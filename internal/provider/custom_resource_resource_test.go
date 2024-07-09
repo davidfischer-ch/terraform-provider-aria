@@ -18,7 +18,7 @@ func TestAccCustomResourceResource(t *testing.T) {
 			{
 				Config: `
 variable "test_project_id" {
-    description = "Project where to generate test resources."
+  description = "Project where to generate test resources."
   type        = string
 }
 
