@@ -82,6 +82,9 @@ func (self *ResourceActionResource) Schema(
 			"resource_type": schema.StringAttribute{
 				MarkdownDescription: "Native resource type",
 				Required:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"runnable_item": schema.SingleNestedAttribute{
 				MarkdownDescription: "Action's runnable",
@@ -156,8 +159,11 @@ func (self *ResourceActionResource) Schema(
 				},
 			},
 			"project_id": schema.StringAttribute{
-				MarkdownDescription: "Project ID",
+				MarkdownDescription: "Project ID. Set it to \"\" to make the action available for all projects.",
 				Required:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"org_id": schema.StringAttribute{
 				MarkdownDescription: "Action organisation identifier",

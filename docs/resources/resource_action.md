@@ -74,7 +74,7 @@ resource "aria_resource_action" "machine_hello_world" {
 - `description` (String) Description
 - `display_name` (String) Action display name
 - `name` (String) Action name
-- `project_id` (String) Project ID
+- `project_id` (String) Project ID. Set it to "" to make the action available for all projects.
 - `resource_type` (String) Native resource type
 - `runnable_item` (Attributes) Action's runnable (see [below for nested schema](#nestedatt--runnable_item))
 
