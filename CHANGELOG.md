@@ -1,5 +1,13 @@
 # Changelog
 
+## Release v0.2.4 (2024-07-09)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.4...v0.2.3
+
+### Fix and enhancements
+
+* Make `aria_resource_action.runnable_item.name` required
+
 ## Release v0.2.3 (2024-07-09)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.3...v0.2.2
