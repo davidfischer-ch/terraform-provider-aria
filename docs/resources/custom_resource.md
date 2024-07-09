@@ -192,7 +192,7 @@ resource "aria_custom_resource" "redis" {
 ### Read-Only
 
 - `id` (String) Resource identifier
-- `org_id` (String) Constant organisation identifier
+- `org_id` (String) Resource organisation identifier
 
 <a id="nestedatt--create"></a>
 ### Nested Schema for `create`

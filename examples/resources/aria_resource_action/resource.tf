@@ -42,6 +42,7 @@ resource "aria_resource_action" "machine_hello_world" {
   project_id    = var.test_project_id
   runnable_item = {
     id                = aria_abx_action.hello_world.id
+    name              = aria_abx_action.hello_world.name
     project_id        = aria_abx_action.hello_world.project_id
     type              = "abx.action"
     input_parameters  = []

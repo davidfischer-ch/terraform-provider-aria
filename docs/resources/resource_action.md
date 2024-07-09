@@ -57,6 +57,7 @@ resource "aria_resource_action" "machine_hello_world" {
   project_id    = var.test_project_id
   runnable_item = {
     id                = aria_abx_action.hello_world.id
+    name              = aria_abx_action.hello_world.name
     project_id        = aria_abx_action.hello_world.project_id
     type              = "abx.action"
     input_parameters  = []
@@ -94,13 +95,10 @@ Required:
 
 - `id` (String) Runnable identifier
 - `input_parameters` (Attributes List) (see [below for nested schema](#nestedatt--runnable_item--input_parameters))
+- `name` (String) Runnable name
 - `output_parameters` (Attributes List) (see [below for nested schema](#nestedatt--runnable_item--output_parameters))
 - `project_id` (String) Runnable's project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
-
-Read-Only:
-
-- `name` (String) Runnable name
 
 <a id="nestedatt--runnable_item--input_parameters"></a>
 ### Nested Schema for `runnable_item.input_parameters`

@@ -53,6 +53,7 @@ resource "aria_resource_action" "test" {
   project_id    = var.test_project_id
   runnable_item = {
     id                = aria_abx_action.machine_reset.id
+    name              = aria_abx_action.machine_reset.name
     project_id        = aria_abx_action.machine_reset.project_id
     type              = "abx.action"
     input_parameters  = []
@@ -110,6 +111,7 @@ resource "aria_resource_action" "test" {
   project_id    = var.test_project_id
   runnable_item = {
     id                = aria_abx_action.machine_reset.id
+    name              = aria_abx_action.machine_reset.name
     project_id        = aria_abx_action.machine_reset.project_id
     type              = "abx.action"
     input_parameters  = []

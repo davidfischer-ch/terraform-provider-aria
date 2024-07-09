@@ -450,7 +450,7 @@ func (self *CustomResourceResource) Schema(
 				},
 			},
 			"org_id": schema.StringAttribute{
-				MarkdownDescription: "Constant organisation identifier",
+				MarkdownDescription: "Resource organisation identifier",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),

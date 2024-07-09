@@ -93,7 +93,7 @@ func (self *ResourceActionResource) Schema(
 					},
 					"name": schema.StringAttribute{
 						MarkdownDescription: "Runnable name",
-						Computed:            true,
+						Required:            true,
 					},
 					"type": schema.StringAttribute{
 						MarkdownDescription: "Runnable type, either abx.action or vro.workflow",
