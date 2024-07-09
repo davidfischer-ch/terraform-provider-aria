@@ -1,5 +1,14 @@
 # Changelog
 
+## Release v0.2.3 (2024-07-09)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.3...v0.2.2
+
+### Features
+
+* Add resource `aria_custom_resource` with some missing features
+* Add resource `aria_resource_action` limited to natives types (for now)
+
 ## Release v0.2.2 (2024-06-24)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.2...v0.2.1
