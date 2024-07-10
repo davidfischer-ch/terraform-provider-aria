@@ -14,7 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int32default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -92,27 +92,27 @@ func (self *ABXActionResource) Schema(
 				Computed:            true,
 				Optional:            true,
 			},
-			"cpu_shares": schema.Int64Attribute{
+			"cpu_shares": schema.Int32Attribute{
 				MarkdownDescription: "Runtime CPU shares",
 				Computed:            true,
 				Optional:            true,
-				Default:             int64default.StaticInt64(1024),
+				Default:             int32default.StaticInt32(1024),
 			},
-			"memory_in_mb": schema.Int64Attribute{
+			"memory_in_mb": schema.Int32Attribute{
 				MarkdownDescription: "Runtime memory constraint in MB",
 				Required:            true,
 			},
-			"timeout_seconds": schema.Int64Attribute{
+			"timeout_seconds": schema.Int32Attribute{
 				MarkdownDescription: "How long an action can run (default to 600)",
 				Computed:            true,
 				Optional:            true,
-				Default:             int64default.StaticInt64(600),
+				Default:             int32default.StaticInt32(600),
 			},
-			"deployment_timeout_seconds": schema.Int64Attribute{
+			"deployment_timeout_seconds": schema.Int32Attribute{
 				MarkdownDescription: "How long ??",
 				Computed:            true,
 				Optional:            true,
-				Default:             int64default.StaticInt64(900),
+				Default:             int32default.StaticInt32(900),
 			},
 			"entrypoint": schema.StringAttribute{
 				MarkdownDescription: "Main function's name",

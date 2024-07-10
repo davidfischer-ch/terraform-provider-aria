@@ -26,8 +26,8 @@ type PropertyModel struct {
 	// Specifications
 	Minimum   types.Int64          `tfsdk:"minimum"`
 	Maximum   types.Int64          `tfsdk:"maximum"`
-	MinLength types.Int64          `tfsdk:"min_length"`
-	MaxLength types.Int64          `tfsdk:"max_length"`
+	MinLength types.Int32          `tfsdk:"min_length"`
+	MaxLength types.Int32          `tfsdk:"max_length"`
 	Pattern   types.String         `tfsdk:"pattern"`
 	OneOf     []PropertyOneOfModel `tfsdk:"one_of"`
 }
@@ -45,8 +45,8 @@ type PropertyAPIModel struct {
 	// Specifications
 	Minimum   int64                   `json:"minimum"`
 	Maximum   int64                   `json:"maximum"`
-	MinLength int64                   `json:"minLength"`
-	MaxLength int64                   `json:"maxLength"`
+	MinLength int32                   `json:"minLength"`
+	MaxLength int32                   `json:"maxLength"`
 	Pattern   string                  `json:"pattern"`
 	OneOf     []PropertyOneOfAPIModel `json:"oneOf"`
 }
@@ -68,8 +68,8 @@ func (self *PropertyModel) FromAPI(
 	self.RecreateOnUpdate = types.BoolValue(raw.RecreateOnUpdate)
 	self.Minimum = types.Int64Value(raw.Minimum)
 	self.Maximum = types.Int64Value(raw.Maximum)
-	self.MinLength = types.Int64Value(raw.MinLength)
-	self.MaxLength = types.Int64Value(raw.MaxLength)
+	self.MinLength = types.Int32Value(raw.MinLength)
+	self.MaxLength = types.Int32Value(raw.MaxLength)
 	self.Pattern = types.StringValue(raw.Pattern)
 
 	/*self.OneOf = []PropertyOneOfModel{}*/
@@ -226,8 +226,8 @@ func (self *PropertyModel) ToAPI(
 			RecreateOnUpdate: self.RecreateOnUpdate.ValueBool(),
 			Minimum:          self.Minimum.ValueInt64(),
 			Maximum:          self.Maximum.ValueInt64(),
-			MinLength:        self.MinLength.ValueInt64(),
-			MaxLength:        self.MaxLength.ValueInt64(),
+			MinLength:        self.MinLength.ValueInt32(),
+			MaxLength:        self.MaxLength.ValueInt32(),
 			Pattern:          self.Pattern.ValueString(),
 			OneOf:            oneOfRawList,
 		},

@@ -23,10 +23,10 @@ type ABXActionModel struct {
 	RuntimeName    types.String `tfsdk:"runtime_name"`
 	RuntimeVersion types.String `tfsdk:"runtime_version"`
 
-	CPUShares                types.Int64 `tfsdk:"cpu_shares"`
-	MemoryInMB               types.Int64 `tfsdk:"memory_in_mb"`
-	TimeoutSeconds           types.Int64 `tfsdk:"timeout_seconds"`
-	DeploymentTimeoutSeconds types.Int64 `tfsdk:"deployment_timeout_seconds"`
+	CPUShares                types.Int32 `tfsdk:"cpu_shares"`
+	MemoryInMB               types.Int32 `tfsdk:"memory_in_mb"`
+	TimeoutSeconds           types.Int32 `tfsdk:"timeout_seconds"`
+	DeploymentTimeoutSeconds types.Int32 `tfsdk:"deployment_timeout_seconds"`
 
 	Entrypoint   types.String `tfsdk:"entrypoint"`
 	Dependencies types.List   `tfsdk:"dependencies"`
@@ -62,10 +62,10 @@ type ABXActionAPIModel struct {
 	RuntimeName    string `json:"runtime"`
 	RuntimeVersion string `json:"runtimeVersion"`
 
-	CPUShares                int64 `json:"cpuShares"`
-	MemoryInMB               int64 `json:"memoryInMB"`
-	TimeoutSeconds           int64 `json:"timeoutSeconds"`
-	DeploymentTimeoutSeconds int64 `json:"deploymentTimeoutSeconds"`
+	CPUShares                int32 `json:"cpuShares"`
+	MemoryInMB               int32 `json:"memoryInMB"`
+	TimeoutSeconds           int32 `json:"timeoutSeconds"`
+	DeploymentTimeoutSeconds int32 `json:"deploymentTimeoutSeconds"`
 
 	Entrypoint   string            `json:"entrypoint"`
 	Dependencies string            `json:"dependencies"`
@@ -99,10 +99,10 @@ func (self *ABXActionModel) FromAPI(
 	self.FAASProvider = types.StringValue(faasProvider)
 	self.RuntimeName = types.StringValue(raw.RuntimeName)
 	self.RuntimeVersion = types.StringValue(raw.RuntimeVersion)
-	self.CPUShares = types.Int64Value(raw.CPUShares)
-	self.MemoryInMB = types.Int64Value(raw.MemoryInMB)
-	self.TimeoutSeconds = types.Int64Value(raw.TimeoutSeconds)
-	self.DeploymentTimeoutSeconds = types.Int64Value(raw.DeploymentTimeoutSeconds)
+	self.CPUShares = types.Int32Value(raw.CPUShares)
+	self.MemoryInMB = types.Int32Value(raw.MemoryInMB)
+	self.TimeoutSeconds = types.Int32Value(raw.TimeoutSeconds)
+	self.DeploymentTimeoutSeconds = types.Int32Value(raw.DeploymentTimeoutSeconds)
 	self.Entrypoint = types.StringValue(raw.Entrypoint)
 	self.Source = types.StringValue(CleanString(raw.Source))
 	self.Shared = types.BoolValue(raw.Shared)
@@ -221,10 +221,10 @@ func (self *ABXActionModel) ToAPI(ctx context.Context) (ABXActionAPIModel, diag.
 		Type:                     self.Type.ValueString(),
 		RuntimeName:              self.RuntimeName.ValueString(),
 		RuntimeVersion:           self.RuntimeVersion.ValueString(),
-		CPUShares:                self.CPUShares.ValueInt64(),
-		MemoryInMB:               self.MemoryInMB.ValueInt64(),
-		TimeoutSeconds:           self.TimeoutSeconds.ValueInt64(),
-		DeploymentTimeoutSeconds: self.DeploymentTimeoutSeconds.ValueInt64(),
+		CPUShares:                self.CPUShares.ValueInt32(),
+		MemoryInMB:               self.MemoryInMB.ValueInt32(),
+		TimeoutSeconds:           self.TimeoutSeconds.ValueInt32(),
+		DeploymentTimeoutSeconds: self.DeploymentTimeoutSeconds.ValueInt32(),
 		Entrypoint:               self.Entrypoint.ValueString(),
 		Dependencies:             strings.Join(SkipEmpty(dependencies), "\n"),
 		Inputs:                   inputs,

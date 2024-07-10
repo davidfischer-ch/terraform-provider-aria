@@ -149,12 +149,12 @@ func (self *CustomResourceResource) Schema(
 							Computed:            true,
 							Optional:            true,
 						},
-						"min_length": schema.Int64Attribute{
+						"min_length": schema.Int32Attribute{
 							MarkdownDescription: "Minimum length (valid for a string)",
 							Computed:            true,
 							Optional:            true,
 						},
-						"max_length": schema.Int64Attribute{
+						"max_length": schema.Int32Attribute{
 							MarkdownDescription: "Maximum length (valid for a string)",
 							Computed:            true,
 							Optional:            true,
