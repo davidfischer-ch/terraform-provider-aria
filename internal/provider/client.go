@@ -24,19 +24,19 @@ const ABX_API_VERSION = "2019-09-12"
 const BLUEPRINT_API_VERSION = "2019-09-12"
 const CATALOG_API_VERSION = "2020-08-25"
 
-// TODO then ensure its used (check related TODOs)
+// TODO then ensure its used (check related TODOs).
 // 7.6 ?? https://developer.vmware.com/apis/576/#api
 const EVENT_BROKER_API_VERSION = ""
 
 const FORM_API_VERSION = "1.0"
 const IAAS_API_VERSION = "2021-07-15"
 
-// TODO then ensure its used (check related TODOs)
+// TODO then ensure its used (check related TODOs).
 const ICON_API_VERSION = ""
 
 const POLICY_API_VERSION = "2020-08-25"
 
-// TODO then ensure its used (check related TODOs)
+// TODO then ensure its used (check related TODOs).
 const PLATFORM_API_VERSION = ""
 
 type AriaClientConfig struct {
@@ -170,14 +170,14 @@ func handleAPIResponse(
 	statusCodesText := strings.Join(statusCodesString, ", ")
 
 	request := response.Request
-	requestBody, err := json.MarshalIndent(request.Body, "", "\t")
-	if err != nil {
+	requestBody, requestBodyErr := json.MarshalIndent(request.Body, "", "\t")
+	if requestBodyErr != nil {
 		requestBody = []byte("<body>")
 	}
 
 	tflog.Debug(ctx, strings.Join([]string{
 		"Request Info:",
-		fmt.Sprintf("  URL         : %d", request.URL),
+		fmt.Sprintf("  URL         : %s", request.URL),
 		fmt.Sprintf("  Method      : %s", request.Method),
 		fmt.Sprintf("  Body        : %s", requestBody),
 		"Response Info:",
