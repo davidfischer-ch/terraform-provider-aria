@@ -108,7 +108,7 @@ func (self *CustomNamingResource) Schema(
 				MarkdownDescription: strings.Join([]string{
 					"Resource naming patterns.",
 					"Map key must be set to " +
-						"\"<resource_type>.<resource_type_name> > <static_pattern>\"" +
+						"\"resource_type.resource_type_name > static_pattern\"" +
 						" for the provider to correlate API with state data.",
 					" See example in documentation for details.",
 					"Inspired by https://discuss.hashicorp.com/t/terraform-framework-optional-" +

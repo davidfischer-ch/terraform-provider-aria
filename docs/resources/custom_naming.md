@@ -88,7 +88,7 @@ resource "aria_custom_naming" "machines" {
 - `name` (String) A friendly name
 - `projects` (Attributes List) Restrict the naming template to given projects (by filters). (see [below for nested schema](#nestedatt--projects))
 - `templates` (Attributes Map) Resource naming patterns.
-Map key must be set to "<resource_type>.<resource_type_name> > <static_pattern>" for the provider to correlate API with state data.
+Map key must be set to "resource_type.resource_type_name > static_pattern" for the provider to correlate API with state data.
  See example in documentation for details.
 Inspired by https://discuss.hashicorp.com/t/terraform-framework-optional-inside-a-setnestedattribute-produces-a-does-not-correlate-with-any-element-in-actual/62974/2. (see [below for nested schema](#nestedatt--templates))
 
