@@ -58,6 +58,7 @@ To run the full suite of Unit tests, run `go test ./...`.
 
 For running the acceptance tests you also have to set additionnal environment variables:
 
+* `TF_VAR_test_org_id` to the organization you are targeting
 * `TF_VAR_test_project_id` to an already provisioned writable project
 * `TF_VAR_test_project_ids` to already provisioned writable projects (comma separated)
 * `TF_VAR_test_icon_id` to an already provisioned Icon
@@ -76,6 +77,7 @@ export ARIA_INSECURE=false
 export ARIA_REFRESH_TOKEN=*****
 export ARIA_ACCESS_TOKEN=***** # If you have one, not required
 
+export TF_VAR_test_org_id=2817c6e5-7408-449f-a86d-8f511105e5ba
 export TF_VAR_test_project_id=2e34b115-dd18-48b3-a6af-f794469e5e0d
 export TF_VAR_test_project_ids=8f274902-94dc-40fd-98b5-f06c68ae1237,a9441e75-57c0-46fa-9262-c06a47acb1a9,2e34b115-dd18-48b3-a6af-f794469e5e0d
 export TF_VAR_test_icon_id=72a9a2c7-494e-31d7-afe8-cd27479c407e
