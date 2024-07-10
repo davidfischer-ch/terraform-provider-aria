@@ -5,7 +5,6 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -239,9 +238,6 @@ func (self *CustomNamingResource) Create(
 	if resp.Diagnostics.HasError() {
 		return
 	}
-
-	content, err := json.MarshalIndent(namingRaw, "", "\t")
-	tflog.Debug(ctx, string(content))
 
 	response, err := self.client.R().
 		SetQueryParam("apiVersion", IAAS_API_VERSION).

@@ -6,6 +6,7 @@ package provider
 import (
 	"context"
 	"crypto/tls"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/url"
@@ -160,29 +161,45 @@ func handleAPIResponse(
 	err error,
 	statusCodes []int,
 ) error {
-	tflog.Debug(ctx, "Response Info:")
-	tflog.Debug(ctx, fmt.Sprintf("  Error      : %s", err))
-	tflog.Debug(ctx, fmt.Sprintf("  Status Code: %d", response.StatusCode()))
-	tflog.Debug(ctx, fmt.Sprintf("  Status     : %s", response.Status()))
-	tflog.Debug(ctx, fmt.Sprintf("  Proto      : %s", response.Proto()))
-	tflog.Debug(ctx, fmt.Sprintf("  Time       : %s", response.Time()))
-	tflog.Debug(ctx, fmt.Sprintf("  Received At: %s", response.ReceivedAt()))
-	tflog.Debug(ctx, fmt.Sprintf("  Body       : %s", response.String()))
+
+	// https://stackoverflow.com/questions/39595045/convert-int-array-to-string-separated-by
+	var statusCodesString []string
+	for _, i := range statusCodes {
+		statusCodesString = append(statusCodesString, strconv.Itoa(i))
+	}
+	statusCodesText := strings.Join(statusCodesString, ", ")
+
+	request := response.Request
+	requestBody, err := json.MarshalIndent(request.Body, "", "\t")
+	if err != nil {
+		requestBody = []byte("<body>")
+	}
+
+	tflog.Debug(ctx, strings.Join([]string{
+		"Request Info:",
+		fmt.Sprintf("  URL         : %d", request.URL),
+		fmt.Sprintf("  Method      : %s", request.Method),
+		fmt.Sprintf("  Body        : %s", requestBody),
+		"Response Info:",
+		fmt.Sprintf("  Error       : %s", err),
+		fmt.Sprintf("  Status Code : %d", response.StatusCode()),
+		fmt.Sprintf("  Expected    : %s", statusCodesText),
+		fmt.Sprintf("  Status      : %s", response.Status()),
+		fmt.Sprintf("  Proto       : %s", response.Proto()),
+		fmt.Sprintf("  Time        : %s", response.Time()),
+		fmt.Sprintf("  Received At : %s", response.ReceivedAt()),
+		fmt.Sprintf("  Body        : %s", response.String()),
+	}, "\n"))
 
 	if err != nil {
 		return err
 	}
 
 	if !slices.Contains(statusCodes, response.StatusCode()) {
-		// https://stackoverflow.com/questions/39595045/convert-int-array-to-string-separated-by
-		var statusCodesString []string
-		for _, i := range statusCodes {
-			statusCodesString = append(statusCodesString, strconv.Itoa(i))
-		}
 		return fmt.Errorf(
 			"API response status code %d (expected %s), Body: %s",
 			response.StatusCode(),
-			strings.Join(statusCodesString, ", "),
+			statusCodesText,
 			response.String())
 	}
 
