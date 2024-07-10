@@ -132,4 +132,4 @@ Optional:
 Read-Only:
 
 - `id` (String) Resource identifier
-- `resource_default` (Boolean) True when static pattern is empty (automatically infered by the provider)
+- `resource_default` (Boolean) True when static pattern is empty (automatically inferred by the provider)

@@ -40,7 +40,7 @@ type CustomNamingTemplateAPIModel struct {
 }
 
 func (self *CustomNamingTemplateModel) String() string {
-	return fmt.Sprintf("Custom Naming Template %s (%s)", self.Id.ValueString(), self.Key)
+	return fmt.Sprintf("Custom Naming Template %s (%s)", self.Id.ValueString(), self.Key())
 }
 
 func (self *CustomNamingTemplateModel) Key() string {

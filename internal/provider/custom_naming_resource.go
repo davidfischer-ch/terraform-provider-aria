@@ -161,7 +161,7 @@ func (self *CustomNamingResource) Schema(
 							},
 						},
 						"resource_default": schema.BoolAttribute{
-							MarkdownDescription: "True when static pattern is empty (automatically infered by the provider)",
+							MarkdownDescription: "True when static pattern is empty (automatically inferred by the provider)",
 							Computed:            true,
 							PlanModifiers: []planmodifier.Bool{
 								boolplanmodifier.RequiresReplace(),
