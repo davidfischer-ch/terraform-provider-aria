@@ -37,7 +37,7 @@ type CustomFormModel struct {
 
 // CustomFormAPIModel describes the resource API model.
 type CustomFormAPIModel struct {
-	Id         string `json:"id"`
+	Id         string `json:"id,omitempty"`
 	Name       string `json:"name"`
 	Type       string `json:"type"`
 	Form       string `json:"form"` // TODO A struct to define this attribute

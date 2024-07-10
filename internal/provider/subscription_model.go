@@ -42,7 +42,7 @@ type SubscriptionModel struct {
 
 // SubscriptionAPIModel describes the resource API model.
 type SubscriptionAPIModel struct {
-	Id                  string `json:"id"`
+	Id                  string `json:"id,omitempty"`
 	Name                string `json:"name"`
 	Description         string `json:"description"`
 	Type                string `json:"type"`

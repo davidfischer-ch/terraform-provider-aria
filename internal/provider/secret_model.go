@@ -27,7 +27,7 @@ type SecretModel struct {
 
 // SecretAPIModel describes the secret API model.
 type SecretAPIModel struct {
-	Id   string `json:"id"`
+	Id   string `json:"id,omitempty"`
 	Name string `json:"name"`
 	// Value
 	Description string   `json:"description"`

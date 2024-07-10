@@ -30,7 +30,7 @@ type ResourceActionModel struct {
 
 // ResourceActionAPIModel describes the resource API model.
 type ResourceActionAPIModel struct {
-	Id           string                         `json:"id"`
+	Id           string                         `json:"id,omitempty"`
 	Name         string                         `json:"name"`
 	DisplayName  string                         `json:"displayName"`
 	Description  string                         `json:"description"`

@@ -22,7 +22,7 @@ type ABXSensitiveConstantModel struct {
 
 // ABXSensitiveConstantAPIModel describes the resource API model.
 type ABXSensitiveConstantAPIModel struct {
-	Id            string `json:"id"`
+	Id            string `json:"id,omitempty"`
 	Name          string `json:"name"`
 	Value         string `json:"value"`
 	Encrypted     bool   `json:"encrypted"`

@@ -53,7 +53,7 @@ func (self *ABXActionModel) String() string {
 
 // ABXActionAPIModel describes the resource API model.
 type ABXActionAPIModel struct {
-	Id           string `json:"id"`
+	Id           string `json:"id,omitempty"`
 	Name         string `json:"name"`
 	Description  string `json:"description"`
 	FAASProvider string `json:"provider"`

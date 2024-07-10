@@ -22,7 +22,7 @@ type CatalogTypeModel struct {
 
 // CatalogTypeAPIModel describes the catalog type API model.
 type CatalogTypeAPIModel struct {
-	Id        string `json:"id"`
+	Id        string `json:"id,omitempty"`
 	Name      string `json:"name"`
 	BaseURI   string `json:"baseUri"`
 	CreatedAt string `json:"createdAt"`

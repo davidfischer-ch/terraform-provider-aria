@@ -38,7 +38,7 @@ type CustomResourcePropertiesAPIModel struct {
 
 // CustomResourceAPIModel describes the resource API model.
 type CustomResourceAPIModel struct {
-	Id           string `json:"id"`
+	Id           string `json:"id,omitempty"`
 	DisplayName  string `json:"displayName"`
 	Description  string `json:"description"`
 	ResourceType string `json:"resourceType"`
