@@ -1,5 +1,22 @@
 # Changelog
 
+## Release v0.2.5 (2024-07-10)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.5...v0.2.4
+
+### Features
+
+* Add resource `aria_custom_naming`
+
+### Fix and enhancements
+
+* Include request in debug info + make it multiline instead of multi log lines
+* Define Aria APIs versions and explicitly define `apiVersion` when making API requests
+* Omit empty `id` attribute when making API requests
+* Use `int32` when `int64` is overkill to save some cache
+* Upgrade go modules
+* Instruct Terraform to replace a `aria_resource_action` when its `project_id` is changed
+
 ## Release v0.2.4 (2024-07-09)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.4...v0.2.3
