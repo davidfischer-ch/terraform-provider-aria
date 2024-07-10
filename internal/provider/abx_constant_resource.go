@@ -49,7 +49,9 @@ func (self *ABXConstantResource) Schema(
 			"id": schema.StringAttribute{
 				MarkdownDescription: "Constant identifier",
 				Computed:            true,
-				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Constant name",
@@ -67,7 +69,9 @@ func (self *ABXConstantResource) Schema(
 			"org_id": schema.StringAttribute{
 				MarkdownDescription: "Constant organisation identifier",
 				Computed:            true,
-				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 		},
 	}

@@ -146,7 +146,9 @@ func (self *ABXActionResource) Schema(
 			"project_id": schema.StringAttribute{
 				MarkdownDescription: "Required for non-system actions",
 				Required:            true,
-				PlanModifiers:       []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"shared": schema.BoolAttribute{
 				MarkdownDescription: "Flag indicating if the action can be shared across projects",
@@ -157,17 +159,23 @@ func (self *ABXActionResource) Schema(
 			"system": schema.BoolAttribute{
 				MarkdownDescription: "Flag indicating if the action is a system action",
 				Computed:            true,
-				PlanModifiers:       []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.Bool{
+					boolplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"async_deployed": schema.BoolAttribute{
 				MarkdownDescription: "TODO",
 				Computed:            true,
-				PlanModifiers:       []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.Bool{
+					boolplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"org_id": schema.StringAttribute{
 				MarkdownDescription: "Organisation identifier",
 				Computed:            true,
-				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			/* created_millis int64 */
 			/* updated_millis int64 */
