@@ -31,11 +31,6 @@ type CustomResourceModel struct {
 	OrgId     types.String `tfsdk:"org_id"`
 }
 
-// CustomResourcePropertiesAPIModel describes the resource API model.
-type CustomResourcePropertiesAPIModel struct {
-	Properties PropertiesAPIModel `json:"properties"`
-}
-
 // CustomResourceAPIModel describes the resource API model.
 type CustomResourceAPIModel struct {
 	Id           string `json:"id,omitempty"`
