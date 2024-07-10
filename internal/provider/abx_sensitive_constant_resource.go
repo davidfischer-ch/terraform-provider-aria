@@ -98,6 +98,7 @@ func (self *ABXSensitiveConstantResource) Create(
 
 	var constantRaw ABXSensitiveConstantAPIModel
 	response, err := self.client.R().
+		SetQueryParam("apiVersion", ABX_API_VERSION).
 		SetBody(constant.ToAPI()).
 		SetResult(&constantRaw).
 		Post("abx/api/resources/action-secrets")
@@ -131,6 +132,7 @@ func (self *ABXSensitiveConstantResource) Read(
 	var constantRaw ABXSensitiveConstantAPIModel
 	constantId := constant.Id.ValueString()
 	response, err := self.client.R().
+		SetQueryParam("apiVersion", ABX_API_VERSION).
 		SetResult(&constantRaw).
 		Get("abx/api/resources/action-secrets/" + constantId)
 
@@ -169,6 +171,7 @@ func (self *ABXSensitiveConstantResource) Update(
 	var constantRaw ABXSensitiveConstantAPIModel
 	constantId := constant.Id.ValueString()
 	response, err := self.client.R().
+		SetQueryParam("apiVersion", ABX_API_VERSION).
 		SetBody(constant.ToAPI()).
 		SetResult(&constantRaw).
 		Put("abx/api/resources/action-secrets/" + constantId)
@@ -210,6 +213,7 @@ func (self *ABXSensitiveConstantResource) Delete(
 			ctx,
 			constant.String(),
 			"abx/api/resources/action-secrets/"+constantId,
+			ABX_API_VERSION,
 		)...,
 	)
 }

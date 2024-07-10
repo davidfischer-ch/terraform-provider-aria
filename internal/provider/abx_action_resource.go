@@ -217,6 +217,7 @@ func (self *ABXActionResource) Create(
 	}
 
 	response, err := self.client.R().
+		SetQueryParam("apiVersion", ABX_API_VERSION).
 		SetBody(actionRaw).
 		SetResult(&actionRaw).
 		Post("abx/api/resources/actions")
@@ -250,6 +251,7 @@ func (self *ABXActionResource) Read(
 	projectId := action.ProjectId.ValueString()
 	var actionRaw ABXActionAPIModel
 	response, err := self.client.R().
+		SetQueryParam("apiVersion", ABX_API_VERSION).
 		SetResult(&actionRaw).
 		Get(fmt.Sprintf("abx/api/resources/actions/%s?projectId=%s", actionId, projectId))
 
@@ -295,6 +297,7 @@ func (self *ABXActionResource) Update(
 	}
 
 	response, err := self.client.R().
+		SetQueryParam("apiVersion", ABX_API_VERSION).
 		SetBody(actionRaw).
 		SetResult(&actionRaw).
 		Put(fmt.Sprintf("abx/api/resources/actions/%s?projectId=%s", actionId, projectId))
@@ -337,6 +340,7 @@ func (self *ABXActionResource) Delete(
 			ctx,
 			action.String(),
 			fmt.Sprintf("abx/api/resources/actions/%s?projectId=%s", actionId, projectId),
+			ABX_API_VERSION,
 		)...,
 	)
 }

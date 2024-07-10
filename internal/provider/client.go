@@ -19,6 +19,25 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
+const ABX_API_VERSION = "2019-09-12"
+const BLUEPRINT_API_VERSION = "2019-09-12"
+const CATALOG_API_VERSION = "2020-08-25"
+
+// TODO then ensure its used (check related TODOs)
+// 7.6 ?? https://developer.vmware.com/apis/576/#api
+const EVENT_BROKER_API_VERSION = ""
+
+const FORM_API_VERSION = "1.0"
+const IAAS_API_VERSION = "2021-07-15"
+
+// TODO then ensure its used (check related TODOs)
+const ICON_API_VERSION = ""
+
+const POLICY_API_VERSION = "2020-08-25"
+
+// TODO then ensure its used (check related TODOs)
+const PLATFORM_API_VERSION = ""
+
 type AriaClientConfig struct {
 	// Add whatever fields, client or connection info, etc. here you would need to setup to
 	// communicate with the upstream API. Config holds the common attributes that can be
@@ -97,11 +116,14 @@ func DeleteIt(
 	ctx context.Context,
 	name string,
 	path string,
+	apiVersion string,
 ) diag.Diagnostics {
 	diags := diag.Diagnostics{}
 
 	tflog.Debug(ctx, fmt.Sprintf("Deleting %s...", name))
-	response, err := client.R().Delete(path)
+
+	// Delete the resource
+	response, err := client.R().SetQueryParam("apiVersion", apiVersion).Delete(path)
 	err = handleAPIResponse(ctx, response, err, []int{200, 204})
 	if err != nil {
 		diags.AddError(
@@ -110,10 +132,11 @@ func DeleteIt(
 		return diags
 	}
 
+	// Poll resource until deleted
 	for retry := range []int{0, 1, 2, 3, 4} {
 		time.Sleep(time.Duration(retry) * time.Second)
 		tflog.Debug(ctx, fmt.Sprintf("Poll %d of 5 - Check %s is deleted...", retry+1, name))
-		response, err := client.R().Get(path)
+		response, err := client.R().SetQueryParam("apiVersion", apiVersion).Get(path)
 		err = handleAPIResponse(ctx, response, err, []int{200, 404})
 		if err != nil {
 			diags.AddError(

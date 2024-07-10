@@ -73,7 +73,9 @@ func (self *IconDataSource) Read(
 		return
 	}
 
-	response, err := self.client.R().Get("icon/api/icons/" + icon.Id.ValueString())
+	response, err := self.client.R().
+		// TODO SetQueryParam("apiVersion", ICON_API_VERSION).
+		Get("icon/api/icons/" + icon.Id.ValueString())
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(

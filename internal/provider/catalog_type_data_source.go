@@ -91,6 +91,7 @@ func (self *CatalogTypeDataSource) Read(
 	var catalogTypeRaw CatalogTypeAPIModel
 	catalogTypeId := catalogType.Id.ValueString()
 	response, err := self.client.R().
+		SetQueryParam("apiVersion", CATALOG_API_VERSION).
 		SetResult(&catalogTypeRaw).
 		Get("/catalog/api/types/" + catalogTypeId)
 

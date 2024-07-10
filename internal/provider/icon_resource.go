@@ -82,6 +82,7 @@ func (self *IconResource) Create(
 	}
 
 	response, err := self.client.R().
+		// TODO SetQueryParam("apiVersion", ICON_API_VERSION).
 		SetFileReader("file", "file", strings.NewReader(icon.Content.ValueString())).
 		Post("icon/api/icons")
 
@@ -120,7 +121,9 @@ func (self *IconResource) Read(
 	}
 
 	iconId := icon.Id.ValueString()
-	response, err := self.client.R().Get("icon/api/icons/" + iconId)
+	response, err := self.client.R().
+		// TODO SetQueryParam("apiVersion", ICON_API_VERSION).
+		Get("icon/api/icons/" + iconId)
 
 	// Handle gracefully a resource that has vanished on the platform
 	// Beware that some APIs respond with HTTP 404 instead of 403 ...
@@ -182,6 +185,7 @@ func (self *IconResource) Delete(
 			ctx,
 			icon.String(),
 			"icon/api/icons/"+iconId,
+			ICON_API_VERSION,
 		)...,
 	)
 }

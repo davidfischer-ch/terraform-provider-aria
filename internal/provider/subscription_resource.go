@@ -189,7 +189,10 @@ func (self *SubscriptionResource) Create(
 		return
 	}
 
-	response, err := self.client.R().SetBody(subscriptionRaw).Post("event-broker/api/subscriptions")
+	response, err := self.client.R().
+		// TODO SetQueryParam("apiVersion", EVENT_BROKER_API_VERSION).
+		SetBody(subscriptionRaw).
+		Post("event-broker/api/subscriptions")
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -200,6 +203,7 @@ func (self *SubscriptionResource) Create(
 
 	// Read (using API) to retrieve the subscription content (and not empty stuff)
 	response, err = self.client.R().
+		// TODO SetQueryParam("apiVersion", EVENT_BROKER_API_VERSION).
 		SetResult(&subscriptionRaw).
 		Get("event-broker/api/subscriptions/" + subscriptionId)
 
@@ -232,6 +236,7 @@ func (self *SubscriptionResource) Read(
 	subscriptionId := subscription.Id.ValueString()
 	var subscriptionRaw SubscriptionAPIModel
 	response, err := self.client.R().
+		// TODO SetQueryParam("apiVersion", EVENT_BROKER_API_VERSION).
 		SetResult(&subscriptionRaw).
 		Get("event-broker/api/subscriptions/" + subscriptionId)
 
@@ -275,7 +280,10 @@ func (self *SubscriptionResource) Update(
 		return
 	}
 
-	response, err := self.client.R().SetBody(subscriptionRaw).Post("event-broker/api/subscriptions")
+	response, err := self.client.R().
+		// TODO SetQueryParam("apiVersion", EVENT_BROKER_API_VERSION).
+		SetBody(subscriptionRaw).
+		Post("event-broker/api/subscriptions")
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -327,6 +335,7 @@ func (self *SubscriptionResource) Delete(
 			ctx,
 			subscription.String(),
 			"event-broker/api/subscriptions/"+subscriptionId,
+			EVENT_BROKER_API_VERSION,
 		)...,
 	)
 }

@@ -487,6 +487,7 @@ func (self *CustomResourceResource) Create(
 	}
 
 	response, err := self.client.R().
+		SetQueryParam("apiVersion", FORM_API_VERSION).
 		SetBody(resourceRaw).
 		SetResult(&resourceRaw).
 		Post("form-service/api/custom/resource-types")
@@ -519,6 +520,7 @@ func (self *CustomResourceResource) Read(
 	resourceId := resource.Id.ValueString()
 	var resourceRaw CustomResourceAPIModel
 	response, err := self.client.R().
+		SetQueryParam("apiVersion", FORM_API_VERSION).
 		SetResult(&resourceRaw).
 		Get("form-service/api/custom/resource-types/" + resourceId)
 
@@ -562,6 +564,7 @@ func (self *CustomResourceResource) Update(
 	}
 
 	response, err := self.client.R().
+		SetQueryParam("apiVersion", FORM_API_VERSION).
 		SetBody(resourceRaw).
 		SetResult(&resourceRaw).
 		Post("form-service/api/custom/resource-types") // Its not a mistake...
@@ -603,6 +606,7 @@ func (self *CustomResourceResource) Delete(
 			ctx,
 			resource.String(),
 			"form-service/api/custom/resource-types/"+resourceId,
+			FORM_API_VERSION,
 		)...,
 	)
 }

@@ -259,6 +259,7 @@ func (self *ResourceActionResource) Create(
 	}
 
 	response, err := self.client.R().
+		SetQueryParam("apiVersion", FORM_API_VERSION).
 		SetBody(actionRaw).
 		SetResult(&actionRaw).
 		Post("form-service/api/custom/resource-actions")
@@ -291,6 +292,7 @@ func (self *ResourceActionResource) Read(
 	actionId := action.Id.ValueString()
 	var actionRaw ResourceActionAPIModel
 	response, err := self.client.R().
+		SetQueryParam("apiVersion", FORM_API_VERSION).
 		SetResult(&actionRaw).
 		Get("form-service/api/custom/resource-actions/" + actionId)
 
@@ -334,6 +336,7 @@ func (self *ResourceActionResource) Update(
 	}
 
 	response, err := self.client.R().
+		SetQueryParam("apiVersion", FORM_API_VERSION).
 		SetBody(actionRaw).
 		SetResult(&actionRaw).
 		Post("form-service/api/custom/resource-actions") // Its not a mistake...
@@ -375,6 +378,7 @@ func (self *ResourceActionResource) Delete(
 			ctx,
 			action.String(),
 			"form-service/api/custom/resource-actions/"+actionId,
+			FORM_API_VERSION,
 		)...,
 	)
 }

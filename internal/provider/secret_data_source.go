@@ -109,6 +109,7 @@ func (self *SecretDataSource) Read(
 	var secretRaw SecretAPIModel
 	secretId := secret.Id.ValueString()
 	response, err := self.client.R().
+		// TODO SetQueryParam("apiVersion", PLATFORM_API_VERSION).
 		SetResult(&secretRaw).
 		Get("/platform/api/secrets/" + secretId)
 
