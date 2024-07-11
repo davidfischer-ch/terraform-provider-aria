@@ -42,6 +42,7 @@ locals {
 	source = <<EOT
 import os
 
+
 def handler(*args, **kwargs):
 		print('Global symbols :', globals())
 		print('Environment variables :', os.environ)

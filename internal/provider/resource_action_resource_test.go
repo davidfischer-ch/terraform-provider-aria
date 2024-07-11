@@ -35,6 +35,7 @@ resource "aria_abx_action" "machine_reset" {
   source          = <<EOT
 import os
 
+
 def handler(*args, **kwargs):
     print('Global symbols :', globals())
     print('Environment variables :', os.environ)
@@ -93,6 +94,7 @@ resource "aria_abx_action" "machine_reset" {
   source          = <<EOT
 import os
 
+
 def handler(*args, **kwargs):
     print('Global symbols :', globals())
     print('Environment variables :', os.environ)
@@ -150,6 +152,7 @@ resource "aria_abx_action" "machine_reset" {
   secrets         = []
   source          = <<EOT
 import os
+
 
 def handler(*args, **kwargs):
     print('Global symbols :', globals())
