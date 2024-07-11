@@ -1,5 +1,13 @@
 # Changelog
 
+## Release v0.2.6 (2024-07-11)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.6...v0.2.5
+
+### Fix and enhancements
+
+* Resource `aria_resource_action`: Omit `project_id` when empty (JSON marshaling)
+
 ## Release v0.2.5 (2024-07-10)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.5...v0.2.4
