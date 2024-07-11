@@ -41,7 +41,7 @@ type ResourceActionAPIModel struct {
 
 	/*FormDefinition CustomFormAPIModel           `json:"formDefinition"`*/
 
-	ProjectId string `json:"projectId"`
+	ProjectId string `json:"projectId,omitempty"`
 	OrgId     string `json:"orgId"`
 }
 
