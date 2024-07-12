@@ -174,14 +174,14 @@ resource "aria_custom_resource" "redis" {
 
 ### Required
 
-- `create` (Attributes) Resource's create action (see [below for nested schema](#nestedatt--create))
-- `delete` (Attributes) Resource's delete action (see [below for nested schema](#nestedatt--delete))
+- `create` (Attributes) Create action (see [below for nested schema](#nestedatt--create))
+- `delete` (Attributes) Delete action (see [below for nested schema](#nestedatt--delete))
 - `description` (String) Describe the resource in few sentences
 - `display_name` (String) A friendly name
 - `properties` (Attributes List) Resource's properties (see [below for nested schema](#nestedatt--properties))
-- `read` (Attributes) Resource's read action (see [below for nested schema](#nestedatt--read))
+- `read` (Attributes) Read action (see [below for nested schema](#nestedatt--read))
 - `resource_type` (String) Define the type (must be unique, e.g. Custom.DB.PostgreSQL)
-- `update` (Attributes) Resource's update action (see [below for nested schema](#nestedatt--update))
+- `update` (Attributes) Update action (see [below for nested schema](#nestedatt--update))
 
 ### Optional
 
@@ -191,23 +191,20 @@ resource "aria_custom_resource" "redis" {
 
 ### Read-Only
 
-- `id` (String) Resource identifier
-- `org_id` (String) Resource organisation identifier
+- `id` (String) Identifier
+- `org_id` (String) Organization identifier
 
 <a id="nestedatt--create"></a>
 ### Nested Schema for `create`
 
 Required:
 
-- `id` (String) Runnable identifier
+- `id` (String) Identifier
 - `input_parameters` (Attributes List) (see [below for nested schema](#nestedatt--create--input_parameters))
+- `name` (String) Runnable name
 - `output_parameters` (Attributes List) (see [below for nested schema](#nestedatt--create--output_parameters))
 - `project_id` (String) Runnable's project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
-
-Read-Only:
-
-- `name` (String) Runnable name
 
 <a id="nestedatt--create--input_parameters"></a>
 ### Nested Schema for `create.input_parameters`
@@ -235,15 +232,12 @@ Required:
 
 Required:
 
-- `id` (String) Runnable identifier
+- `id` (String) Identifier
 - `input_parameters` (Attributes List) (see [below for nested schema](#nestedatt--delete--input_parameters))
+- `name` (String) Runnable name
 - `output_parameters` (Attributes List) (see [below for nested schema](#nestedatt--delete--output_parameters))
 - `project_id` (String) Runnable's project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
-
-Read-Only:
-
-- `name` (String) Runnable name
 
 <a id="nestedatt--delete--input_parameters"></a>
 ### Nested Schema for `delete.input_parameters`
@@ -308,15 +302,12 @@ Required:
 
 Required:
 
-- `id` (String) Runnable identifier
+- `id` (String) Identifier
 - `input_parameters` (Attributes List) (see [below for nested schema](#nestedatt--read--input_parameters))
+- `name` (String) Runnable name
 - `output_parameters` (Attributes List) (see [below for nested schema](#nestedatt--read--output_parameters))
 - `project_id` (String) Runnable's project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
-
-Read-Only:
-
-- `name` (String) Runnable name
 
 <a id="nestedatt--read--input_parameters"></a>
 ### Nested Schema for `read.input_parameters`
@@ -344,15 +335,12 @@ Required:
 
 Required:
 
-- `id` (String) Runnable identifier
+- `id` (String) Identifier
 - `input_parameters` (Attributes List) (see [below for nested schema](#nestedatt--update--input_parameters))
+- `name` (String) Runnable name
 - `output_parameters` (Attributes List) (see [below for nested schema](#nestedatt--update--output_parameters))
 - `project_id` (String) Runnable's project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
-
-Read-Only:
-
-- `name` (String) Runnable name
 
 <a id="nestedatt--update--input_parameters"></a>
 ### Nested Schema for `update.input_parameters`

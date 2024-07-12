@@ -91,8 +91,8 @@ resource "aria_subscription" "hello_world" {
 ### Read-Only
 
 - `broadcast` (Boolean) TODO
-- `id` (String) Subscription identifier
-- `org_id` (String) Subscription organisation identifier
-- `owner_id` (String) Subscription owner identifier
+- `id` (String) Identifier
+- `org_id` (String) Organization identifier
+- `owner_id` (String) Owner identifier
 - `subscriber_id` (String) Subscriber identifier
 - `system` (Boolean) TODO

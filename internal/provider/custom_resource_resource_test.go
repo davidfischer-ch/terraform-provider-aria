@@ -191,6 +191,7 @@ EOT
 
   create = {
     id                = aria_abx_action.create.id
+    name              = aria_abx_action.create.name
     project_id        = aria_abx_action.create.project_id
     type              = "abx.action"
     input_parameters  = []
@@ -199,6 +200,7 @@ EOT
 
   read = {
     id                = aria_abx_action.read.id
+    name              = aria_abx_action.read.name
     project_id        = aria_abx_action.read.project_id
     type              = "abx.action"
     input_parameters  = []
@@ -207,6 +209,7 @@ EOT
 
   update = {
     id                = aria_abx_action.update.id
+    name              = aria_abx_action.update.name
     project_id        = aria_abx_action.update.project_id
     type              = "abx.action"
     input_parameters  = []
@@ -215,6 +218,7 @@ EOT
 
   delete = {
     id                = aria_abx_action.delete.id
+    name              = aria_abx_action.delete.name
     project_id        = aria_abx_action.delete.project_id
     type              = "abx.action"
     input_parameters  = []
@@ -410,6 +414,7 @@ EOT
 
   create = {
     id                = aria_abx_action.create.id
+    name              = aria_abx_action.create.name
     project_id        = aria_abx_action.create.project_id
     type              = "abx.action"
     input_parameters  = []
@@ -418,6 +423,7 @@ EOT
 
   read = {
     id                = aria_abx_action.read.id
+    name              = aria_abx_action.read.name
     project_id        = aria_abx_action.read.project_id
     type              = "abx.action"
     input_parameters  = []
@@ -426,6 +432,7 @@ EOT
 
   update = {
     id                = aria_abx_action.update.id
+    name              = aria_abx_action.update.name
     project_id        = aria_abx_action.update.project_id
     type              = "abx.action"
     input_parameters  = []
@@ -434,6 +441,7 @@ EOT
 
   delete = {
     id                = aria_abx_action.delete.id
+    name              = aria_abx_action.delete.name
     project_id        = aria_abx_action.delete.project_id
     type              = "abx.action"
     input_parameters  = []

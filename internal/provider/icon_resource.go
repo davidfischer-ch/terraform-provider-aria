@@ -47,15 +47,13 @@ func (self *IconResource) Schema(
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Icon resource",
 		Attributes: map[string]schema.Attribute{
-			"id": schema.StringAttribute{
-				MarkdownDescription: "Icon identifier (Aria seem to compute it from content)",
-				Computed:            true,
-				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-			},
+			"id": ComputedIdentifierSchema("Identifier (Aria seem to compute it from content)"),
 			"content": schema.StringAttribute{
-				MarkdownDescription: "Icon content (force recreation on change)",
+				MarkdownDescription: "Content (force recreation on change)",
 				Required:            true,
-				PlanModifiers:       []planmodifier.String{stringplanmodifier.RequiresReplace()},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 		},
 	}

@@ -12,8 +12,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -46,33 +44,21 @@ func (self *ABXConstantResource) Schema(
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "ABX constant resource",
 		Attributes: map[string]schema.Attribute{
-			"id": schema.StringAttribute{
-				MarkdownDescription: "Constant identifier",
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
+			"id": ComputedIdentifierSchema(""),
 			"name": schema.StringAttribute{
-				MarkdownDescription: "Constant name",
+				MarkdownDescription: "Name",
 				Required:            true,
 			},
 			"value": schema.StringAttribute{
-				MarkdownDescription: "Constant value",
+				MarkdownDescription: "Value",
 				Required:            true,
 			},
 			"encrypted": schema.BoolAttribute{
-				MarkdownDescription: "Constant should be always unencrypted!",
+				MarkdownDescription: "Should be always unencrypted!",
 				Computed:            true,
 				Default:             booldefault.StaticBool(false),
 			},
-			"org_id": schema.StringAttribute{
-				MarkdownDescription: "Constant organisation identifier",
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
+			"org_id": ComputedOrganizationIdSchema(""),
 		},
 	}
 }

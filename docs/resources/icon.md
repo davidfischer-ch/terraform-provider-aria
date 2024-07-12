@@ -30,8 +30,8 @@ output "example_icon" {
 
 ### Required
 
-- `content` (String) Icon content (force recreation on change)
+- `content` (String) Content (force recreation on change)
 
 ### Read-Only
 
-- `id` (String) Icon identifier (Aria seem to compute it from content)
+- `id` (String) Identifier (Aria seem to compute it from content)

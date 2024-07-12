@@ -53,11 +53,7 @@ func (self *SubscriptionResource) Schema(
 			"(https://developer.broadcom.com/xapis/vrealize-automation-event-broker-service-api/" +
 			"latest/subscription/))",
 		Attributes: map[string]schema.Attribute{
-			"id": schema.StringAttribute{
-				MarkdownDescription: "Subscription identifier",
-				Computed:            true,
-				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-			},
+			"id": ComputedIdentifierSchema(""),
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Subscription name",
 				Required:            true,
@@ -142,20 +138,20 @@ func (self *SubscriptionResource) Schema(
 				MarkdownDescription: "TODO",
 				Required:            true,
 			},
-			"org_id": schema.StringAttribute{
-				MarkdownDescription: "Subscription organisation identifier",
-				Computed:            true,
-				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-			},
+			"org_id": ComputedOrganizationIdSchema(""),
 			"owner_id": schema.StringAttribute{
-				MarkdownDescription: "Subscription owner identifier",
+				MarkdownDescription: "Owner identifier",
 				Computed:            true,
-				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"subscriber_id": schema.StringAttribute{
 				MarkdownDescription: "Subscriber identifier",
 				Computed:            true,
-				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 		},
 	}

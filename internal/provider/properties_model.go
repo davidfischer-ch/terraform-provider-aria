@@ -5,10 +5,15 @@ package provider
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
+
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 )
+
+type PropertiesModel []PropertyModel
 
 // PropertiesAPIModel describes the resource API model.
 // Refers
@@ -25,6 +30,34 @@ type PropertiesAPIModel struct {
 type PropertiesAPIModelItem struct {
 	Name     string
 	Property PropertyAPIModel
+}
+
+func (self *PropertiesModel) FromAPI(
+	ctx context.Context,
+	raw PropertiesAPIModel,
+) diag.Diagnostics {
+	diags := diag.Diagnostics{}
+	self = nil // Empty the slice (WTF)
+	for _, propertyItem := range raw.Items() {
+		property := PropertyModel{}
+		diags.Append(property.FromAPI(ctx, propertyItem.Name, propertyItem.Property)...)
+		*self = append(*self, property)
+	}
+	return diags
+}
+
+func (self *PropertiesModel) ToAPI(
+	ctx context.Context,
+) (PropertiesAPIModel, diag.Diagnostics) {
+	diags := diag.Diagnostics{}
+	properties := PropertiesAPIModel{}
+	properties.Init()
+	for _, property := range *self {
+		propertyName, propertyRaw, propertyDiags := property.ToAPI(ctx)
+		properties.Set(propertyName, propertyRaw)
+		diags.Append(propertyDiags...)
+	}
+	return properties, diags
 }
 
 // Reset the structure (prepare it for collecting new data).
