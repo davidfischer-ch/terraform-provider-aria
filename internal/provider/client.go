@@ -169,6 +169,29 @@ func handleAPIResponse(
 	}
 	statusCodesText := strings.Join(statusCodesString, ", ")
 
+	if err != nil {
+		logAPIResponseInfo(ctx, response, err, statusCodesText)
+		return err
+	}
+
+	if !slices.Contains(statusCodes, response.StatusCode()) {
+		logAPIResponseInfo(ctx, response, err, statusCodesText)
+		return fmt.Errorf(
+			"API response status code %d (expected %s), Body: %s",
+			response.StatusCode(),
+			statusCodesText,
+			response.String())
+	}
+
+	return nil
+}
+
+func logAPIResponseInfo(
+	ctx context.Context,
+	response *resty.Response,
+	err error,
+	statusCodesText string,
+) {
 	request := response.Request
 	requestBody, requestBodyErr := json.MarshalIndent(request.Body, "", "\t")
 	if requestBodyErr != nil {
@@ -190,20 +213,6 @@ func handleAPIResponse(
 		fmt.Sprintf("  Received At : %s", response.ReceivedAt()),
 		fmt.Sprintf("  Body        : %s", response.String()),
 	}, "\n"))
-
-	if err != nil {
-		return err
-	}
-
-	if !slices.Contains(statusCodes, response.StatusCode()) {
-		return fmt.Errorf(
-			"API response status code %d (expected %s), Body: %s",
-			response.StatusCode(),
-			statusCodesText,
-			response.String())
-	}
-
-	return nil
 }
 
 func GetIdFromLocation(response *resty.Response) (string, error) {
