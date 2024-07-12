@@ -72,9 +72,9 @@ func (self *CustomNamingTemplateModel) FromAPI(
 	return diag.Diagnostics{}
 }
 
-func (self *CustomNamingTemplateModel) ToAPI(
+func (self *CustomNamingTemplateModel) toAPI(
 	ctx context.Context,
-) (CustomNamingTemplateAPIModel, diag.Diagnostics) {
+) CustomNamingTemplateAPIModel {
 	return CustomNamingTemplateAPIModel{
 		Id:               self.Id.ValueString(),
 		Name:             self.Name.ValueString(),
@@ -86,5 +86,30 @@ func (self *CustomNamingTemplateModel) ToAPI(
 		StaticPattern:    self.StaticPattern.ValueString(),
 		StartCounter:     self.StartCounter.ValueInt32(),
 		IncrementStep:    self.IncrementStep.ValueInt32(),
-	}, diag.Diagnostics{}
+	}
+}
+
+func (self *CustomNamingTemplateModel) ToAPI(
+	ctx context.Context,
+	state CustomNamingTemplateModel,
+) (CustomNamingTemplateAPIModel, diag.Diagnostics) {
+	raw := self.toAPI(ctx)
+	// If the identifier is set, means its an UPDATE
+	if len(raw.Id) > 0 {
+		stateRaw := state.toAPI(ctx)
+		// Attributes are writable once, any changes requires a replacement
+		// In that case, the identifier is wiped to trigger the replacement (by Aria)
+		if raw.Name != stateRaw.Name ||
+			raw.ResourceType != stateRaw.ResourceType ||
+			raw.ResourceTypeName != stateRaw.ResourceTypeName ||
+			raw.ResourceDefault != stateRaw.ResourceDefault ||
+			raw.UniqueName != stateRaw.UniqueName ||
+			raw.Pattern != stateRaw.Pattern ||
+			raw.StaticPattern != stateRaw.StaticPattern ||
+			raw.StartCounter != stateRaw.StartCounter ||
+			raw.IncrementStep != stateRaw.IncrementStep {
+			raw.Id = ""
+		}
+	}
+	return raw, diag.Diagnostics{}
 }

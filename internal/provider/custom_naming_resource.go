@@ -15,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int32default"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int32planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
@@ -108,21 +107,34 @@ func (self *CustomNamingResource) Schema(
 						"org_default": schema.BoolAttribute{
 							MarkdownDescription: "Default for the organization?",
 							Required:            true,
+							PlanModifiers: []planmodifier.Bool{
+								boolplanmodifier.RequiresReplace(),
+								boolplanmodifier.UseStateForUnknown(),
+							},
 						},
 						"org_id": schema.StringAttribute{
 							MarkdownDescription: "Organization identifier",
 							Required:            true,
 							PlanModifiers: []planmodifier.String{
 								stringplanmodifier.RequiresReplace(),
+								stringplanmodifier.UseStateForUnknown(),
 							},
 						},
 						"project_id": schema.StringAttribute{
 							MarkdownDescription: "Projects identifier pattern (e.g. *).",
 							Required:            true,
+							PlanModifiers: []planmodifier.String{
+								stringplanmodifier.RequiresReplace(),
+								stringplanmodifier.UseStateForUnknown(),
+							},
 						},
 						"project_name": schema.StringAttribute{
 							MarkdownDescription: "Projects name pattern (e.g. *).",
 							Required:            true,
+							PlanModifiers: []planmodifier.String{
+								stringplanmodifier.RequiresReplace(),
+								stringplanmodifier.UseStateForUnknown(),
+							},
 						},
 					},
 				},
@@ -135,8 +147,8 @@ func (self *CustomNamingResource) Schema(
 						" for the provider to correlate API with state data.",
 					" See example in documentation for details.",
 					"Inspired by https://discuss.hashicorp.com/t/terraform-framework-optional-" +
-						"inside-a-setnestedattribute-produces-a-does-not-correlate-with-any-element" +
-						"-in-actual/62974/2.",
+						"inside-a-setnestedattribute-produces-a-does-not-correlate-with-any-" +
+						"element-in-actual/62974/2.",
 				}, "\n"),
 				Required: true,
 				NestedObject: schema.NestedAttributeObject{
@@ -144,23 +156,17 @@ func (self *CustomNamingResource) Schema(
 						"id": schema.StringAttribute{
 							MarkdownDescription: "Resource identifier",
 							Computed:            true,
-							PlanModifiers: []planmodifier.String{
-								stringplanmodifier.UseStateForUnknown(),
-							},
 						},
 						"name": schema.StringAttribute{
-							MarkdownDescription: "Template name (valid for types that supports named templates)",
-							Required:            true,
-							PlanModifiers: []planmodifier.String{
-								stringplanmodifier.RequiresReplace(),
-							},
+							MarkdownDescription: "Template name (valid for types that supports " +
+								"named templates)",
+							Required: true,
 						},
 						"resource_type": schema.StringAttribute{
-							MarkdownDescription: "Resource type, one of COMPUTE, COMPUTE_STORAGE, NETWORK, LOAD_BALANCER, RESOURCE_GROUP, GATEWAY, NAT, SECURITY_GROUP, GENERIC",
-							Required:            true,
-							PlanModifiers: []planmodifier.String{
-								stringplanmodifier.RequiresReplace(),
-							},
+							MarkdownDescription: "Resource type, one of COMPUTE, COMPUTE_STORAGE, " +
+								"NETWORK, LOAD_BALANCER, RESOURCE_GROUP, GATEWAY, NAT, " +
+								"SECURITY_GROUP, GENERIC",
+							Required: true,
 							Validators: []validator.String{
 								stringvalidator.OneOf([]string{
 									"COMPUTE",
@@ -178,56 +184,38 @@ func (self *CustomNamingResource) Schema(
 						"resource_type_name": schema.StringAttribute{
 							MarkdownDescription: "Resource type name (e.g. Machine)",
 							Required:            true,
-							PlanModifiers: []planmodifier.String{
-								stringplanmodifier.RequiresReplace(),
-							},
 						},
 						"resource_default": schema.BoolAttribute{
-							MarkdownDescription: "True when static pattern is empty (automatically inferred by the provider)",
-							Computed:            true,
+							MarkdownDescription: "True when static pattern is empty (automatically" +
+								" inferred by the provider)",
+							Computed: true,
 							PlanModifiers: []planmodifier.Bool{
-								boolplanmodifier.RequiresReplace(),
 								boolplanmodifier.UseStateForUnknown(),
 							},
 						},
 						"unique_name": schema.BoolAttribute{
 							MarkdownDescription: "TODO",
 							Required:            true,
-							PlanModifiers: []planmodifier.Bool{
-								boolplanmodifier.RequiresReplace(),
-							},
 						},
 						"pattern": schema.StringAttribute{
 							MarkdownDescription: "TODO",
 							Required:            true,
-							PlanModifiers: []planmodifier.String{
-								stringplanmodifier.RequiresReplace(),
-							},
 						},
 						"static_pattern": schema.StringAttribute{
 							MarkdownDescription: "TODO",
 							Required:            true,
-							PlanModifiers: []planmodifier.String{
-								stringplanmodifier.RequiresReplace(),
-							},
 						},
 						"start_counter": schema.Int32Attribute{
 							MarkdownDescription: "TODO",
 							Computed:            true,
 							Optional:            true,
 							Default:             int32default.StaticInt32(1),
-							PlanModifiers: []planmodifier.Int32{
-								int32planmodifier.RequiresReplace(),
-							},
 						},
 						"increment_step": schema.Int32Attribute{
 							MarkdownDescription: "TODO",
 							Computed:            true,
 							Optional:            true,
 							Default:             int32default.StaticInt32(1),
-							PlanModifiers: []planmodifier.Int32{
-								int32planmodifier.RequiresReplace(),
-							},
 						},
 					},
 				},
@@ -256,7 +244,7 @@ func (self *CustomNamingResource) Create(
 		return
 	}
 
-	namingRaw, diags := naming.ToAPI(ctx)
+	namingRaw, diags := naming.ToAPI(ctx, CustomNamingModel{})
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -326,14 +314,15 @@ func (self *CustomNamingResource) Update(
 	req resource.UpdateRequest,
 	resp *resource.UpdateResponse,
 ) {
-	// Read Terraform plan data into the model
-	var naming CustomNamingModel
+	// Read Terraform plan and state data into the model
+	var naming, namingState CustomNamingModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &naming)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &namingState)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	namingRaw, diags := naming.ToAPI(ctx)
+	namingRaw, diags := naming.ToAPI(ctx, namingState)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return

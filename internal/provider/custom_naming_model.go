@@ -17,8 +17,7 @@ type CustomNamingModel struct {
 	Name        types.String `tfsdk:"name"`
 	Description types.String `tfsdk:"description"`
 
-	Projects []CustomNamingProjectFilterModel `tfsdk:"projects"`
-
+	Projects  []CustomNamingProjectFilterModel     `tfsdk:"projects"`
 	Templates map[string]CustomNamingTemplateModel `tfsdk:"templates"`
 }
 
@@ -70,20 +69,22 @@ func (self *CustomNamingModel) FromAPI(
 
 func (self *CustomNamingModel) ToAPI(
 	ctx context.Context,
+	state CustomNamingModel,
 ) (CustomNamingAPIModel, diag.Diagnostics) {
 
 	diags := diag.Diagnostics{}
 
 	projectsRaw := []CustomNamingProjectFilterAPIModel{}
 	for _, project := range self.Projects {
-		projetRaw, projectDiags := project.ToAPI(ctx)
-		projectsRaw = append(projectsRaw, projetRaw)
+		projectRaw, projectDiags := project.ToAPI(ctx)
+		projectsRaw = append(projectsRaw, projectRaw)
 		diags.Append(projectDiags...)
 	}
 
 	templatesRaw := []CustomNamingTemplateAPIModel{}
-	for _, template := range self.Templates {
-		templateRaw, templateDiags := template.ToAPI(ctx)
+	for key, template := range self.Templates {
+		templateState := state.Templates[key]
+		templateRaw, templateDiags := template.ToAPI(ctx, templateState)
 		templatesRaw = append(templatesRaw, templateRaw)
 		diags.Append(templateDiags...)
 	}
