@@ -72,9 +72,7 @@ func (self *CustomNamingTemplateModel) FromAPI(
 	return diag.Diagnostics{}
 }
 
-func (self *CustomNamingTemplateModel) toAPI(
-	ctx context.Context,
-) CustomNamingTemplateAPIModel {
+func (self *CustomNamingTemplateModel) toAPI() CustomNamingTemplateAPIModel {
 	return CustomNamingTemplateAPIModel{
 		Id:               self.Id.ValueString(),
 		Name:             self.Name.ValueString(),
@@ -93,10 +91,10 @@ func (self *CustomNamingTemplateModel) ToAPI(
 	ctx context.Context,
 	state CustomNamingTemplateModel,
 ) (CustomNamingTemplateAPIModel, diag.Diagnostics) {
-	raw := self.toAPI(ctx)
+	raw := self.toAPI()
 	// If the identifier is set, means its an UPDATE
 	if len(raw.Id) > 0 {
-		stateRaw := state.toAPI(ctx)
+		stateRaw := state.toAPI()
 		// Attributes are writable once, any changes requires a replacement
 		// In that case, the identifier is wiped to trigger the replacement (by Aria)
 		if raw.Name != stateRaw.Name ||
