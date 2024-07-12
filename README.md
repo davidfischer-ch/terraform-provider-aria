@@ -2,7 +2,7 @@
 
 This is the [Terraform](https://www.terraform.io) provider for VMWare's Aria Automation Platform.
 
-We'll [publish it on the Terraform Registry](https://developer.hashicorp.com/terraform/registry/providers/publishing) so that others can use it.
+The provider is [published here](https://registry.terraform.io/providers/davidfischer-ch/aria/latest).
 
 It has been developped by the CSC Team from the IT department of the State of Geneva (Switzerland).
 
