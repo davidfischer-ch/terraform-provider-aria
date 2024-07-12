@@ -49,7 +49,30 @@ func (self *CustomNamingResource) Schema(
 	resp *resource.SchemaResponse,
 ) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "Custom Naming resource",
+		MarkdownDescription: strings.Join([]string{
+			"Custom Naming resource",
+			"",
+			"**CAUTION: Updating projects**",
+			"",
+			"See [#29 Resource aria_custom_naming manage updating projects properly (scoped mode)]" +
+				"(https://github.com/davidfischer-ch/terraform-provider-aria/issues/29)",
+			"",
+			"If the custon naming is scoped to projects, then updating projects should trigger an " +
+				"update in place and not a replacement. However current version of the provider will " +
+				"plan to replace the resource! The counters will be reset and its probably something " +
+				"not desirable.",
+			"",
+			"As a workaround, you can update the list of projects in the config and manually on " +
+				"the platform. Then plan to ensure no changes are detected by Terraform.",
+			"",
+			"Switching from organization <-> projects mode will never be possible without " +
+				"replacing the resource.",
+			"",
+			"**CAUTION: Updating templates**",
+			"",
+			"Updating templates attributes will be shown as updatable in place." +
+				"The nested template resource will be recreated, including its internal counter.",
+		}, "\n"),
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{
 				MarkdownDescription: "Resource identifier",
