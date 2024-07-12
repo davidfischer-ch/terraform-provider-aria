@@ -1,5 +1,15 @@
 # Changelog
 
+## Release v0.2.7 (2024-07-11)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.7...v0.2.6
+
+### Fix and enhancements
+
+* Resource `aria_custom_naming`: Manage changing templates (update in place)
+* Add CAUTION section in `aria_custom_naming` resource description
+* Log API call details only in case of error
+
 ## Release v0.2.6 (2024-07-11)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.6...v0.2.5
