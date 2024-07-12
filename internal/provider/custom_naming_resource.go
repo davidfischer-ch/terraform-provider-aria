@@ -70,7 +70,7 @@ func (self *CustomNamingResource) Schema(
 			"**CAUTION: Updating templates**",
 			"",
 			"Updating templates attributes will be shown as updatable in place." +
-				"The nested template resource will be recreated, including its internal counter.",
+				" The nested template resource will be recreated, including its internal counter.",
 		}, "\n"),
 		Attributes: map[string]schema.Attribute{
 			"id": schema.StringAttribute{

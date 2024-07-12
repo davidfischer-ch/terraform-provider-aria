@@ -10,7 +10,7 @@ description: |-
   As a workaround, you can update the list of projects in the config and manually on the platform. Then plan to ensure no changes are detected by Terraform.
   Switching from organization <-> projects mode will never be possible without replacing the resource.
   CAUTION: Updating templates
-  Updating templates attributes will be shown as updatable in place.The nested template resource will be recreated, including its internal counter.
+  Updating templates attributes will be shown as updatable in place. The nested template resource will be recreated, including its internal counter.
 ---
 
 # aria_custom_naming (Resource)
@@ -29,7 +29,7 @@ Switching from organization <-> projects mode will never be possible without rep
 
 **CAUTION: Updating templates**
 
-Updating templates attributes will be shown as updatable in place.The nested template resource will be recreated, including its internal counter.
+Updating templates attributes will be shown as updatable in place. The nested template resource will be recreated, including its internal counter.
 
 ## Example Usage
 
