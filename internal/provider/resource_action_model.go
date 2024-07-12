@@ -47,7 +47,7 @@ type ResourceActionAPIModel struct {
 
 func (self *ResourceActionModel) String() string {
 	return fmt.Sprintf(
-		"Resource %s Additional Action %s (%s) project %s",
+		"Resource %s Action %s (%s) project %s",
 		self.ResourceType.ValueString(),
 		self.Id.ValueString(),
 		self.Name.ValueString(),
