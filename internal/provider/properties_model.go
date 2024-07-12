@@ -37,7 +37,7 @@ func (self *PropertiesModel) FromAPI(
 	raw PropertiesAPIModel,
 ) diag.Diagnostics {
 	diags := diag.Diagnostics{}
-	self = nil // Empty the slice (WTF)
+	*self = PropertiesModel{}
 	for _, propertyItem := range raw.Items() {
 		property := PropertyModel{}
 		diags.Append(property.FromAPI(ctx, propertyItem.Name, propertyItem.Property)...)

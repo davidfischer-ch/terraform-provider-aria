@@ -60,8 +60,6 @@ func (self *CustomResourceModel) FromAPI(
 	raw CustomResourceAPIModel,
 ) diag.Diagnostics {
 
-	diags := diag.Diagnostics{}
-
 	self.Id = types.StringValue(raw.Id)
 	self.DisplayName = types.StringValue(raw.DisplayName)
 	self.Description = types.StringValue(raw.Description)
@@ -70,13 +68,7 @@ func (self *CustomResourceModel) FromAPI(
 	self.Status = types.StringValue(raw.Status)
 	self.ProjectId = types.StringValue(raw.ProjectId)
 	self.OrgId = types.StringValue(raw.OrgId)
-
-	self.Properties = []PropertyModel{}
-	for _, propertyItem := range raw.Properties.Properties.Items() {
-		property := PropertyModel{}
-		diags.Append(property.FromAPI(ctx, propertyItem.Name, propertyItem.Property)...)
-		self.Properties = append(self.Properties, property)
-	}
+	diags := self.Properties.FromAPI(ctx, raw.Properties.Properties)
 
 	self.Create = ResourceActionRunnableModel{}
 	diags.Append(self.Create.FromAPI(ctx, raw.MainActions["create"])...)
@@ -97,15 +89,7 @@ func (self *CustomResourceModel) ToAPI(
 	ctx context.Context,
 ) (CustomResourceAPIModel, diag.Diagnostics) {
 
-	diags := diag.Diagnostics{}
-
-	propertiesRaw := PropertiesAPIModel{}
-	propertiesRaw.Init()
-	for _, property := range self.Properties {
-		propertyName, propertyRaw, propertyDiags := property.ToAPI(ctx)
-		propertiesRaw.Set(propertyName, propertyRaw)
-		diags.Append(propertyDiags...)
-	}
+	propertiesRaw, diags := self.Properties.ToAPI(ctx)
 
 	createRaw, createDiags := self.Create.ToAPI(ctx)
 	diags.Append(createDiags...)
