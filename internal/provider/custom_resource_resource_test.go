@@ -468,6 +468,13 @@ EOT
 				    resource.TestCheckResourceAttrSet("aria_abx_action.test", "org_id"),
 				),*/
 			},
+			// ImportState testing
+			/* TODO https://github.com/davidfischer-ch/terraform-provider-aria/issues/33
+			   {
+			     ResourceName:      "aria_custom_resource.test",
+			     ImportState:       true,
+			     ImportStateVerify: true,
+			   }, */
 			// Delete testing automatically occurs in TestCase
 			// TODO Check https://developer.hashicorp.com/terraform/plugin/sdkv2/testing/acceptance-tests/testcase#checkdestroy
 		},
