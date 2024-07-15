@@ -106,12 +106,6 @@ resource "aria_abx_action" "test" {
 					resource.TestCheckResourceAttrSet("aria_abx_action.test", "org_id"),
 				),
 			},
-			// ImportState testing
-			/*{
-				ResourceName:      "aria_abx_action.test",
-				ImportState:       true,
-				ImportStateVerify: true,
-			},*/
 			// Update and Read testing
 			{
 				Config: `
@@ -208,6 +202,13 @@ resource "aria_abx_action" "test" {
 					resource.TestCheckResourceAttrSet("aria_abx_action.test", "org_id"),
 				),
 			},
+			// ImportState testing
+			/* TODO https://github.com/davidfischer-ch/terraform-provider-aria/issues/34
+			{
+				ResourceName:      "aria_abx_action.test",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},*/
 			// Delete testing automatically occurs in TestCase
 			// TODO Check https://developer.hashicorp.com/terraform/plugin/sdkv2/testing/acceptance-tests/testcase#checkdestroy
 		},
