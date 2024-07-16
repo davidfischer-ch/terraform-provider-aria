@@ -175,15 +175,15 @@ func handleAPIResponse(
 	}
 
 	if !slices.Contains(statusCodes, response.StatusCode()) {
-		logAPIResponseInfo(ctx, response, err, statusCodesText)
-		return fmt.Errorf(
+		err = fmt.Errorf(
 			"API response status code %d (expected %s), Body: %s",
 			response.StatusCode(),
 			statusCodesText,
 			response.String())
 	}
 
-	return nil
+	logAPIResponseInfo(ctx, response, err, statusCodesText)
+	return err
 }
 
 func logAPIResponseInfo(
@@ -198,7 +198,12 @@ func logAPIResponseInfo(
 		requestBody = []byte("<body>")
 	}
 
-	tflog.Debug(ctx, strings.Join([]string{
+	method := tflog.Trace
+	if err != nil {
+		method = tflog.Debug
+	}
+
+	method(ctx, strings.Join([]string{
 		"Request Info:",
 		fmt.Sprintf("  URL         : %s", request.URL),
 		fmt.Sprintf("  Method      : %s", request.Method),
