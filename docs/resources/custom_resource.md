@@ -114,24 +114,29 @@ resource "aria_custom_resource" "redis" {
       ]
     },
     {
-      name        = "storage_size"
-      title       = "Storage Size"
-      description = "Storage size (MB)."
-      type        = "integer"
-      default     = tostring(10 * 1024)
-      minimum     = 1 * 1024
-      maximum     = 100 * 1024
-      one_of      = []
+      name               = "storage_size"
+      title              = "Storage Size"
+      description        = "Storage size (MB)."
+      type               = "integer"
+      default            = tostring(10 * 1024)
+      encrypted          = false
+      read_only          = false
+      recreate_on_update = false
+      minimum            = 1 * 1024
+      maximum            = 100 * 1024
+      one_of             = []
     },
     {
-      name        = "secret"
-      title       = "Secret"
-      description = "Secret key."
-      type        = "string"
-      encrypted   = true
-      min_length  = 16
-      max_length  = 64
-      one_of      = []
+      name               = "secret"
+      title              = "Secret"
+      description        = "Secret key."
+      type               = "string"
+      encrypted          = true
+      read_only          = false
+      recreate_on_update = false
+      min_length         = 16
+      max_length         = 64
+      one_of             = []
     }
   ]
 
@@ -266,7 +271,10 @@ Required:
 Required:
 
 - `description` (String) Description
+- `encrypted` (Boolean) Encrypted?
 - `name` (String) Name
+- `read_only` (Boolean) Make the field read-only (in the form)
+- `recreate_on_update` (Boolean) Mark this field as writable once (resource will be recreated on change)
 - `title` (String) Title
 - `type` (String) Type, one of string, integer, number or boolean. (handling object and array is not yet implemented)
 
@@ -276,15 +284,12 @@ Optional:
 This attribute should be a dynamic type, but Terraform SDK returns this issue:
 Dynamic types inside of collections are not currently supported in terraform-plugin-framework.
 If underlying dynamic values are required, replace the 'properties' attribute definition with DynamicAttribute instead.
-- `encrypted` (Boolean) Encrypted?
 - `max_length` (Number) Maximum length (valid for a string)
 - `maximum` (Number) Maximum value (inclusive, valid for an integer)
 - `min_length` (Number) Minimum length (valid for a string)
 - `minimum` (Number) Minimum value (inclusive, valid for an integer)
 - `one_of` (Attributes List) Enumerate possible values (see [below for nested schema](#nestedatt--properties--one_of))
 - `pattern` (String) Pattern (valid for a string)
-- `read_only` (Boolean) Make the field read-only (in the form)
-- `recreate_on_update` (Boolean) Mark this field as writable once (resource will be recreated on change)
 
 <a id="nestedatt--properties--one_of"></a>
 ### Nested Schema for `properties.one_of`

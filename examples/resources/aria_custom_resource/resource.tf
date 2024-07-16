@@ -99,24 +99,29 @@ resource "aria_custom_resource" "redis" {
       ]
     },
     {
-      name        = "storage_size"
-      title       = "Storage Size"
-      description = "Storage size (MB)."
-      type        = "integer"
-      default     = tostring(10 * 1024)
-      minimum     = 1 * 1024
-      maximum     = 100 * 1024
-      one_of      = []
+      name               = "storage_size"
+      title              = "Storage Size"
+      description        = "Storage size (MB)."
+      type               = "integer"
+      default            = tostring(10 * 1024)
+      encrypted          = false
+      read_only          = false
+      recreate_on_update = false
+      minimum            = 1 * 1024
+      maximum            = 100 * 1024
+      one_of             = []
     },
     {
-      name        = "secret"
-      title       = "Secret"
-      description = "Secret key."
-      type        = "string"
-      encrypted   = true
-      min_length  = 16
-      max_length  = 64
-      one_of      = []
+      name               = "secret"
+      title              = "Secret"
+      description        = "Secret key."
+      type               = "string"
+      encrypted          = true
+      read_only          = false
+      recreate_on_update = false
+      min_length         = 16
+      max_length         = 64
+      one_of             = []
     }
   ]
 

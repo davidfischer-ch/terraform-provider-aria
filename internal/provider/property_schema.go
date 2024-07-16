@@ -8,7 +8,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
@@ -50,22 +49,16 @@ func PropertySchema() schema.NestedAttributeObject {
 			},
 			"encrypted": schema.BoolAttribute{
 				MarkdownDescription: "Encrypted?",
-				Computed:            true,
-				Optional:            true,
-				Default:             booldefault.StaticBool(false),
+				Required:            true,
 			},
 			"read_only": schema.BoolAttribute{
 				MarkdownDescription: "Make the field read-only (in the form)",
-				Computed:            true,
-				Optional:            true,
-				Default:             booldefault.StaticBool(false),
+				Required:            true,
 			},
 			"recreate_on_update": schema.BoolAttribute{
 				MarkdownDescription: "Mark this field as writable once (resource will be " +
 					"recreated on change)",
-				Computed: true,
-				Optional: true,
-				Default:  booldefault.StaticBool(false),
+				Required: true,
 			},
 			"minimum": schema.Int64Attribute{
 				MarkdownDescription: "Minimum value (inclusive, valid for an integer)",
@@ -89,26 +82,7 @@ func PropertySchema() schema.NestedAttributeObject {
 				Optional:            true,
 				Default:             stringdefault.StaticString(""),
 			},
-			"one_of": schema.ListNestedAttribute{
-				MarkdownDescription: "Enumerate possible values",
-				Optional:            true,
-				NestedObject: schema.NestedAttributeObject{
-					Attributes: map[string]schema.Attribute{
-						"const": schema.StringAttribute{
-							MarkdownDescription: "Technical value",
-							Required:            true,
-						},
-						"title": schema.StringAttribute{
-							MarkdownDescription: "Display value",
-							Required:            true,
-						},
-						"encrypted": schema.BoolAttribute{
-							MarkdownDescription: "Encrypted?",
-							Required:            true,
-						},
-					},
-				},
-			},
+			"one_of": PropertyOneOfSchema(),
 		},
 	}
 }
