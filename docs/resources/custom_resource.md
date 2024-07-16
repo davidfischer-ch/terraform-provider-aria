@@ -114,24 +114,27 @@ resource "aria_custom_resource" "redis" {
       ]
     },
     {
-      name        = "storage_size"
-      title       = "Storage Size"
-      description = "Storage size (MB)."
-      type        = "integer"
-      default     = tostring(10 * 1024)
-      minimum     = 1 * 1024
-      maximum     = 100 * 1024
-      one_of      = []
+      name               = "storage_size"
+      title              = "Storage Size"
+      description        = "Storage size (MB)."
+      type               = "integer"
+      default            = tostring(10 * 1024)
+      encrypted          = false
+      read_only          = false
+      recreate_on_update = false
+      minimum            = 1 * 1024
+      maximum            = 100 * 1024
     },
     {
-      name        = "secret"
-      title       = "Secret"
-      description = "Secret key."
-      type        = "string"
-      encrypted   = true
-      min_length  = 16
-      max_length  = 64
-      one_of      = []
+      name               = "secret"
+      title              = "Secret"
+      description        = "Secret key."
+      type               = "string"
+      encrypted          = true
+      read_only          = false
+      recreate_on_update = false
+      min_length         = 16
+      max_length         = 64
     }
   ]
 
@@ -174,14 +177,14 @@ resource "aria_custom_resource" "redis" {
 
 ### Required
 
-- `create` (Attributes) Resource's create action (see [below for nested schema](#nestedatt--create))
-- `delete` (Attributes) Resource's delete action (see [below for nested schema](#nestedatt--delete))
+- `create` (Attributes) Create action (see [below for nested schema](#nestedatt--create))
+- `delete` (Attributes) Delete action (see [below for nested schema](#nestedatt--delete))
 - `description` (String) Describe the resource in few sentences
 - `display_name` (String) A friendly name
-- `properties` (Attributes List) Resource's properties (see [below for nested schema](#nestedatt--properties))
-- `read` (Attributes) Resource's read action (see [below for nested schema](#nestedatt--read))
+- `properties` (Attributes Set) Resource's properties (see [below for nested schema](#nestedatt--properties))
+- `read` (Attributes) Read action (see [below for nested schema](#nestedatt--read))
 - `resource_type` (String) Define the type (must be unique, e.g. Custom.DB.PostgreSQL)
-- `update` (Attributes) Resource's update action (see [below for nested schema](#nestedatt--update))
+- `update` (Attributes) Update action (see [below for nested schema](#nestedatt--update))
 
 ### Optional
 
@@ -191,23 +194,20 @@ resource "aria_custom_resource" "redis" {
 
 ### Read-Only
 
-- `id` (String) Resource identifier
-- `org_id` (String) Resource organisation identifier
+- `id` (String) Identifier
+- `org_id` (String) Organization identifier
 
 <a id="nestedatt--create"></a>
 ### Nested Schema for `create`
 
 Required:
 
-- `id` (String) Runnable identifier
+- `id` (String) Identifier
 - `input_parameters` (Attributes List) (see [below for nested schema](#nestedatt--create--input_parameters))
+- `name` (String) Runnable name
 - `output_parameters` (Attributes List) (see [below for nested schema](#nestedatt--create--output_parameters))
 - `project_id` (String) Runnable's project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
-
-Read-Only:
-
-- `name` (String) Runnable name
 
 <a id="nestedatt--create--input_parameters"></a>
 ### Nested Schema for `create.input_parameters`
@@ -235,15 +235,12 @@ Required:
 
 Required:
 
-- `id` (String) Runnable identifier
+- `id` (String) Identifier
 - `input_parameters` (Attributes List) (see [below for nested schema](#nestedatt--delete--input_parameters))
+- `name` (String) Runnable name
 - `output_parameters` (Attributes List) (see [below for nested schema](#nestedatt--delete--output_parameters))
 - `project_id` (String) Runnable's project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
-
-Read-Only:
-
-- `name` (String) Runnable name
 
 <a id="nestedatt--delete--input_parameters"></a>
 ### Nested Schema for `delete.input_parameters`
@@ -272,8 +269,10 @@ Required:
 Required:
 
 - `description` (String) Description
+- `encrypted` (Boolean) Encrypted?
 - `name` (String) Name
-- `one_of` (Attributes List) (see [below for nested schema](#nestedatt--properties--one_of))
+- `read_only` (Boolean) Make the field read-only (in the form)
+- `recreate_on_update` (Boolean) Mark this field as writable once (resource will be recreated on change)
 - `title` (String) Title
 - `type` (String) Type, one of string, integer, number or boolean. (handling object and array is not yet implemented)
 
@@ -283,14 +282,12 @@ Optional:
 This attribute should be a dynamic type, but Terraform SDK returns this issue:
 Dynamic types inside of collections are not currently supported in terraform-plugin-framework.
 If underlying dynamic values are required, replace the 'properties' attribute definition with DynamicAttribute instead.
-- `encrypted` (Boolean) Encrypted?
 - `max_length` (Number) Maximum length (valid for a string)
 - `maximum` (Number) Maximum value (inclusive, valid for an integer)
 - `min_length` (Number) Minimum length (valid for a string)
 - `minimum` (Number) Minimum value (inclusive, valid for an integer)
+- `one_of` (Attributes List) Enumerate possible values (see [below for nested schema](#nestedatt--properties--one_of))
 - `pattern` (String) Pattern (valid for a string)
-- `read_only` (Boolean) Make the field read-only (in the form)
-- `recreate_on_update` (Boolean) Mark this field as writable once (resource will be recreated on change)
 
 <a id="nestedatt--properties--one_of"></a>
 ### Nested Schema for `properties.one_of`
@@ -308,15 +305,12 @@ Required:
 
 Required:
 
-- `id` (String) Runnable identifier
+- `id` (String) Identifier
 - `input_parameters` (Attributes List) (see [below for nested schema](#nestedatt--read--input_parameters))
+- `name` (String) Runnable name
 - `output_parameters` (Attributes List) (see [below for nested schema](#nestedatt--read--output_parameters))
 - `project_id` (String) Runnable's project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
-
-Read-Only:
-
-- `name` (String) Runnable name
 
 <a id="nestedatt--read--input_parameters"></a>
 ### Nested Schema for `read.input_parameters`
@@ -344,15 +338,12 @@ Required:
 
 Required:
 
-- `id` (String) Runnable identifier
+- `id` (String) Identifier
 - `input_parameters` (Attributes List) (see [below for nested schema](#nestedatt--update--input_parameters))
+- `name` (String) Runnable name
 - `output_parameters` (Attributes List) (see [below for nested schema](#nestedatt--update--output_parameters))
 - `project_id` (String) Runnable's project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
-
-Read-Only:
-
-- `name` (String) Runnable name
 
 <a id="nestedatt--update--input_parameters"></a>
 ### Nested Schema for `update.input_parameters`

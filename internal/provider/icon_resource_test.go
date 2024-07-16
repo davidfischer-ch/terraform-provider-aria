@@ -23,12 +23,6 @@ func TestAccIconResource(t *testing.T) {
 					resource.TestCheckResourceAttr("aria_icon.test", "content", svgIcon),
 				),
 			},
-			// ImportState testing
-			{
-				ResourceName:      "aria_icon.test",
-				ImportState:       true,
-				ImportStateVerify: true,
-			},
 			// Update and Read testing
 			// TODO Implement this test
 			/* {
@@ -37,6 +31,12 @@ func TestAccIconResource(t *testing.T) {
 					resource.TestCheckResourceAttr("aria_icon.test", "content", bSvgIcon),
 				),
 			}, */
+			// ImportState testing
+			{
+				ResourceName:      "aria_icon.test",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 			// Delete testing automatically occurs in TestCase
 			// TODO Check https://developer.hashicorp.com/terraform/plugin/sdkv2/testing/acceptance-tests/testcase#checkdestroy
 		},

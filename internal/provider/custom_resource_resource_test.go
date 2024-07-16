@@ -148,11 +148,14 @@ resource "aria_custom_resource" "test" {
 
   properties = [
     {
-      name        = "some_text"
-      title       = "Some Text"
-      description = "Some text, more text."
-      type        = "string"
-      one_of      = [
+      name               = "some_text"
+      title              = "Some Text"
+      description        = "Some text, more text."
+      type               = "string"
+      encrypted          = false
+      read_only          = false
+      recreate_on_update = false
+      one_of = [
         { const = "a", title = "A", encrypted = false },
         { const = "b", title = "B", encrypted = false }
       ]
@@ -164,33 +167,39 @@ resource "aria_custom_resource" "test" {
 Some number.
 It can be an integer or a float.
 EOT
-      type    = "number"
-      default = "3.141592"
-      minimum = 0
-      maximum = 5
-      one_of  = []
+      type               = "number"
+      default            = "3.141592"
+      minimum            = 0
+      maximum            = 5
+      encrypted          = false
+      read_only          = false
+      recreate_on_update = false
     },
     {
-      name        = "super_secret"
-      title       = "Super Secret"
-      description = ""
-      type        = "string"
-      encrypted   = true
-      min_length  = 16
-      max_length  = 64
-      one_of      = []
+      name               = "super_secret"
+      title              = "Super Secret"
+      description        = ""
+      type               = "string"
+      encrypted          = true
+      read_only          = false
+      recreate_on_update = false
+      min_length         = 16
+      max_length         = 64
     },
     {
-      name        = "other"
-      title       = "Other"
-      description = ""
-      type        = "string"
-      one_of      = []
+      name               = "other"
+      title              = "Other"
+      description        = ""
+      type               = "string"
+      encrypted          = false
+      read_only          = false
+      recreate_on_update = false
     }
   ]
 
   create = {
     id                = aria_abx_action.create.id
+    name              = aria_abx_action.create.name
     project_id        = aria_abx_action.create.project_id
     type              = "abx.action"
     input_parameters  = []
@@ -199,6 +208,7 @@ EOT
 
   read = {
     id                = aria_abx_action.read.id
+    name              = aria_abx_action.read.name
     project_id        = aria_abx_action.read.project_id
     type              = "abx.action"
     input_parameters  = []
@@ -207,6 +217,7 @@ EOT
 
   update = {
     id                = aria_abx_action.update.id
+    name              = aria_abx_action.update.name
     project_id        = aria_abx_action.update.project_id
     type              = "abx.action"
     input_parameters  = []
@@ -215,6 +226,7 @@ EOT
 
   delete = {
     id                = aria_abx_action.delete.id
+    name              = aria_abx_action.delete.name
     project_id        = aria_abx_action.delete.project_id
     type              = "abx.action"
     input_parameters  = []
@@ -374,11 +386,14 @@ resource "aria_custom_resource" "test" {
 
   properties = [
     {
-      name        = "some_text"
-      title       = "Some Text"
-      description = "Some text, more text."
-      type        = "string"
-      one_of      = [
+      name               = "some_text"
+      title              = "Some Text"
+      description        = "Some text, more text."
+      type               = "string"
+      encrypted          = false
+      read_only          = false
+      recreate_on_update = false
+      one_of = [
         { const = "a", title = "A", encrypted = false },
         { const = "b", title = "B", encrypted = false }
       ]
@@ -390,26 +405,30 @@ resource "aria_custom_resource" "test" {
 Some number.
 It can be an integer or a float.
 EOT
-      type    = "number"
-      default = "3.141592"
-      minimum = 0
-      maximum = 5
-      one_of  = []
+      type               = "number"
+      default            = "3.141592"
+      encrypted          = false
+      read_only          = false
+      recreate_on_update = false
+      minimum            = 0
+      maximum            = 5
     },
     {
-      name        = "super_secret"
-      title       = "Super Secret"
-      description = ""
-      type        = "string"
-      encrypted   = true
-      min_length  = 16
-      max_length  = 64
-      one_of      = []
+      name               = "super_secret"
+      title              = "Super Secret"
+      description        = ""
+      type               = "string"
+      encrypted          = true
+      read_only          = false
+      recreate_on_update = false
+      min_length         = 16
+      max_length         = 64
     }
   ]
 
   create = {
     id                = aria_abx_action.create.id
+    name              = aria_abx_action.create.name
     project_id        = aria_abx_action.create.project_id
     type              = "abx.action"
     input_parameters  = []
@@ -418,6 +437,7 @@ EOT
 
   read = {
     id                = aria_abx_action.read.id
+    name              = aria_abx_action.read.name
     project_id        = aria_abx_action.read.project_id
     type              = "abx.action"
     input_parameters  = []
@@ -426,6 +446,7 @@ EOT
 
   update = {
     id                = aria_abx_action.update.id
+    name              = aria_abx_action.update.name
     project_id        = aria_abx_action.update.project_id
     type              = "abx.action"
     input_parameters  = []
@@ -434,6 +455,7 @@ EOT
 
   delete = {
     id                = aria_abx_action.delete.id
+    name              = aria_abx_action.delete.name
     project_id        = aria_abx_action.delete.project_id
     type              = "abx.action"
     input_parameters  = []
@@ -460,6 +482,13 @@ EOT
 				    resource.TestCheckResourceAttrSet("aria_abx_action.test", "org_id"),
 				),*/
 			},
+			// ImportState testing
+			/* TODO https://github.com/davidfischer-ch/terraform-provider-aria/issues/33
+			   {
+			     ResourceName:      "aria_custom_resource.test",
+			     ImportState:       true,
+			     ImportStateVerify: true,
+			   }, */
 			// Delete testing automatically occurs in TestCase
 			// TODO Check https://developer.hashicorp.com/terraform/plugin/sdkv2/testing/acceptance-tests/testcase#checkdestroy
 		},

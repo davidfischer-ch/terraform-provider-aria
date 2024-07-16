@@ -95,6 +95,6 @@ EOT
 ### Read-Only
 
 - `async_deployed` (Boolean) TODO
-- `id` (String) Action identifier
-- `org_id` (String) Organisation identifier
+- `id` (String) Identifier
+- `org_id` (String) Organization identifier
 - `system` (Boolean) Flag indicating if the action is a system action

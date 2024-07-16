@@ -52,11 +52,7 @@ func (self *ABXActionResource) Schema(
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "ABX action resource",
 		Attributes: map[string]schema.Attribute{
-			"id": schema.StringAttribute{
-				MarkdownDescription: "Action identifier",
-				Computed:            true,
-				PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
-			},
+			"id": ComputedIdentifierSchema(""),
 			"name": schema.StringAttribute{
 				MarkdownDescription: "A name (must be unique)",
 				Required:            true,
@@ -170,13 +166,7 @@ func (self *ABXActionResource) Schema(
 					boolplanmodifier.UseStateForUnknown(),
 				},
 			},
-			"org_id": schema.StringAttribute{
-				MarkdownDescription: "Organisation identifier",
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
+			"org_id": ComputedOrganizationIdSchema(""),
 			/* created_millis int64 */
 			/* updated_millis int64 */
 			/* metadata {} */

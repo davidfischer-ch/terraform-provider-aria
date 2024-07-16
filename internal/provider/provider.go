@@ -228,6 +228,7 @@ func (self *AriaProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewCustomNamingResource,
 		NewCustomResourceResource,
 		NewIconResource,
+		NewPropertyGroupResource,
 		NewResourceActionResource,
 		NewSubscriptionResource,
 	}

@@ -28,11 +28,11 @@ output "example_sensitive_constant" {
 
 ### Required
 
-- `name` (String) Constant name
-- `value` (String, Sensitive) Constant value (cannot be enforced since API don't return it)
+- `name` (String) Name
+- `value` (String, Sensitive) Value (cannot be enforced since API don't return it)
 
 ### Read-Only
 
-- `encrypted` (Boolean) Constant should be always encrypted!
-- `id` (String) Constant identifier
-- `org_id` (String) Constant organisation identifier
+- `encrypted` (Boolean) Should be always encrypted!
+- `id` (String) Identifier
+- `org_id` (String) Organization identifier

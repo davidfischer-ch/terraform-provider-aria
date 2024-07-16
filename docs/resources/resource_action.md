@@ -85,15 +85,15 @@ resource "aria_resource_action" "machine_hello_world" {
 
 ### Read-Only
 
-- `id` (String) Action identifier
-- `org_id` (String) Action organisation identifier
+- `id` (String) Identifier
+- `org_id` (String) Organization identifier
 
 <a id="nestedatt--runnable_item"></a>
 ### Nested Schema for `runnable_item`
 
 Required:
 
-- `id` (String) Runnable identifier
+- `id` (String) Identifier
 - `input_parameters` (Attributes List) (see [below for nested schema](#nestedatt--runnable_item--input_parameters))
 - `name` (String) Runnable name
 - `output_parameters` (Attributes List) (see [below for nested schema](#nestedatt--runnable_item--output_parameters))

@@ -28,11 +28,11 @@ output "example_constant" {
 
 ### Required
 
-- `name` (String) Constant name
-- `value` (String) Constant value
+- `name` (String) Name
+- `value` (String) Value
 
 ### Read-Only
 
-- `encrypted` (Boolean) Constant should be always unencrypted!
-- `id` (String) Constant identifier
-- `org_id` (String) Constant organisation identifier
+- `encrypted` (Boolean) Should be always unencrypted!
+- `id` (String) Identifier
+- `org_id` (String) Organization identifier

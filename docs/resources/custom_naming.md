@@ -115,7 +115,7 @@ Inspired by https://discuss.hashicorp.com/t/terraform-framework-optional-inside-
 
 ### Read-Only
 
-- `id` (String) Resource identifier
+- `id` (String) Identifier
 
 <a id="nestedatt--projects"></a>
 ### Nested Schema for `projects`
@@ -130,7 +130,7 @@ Required:
 
 Read-Only:
 
-- `id` (String) Resource identifier
+- `id` (String) Identifier
 
 
 <a id="nestedatt--templates"></a>
@@ -152,5 +152,5 @@ Optional:
 
 Read-Only:
 
-- `id` (String) Resource identifier
+- `id` (String) Identifier
 - `resource_default` (Boolean) True when static pattern is empty (automatically inferred by the provider)

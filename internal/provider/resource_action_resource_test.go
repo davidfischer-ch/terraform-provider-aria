@@ -191,6 +191,13 @@ resource "aria_resource_action" "test" {
 					resource.TestCheckResourceAttrSet("aria_resource_action.test", "org_id"),
 				),
 			},
+			// ImportState testing
+			/* TODO https://github.com/davidfischer-ch/terraform-provider-aria/issues/32
+			   {
+			     ResourceName:      "aria_resource_action.test",
+			     ImportState:       true,
+			     ImportStateVerify: true,
+			   }, */
 			// Delete testing automatically occurs in TestCase
 			// TODO Check https://developer.hashicorp.com/terraform/plugin/sdkv2/testing/acceptance-tests/testcase#checkdestroy
 		},

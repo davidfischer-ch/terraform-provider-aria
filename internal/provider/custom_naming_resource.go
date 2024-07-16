@@ -57,9 +57,9 @@ func (self *CustomNamingResource) Schema(
 				"(https://github.com/davidfischer-ch/terraform-provider-aria/issues/29)",
 			"",
 			"If the custon naming is scoped to projects, then updating projects should trigger an " +
-				"update in place and not a replacement. However current version of the provider will " +
-				"plan to replace the resource! The counters will be reset and its probably something " +
-				"not desirable.",
+				"update in place and not a replacement. However current version of the provider " +
+				"will plan to replace the resource! The counters will be reset and its probably " +
+				"something not desirable.",
 			"",
 			"As a workaround, you can update the list of projects in the config and manually on " +
 				"the platform. Then plan to ensure no changes are detected by Terraform.",
@@ -73,13 +73,7 @@ func (self *CustomNamingResource) Schema(
 				" The nested template resource will be recreated, including its internal counter.",
 		}, "\n"),
 		Attributes: map[string]schema.Attribute{
-			"id": schema.StringAttribute{
-				MarkdownDescription: "Resource identifier",
-				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
+			"id": ComputedIdentifierSchema(""),
 			"name": schema.StringAttribute{
 				MarkdownDescription: "A friendly name",
 				Required:            true,
@@ -93,13 +87,7 @@ func (self *CustomNamingResource) Schema(
 				Required:            true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
-						"id": schema.StringAttribute{
-							MarkdownDescription: "Resource identifier",
-							Computed:            true,
-							PlanModifiers: []planmodifier.String{
-								stringplanmodifier.UseStateForUnknown(),
-							},
-						},
+						"id": ComputedIdentifierSchema(""),
 						"active": schema.BoolAttribute{
 							MarkdownDescription: "TODO",
 							Required:            true,
@@ -153,10 +141,7 @@ func (self *CustomNamingResource) Schema(
 				Required: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
-						"id": schema.StringAttribute{
-							MarkdownDescription: "Resource identifier",
-							Computed:            true,
-						},
+						"id": ComputedMutableIdentifierSchema(""),
 						"name": schema.StringAttribute{
 							MarkdownDescription: "Template name (valid for types that supports " +
 								"named templates)",

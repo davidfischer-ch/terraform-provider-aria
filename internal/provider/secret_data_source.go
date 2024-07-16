@@ -53,10 +53,7 @@ func (self *SecretDataSource) Schema(
 				MarkdownDescription: "Describe the secret in few sentences",
 				Computed:            true,
 			},
-			"org_id": schema.StringAttribute{
-				MarkdownDescription: "Organisation identifier",
-				Computed:            true,
-			},
+			"org_id": ComputedOrganizationIdSchema(""),
 			"org_scoped": schema.BoolAttribute{
 				MarkdownDescription: "Scoped to the organization?",
 				Computed:            true,

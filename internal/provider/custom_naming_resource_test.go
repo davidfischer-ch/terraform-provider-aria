@@ -217,6 +217,12 @@ resource "aria_custom_naming" "test" {
 `,
 				// Check: TODO
 			},
+			// ImportState testing
+			{
+				ResourceName:      "aria_custom_naming.test",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 			// Delete testing automatically occurs in TestCase
 			// TODO Check https://developer.hashicorp.com/terraform/plugin/sdkv2/testing/acceptance-tests/testcase#checkdestroy
 		},
