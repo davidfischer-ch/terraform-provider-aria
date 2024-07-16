@@ -267,7 +267,6 @@ Required:
 
 - `description` (String) Description
 - `name` (String) Name
-- `one_of` (Attributes List) (see [below for nested schema](#nestedatt--properties--one_of))
 - `title` (String) Title
 - `type` (String) Type, one of string, integer, number or boolean. (handling object and array is not yet implemented)
 
@@ -282,6 +281,7 @@ If underlying dynamic values are required, replace the 'properties' attribute de
 - `maximum` (Number) Maximum value (inclusive, valid for an integer)
 - `min_length` (Number) Minimum length (valid for a string)
 - `minimum` (Number) Minimum value (inclusive, valid for an integer)
+- `one_of` (Attributes List) Enumerate possible values (see [below for nested schema](#nestedatt--properties--one_of))
 - `pattern` (String) Pattern (valid for a string)
 - `read_only` (Boolean) Make the field read-only (in the form)
 - `recreate_on_update` (Boolean) Mark this field as writable once (resource will be recreated on change)

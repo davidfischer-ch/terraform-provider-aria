@@ -5,99 +5,12 @@ package provider
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
-
-func TestPropertyModel_Default_ToAPI(t *testing.T) {
-	cases := []struct {
-		name             string
-		propertyType     string
-		propertyInternal types.String
-		propertyRaw      any
-		warningMessage   string
-		errorMessage     string
-	}{
-		{
-			name:             "boolean value (false)",
-			propertyType:     "boolean",
-			propertyInternal: types.StringValue("false"),
-			propertyRaw:      false,
-		},
-		{
-			name:             "boolean value (true)",
-			propertyType:     "boolean",
-			propertyInternal: types.StringValue("true"),
-			propertyRaw:      true,
-		},
-		{
-			name:             "boolean value (string)",
-			propertyType:     "boolean",
-			propertyInternal: types.StringValue("not really a boolean"),
-			propertyRaw:      nil,
-			errorMessage:     "invalid syntax",
-		},
-		{
-			name:             "boolean value (nil)",
-			propertyType:     "boolean",
-			propertyInternal: types.StringNull(),
-			propertyRaw:      nil,
-		},
-		{
-			name:             "integer value (integer)",
-			propertyType:     "integer",
-			propertyInternal: types.StringValue("42"),
-			propertyRaw:      int64(42),
-		},
-		{
-			name:             "integer value (float)",
-			propertyType:     "integer",
-			propertyInternal: types.StringValue("1.2"),
-			propertyRaw:      nil,
-			errorMessage:     "invalid syntax",
-		},
-		{
-			name:             "number value (integer)",
-			propertyType:     "number",
-			propertyInternal: types.StringValue("-100"),
-			propertyRaw:      int64(-100),
-		},
-		{
-			name:             "number value (float)",
-			propertyType:     "number",
-			propertyInternal: types.StringValue("3.141592"),
-			propertyRaw:      3.141592,
-		},
-		{
-			name:             "string value (string)",
-			propertyType:     "string",
-			propertyInternal: types.StringValue("some text"),
-			propertyRaw:      "some text",
-		},
-		{
-			name:             "array value (array)",
-			propertyType:     "array",
-			propertyInternal: types.StringValue("[1, 2, 3]"),
-			errorMessage:     "type array is not yet implemented",
-		},
-	}
-
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			property := PropertyModel{
-				Name:    types.StringValue("p"),
-				Title:   types.StringValue("P"),
-				Type:    types.StringValue(tc.propertyType),
-				Default: tc.propertyInternal,
-			}
-			name, raw, diags := property.ToAPI(context.Background())
-			CheckDiagnostics(t, diags, tc.warningMessage, tc.errorMessage)
-			CheckEqual(t, raw.Default, tc.propertyRaw)
-			CheckEqual(t, name, "p")
-		})
-	}
-}
 
 func TestPropertyModel_Default_FromAPI(t *testing.T) {
 	cases := []struct {
@@ -141,6 +54,12 @@ func TestPropertyModel_Default_FromAPI(t *testing.T) {
 			warningMessage:   "Property P default \"%!s(float64=1.2)\" is not an integer",
 		},
 		{
+			name:             "integer value (nil)",
+			propertyType:     "integer",
+			propertyRaw:      nil,
+			propertyInternal: types.StringNull(),
+		},
+		{
 			name:             "number value (integer)",
 			propertyType:     "number",
 			propertyRaw:      int64(-100),
@@ -175,6 +94,7 @@ func TestPropertyModel_Default_FromAPI(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 			property := PropertyModel{}
 			diags := property.FromAPI(context.Background(), "p", PropertyAPIModel{
 				Title:   "P",
@@ -188,43 +108,129 @@ func TestPropertyModel_Default_FromAPI(t *testing.T) {
 	}
 }
 
-func TestPropertyModel_OneOf_ToAPI(t *testing.T) {
-	property := PropertyModel{
-		Name:  types.StringValue("p"),
-		Title: types.StringValue("P"),
-		Type:  types.StringValue("string"),
-		OneOf: []PropertyOneOfModel{
-			{
-				Const: types.StringValue("a"),
-				Title: types.StringValue("A"),
-			},
-			{
-				Const:     types.StringValue("b"),
-				Title:     types.StringValue("B"),
-				Encrypted: types.BoolValue(true),
-			},
+func TestPropertyModel_Default_ToAPI(t *testing.T) {
+	cases := []struct {
+		name             string
+		propertyType     string
+		propertyInternal types.String
+		propertyRaw      any
+		propertyJson     string
+		warningMessage   string
+		errorMessage     string
+	}{
+		{
+			name:             "boolean value (false)",
+			propertyType:     "boolean",
+			propertyInternal: types.StringValue("false"),
+			propertyRaw:      false,
+			propertyJson:     "\"default\":false,",
+		},
+		{
+			name:             "boolean value (true)",
+			propertyType:     "boolean",
+			propertyInternal: types.StringValue("true"),
+			propertyRaw:      true,
+			propertyJson:     "\"default\":true,",
+		},
+		{
+			name:             "boolean value (string)",
+			propertyType:     "boolean",
+			propertyInternal: types.StringValue("not really a boolean"),
+			propertyRaw:      nil,
+			errorMessage:     "invalid syntax",
+		},
+		{
+			name:             "boolean value (nil)",
+			propertyType:     "boolean",
+			propertyInternal: types.StringNull(),
+			propertyRaw:      nil,
+			propertyJson:     "",
+		},
+		{
+			name:             "integer value (integer)",
+			propertyType:     "integer",
+			propertyInternal: types.StringValue("42"),
+			propertyRaw:      int64(42),
+			propertyJson:     "\"default\":42,",
+		},
+		{
+			name:             "integer value (float)",
+			propertyType:     "integer",
+			propertyInternal: types.StringValue("1.2"),
+			propertyRaw:      nil,
+			errorMessage:     "invalid syntax",
+		},
+		{
+			name:             "number value (integer)",
+			propertyType:     "number",
+			propertyInternal: types.StringValue("-100"),
+			propertyRaw:      int64(-100),
+			propertyJson:     "\"default\":-100,",
+		},
+		{
+			name:             "number value (float)",
+			propertyType:     "number",
+			propertyInternal: types.StringValue("3.141592"),
+			propertyRaw:      3.141592,
+			propertyJson:     "\"default\":3.141592,",
+		},
+		{
+			name:             "string value (string)",
+			propertyType:     "string",
+			propertyInternal: types.StringValue("some text"),
+			propertyRaw:      "some text",
+			propertyJson:     "\"default\":\"some text\",",
+		},
+		{
+			name:             "string value (string empty)",
+			propertyType:     "string",
+			propertyInternal: types.StringNull(),
+			propertyRaw:      nil,
+			propertyJson:     "",
+		},
+		{
+			name:             "array value (array)",
+			propertyType:     "array",
+			propertyInternal: types.StringValue("[1, 2, 3]"),
+			errorMessage:     "type array is not yet implemented",
 		},
 	}
-	name, raw, diags := property.ToAPI(context.Background())
-	CheckDiagnostics(t, diags, "", "")
-	CheckDeepEqual(t, raw.OneOf[0], PropertyOneOfAPIModel{Const: "a", Title: "A"})
-	CheckDeepEqual(t, raw.OneOf[1], PropertyOneOfAPIModel{
-		Const:     "b",
-		Title:     "B",
-		Encrypted: true,
-	})
-	CheckEqual(t, name, "p")
-}
 
-func TestPropertyModel_OneOf_ToAPI_nil(t *testing.T) {
-	property := PropertyModel{
-		Name:  types.StringValue("p"),
-		Title: types.StringValue("P"),
-		Type:  types.StringValue("string"),
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			property := PropertyModel{
+				Name:    types.StringValue("p"),
+				Title:   types.StringValue("P"),
+				Type:    types.StringValue(tc.propertyType),
+				Default: tc.propertyInternal,
+			}
+			name, raw, diags := property.ToAPI(context.Background())
+			CheckDiagnostics(t, diags, tc.warningMessage, tc.errorMessage)
+			CheckEqual(t, raw.Default, tc.propertyRaw)
+			CheckEqual(t, name, "p")
+
+			if !diags.HasError() {
+				rawJson, err := json.Marshal(raw)
+				CheckEqual(t, err, nil)
+				CheckEqual(
+					t,
+					string(rawJson),
+					fmt.Sprintf("{"+
+						"\"title\":\"P\","+
+						"\"description\":\"\","+
+						"\"type\":\"%s\","+
+						"%s"+
+						"\"encrypted\":false,"+
+						"\"ReadOnly\":false,"+
+						"\"recreateOnUpdate\":false,"+
+						"\"pattern\":\"\""+
+						"}",
+						tc.propertyType,
+						tc.propertyJson))
+			}
+		})
 	}
-	_, raw, diags := property.ToAPI(context.Background())
-	CheckDiagnostics(t, diags, "", "")
-	CheckEqual(t, len(raw.OneOf), 0)
 }
 
 func TestPropertyModel_OneOf_FromAPI(t *testing.T) {
@@ -265,4 +271,43 @@ func TestPropertyModel_OneOf_FromAPI_nil(t *testing.T) {
 	})
 	CheckDiagnostics(t, diags, "", "")
 	CheckEqual(t, len(property.OneOf), 0)
+}
+
+func TestPropertyModel_OneOf_ToAPI(t *testing.T) {
+	property := PropertyModel{
+		Name:  types.StringValue("p"),
+		Title: types.StringValue("P"),
+		Type:  types.StringValue("string"),
+		OneOf: []PropertyOneOfModel{
+			{
+				Const: types.StringValue("a"),
+				Title: types.StringValue("A"),
+			},
+			{
+				Const:     types.StringValue("b"),
+				Title:     types.StringValue("B"),
+				Encrypted: types.BoolValue(true),
+			},
+		},
+	}
+	name, raw, diags := property.ToAPI(context.Background())
+	CheckDiagnostics(t, diags, "", "")
+	CheckDeepEqual(t, raw.OneOf[0], PropertyOneOfAPIModel{Const: "a", Title: "A"})
+	CheckDeepEqual(t, raw.OneOf[1], PropertyOneOfAPIModel{
+		Const:     "b",
+		Title:     "B",
+		Encrypted: true,
+	})
+	CheckEqual(t, name, "p")
+}
+
+func TestPropertyModel_OneOf_ToAPI_nil(t *testing.T) {
+	property := PropertyModel{
+		Name:  types.StringValue("p"),
+		Title: types.StringValue("P"),
+		Type:  types.StringValue("string"),
+	}
+	_, raw, diags := property.ToAPI(context.Background())
+	CheckDiagnostics(t, diags, "", "")
+	CheckEqual(t, len(raw.OneOf), 0)
 }

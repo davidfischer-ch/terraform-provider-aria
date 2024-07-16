@@ -37,18 +37,18 @@ type PropertyAPIModel struct {
 	Title            string `json:"title"`
 	Description      string `json:"description"`
 	Type             string `json:"type"`
-	Default          any    `json:"default"`
+	Default          any    `json:"default,omitempty"`
 	Encrypted        bool   `json:"encrypted"`
 	ReadOnly         bool   `tfsdk:"readOnly"`
 	RecreateOnUpdate bool   `json:"recreateOnUpdate"`
 
 	// Specifications
-	Minimum   int64                   `json:"minimum"`
-	Maximum   int64                   `json:"maximum"`
-	MinLength int32                   `json:"minLength"`
-	MaxLength int32                   `json:"maxLength"`
+	Minimum   *int64                  `json:"minimum,omitempty"`
+	Maximum   *int64                  `json:"maximum,omitempty"`
+	MinLength *int32                  `json:"minLength,omitempty"`
+	MaxLength *int32                  `json:"maxLength,omitempty"`
 	Pattern   string                  `json:"pattern"`
-	OneOf     []PropertyOneOfAPIModel `json:"oneOf"`
+	OneOf     []PropertyOneOfAPIModel `json:"oneOf,omitempty"`
 }
 
 func (self *PropertyModel) FromAPI(
@@ -66,13 +66,11 @@ func (self *PropertyModel) FromAPI(
 	self.Encrypted = types.BoolValue(raw.Encrypted)
 	self.ReadOnly = types.BoolValue(raw.ReadOnly)
 	self.RecreateOnUpdate = types.BoolValue(raw.RecreateOnUpdate)
-	self.Minimum = types.Int64Value(raw.Minimum)
-	self.Maximum = types.Int64Value(raw.Maximum)
-	self.MinLength = types.Int32Value(raw.MinLength)
-	self.MaxLength = types.Int32Value(raw.MaxLength)
+	self.Minimum = types.Int64PointerValue(raw.Minimum)
+	self.Maximum = types.Int64PointerValue(raw.Maximum)
+	self.MinLength = types.Int32PointerValue(raw.MinLength)
+	self.MaxLength = types.Int32PointerValue(raw.MaxLength)
 	self.Pattern = types.StringValue(raw.Pattern)
-
-	/*self.OneOf = []PropertyOneOfModel{}*/
 
 	if raw.OneOf == nil {
 		self.OneOf = nil
@@ -160,7 +158,7 @@ func (self *PropertyModel) ToAPI(
 	typeRaw := self.Type.ValueString()
 
 	var defaultRaw any
-	if self.Default.IsNull() {
+	if self.Default.IsNull() || self.Default.IsUnknown() {
 		defaultRaw = nil
 	} else {
 		var err error
@@ -213,8 +211,6 @@ func (self *PropertyModel) ToAPI(
 		}
 	}
 
-	/*oneOfRawList := []PropertyOneOfAPIModel{}*/
-
 	return self.Name.ValueString(),
 		PropertyAPIModel{
 			Title:            titleRaw,
@@ -224,10 +220,10 @@ func (self *PropertyModel) ToAPI(
 			Encrypted:        self.Encrypted.ValueBool(),
 			ReadOnly:         self.ReadOnly.ValueBool(),
 			RecreateOnUpdate: self.RecreateOnUpdate.ValueBool(),
-			Minimum:          self.Minimum.ValueInt64(),
-			Maximum:          self.Maximum.ValueInt64(),
-			MinLength:        self.MinLength.ValueInt32(),
-			MaxLength:        self.MaxLength.ValueInt32(),
+			Minimum:          self.Minimum.ValueInt64Pointer(),
+			Maximum:          self.Maximum.ValueInt64Pointer(),
+			MinLength:        self.MinLength.ValueInt32Pointer(),
+			MaxLength:        self.MaxLength.ValueInt32Pointer(),
 			Pattern:          self.Pattern.ValueString(),
 			OneOf:            oneOfRawList,
 		},

@@ -34,7 +34,7 @@ type PropertyGroupAPIModel struct {
 	Properties PropertiesAPIModel `json:"properties"`
 
 	ProjectId string `json:"projectId,omitempty"`
-	OrgId     string `json:"orgId"`
+	OrgId     string `json:"orgId,omitempty"`
 }
 
 func (self *PropertyGroupModel) String() string {

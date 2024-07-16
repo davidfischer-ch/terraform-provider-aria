@@ -107,7 +107,9 @@ func (self *SubscriptionResource) Schema(
 			"broadcast": schema.BoolAttribute{
 				MarkdownDescription: "TODO",
 				Computed:            true,
-				PlanModifiers:       []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.Bool{
+					boolplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"contextual": schema.BoolAttribute{
 				MarkdownDescription: "TODO",
@@ -132,7 +134,9 @@ func (self *SubscriptionResource) Schema(
 			"system": schema.BoolAttribute{
 				MarkdownDescription: "TODO",
 				Computed:            true,
-				PlanModifiers:       []planmodifier.Bool{boolplanmodifier.UseStateForUnknown()},
+				PlanModifiers: []planmodifier.Bool{
+					boolplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"timeout": schema.Int64Attribute{
 				MarkdownDescription: "TODO",

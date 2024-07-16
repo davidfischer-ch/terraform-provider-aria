@@ -63,7 +63,7 @@ func (self *PropertyGroupResource) Schema(
 					stringvalidator.OneOf([]string{"INPUT", "CONSTANT"}...),
 				},
 			},
-			"properties": PropertyGroupSchema("Property Group's properties"),
+			"properties": UnorderedPropertyGroupSchema("Property Group's properties"),
 			"project_id": schema.StringAttribute{
 				MarkdownDescription: "Project ID",
 				Computed:            true,
@@ -109,7 +109,7 @@ func (self *PropertyGroupResource) Create(
 		SetBody(propertyGroupRaw).
 		SetResult(&propertyGroupRaw).
 		Post("properties/api/property-groups")
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",

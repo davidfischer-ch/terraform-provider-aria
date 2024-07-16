@@ -79,7 +79,7 @@ func (self *CustomResourceResource) Schema(
 					stringvalidator.OneOf([]string{"DRAFT", "ON", "RELEASED"}...),
 				},
 			},
-			"properties": PropertyGroupSchema("Resource's properties"),
+			"properties": OrderedPropertyGroupSchema("Resource's properties"),
 			/* "allocate:" TODO one of the optional main actions */
 			"create": ResourceActionRunnableSchema("Create action"),
 			"read":   ResourceActionRunnableSchema("Read action"),
