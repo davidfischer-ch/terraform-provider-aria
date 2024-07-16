@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 )
 
-func OrderedPropertyGroupSchema(description string) schema.ListNestedAttribute {
+func OrderedPropertiesSchema(description string) schema.ListNestedAttribute {
 	return schema.ListNestedAttribute{
 		MarkdownDescription: description,
 		Required:            true,
@@ -15,7 +15,7 @@ func OrderedPropertyGroupSchema(description string) schema.ListNestedAttribute {
 	}
 }
 
-func UnorderedPropertyGroupSchema(description string) schema.SetNestedAttribute {
+func UnorderedPropertiesSchema(description string) schema.SetNestedAttribute {
 	return schema.SetNestedAttribute{
 		MarkdownDescription: description,
 		Required:            true,

@@ -148,11 +148,14 @@ resource "aria_custom_resource" "test" {
 
   properties = [
     {
-      name        = "some_text"
-      title       = "Some Text"
-      description = "Some text, more text."
-      type        = "string"
-      one_of      = [
+      name               = "some_text"
+      title              = "Some Text"
+      description        = "Some text, more text."
+      type               = "string"
+      encrypted          = false
+      read_only          = false
+      recreate_on_update = false
+      one_of = [
         { const = "a", title = "A", encrypted = false },
         { const = "b", title = "B", encrypted = false }
       ]
@@ -164,28 +167,33 @@ resource "aria_custom_resource" "test" {
 Some number.
 It can be an integer or a float.
 EOT
-      type    = "number"
-      default = "3.141592"
-      minimum = 0
-      maximum = 5
-      one_of  = []
+      type               = "number"
+      default            = "3.141592"
+      minimum            = 0
+      maximum            = 5
+      encrypted          = false
+      read_only          = false
+      recreate_on_update = false
     },
     {
-      name        = "super_secret"
-      title       = "Super Secret"
-      description = ""
-      type        = "string"
-      encrypted   = true
-      min_length  = 16
-      max_length  = 64
-      one_of      = []
+      name               = "super_secret"
+      title              = "Super Secret"
+      description        = ""
+      type               = "string"
+      encrypted          = true
+      read_only          = false
+      recreate_on_update = false
+      min_length         = 16
+      max_length         = 64
     },
     {
-      name        = "other"
-      title       = "Other"
-      description = ""
-      type        = "string"
-      one_of      = []
+      name               = "other"
+      title              = "Other"
+      description        = ""
+      type               = "string"
+      encrypted          = false
+      read_only          = false
+      recreate_on_update = false
     }
   ]
 
@@ -378,11 +386,14 @@ resource "aria_custom_resource" "test" {
 
   properties = [
     {
-      name        = "some_text"
-      title       = "Some Text"
-      description = "Some text, more text."
-      type        = "string"
-      one_of      = [
+      name               = "some_text"
+      title              = "Some Text"
+      description        = "Some text, more text."
+      type               = "string"
+      encrypted          = false
+      read_only          = false
+      recreate_on_update = false
+      one_of = [
         { const = "a", title = "A", encrypted = false },
         { const = "b", title = "B", encrypted = false }
       ]
@@ -394,21 +405,24 @@ resource "aria_custom_resource" "test" {
 Some number.
 It can be an integer or a float.
 EOT
-      type    = "number"
-      default = "3.141592"
-      minimum = 0
-      maximum = 5
-      one_of  = []
+      type               = "number"
+      default            = "3.141592"
+      encrypted          = false
+      read_only          = false
+      recreate_on_update = false
+      minimum            = 0
+      maximum            = 5
     },
     {
-      name        = "super_secret"
-      title       = "Super Secret"
-      description = ""
-      type        = "string"
-      encrypted   = true
-      min_length  = 16
-      max_length  = 64
-      one_of      = []
+      name               = "super_secret"
+      title              = "Super Secret"
+      description        = ""
+      type               = "string"
+      encrypted          = true
+      read_only          = false
+      recreate_on_update = false
+      min_length         = 16
+      max_length         = 64
     }
   ]
 

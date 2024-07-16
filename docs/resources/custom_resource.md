@@ -124,7 +124,6 @@ resource "aria_custom_resource" "redis" {
       recreate_on_update = false
       minimum            = 1 * 1024
       maximum            = 100 * 1024
-      one_of             = []
     },
     {
       name               = "secret"
@@ -136,7 +135,6 @@ resource "aria_custom_resource" "redis" {
       recreate_on_update = false
       min_length         = 16
       max_length         = 64
-      one_of             = []
     }
   ]
 
@@ -183,7 +181,7 @@ resource "aria_custom_resource" "redis" {
 - `delete` (Attributes) Delete action (see [below for nested schema](#nestedatt--delete))
 - `description` (String) Describe the resource in few sentences
 - `display_name` (String) A friendly name
-- `properties` (Attributes List) Resource's properties (see [below for nested schema](#nestedatt--properties))
+- `properties` (Attributes Set) Resource's properties (see [below for nested schema](#nestedatt--properties))
 - `read` (Attributes) Read action (see [below for nested schema](#nestedatt--read))
 - `resource_type` (String) Define the type (must be unique, e.g. Custom.DB.PostgreSQL)
 - `update` (Attributes) Update action (see [below for nested schema](#nestedatt--update))

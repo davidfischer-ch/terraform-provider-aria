@@ -109,7 +109,6 @@ resource "aria_custom_resource" "redis" {
       recreate_on_update = false
       minimum            = 1 * 1024
       maximum            = 100 * 1024
-      one_of             = []
     },
     {
       name               = "secret"
@@ -121,7 +120,6 @@ resource "aria_custom_resource" "redis" {
       recreate_on_update = false
       min_length         = 16
       max_length         = 64
-      one_of             = []
     }
   ]
 

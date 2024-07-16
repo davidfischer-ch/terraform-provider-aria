@@ -69,7 +69,7 @@ func (self *PropertyGroupResource) Schema(
 					stringvalidator.OneOf([]string{"INPUT", "CONSTANT"}...),
 				},
 			},
-			"properties": UnorderedPropertyGroupSchema("Property Group's properties"),
+			"properties": UnorderedPropertiesSchema("Property Group's properties"),
 			"project_id": schema.StringAttribute{
 				MarkdownDescription: "Project ID",
 				Computed:            true,
