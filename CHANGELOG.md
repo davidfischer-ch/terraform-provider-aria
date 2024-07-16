@@ -1,5 +1,25 @@
 # Changelog
 
+## Release v0.3.0 (2024-07-16)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.3.0...v0.2.7
+
+### Minor compatibility breaks
+
+* Make some parameters of `aria_custom_resource.properties` mandatory (`encrypted`, `read_only`, `recreated_on_update`)
+* Make `aria_custom_resource.properties` unordered (from ordered, see #37)
+
+### Features
+
+* Add resource `aria_property_group`
+* Make API request info available in `TRACE` (when successful) or `DEBUG` (when failed)
+
+### Fix and enhancements
+
+* Make code DRY
+* Test imports in acceptance tests
+* Add TODOs for the future
+
 ## Release v0.2.7 (2024-07-11)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.7...v0.2.6
