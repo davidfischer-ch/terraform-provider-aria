@@ -51,6 +51,9 @@ func (self *PropertyGroupResource) Schema(
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Name",
 				Required:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"description": schema.StringAttribute{
 				MarkdownDescription: "Describe the resource in few sentences",
@@ -59,6 +62,9 @@ func (self *PropertyGroupResource) Schema(
 			"type": schema.StringAttribute{
 				MarkdownDescription: "Type, either INPUT or CONSTANT",
 				Required:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{"INPUT", "CONSTANT"}...),
 				},
@@ -69,7 +75,7 @@ func (self *PropertyGroupResource) Schema(
 				Computed:            true,
 				Optional:            true,
 				PlanModifiers: []planmodifier.String{
-					// stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.RequiresReplace(),
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
@@ -186,7 +192,7 @@ func (self *PropertyGroupResource) Update(
 		SetQueryParam("apiVersion", BLUEPRINT_API_VERSION).
 		SetBody(propertyGroupRaw).
 		SetResult(&propertyGroupRaw).
-		Post("properties/api/property-groups/" + propertyGroupId)
+		Put("properties/api/property-groups/" + propertyGroupId)
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
