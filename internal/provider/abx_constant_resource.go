@@ -58,7 +58,7 @@ func (self *ABXConstantResource) Schema(
 				Computed:            true,
 				Default:             booldefault.StaticBool(false),
 			},
-			"org_id": ComputedOrganizationIdSchema(""),
+			"org_id": ComputedOrganizationIdSchema(),
 		},
 	}
 }

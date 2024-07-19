@@ -98,7 +98,7 @@ Required:
 - `input_parameters` (Attributes List) (see [below for nested schema](#nestedatt--runnable_item--input_parameters))
 - `name` (String) Runnable name
 - `output_parameters` (Attributes List) (see [below for nested schema](#nestedatt--runnable_item--output_parameters))
-- `project_id` (String) Runnable's project identifier
+- `project_id` (String) Project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
 
 <a id="nestedatt--runnable_item--input_parameters"></a>

@@ -109,7 +109,7 @@ resource "aria_property_group" "vm_common" {
 
 ### Optional
 
-- `project_id` (String) Project ID
+- `project_id` (String) Project identifier
 
 ### Read-Only
 

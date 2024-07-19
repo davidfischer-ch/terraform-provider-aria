@@ -139,6 +139,7 @@ func (self *ABXActionResource) Schema(
 				MarkdownDescription: "Action source code",
 				Required:            true,
 			},
+			// TODO Use OptionalImmutableProjectIdSchema() and test case where project_id is not set
 			"project_id": schema.StringAttribute{
 				MarkdownDescription: "Required for non-system actions",
 				Required:            true,
@@ -166,7 +167,7 @@ func (self *ABXActionResource) Schema(
 					boolplanmodifier.UseStateForUnknown(),
 				},
 			},
-			"org_id": ComputedOrganizationIdSchema(""),
+			"org_id": ComputedOrganizationIdSchema(),
 			/* created_millis int64 */
 			/* updated_millis int64 */
 			/* metadata {} */

@@ -142,7 +142,7 @@ func (self *SubscriptionResource) Schema(
 				MarkdownDescription: "TODO",
 				Required:            true,
 			},
-			"org_id": ComputedOrganizationIdSchema(""),
+			"org_id": ComputedOrganizationIdSchema(),
 			"owner_id": schema.StringAttribute{
 				MarkdownDescription: "Owner identifier",
 				Computed:            true,

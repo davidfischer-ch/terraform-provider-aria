@@ -80,7 +80,9 @@ func (self *ResourceActionResource) Schema(
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
-			"runnable_item": ResourceActionRunnableSchema("Action's runnable"),
+			//"criteria": ResourceActionCriteriaSchema(),
+			"form_definition": CustomFormSchema(),
+			"runnable_item":   ResourceActionRunnableSchema("Action's runnable"),
 			"status": schema.StringAttribute{
 				MarkdownDescription: "Action status, either DRAFT or RELEASED",
 				Computed:            true,
@@ -91,14 +93,14 @@ func (self *ResourceActionResource) Schema(
 				},
 			},
 			"project_id": schema.StringAttribute{
-				MarkdownDescription: "Project ID. Set it to \"\" to make the action available for all projects.",
-				Required:            true,
+				MarkdownDescription: "Project ID. Set it to \"\" to make the action " +
+					"available for all projects.",
+				Required: true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
-			"org_id":          ComputedOrganizationIdSchema(""),
-			"form_definition": CustomFormSchema(),
+			"org_id": ComputedOrganizationIdSchema(),
 		},
 	}
 }

@@ -188,7 +188,7 @@ resource "aria_custom_resource" "redis" {
 
 ### Optional
 
-- `project_id` (String) Project ID
+- `project_id` (String) Project identifier
 - `schema_type` (String) Type of resource, one of ABX_USER_DEFINED (and that's all, maybe)
 - `status` (String) Resource status, one of DRAFT, ON, or RELEASED
 
@@ -206,7 +206,7 @@ Required:
 - `input_parameters` (Attributes List) (see [below for nested schema](#nestedatt--create--input_parameters))
 - `name` (String) Runnable name
 - `output_parameters` (Attributes List) (see [below for nested schema](#nestedatt--create--output_parameters))
-- `project_id` (String) Runnable's project identifier
+- `project_id` (String) Project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
 
 <a id="nestedatt--create--input_parameters"></a>
@@ -239,7 +239,7 @@ Required:
 - `input_parameters` (Attributes List) (see [below for nested schema](#nestedatt--delete--input_parameters))
 - `name` (String) Runnable name
 - `output_parameters` (Attributes List) (see [below for nested schema](#nestedatt--delete--output_parameters))
-- `project_id` (String) Runnable's project identifier
+- `project_id` (String) Project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
 
 <a id="nestedatt--delete--input_parameters"></a>
@@ -309,7 +309,7 @@ Required:
 - `input_parameters` (Attributes List) (see [below for nested schema](#nestedatt--read--input_parameters))
 - `name` (String) Runnable name
 - `output_parameters` (Attributes List) (see [below for nested schema](#nestedatt--read--output_parameters))
-- `project_id` (String) Runnable's project identifier
+- `project_id` (String) Project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
 
 <a id="nestedatt--read--input_parameters"></a>
@@ -342,7 +342,7 @@ Required:
 - `input_parameters` (Attributes List) (see [below for nested schema](#nestedatt--update--input_parameters))
 - `name` (String) Runnable name
 - `output_parameters` (Attributes List) (see [below for nested schema](#nestedatt--update--output_parameters))
-- `project_id` (String) Runnable's project identifier
+- `project_id` (String) Project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
 
 <a id="nestedatt--update--input_parameters"></a>

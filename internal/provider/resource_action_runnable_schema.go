@@ -26,10 +26,7 @@ func ResourceActionRunnableSchema(description string) schema.SingleNestedAttribu
 					stringvalidator.OneOf([]string{"abx.action", "vro.workflow"}...),
 				},
 			},
-			"project_id": schema.StringAttribute{
-				MarkdownDescription: "Runnable's project identifier",
-				Required:            true,
-			},
+			"project_id": RequiredProjectId(),
 			"input_parameters": schema.ListNestedAttribute{
 				Required: true,
 				NestedObject: schema.NestedAttributeObject{
