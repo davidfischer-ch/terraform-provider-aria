@@ -85,6 +85,7 @@ resource "aria_resource_action" "machine_hello_world" {
 
 ### Read-Only
 
+- `form_definition` (Attributes) Form definition (see [below for nested schema](#nestedatt--form_definition))
 - `id` (String) Identifier
 - `org_id` (String) Organization identifier
 
@@ -118,3 +119,21 @@ Required:
 - `description` (String) Description
 - `name` (String) Name
 - `type` (String) Type
+
+
+
+<a id="nestedatt--form_definition"></a>
+### Nested Schema for `form_definition`
+
+Read-Only:
+
+- `form` (String) Form content in JSON (TODO nested attribute to define this instead of messing with JSON)
+- `form_format` (String) Form format either JSON or YAML, will be forced to JSON by Aria so you have no choice...
+- `id` (String) Identifier
+- `name` (String) Form name
+- `source_id` (String) Form source ientifier
+- `source_type` (String) Form source type
+- `status` (String) Resource status, one of DRAFT, ON, or RELEASED
+- `styles` (String) Form stylesheet
+- `tenant` (String) TODO
+- `type` (String) Form type, requestForm

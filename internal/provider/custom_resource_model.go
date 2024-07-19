@@ -103,7 +103,8 @@ func (self *CustomResourceModel) ToAPI(
 	deleteRaw, deleteDiags := self.Delete.ToAPI(ctx)
 	diags.Append(deleteDiags...)
 
-	raw := CustomResourceAPIModel{
+	return CustomResourceAPIModel{
+		Id:           self.Id.ValueString(),
 		DisplayName:  self.DisplayName.ValueString(),
 		Description:  CleanString(self.Description.ValueString()),
 		ResourceType: self.ResourceType.ValueString(),
@@ -120,12 +121,5 @@ func (self *CustomResourceModel) ToAPI(
 			"update": updateRaw,
 			"delete": deleteRaw,
 		},
-	}
-
-	// When updating resource
-	if !self.Id.IsNull() {
-		raw.Id = self.Id.ValueString()
-	}
-
-	return raw, diags
+	}, diags
 }

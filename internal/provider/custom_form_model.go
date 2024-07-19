@@ -6,20 +6,11 @@ package provider
 import (
 	"context"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
-
-/*
-"form": "{\"layout\":{\"pages\":[{\"id\":\"page_1\",\"title\":\"Page 1\",\"sections\":[]}]},\"schema\":{}}"
-"formFormat": "JSON"
-"name": "update-sonde"
-"sourceId": "Custom.POC.API.FAX.DOPI_v1.custom.update-sonde"
-"sourceType": "resource.action"
-"status": "ON"
-"tenant": "2817c6e5-7408-449f-a86d-8f511105e5ba"
-"type": "requestForm"
-*/
 
 // CustomFormModel describes the resource data model.
 type CustomFormModel struct {
@@ -81,4 +72,51 @@ func (self *CustomFormModel) ToAPI(
 		Tenant:     self.Tenant.ValueString(),
 		Status:     self.Status.ValueString(),
 	}, diag.Diagnostics{}
+}
+
+// Convert an object to a CustomFormAPIModel
+func CustomFormAPIModelFromObject(
+	ctx context.Context,
+	object types.Object,
+) (*CustomFormAPIModel, diag.Diagnostics) {
+
+	if object.IsNull() || object.IsUnknown() {
+		return nil, diag.Diagnostics{}
+	}
+
+	var formDefinition CustomFormModel
+	diags := object.As(ctx, &formDefinition, basetypes.ObjectAsOptions{})
+	raw, formDiags := formDefinition.ToAPI(ctx)
+	diags.Append(formDiags...)
+	return &raw, diags
+}
+
+// Convert a CustomFormAPIModel to an object
+func (self *CustomFormAPIModel) ToObject(
+	ctx context.Context,
+) (types.Object, diag.Diagnostics) {
+	if self == nil {
+		return types.ObjectNull(CustomFormModelAttributeTypes()), diag.Diagnostics{}
+	}
+	form := CustomFormModel{}
+	diags := form.FromAPI(ctx, *self)
+	object, objectDiags := types.ObjectValueFrom(ctx, CustomFormModelAttributeTypes(), form)
+	diags.Append(objectDiags...)
+	return object, diags
+}
+
+// Used to convert structure to a types.Object
+func CustomFormModelAttributeTypes() map[string]attr.Type {
+	return map[string]attr.Type{
+		"id":          types.StringType,
+		"name":        types.StringType,
+		"type":        types.StringType,
+		"form":        types.StringType,
+		"form_format": types.StringType,
+		"styles":      types.StringType,
+		"source_id":   types.StringType,
+		"source_type": types.StringType,
+		"tenant":      types.StringType,
+		"status":      types.StringType,
+	}
 }
