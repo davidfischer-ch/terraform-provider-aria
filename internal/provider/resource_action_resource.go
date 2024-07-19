@@ -80,9 +80,12 @@ func (self *ResourceActionResource) Schema(
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
-			//"criteria": ResourceActionCriteriaSchema(),
+			"runnable_item": ResourceActionRunnableSchema("Action's runnable"),
+			"criteria": schema.StringAttribute{
+				MarkdownDescription: "Filtering criteria (JSON encoded)",
+				Optional:            true,
+			},
 			"form_definition": CustomFormSchema(),
-			"runnable_item":   ResourceActionRunnableSchema("Action's runnable"),
 			"status": schema.StringAttribute{
 				MarkdownDescription: "Action status, either DRAFT or RELEASED",
 				Computed:            true,
