@@ -5,6 +5,7 @@ package provider
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -20,6 +21,7 @@ type ResourceActionModel struct {
 	ProviderName types.String                `tfsdk:"provider_name"`
 	ResourceType types.String                `tfsdk:"resource_type"`
 	RunnableItem ResourceActionRunnableModel `tfsdk:"runnable_item"`
+	Criteria     types.String                `tfsdk:"criteria"`
 	Status       types.String                `tfsdk:"status"`
 
 	// Of type CustomFormModel
@@ -38,6 +40,7 @@ type ResourceActionAPIModel struct {
 	ProviderName string                         `json:"providerName"`
 	ResourceType string                         `json:"resourceType"`
 	RunnableItem ResourceActionRunnableAPIModel `json:"runnableItem"`
+	Criteria     map[string]interface{}         `json:"criteria,omitempty"`
 	Status       string                         `json:"status"`
 
 	FormDefinition *CustomFormAPIModel `json:"formDefinition,omitempty"`
@@ -73,6 +76,20 @@ func (self *ResourceActionModel) FromAPI(
 	self.RunnableItem = ResourceActionRunnableModel{}
 	diags := self.RunnableItem.FromAPI(ctx, raw.RunnableItem)
 
+	// Criteria API data -> JSON Encoded
+	if raw.Criteria == nil {
+		self.Criteria = types.StringNull()
+	} else {
+		criteriaJson, err := json.Marshal(raw.Criteria)
+		if err != nil {
+			diags.AddError(
+				"Client error",
+				fmt.Sprintf("Unable to JSON encode %s criteria, got error: %s", self.String(), err))
+		} else {
+			self.Criteria = types.StringValue(string(criteriaJson))
+		}
+	}
+
 	var formDiags diag.Diagnostics
 	self.FormDefinition, formDiags = raw.FormDefinition.ToObject(ctx)
 	diags.Append(formDiags...)
@@ -88,6 +105,19 @@ func (self *ResourceActionModel) ToAPI(
 	runnableItemRaw, runnableItemDiags := self.RunnableItem.ToAPI(ctx)
 	diags.Append(runnableItemDiags...)
 
+	// Criteria JSON Encoded -> API data
+	var criteriaRaw map[string]interface{}
+	if self.Criteria.IsNull() {
+		criteriaRaw = nil
+	} else {
+		err := json.Unmarshal([]byte(self.Criteria.ValueString()), &criteriaRaw)
+		if err != nil {
+			diags.AddError(
+				"Client error",
+				fmt.Sprintf("Unable to JSON decode %s criteria, got error: %s", self.String(), err))
+		}
+	}
+
 	return ResourceActionAPIModel{
 		Id:             self.Id.ValueString(),
 		Name:           self.Name.ValueString(),
@@ -96,6 +126,7 @@ func (self *ResourceActionModel) ToAPI(
 		ProviderName:   self.ProviderName.ValueString(),
 		ResourceType:   self.ResourceType.ValueString(),
 		RunnableItem:   runnableItemRaw,
+		Criteria:       criteriaRaw,
 		FormDefinition: formDefinitionRaw,
 		Status:         self.Status.ValueString(),
 		ProjectId:      self.ProjectId.ValueString(),

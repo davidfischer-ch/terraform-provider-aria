@@ -12,9 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -81,20 +79,12 @@ func (self *CustomResourceResource) Schema(
 			},
 			"properties": UnorderedPropertiesSchema("Resource's properties"),
 			/* "allocate:" TODO one of the optional main actions */
-			"create": ResourceActionRunnableSchema("Create action"),
-			"read":   ResourceActionRunnableSchema("Read action"),
-			"update": ResourceActionRunnableSchema("Update action"),
-			"delete": ResourceActionRunnableSchema("Delete action"),
-			"project_id": schema.StringAttribute{
-				MarkdownDescription: "Project ID",
-				Computed:            true,
-				Optional:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
-			"org_id": ComputedOrganizationIdSchema(""),
+			"create":     ResourceActionRunnableSchema("Create action"),
+			"read":       ResourceActionRunnableSchema("Read action"),
+			"update":     ResourceActionRunnableSchema("Update action"),
+			"delete":     ResourceActionRunnableSchema("Delete action"),
+			"project_id": OptionalImmutableProjectIdSchema(),
+			"org_id":     ComputedOrganizationIdSchema(),
 		},
 	}
 }

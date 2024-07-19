@@ -70,16 +70,8 @@ func (self *PropertyGroupResource) Schema(
 				},
 			},
 			"properties": UnorderedPropertiesSchema("Property Group's properties"),
-			"project_id": schema.StringAttribute{
-				MarkdownDescription: "Project ID",
-				Computed:            true,
-				Optional:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
-					stringplanmodifier.UseStateForUnknown(),
-				},
-			},
-			"org_id": ComputedOrganizationIdSchema(""),
+			"project_id": OptionalImmutableProjectIdSchema(),
+			"org_id":     ComputedOrganizationIdSchema(),
 		},
 	}
 }

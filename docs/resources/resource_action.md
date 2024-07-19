@@ -63,6 +63,48 @@ resource "aria_resource_action" "machine_hello_world" {
     input_parameters  = []
     output_parameters = []
   }
+
+  // See https://docs.vmware.com/en/VMware-Aria-Automation/8.16/Using-Automation-Assembler/GUID-964816D8-DB67-406F-9224-DF597749397D.html
+  criteria = jsonencode({
+    matchExpression = [
+      {
+        and = [
+          {
+            key      = "$${properties.osType}"
+            operator = "eq"
+            value    = "WINDOWS"
+          },
+          {
+            key      = "$${properties.totalMemoryMB}"
+            operator = "greaterThan"
+            value    = "1024"
+          },
+          {
+            key      = "$${properties.tags}"
+            operator = "hasAny"
+            value = {
+              matchExpression = [
+                {
+                  and = [
+                    {
+                      key      = "key"
+                      operator = "eq"
+                      value    = "env"
+                    },
+                    {
+                      key      = "value"
+                      operator = "eq"
+                      value    = "REC"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  })
 }
 ```
 
@@ -80,6 +122,7 @@ resource "aria_resource_action" "machine_hello_world" {
 
 ### Optional
 
+- `criteria` (String) Filtering criteria (JSON encoded)
 - `provider_name` (String) Provider name, one of xaas (and that's all, maybe)
 - `status` (String) Action status, either DRAFT or RELEASED
 
@@ -98,7 +141,7 @@ Required:
 - `input_parameters` (Attributes List) (see [below for nested schema](#nestedatt--runnable_item--input_parameters))
 - `name` (String) Runnable name
 - `output_parameters` (Attributes List) (see [below for nested schema](#nestedatt--runnable_item--output_parameters))
-- `project_id` (String) Runnable's project identifier
+- `project_id` (String) Project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
 
 <a id="nestedatt--runnable_item--input_parameters"></a>
