@@ -74,7 +74,7 @@ func (self *CustomFormModel) ToAPI(
 	}, diag.Diagnostics{}
 }
 
-// Convert an object to a CustomFormAPIModel
+// Convert an object to a CustomFormAPIModel.
 func CustomFormAPIModelFromObject(
 	ctx context.Context,
 	object types.Object,
@@ -91,7 +91,7 @@ func CustomFormAPIModelFromObject(
 	return &raw, diags
 }
 
-// Convert a CustomFormAPIModel to an object
+// Convert a CustomFormAPIModel to an object.
 func (self *CustomFormAPIModel) ToObject(
 	ctx context.Context,
 ) (types.Object, diag.Diagnostics) {
@@ -105,7 +105,7 @@ func (self *CustomFormAPIModel) ToObject(
 	return object, diags
 }
 
-// Used to convert structure to a types.Object
+// Used to convert structure to a types.Object.
 func CustomFormModelAttributeTypes() map[string]attr.Type {
 	return map[string]attr.Type{
 		"id":          types.StringType,

@@ -13,7 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
-// Computed as of today, only used by the ResourceActionSchema
+// Computed as of today, only used by the ResourceActionSchema.
 func CustomFormSchema() schema.SingleNestedAttribute {
 	return schema.SingleNestedAttribute{
 		MarkdownDescription: "Form definition",
