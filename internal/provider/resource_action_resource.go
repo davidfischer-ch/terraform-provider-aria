@@ -97,67 +97,8 @@ func (self *ResourceActionResource) Schema(
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
-			"org_id": ComputedOrganizationIdSchema(""),
-			/*"form_definition": schema.SingleNestedAttribute{
-			    MarkdownDescription: "Custom form",
-			    Computed: true,
-			    // Optional: true,
-			    Attributes: map[string]schema.Attribute{
-			        "id": ComputedIdentifierSchema(""),
-			        "name": schema.StringAttribute{
-			            MarkdownDescription: "Form name",
-			            Computed: true,
-			            // Required: true,
-			        },
-			        "type": schema.StringAttribute{
-			            MarkdownDescription: "Form type, requestForm",
-			            Computed:            true,
-			            // Optional: true,
-			            // Default:  stringdefault.StaticString("requestForm"),
-			            PlanModifiers:       []planmodifier.String{
-			            	stringplanmodifier.UseStateForUnknown(),
-			            },
-			            Validators: []validator.String{
-			                stringvalidator.OneOf([]string{"requestForm"}...),
-			            },
-			        },
-			        "form": schema.StringAttribute{
-			            MarkdownDescription: "Form content in JSON (TODO nested attribute to define this instead of messing with JSON)",
-			            Computed: true,
-			            // Required: true,
-			        },
-			        "form_format": schema.StringAttribute{
-			            MarkdownDescription: "Form format either JSON or YAML, will be forced to JSON by Aria ...",
-			            Computed:            true,
-			            // Default: stringdefault.StaticString("JSON"),
-			        },
-			        "styles": schema.StringAttribute{
-			            MarkdownDescription: "Form stylesheet",
-			            Computed: true,
-			            // Optional: true,
-			            // Default:  stringdefault.StaticString(""),
-			            PlanModifiers:       []planmodifier.String{
-			            	stringplanmodifier.UseStateForUnknown(),
-			            },
-			        },
-			        "source_type": schema.StringAttribute{
-			            MarkdownDescription: "Form source type",
-			            Computed: true,
-			            // Default: stringdefault.StaticString("resource.action"),
-			            PlanModifiers: []planmodifier.String{
-			            	stringplanmodifier.UseStateForUnknown(),
-			        	},
-			        },
-			        "status": schema.StringAttribute{
-			            MarkdownDescription: "Resource status, one of DRAFT, ON, or RELEASED",
-			            Computed:            true,
-			            // Optional: true,
-			            Validators: []validator.String{
-			                stringvalidator.OneOf([]string{"DRAFT", "ON", "RELEASED"}...),
-			            },
-			        },
-			    },
-			},*/
+			"org_id":          ComputedOrganizationIdSchema(""),
+			"form_definition": CustomFormSchema(),
 		},
 	}
 }

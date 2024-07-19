@@ -22,7 +22,8 @@ type ResourceActionModel struct {
 	RunnableItem ResourceActionRunnableModel `tfsdk:"runnable_item"`
 	Status       types.String                `tfsdk:"status"`
 
-	/*FormDefinition CustomFormModel           `tfsdk:"form_definition"`*/
+	// Of type CustomFormModel
+	FormDefinition types.Object `tfsdk:"form_definition"`
 
 	ProjectId types.String `tfsdk:"project_id"`
 	OrgId     types.String `tfsdk:"org_id"`
@@ -39,10 +40,10 @@ type ResourceActionAPIModel struct {
 	RunnableItem ResourceActionRunnableAPIModel `json:"runnableItem"`
 	Status       string                         `json:"status"`
 
-	/*FormDefinition CustomFormAPIModel           `json:"formDefinition"`*/
+	FormDefinition *CustomFormAPIModel `json:"formDefinition,omitempty"`
 
 	ProjectId string `json:"projectId,omitempty"`
-	OrgId     string `json:"orgId"`
+	OrgId     string `json:"orgId,omitempty"`
 }
 
 func (self *ResourceActionModel) String() string {
@@ -59,8 +60,6 @@ func (self *ResourceActionModel) FromAPI(
 	raw ResourceActionAPIModel,
 ) diag.Diagnostics {
 
-	diags := diag.Diagnostics{}
-
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
 	self.DisplayName = types.StringValue(raw.DisplayName)
@@ -72,9 +71,11 @@ func (self *ResourceActionModel) FromAPI(
 	self.OrgId = types.StringValue(raw.OrgId)
 
 	self.RunnableItem = ResourceActionRunnableModel{}
-	diags.Append(self.RunnableItem.FromAPI(ctx, raw.RunnableItem)...)
+	diags := self.RunnableItem.FromAPI(ctx, raw.RunnableItem)
 
-	// FIXME self.FormDefinition =
+	var formDiags diag.Diagnostics
+	self.FormDefinition, formDiags = raw.FormDefinition.ToObject(ctx)
+	diags.Append(formDiags...)
 
 	return diags
 }
@@ -83,28 +84,21 @@ func (self *ResourceActionModel) ToAPI(
 	ctx context.Context,
 ) (ResourceActionAPIModel, diag.Diagnostics) {
 
-	diags := diag.Diagnostics{}
-
+	formDefinitionRaw, diags := CustomFormAPIModelFromObject(ctx, self.FormDefinition)
 	runnableItemRaw, runnableItemDiags := self.RunnableItem.ToAPI(ctx)
 	diags.Append(runnableItemDiags...)
 
-	raw := ResourceActionAPIModel{
-		Name:         self.Name.ValueString(),
-		DisplayName:  self.DisplayName.ValueString(),
-		Description:  self.Description.ValueString(),
-		ProviderName: self.ProviderName.ValueString(),
-		ResourceType: self.ResourceType.ValueString(),
-		RunnableItem: runnableItemRaw,
-		// FIXME FormDefinition:
-		Status:    self.Status.ValueString(),
-		ProjectId: self.ProjectId.ValueString(),
-		OrgId:     self.OrgId.ValueString(),
-	}
-
-	// When updating resource
-	if !self.Id.IsNull() {
-		raw.Id = self.Id.ValueString()
-	}
-
-	return raw, diags
+	return ResourceActionAPIModel{
+		Id:             self.Id.ValueString(),
+		Name:           self.Name.ValueString(),
+		DisplayName:    self.DisplayName.ValueString(),
+		Description:    self.Description.ValueString(),
+		ProviderName:   self.ProviderName.ValueString(),
+		ResourceType:   self.ResourceType.ValueString(),
+		RunnableItem:   runnableItemRaw,
+		FormDefinition: formDefinitionRaw,
+		Status:         self.Status.ValueString(),
+		ProjectId:      self.ProjectId.ValueString(),
+		OrgId:          self.OrgId.ValueString(),
+	}, diags
 }
