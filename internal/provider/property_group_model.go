@@ -18,7 +18,7 @@ type PropertyGroupModel struct {
 	Description types.String `tfsdk:"description"`
 	Type        types.String `tfsdk:"type"`
 
-	Properties PropertiesModel `tfsdk:"properties"`
+	Properties OrderedPropertiesModel `tfsdk:"properties"`
 
 	ProjectId types.String `tfsdk:"project_id"`
 	OrgId     types.String `tfsdk:"org_id"`
@@ -31,7 +31,7 @@ type PropertyGroupAPIModel struct {
 	Description string `json:"description"`
 	Type        string `json:"type"`
 
-	Properties PropertiesAPIModel `json:"properties"`
+	Properties OrderedPropertiesAPIModel `json:"properties"`
 
 	ProjectId string `json:"projectId,omitempty"`
 	OrgId     string `json:"orgId,omitempty"`

@@ -20,7 +20,7 @@ type CustomResourceModel struct {
 	SchemaType   types.String `tfsdk:"schema_type"`
 	Status       types.String `tfsdk:"status"`
 
-	Properties PropertiesModel `tfsdk:"properties"`
+	Properties OrderedPropertiesModel `tfsdk:"properties"`
 
 	Create ResourceActionRunnableModel `tfsdk:"create"`
 	Read   ResourceActionRunnableModel `tfsdk:"read"`
