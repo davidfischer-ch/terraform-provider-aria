@@ -1,5 +1,19 @@
 # Changelog
 
+## Release v0.4.0 (2024-07-23)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.4.0...v0.3.1
+
+### Minor compatibility breaks
+
+* Resource `aria_custom_resource`: Attribute `properties` is now a map of name to property
+* Resource `aria_property_group`: Attribute `properties` is now a map of name to property
+
+### Features
+
+* Diff of `aria_custom_resource` and `aria_property_group` should be more readable (+/- & ~)
+* Managing `aria_custom_resource` and `aria_property_group` will be immune to Terraform "diff" after apply errors
+
 ## Release v0.3.1 (2024-07-23)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.3.0...v0.3.1
