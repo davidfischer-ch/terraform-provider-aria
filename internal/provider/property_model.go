@@ -51,6 +51,10 @@ type PropertyAPIModel struct {
 	OneOf     []PropertyOneOfAPIModel `json:"oneOf,omitempty"`
 }
 
+func (self *PropertyModel) String() string {
+	return fmt.Sprintf("Property %s", self.Name.ValueString())
+}
+
 func (self *PropertyModel) FromAPI(
 	ctx context.Context,
 	name string,

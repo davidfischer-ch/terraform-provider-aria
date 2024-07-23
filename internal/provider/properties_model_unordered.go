@@ -45,7 +45,7 @@ func (self UnorderedPropertiesModel) ToAPI(
 				"Configuration error",
 				fmt.Sprintf(
 					"%s must be declared in map on key %s and not %s",
-					propertyName, propertyKey))
+					property.String(), propertyName, propertyKey))
 		}
 	}
 	return properties, diags
