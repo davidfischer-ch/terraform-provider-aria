@@ -8,11 +8,11 @@ import (
 	"testing"
 )
 
-func TestPropertiesAPIModel(t *testing.T) {
-	raw := PropertiesAPIModel{}
+func TestOrderedPropertiesAPIModel(t *testing.T) {
+	raw := OrderedPropertiesAPIModel{}
 	raw.Init()
 	CheckDeepEqual(t, raw.Get("missing"), PropertyAPIModel{})
-	CheckDeepEqual(t, raw.Items(), []PropertiesAPIModelItem{})
+	CheckDeepEqual(t, raw.Items(), []OrderedPropertiesAPIModelItem{})
 
 	// Insert some properties then retrieve them
 	CheckEqual(t, raw.Set("some", PropertyAPIModel{Title: "Some"}), true)
@@ -20,7 +20,7 @@ func TestPropertiesAPIModel(t *testing.T) {
 	CheckEqual(t, raw.Set("another", PropertyAPIModel{Title: "Another"}), true)
 	CheckEqual(t, raw.Set("latest", PropertyAPIModel{Title: "Latest"}), true)
 	CheckDeepEqual(t, raw.Get("other"), PropertyAPIModel{Title: "Other"})
-	CheckDeepEqual(t, raw.Items(), []PropertiesAPIModelItem{
+	CheckDeepEqual(t, raw.Items(), []OrderedPropertiesAPIModelItem{
 		{Name: "some", Property: PropertyAPIModel{Title: "Some"}},
 		{Name: "other", Property: PropertyAPIModel{Title: "Other"}},
 		{Name: "another", Property: PropertyAPIModel{Title: "Another"}},
@@ -31,7 +31,7 @@ func TestPropertiesAPIModel(t *testing.T) {
 	_, exists := raw.Pop("other")
 	CheckEqual(t, exists, true)
 
-	CheckDeepEqual(t, raw.Items(), []PropertiesAPIModelItem{
+	CheckDeepEqual(t, raw.Items(), []OrderedPropertiesAPIModelItem{
 		{Name: "some", Property: PropertyAPIModel{Title: "Some"}},
 		{Name: "another", Property: PropertyAPIModel{Title: "Another"}},
 		{Name: "latest", Property: PropertyAPIModel{Title: "Latest"}},
@@ -42,15 +42,15 @@ func TestPropertiesAPIModel(t *testing.T) {
 
 	// Overwrite
 	CheckEqual(t, raw.Set("another", PropertyAPIModel{Title: "Another v2"}), false)
-	CheckDeepEqual(t, raw.Items(), []PropertiesAPIModelItem{
+	CheckDeepEqual(t, raw.Items(), []OrderedPropertiesAPIModelItem{
 		{Name: "some", Property: PropertyAPIModel{Title: "Some"}},
 		{Name: "another", Property: PropertyAPIModel{Title: "Another v2"}},
 		{Name: "latest", Property: PropertyAPIModel{Title: "Latest"}},
 	})
 }
 
-func TestPropertiesAPIModelJSON(t *testing.T) {
-	raw := PropertiesAPIModel{}
+func TestOrderedPropertiesAPIModelJSON(t *testing.T) {
+	raw := OrderedPropertiesAPIModel{}
 	raw.Init()
 	CheckEqual(t, raw.Set("some", PropertyAPIModel{Title: "Some"}), true)
 	CheckEqual(t, raw.Set("other", PropertyAPIModel{Title: "Other"}), true)
@@ -64,15 +64,15 @@ func TestPropertiesAPIModelJSON(t *testing.T) {
 		panic(err)
 	}
 
-	rawBis := PropertiesAPIModel{}
-	CheckDeepEqual(t, rawBis.Items(), []PropertiesAPIModelItem{})
+	rawBis := OrderedPropertiesAPIModel{}
+	CheckDeepEqual(t, rawBis.Items(), []OrderedPropertiesAPIModelItem{})
 
 	err = json.Unmarshal(data, &rawBis)
 	if err != nil {
 		panic(err)
 	}
 
-	CheckDeepEqual(t, rawBis.Items(), []PropertiesAPIModelItem{
+	CheckDeepEqual(t, rawBis.Items(), []OrderedPropertiesAPIModelItem{
 		{Name: "some", Property: PropertyAPIModel{Title: "Some"}},
 		{Name: "other", Property: PropertyAPIModel{Title: "Other"}},
 		{Name: "another", Property: PropertyAPIModel{Title: "Another"}},

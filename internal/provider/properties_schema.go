@@ -15,8 +15,8 @@ func OrderedPropertiesSchema(description string) schema.ListNestedAttribute {
 	}
 }
 
-func UnorderedPropertiesSchema(description string) schema.SetNestedAttribute {
-	return schema.SetNestedAttribute{
+func UnorderedPropertiesSchema(description string) schema.MapNestedAttribute {
+	return schema.MapNestedAttribute{
 		MarkdownDescription: description,
 		Required:            true,
 		NestedObject:        PropertySchema(),

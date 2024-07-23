@@ -146,8 +146,8 @@ resource "aria_custom_resource" "test" {
   status        = "DRAFT"
   project_id    = var.test_project_id
 
-  properties = [
-    {
+  properties = {
+    some_text = {
       name               = "some_text"
       title              = "Some Text"
       description        = "Some text, more text."
@@ -159,8 +159,8 @@ resource "aria_custom_resource" "test" {
         { const = "a", title = "A", encrypted = false },
         { const = "b", title = "B", encrypted = false }
       ]
-    },
-    {
+    }
+    number = {
       name        = "number"
       title       = "Some Number"
       description = <<EOT
@@ -174,8 +174,8 @@ EOT
       encrypted          = false
       read_only          = false
       recreate_on_update = false
-    },
-    {
+    }
+    super_secret = {
       name               = "super_secret"
       title              = "Super Secret"
       description        = ""
@@ -185,8 +185,8 @@ EOT
       recreate_on_update = false
       min_length         = 16
       max_length         = 64
-    },
-    {
+    }
+    other = {
       name               = "other"
       title              = "Other"
       description        = ""
@@ -195,7 +195,7 @@ EOT
       read_only          = false
       recreate_on_update = false
     }
-  ]
+  }
 
   create = {
     id                = aria_abx_action.create.id
@@ -384,8 +384,8 @@ resource "aria_custom_resource" "test" {
   schema_type   = "ABX_USER_DEFINED"
   status        = "DRAFT"
 
-  properties = [
-    {
+  properties = {
+    some_text = {
       name               = "some_text"
       title              = "Some Text"
       description        = "Some text, more text."
@@ -397,8 +397,8 @@ resource "aria_custom_resource" "test" {
         { const = "a", title = "A", encrypted = false },
         { const = "b", title = "B", encrypted = false }
       ]
-    },
-    {
+    }
+    number = {
       name        = "number"
       title       = "Some Number"
       description = <<EOT
@@ -412,8 +412,8 @@ EOT
       recreate_on_update = false
       minimum            = 0
       maximum            = 5
-    },
-    {
+    }
+    super_secret = {
       name               = "super_secret"
       title              = "Super Secret"
       description        = ""
@@ -424,7 +424,7 @@ EOT
       min_length         = 16
       max_length         = 64
     }
-  ]
+  }
 
   create = {
     id                = aria_abx_action.create.id

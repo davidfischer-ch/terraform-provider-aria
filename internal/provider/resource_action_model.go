@@ -49,7 +49,7 @@ type ResourceActionAPIModel struct {
 	OrgId     string `json:"orgId,omitempty"`
 }
 
-func (self *ResourceActionModel) String() string {
+func (self ResourceActionModel) String() string {
 	return fmt.Sprintf(
 		"Resource %s Action %s (%s) project %s",
 		self.ResourceType.ValueString(),
@@ -97,7 +97,7 @@ func (self *ResourceActionModel) FromAPI(
 	return diags
 }
 
-func (self *ResourceActionModel) ToAPI(
+func (self ResourceActionModel) ToAPI(
 	ctx context.Context,
 ) (ResourceActionAPIModel, diag.Diagnostics) {
 

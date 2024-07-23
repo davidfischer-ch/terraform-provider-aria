@@ -39,11 +39,11 @@ type CustomNamingTemplateAPIModel struct {
 	IncrementStep    int32  `json:"incrementStep"`
 }
 
-func (self *CustomNamingTemplateModel) String() string {
+func (self CustomNamingTemplateModel) String() string {
 	return fmt.Sprintf("Custom Naming Template %s (%s)", self.Id.ValueString(), self.Key())
 }
 
-func (self *CustomNamingTemplateModel) Key() string {
+func (self CustomNamingTemplateModel) Key() string {
 	pattern := self.StaticPattern.ValueString()
 	if len(pattern) == 0 {
 		pattern = "Default"
@@ -72,7 +72,7 @@ func (self *CustomNamingTemplateModel) FromAPI(
 	return diag.Diagnostics{}
 }
 
-func (self *CustomNamingTemplateModel) toAPI() CustomNamingTemplateAPIModel {
+func (self CustomNamingTemplateModel) toAPI() CustomNamingTemplateAPIModel {
 	return CustomNamingTemplateAPIModel{
 		Id:               self.Id.ValueString(),
 		Name:             self.Name.ValueString(),
@@ -87,7 +87,7 @@ func (self *CustomNamingTemplateModel) toAPI() CustomNamingTemplateAPIModel {
 	}
 }
 
-func (self *CustomNamingTemplateModel) ToAPI(
+func (self CustomNamingTemplateModel) ToAPI(
 	ctx context.Context,
 	state CustomNamingTemplateModel,
 ) (CustomNamingTemplateAPIModel, diag.Diagnostics) {

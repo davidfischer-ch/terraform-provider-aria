@@ -34,7 +34,7 @@ func (self *PropertyOneOfModel) FromAPI(
 	return diag.Diagnostics{}
 }
 
-func (self *PropertyOneOfModel) ToAPI(
+func (self PropertyOneOfModel) ToAPI(
 	ctx context.Context,
 ) (PropertyOneOfAPIModel, diag.Diagnostics) {
 	return PropertyOneOfAPIModel{

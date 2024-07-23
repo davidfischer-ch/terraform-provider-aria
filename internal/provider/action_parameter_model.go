@@ -34,7 +34,7 @@ func (self *ActionParameterModel) FromAPI(
 	return diag.Diagnostics{}
 }
 
-func (self *ActionParameterModel) ToAPI(
+func (self ActionParameterModel) ToAPI(
 	ctx context.Context,
 ) (ActionParameterAPIModel, diag.Diagnostics) {
 	return ActionParameterAPIModel{

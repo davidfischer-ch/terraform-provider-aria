@@ -20,7 +20,7 @@ type CustomResourceModel struct {
 	SchemaType   types.String `tfsdk:"schema_type"`
 	Status       types.String `tfsdk:"status"`
 
-	Properties PropertiesModel `tfsdk:"properties"`
+	Properties UnorderedPropertiesModel `tfsdk:"properties"`
 
 	Create ResourceActionRunnableModel `tfsdk:"create"`
 	Read   ResourceActionRunnableModel `tfsdk:"read"`
@@ -48,7 +48,7 @@ type CustomResourceAPIModel struct {
 	OrgId     string `json:"orgId"`
 }
 
-func (self *CustomResourceModel) String() string {
+func (self CustomResourceModel) String() string {
 	return fmt.Sprintf(
 		"ABX Custom Resource %s (%s)",
 		self.Id.ValueString(),
@@ -85,7 +85,7 @@ func (self *CustomResourceModel) FromAPI(
 	return diags
 }
 
-func (self *CustomResourceModel) ToAPI(
+func (self CustomResourceModel) ToAPI(
 	ctx context.Context,
 ) (CustomResourceAPIModel, diag.Diagnostics) {
 

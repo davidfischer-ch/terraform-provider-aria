@@ -13,31 +13,32 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 )
 
-type PropertiesModel []PropertyModel
+// OrderedPropertiesModel describes the resource data model.
+type OrderedPropertiesModel []PropertyModel
 
-// PropertiesAPIModel describes the resource API model.
+// OrderedPropertiesAPIModel describes the resource API model.
 // Refers
 //
 //	JSON and Go        https://blog.golang.org/json-and-go
 //	Go-Ordered-JSON    https://github.com/virtuald/go-ordered-json
 //	Python OrderedDict https://github.com/python/cpython/blob/2.7/Lib/collections.py#L38
 //	port OrderedDict   https://github.com/cevaris/ordered_map
-type PropertiesAPIModel struct {
+type OrderedPropertiesAPIModel struct {
 	Names []string
 	Data  map[string]PropertyAPIModel
 }
 
-type PropertiesAPIModelItem struct {
+type OrderedPropertiesAPIModelItem struct {
 	Name     string
 	Property PropertyAPIModel
 }
 
-func (self *PropertiesModel) FromAPI(
+func (self *OrderedPropertiesModel) FromAPI(
 	ctx context.Context,
-	raw PropertiesAPIModel,
+	raw OrderedPropertiesAPIModel,
 ) diag.Diagnostics {
 	diags := diag.Diagnostics{}
-	*self = PropertiesModel{}
+	*self = OrderedPropertiesModel{}
 	for _, propertyItem := range raw.Items() {
 		property := PropertyModel{}
 		diags.Append(property.FromAPI(ctx, propertyItem.Name, propertyItem.Property)...)
@@ -46,13 +47,13 @@ func (self *PropertiesModel) FromAPI(
 	return diags
 }
 
-func (self *PropertiesModel) ToAPI(
+func (self OrderedPropertiesModel) ToAPI(
 	ctx context.Context,
-) (PropertiesAPIModel, diag.Diagnostics) {
+) (OrderedPropertiesAPIModel, diag.Diagnostics) {
 	diags := diag.Diagnostics{}
-	properties := PropertiesAPIModel{}
+	properties := OrderedPropertiesAPIModel{}
 	properties.Init()
-	for _, property := range *self {
+	for _, property := range self {
 		propertyName, propertyRaw, propertyDiags := property.ToAPI(ctx)
 		properties.Set(propertyName, propertyRaw)
 		diags.Append(propertyDiags...)
@@ -61,13 +62,13 @@ func (self *PropertiesModel) ToAPI(
 }
 
 // Reset the structure (prepare it for collecting new data).
-func (self *PropertiesAPIModel) Init() {
+func (self *OrderedPropertiesAPIModel) Init() {
 	self.Names = []string{}
 	self.Data = map[string]PropertyAPIModel{}
 }
 
 // Return a property matching given name, nil if not exists.
-func (self *PropertiesAPIModel) Get(
+func (self OrderedPropertiesAPIModel) Get(
 	name string,
 ) PropertyAPIModel {
 	return self.Data[name]
@@ -76,7 +77,7 @@ func (self *PropertiesAPIModel) Get(
 // Set the property by name, this will remember the order of insertion.
 // The initial insertion order is kept even if the property is overwritten.
 // Returns a boolean indicating if the value is newly inserted (not overwritten).
-func (self *PropertiesAPIModel) Set(
+func (self *OrderedPropertiesAPIModel) Set(
 	name string,
 	property PropertyAPIModel,
 ) bool {
@@ -90,7 +91,7 @@ func (self *PropertiesAPIModel) Set(
 
 // Drop the property if present.
 // Return the property (if found) and a flag indicating if the property was found.
-func (self *PropertiesAPIModel) Pop(
+func (self *OrderedPropertiesAPIModel) Pop(
 	name string,
 ) (PropertyAPIModel, bool) {
 	property, exists := self.Data[name]
@@ -108,16 +109,16 @@ func (self *PropertiesAPIModel) Pop(
 }
 
 // Return a slice with given the name, property pair in insertion order.
-func (self *PropertiesAPIModel) Items() []PropertiesAPIModelItem {
-	items := []PropertiesAPIModelItem{}
+func (self OrderedPropertiesAPIModel) Items() []OrderedPropertiesAPIModelItem {
+	items := []OrderedPropertiesAPIModelItem{}
 	for _, name := range self.Names {
-		items = append(items, PropertiesAPIModelItem{name, self.Data[name]})
+		items = append(items, OrderedPropertiesAPIModelItem{name, self.Data[name]})
 	}
 	return items
 }
 
-// Implement type json.Marshaler interface. Will be called when marshaling PropertiesAPIModel.
-func (self PropertiesAPIModel) MarshalJSON() ([]byte, error) {
+// Implement type json.Marshaler interface. Will be called when marshaling OrderedPropertiesAPIModel.
+func (self OrderedPropertiesAPIModel) MarshalJSON() ([]byte, error) {
 	data := []byte{'{'}
 	items := self.Items()
 	last := len(items) - 1
@@ -136,8 +137,8 @@ func (self PropertiesAPIModel) MarshalJSON() ([]byte, error) {
 	return data, nil
 }
 
-// Implement type json.Unmarshaler interface. Will be called when unmarshaling PropertiesAPIModel.
-func (self *PropertiesAPIModel) UnmarshalJSON(data []byte) error {
+// Implement type json.Unmarshaler interface. Will be called when unmarshaling OrderedPropertiesAPIModel.
+func (self *OrderedPropertiesAPIModel) UnmarshalJSON(data []byte) error {
 	self.Init()
 
 	decoder := json.NewDecoder(bytes.NewReader(data))

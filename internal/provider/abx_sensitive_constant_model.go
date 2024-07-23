@@ -30,7 +30,7 @@ type ABXSensitiveConstantAPIModel struct {
 	CreatedMillis uint64 `json:"createdMillis"`
 }
 
-func (self *ABXSensitiveConstantModel) String() string {
+func (self ABXSensitiveConstantModel) String() string {
 	return fmt.Sprintf(
 		"ABX Sensitive Constant %s (%s)",
 		self.Id.ValueString(),
@@ -50,7 +50,7 @@ func (self *ABXSensitiveConstantModel) FromAPI(
 	return diag.Diagnostics{}
 }
 
-func (self *ABXSensitiveConstantModel) ToAPI() ABXSensitiveConstantAPIModel {
+func (self ABXSensitiveConstantModel) ToAPI() ABXSensitiveConstantAPIModel {
 	return ABXSensitiveConstantAPIModel{
 		Name:      self.Name.ValueString(),
 		Value:     self.Value.ValueString(),

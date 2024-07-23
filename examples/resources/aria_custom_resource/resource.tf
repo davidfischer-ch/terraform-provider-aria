@@ -87,8 +87,8 @@ resource "aria_custom_resource" "redis" {
   status        = "DRAFT"
   project_id    = var.project_id
 
-  properties = [
-    {
+  properties = {
+    version = {
       name        = "version"
       title       = "Version"
       description = "Instance version."
@@ -97,8 +97,8 @@ resource "aria_custom_resource" "redis" {
         { const = "7.4", title = "7.4", encrypted = false },
         { const = "8.0", title = "8.0", encrypted = false }
       ]
-    },
-    {
+    }
+    storage_size = {
       name               = "storage_size"
       title              = "Storage Size"
       description        = "Storage size (MB)."
@@ -109,8 +109,8 @@ resource "aria_custom_resource" "redis" {
       recreate_on_update = false
       minimum            = 1 * 1024
       maximum            = 100 * 1024
-    },
-    {
+    }
+    secret = {
       name               = "secret"
       title              = "Secret"
       description        = "Secret key."
@@ -121,7 +121,7 @@ resource "aria_custom_resource" "redis" {
       min_length         = 16
       max_length         = 64
     }
-  ]
+  }
 
   create = {
     id                = aria_abx_action.redis_create.id

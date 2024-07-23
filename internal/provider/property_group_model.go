@@ -18,7 +18,7 @@ type PropertyGroupModel struct {
 	Description types.String `tfsdk:"description"`
 	Type        types.String `tfsdk:"type"`
 
-	Properties PropertiesModel `tfsdk:"properties"`
+	Properties UnorderedPropertiesModel `tfsdk:"properties"`
 
 	ProjectId types.String `tfsdk:"project_id"`
 	OrgId     types.String `tfsdk:"org_id"`
@@ -31,13 +31,13 @@ type PropertyGroupAPIModel struct {
 	Description string `json:"description"`
 	Type        string `json:"type"`
 
-	Properties PropertiesAPIModel `json:"properties"`
+	Properties UnorderedPropertiesAPIModel `json:"properties"`
 
 	ProjectId string `json:"projectId,omitempty"`
 	OrgId     string `json:"orgId,omitempty"`
 }
 
-func (self *PropertyGroupModel) String() string {
+func (self PropertyGroupModel) String() string {
 	return fmt.Sprintf(
 		"Property Group %s (%s)",
 		self.Id.ValueString(),
@@ -58,7 +58,7 @@ func (self *PropertyGroupModel) FromAPI(
 	return diags
 }
 
-func (self *PropertyGroupModel) ToAPI(
+func (self PropertyGroupModel) ToAPI(
 	ctx context.Context,
 ) (PropertyGroupAPIModel, diag.Diagnostics) {
 	propertiesRaw, diags := self.Properties.ToAPI(ctx)
