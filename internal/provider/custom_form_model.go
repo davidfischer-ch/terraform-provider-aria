@@ -5,6 +5,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -30,14 +31,21 @@ type CustomFormModel struct {
 type CustomFormAPIModel struct {
 	Id         string `json:"id,omitempty"`
 	Name       string `json:"name"`
-	Type       string `json:"type"`
-	Form       string `json:"form"` // TODO A struct to define this attribute
-	FormFormat string `json:"formFormat"`
-	Styles     string `json:"styles"`
-	SourceId   string `json:"sourceId"`
-	SourceType string `json:"sourceType"`
-	Tenant     string `json:"tenant"`
-	Status     string `json:"status"`
+	Type       string `json:"type,omitempty"`
+	Form       string `json:"form,omitempty"` // TODO A struct to define this attribute
+	FormFormat string `json:"formFormat,omitempty"`
+	Styles     string `json:"styles,omitempty"`
+	SourceId   string `json:"sourceId,omitempty"`
+	SourceType string `json:"sourceType,omitempty"`
+	Tenant     string `json:"tenant,omitempty"`
+	Status     string `json:"status,omitempty"`
+}
+
+func (self *CustomFormModel) String() string {
+	return fmt.Sprintf(
+		"Custom Form %s (%s)",
+		self.Id.ValueString(),
+		self.Name.ValueString())
 }
 
 func (self *CustomFormModel) FromAPI(
@@ -47,14 +55,17 @@ func (self *CustomFormModel) FromAPI(
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
 	self.Type = types.StringValue(raw.Type)
-	self.Form = types.StringValue(raw.Form)
 	self.FormFormat = types.StringValue(raw.FormFormat)
 	self.Styles = types.StringValue(raw.Styles)
 	self.SourceId = types.StringValue(raw.SourceId)
 	self.SourceType = types.StringValue(raw.SourceType)
 	self.Tenant = types.StringValue(raw.Tenant)
 	self.Status = types.StringValue(raw.Status)
-	return diag.Diagnostics{}
+
+	// Deserialize then serialize form to stabilize ordering of attributes
+	form, diags := JSONRencode(raw.Form, self.String()+" form")
+	self.Form = types.StringValue(form)
+	return diags
 }
 
 func (self *CustomFormModel) ToAPI(

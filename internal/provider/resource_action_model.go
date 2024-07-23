@@ -105,6 +105,13 @@ func (self *ResourceActionModel) ToAPI(
 	runnableItemRaw, runnableItemDiags := self.RunnableItem.ToAPI(ctx)
 	diags.Append(runnableItemDiags...)
 
+	// Defining name is mandatory when passing other form attributes such as styles...
+	// Otherwise we trigger an Hibernate exception on Aria. Fortunately We known that
+	// form's name is equal to resource action's name, so we set it like this.
+	if formDefinitionRaw != nil {
+		formDefinitionRaw.Name = self.Name.ValueString()
+	}
+
 	// Criteria JSON Encoded -> API data
 	var criteriaRaw map[string]interface{}
 	if self.Criteria.IsNull() {

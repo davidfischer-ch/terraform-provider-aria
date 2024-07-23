@@ -105,6 +105,29 @@ resource "aria_resource_action" "machine_hello_world" {
       }
     ]
   })
+
+  // You can optionally customize the form (this is not a really useful form here).
+  form_definition = {
+
+    form = jsonencode({
+      layout = {
+        pages = [
+          {
+            id       = "page_1"
+            sections = []
+            title    = "Première Page"
+          }
+        ]
+      },
+      schema = {}
+    })
+
+    styles = <<EOT
+section {
+  --main-bg-color: brown;
+}
+EOT
+  }
 }
 ```
 
@@ -123,12 +146,12 @@ resource "aria_resource_action" "machine_hello_world" {
 ### Optional
 
 - `criteria` (String) Filtering criteria (JSON encoded)
+- `form_definition` (Attributes) Form definition (see [below for nested schema](#nestedatt--form_definition))
 - `provider_name` (String) Provider name, one of xaas (and that's all, maybe)
 - `status` (String) Action status, either DRAFT or RELEASED
 
 ### Read-Only
 
-- `form_definition` (Attributes) Form definition (see [below for nested schema](#nestedatt--form_definition))
 - `id` (String) Identifier
 - `org_id` (String) Organization identifier
 
@@ -168,15 +191,18 @@ Required:
 <a id="nestedatt--form_definition"></a>
 ### Nested Schema for `form_definition`
 
+Optional:
+
+- `form` (String) Form content in JSON
+- `styles` (String) Form stylesheet
+
 Read-Only:
 
-- `form` (String) Form content in JSON (TODO nested attribute to define this instead of messing with JSON)
 - `form_format` (String) Form format either JSON or YAML, will be forced to JSON by Aria so you have no choice...
 - `id` (String) Identifier
 - `name` (String) Form name
 - `source_id` (String) Form source ientifier
 - `source_type` (String) Form source type
 - `status` (String) Resource status, one of DRAFT, ON, or RELEASED
-- `styles` (String) Form stylesheet
 - `tenant` (String) TODO
 - `type` (String) Form type, requestForm

@@ -90,4 +90,27 @@ resource "aria_resource_action" "machine_hello_world" {
       }
     ]
   })
+
+  // You can optionally customize the form (this is not a really useful form here).
+  form_definition = {
+
+    form = jsonencode({
+      layout = {
+        pages = [
+          {
+            id       = "page_1"
+            sections = []
+            title    = "Première Page"
+          }
+        ]
+      },
+      schema = {}
+    })
+
+    styles = <<EOT
+section {
+  --main-bg-color: brown;
+}
+EOT
+  }
 }

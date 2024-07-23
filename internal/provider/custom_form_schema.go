@@ -13,11 +13,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
-// Computed as of today, only used by the ResourceActionSchema.
+// Optional, only used by the ResourceActionSchema (as of current version).
 func CustomFormSchema() schema.SingleNestedAttribute {
 	return schema.SingleNestedAttribute{
 		MarkdownDescription: "Form definition",
 		Computed:            true,
+		Optional:            true,
 		PlanModifiers: []planmodifier.Object{
 			objectplanmodifier.UseStateForUnknown(),
 		},
@@ -26,6 +27,9 @@ func CustomFormSchema() schema.SingleNestedAttribute {
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Form name",
 				Computed:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"type": schema.StringAttribute{
 				MarkdownDescription: "Form type, requestForm",
@@ -39,33 +43,53 @@ func CustomFormSchema() schema.SingleNestedAttribute {
 				},
 			},
 			"form": schema.StringAttribute{
-				MarkdownDescription: "Form content in JSON " +
-					"(TODO nested attribute to define this instead of messing with JSON)",
-				Computed: true,
+				MarkdownDescription: "Form content in JSON",
+				Computed:            true,
+				Optional:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"form_format": schema.StringAttribute{
 				MarkdownDescription: "Form format either JSON or YAML, " +
 					"will be forced to JSON by Aria so you have no choice...",
 				Computed: true,
 				Default:  stringdefault.StaticString("JSON"),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"styles": schema.StringAttribute{
 				MarkdownDescription: "Form stylesheet",
 				Computed:            true,
+				Optional:            true,
 				Default:             stringdefault.StaticString(""),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"source_id": schema.StringAttribute{
 				MarkdownDescription: "Form source ientifier",
 				Computed:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"source_type": schema.StringAttribute{
 				MarkdownDescription: "Form source type",
 				Computed:            true,
 				Default:             stringdefault.StaticString("resource.action"),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"status": schema.StringAttribute{
 				MarkdownDescription: "Resource status, one of DRAFT, ON, or RELEASED",
 				Computed:            true,
+				Default:             stringdefault.StaticString("ON"),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{"DRAFT", "ON", "RELEASED"}...),
 				},
@@ -73,6 +97,9 @@ func CustomFormSchema() schema.SingleNestedAttribute {
 			"tenant": schema.StringAttribute{
 				MarkdownDescription: "TODO",
 				Computed:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 		},
 	}
