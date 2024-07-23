@@ -5,5 +5,5 @@ package provider
 
 // CustomResourcePropertiesAPIModel describes the resource API model.
 type CustomResourcePropertiesAPIModel struct {
-	Properties OrderedPropertiesAPIModel `json:"properties"`
+	Properties UnorderedPropertiesAPIModel `json:"properties"`
 }

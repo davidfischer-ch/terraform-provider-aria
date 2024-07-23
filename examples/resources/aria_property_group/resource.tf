@@ -3,8 +3,8 @@ resource "aria_property_group" "vm_common" {
   description = "Common Machines properties."
   type        = "INPUT"
 
-  properties = [
-    {
+  properties = {
+    vlan = {
       name               = "vlan"
       title              = "VLAN"
       description        = "VLAN"
@@ -24,8 +24,8 @@ resource "aria_property_group" "vm_common" {
           encrypted = false
         }
       ]
-    },
-    {
+    }
+    srv_role = {
       name               = "srv_role"
       title              = "Rôle du serveur"
       description        = "Rôle du serveur dans l'architecture sur <b>3</b> caractères."
@@ -78,5 +78,5 @@ resource "aria_property_group" "vm_common" {
         }
       ]
     }
-  ]
+  }
 }

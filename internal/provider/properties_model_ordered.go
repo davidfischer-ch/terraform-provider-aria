@@ -13,6 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 )
 
+// OrderedPropertiesModel describes the resource data model.
 type OrderedPropertiesModel []PropertyModel
 
 // OrderedPropertiesAPIModel describes the resource API model.
@@ -46,13 +47,13 @@ func (self *OrderedPropertiesModel) FromAPI(
 	return diags
 }
 
-func (self *OrderedPropertiesModel) ToAPI(
+func (self OrderedPropertiesModel) ToAPI(
 	ctx context.Context,
 ) (OrderedPropertiesAPIModel, diag.Diagnostics) {
 	diags := diag.Diagnostics{}
 	properties := OrderedPropertiesAPIModel{}
 	properties.Init()
-	for _, property := range *self {
+	for _, property := range self {
 		propertyName, propertyRaw, propertyDiags := property.ToAPI(ctx)
 		properties.Set(propertyName, propertyRaw)
 		diags.Append(propertyDiags...)
