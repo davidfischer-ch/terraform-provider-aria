@@ -1,5 +1,17 @@
 # Changelog
 
+## Release v0.3.1 (2024-07-23)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.3.1...v0.3.0
+
+### Features
+
+* Resource `aria_resource_action`: Add attribute `criteria`
+* Resource `aria_resource_action`: Add attribute `form_definition`
+
+### Fix and enhancements
+
+
 ## Release v0.3.0 (2024-07-16)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.3.0...v0.2.7
