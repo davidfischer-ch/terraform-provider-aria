@@ -15,6 +15,6 @@ type IconModel struct {
 	Content types.String `tfsdk:"content"`
 }
 
-func (self *IconModel) String() string {
+func (self IconModel) String() string {
 	return fmt.Sprintf("Icon %s", self.Id.ValueString())
 }

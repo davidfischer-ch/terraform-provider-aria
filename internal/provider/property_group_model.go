@@ -37,7 +37,7 @@ type PropertyGroupAPIModel struct {
 	OrgId     string `json:"orgId,omitempty"`
 }
 
-func (self *PropertyGroupModel) String() string {
+func (self PropertyGroupModel) String() string {
 	return fmt.Sprintf(
 		"Property Group %s (%s)",
 		self.Id.ValueString(),
@@ -58,7 +58,7 @@ func (self *PropertyGroupModel) FromAPI(
 	return diags
 }
 
-func (self *PropertyGroupModel) ToAPI(
+func (self PropertyGroupModel) ToAPI(
 	ctx context.Context,
 ) (PropertyGroupAPIModel, diag.Diagnostics) {
 	propertiesRaw, diags := self.Properties.ToAPI(ctx)

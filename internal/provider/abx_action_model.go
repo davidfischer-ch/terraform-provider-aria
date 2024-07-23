@@ -43,14 +43,6 @@ type ABXActionModel struct {
 	OrgId     types.String `tfsdk:"org_id"`
 }
 
-func (self *ABXActionModel) String() string {
-	return fmt.Sprintf(
-		"ABX Action %s (%s) project %s",
-		self.Id.ValueString(),
-		self.Name.ValueString(),
-		self.ProjectId.ValueString())
-}
-
 // ABXActionAPIModel describes the resource API model.
 type ABXActionAPIModel struct {
 	Id           string `json:"id,omitempty"`
@@ -79,6 +71,14 @@ type ABXActionAPIModel struct {
 
 	ProjectId string `json:"projectId"`
 	OrgId     string `json:"orgId"`
+}
+
+func (self ABXActionModel) String() string {
+	return fmt.Sprintf(
+		"ABX Action %s (%s) project %s",
+		self.Id.ValueString(),
+		self.Name.ValueString(),
+		self.ProjectId.ValueString())
 }
 
 func (self *ABXActionModel) FromAPI(
@@ -154,7 +154,9 @@ func (self *ABXActionModel) FromAPI(
 	return diags
 }
 
-func (self *ABXActionModel) ToAPI(ctx context.Context) (ABXActionAPIModel, diag.Diagnostics) {
+func (self ABXActionModel) ToAPI(
+	ctx context.Context,
+) (ABXActionAPIModel, diag.Diagnostics) {
 
 	diags := diag.Diagnostics{}
 

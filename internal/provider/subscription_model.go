@@ -68,7 +68,7 @@ type SubscriptionAPIModel struct {
 	SubscriberId string `json:"subscriberId"`
 }
 
-func (self *SubscriptionModel) String() string {
+func (self SubscriptionModel) String() string {
 	return fmt.Sprintf(
 		"Subscription %s (%s)",
 		self.Id.ValueString(),
@@ -112,7 +112,9 @@ func (self *SubscriptionModel) FromAPI(
 	return diags
 }
 
-func (self *SubscriptionModel) ToAPI(ctx context.Context) (SubscriptionAPIModel, diag.Diagnostics) {
+func (self SubscriptionModel) ToAPI(
+	ctx context.Context,
+) (SubscriptionAPIModel, diag.Diagnostics) {
 
 	var diags diag.Diagnostics
 

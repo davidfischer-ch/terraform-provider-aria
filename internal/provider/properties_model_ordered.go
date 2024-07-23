@@ -68,7 +68,7 @@ func (self *OrderedPropertiesAPIModel) Init() {
 }
 
 // Return a property matching given name, nil if not exists.
-func (self *OrderedPropertiesAPIModel) Get(
+func (self OrderedPropertiesAPIModel) Get(
 	name string,
 ) PropertyAPIModel {
 	return self.Data[name]
@@ -109,7 +109,7 @@ func (self *OrderedPropertiesAPIModel) Pop(
 }
 
 // Return a slice with given the name, property pair in insertion order.
-func (self *OrderedPropertiesAPIModel) Items() []OrderedPropertiesAPIModelItem {
+func (self OrderedPropertiesAPIModel) Items() []OrderedPropertiesAPIModelItem {
 	items := []OrderedPropertiesAPIModelItem{}
 	for _, name := range self.Names {
 		items = append(items, OrderedPropertiesAPIModelItem{name, self.Data[name]})

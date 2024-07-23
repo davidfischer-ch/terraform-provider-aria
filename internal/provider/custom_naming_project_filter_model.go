@@ -31,7 +31,7 @@ type CustomNamingProjectFilterAPIModel struct {
 	ProjectName string `json:"projectName"`
 }
 
-func (self *CustomNamingProjectFilterModel) String() string {
+func (self CustomNamingProjectFilterModel) String() string {
 	return fmt.Sprintf(
 		"Custom Naming Project Filter %s (ID='%s', Name='%s')",
 		self.Id.ValueString(),
@@ -52,7 +52,7 @@ func (self *CustomNamingProjectFilterModel) FromAPI(
 	return diag.Diagnostics{}
 }
 
-func (self *CustomNamingProjectFilterModel) ToAPI(
+func (self CustomNamingProjectFilterModel) ToAPI(
 	ctx context.Context,
 ) (CustomNamingProjectFilterAPIModel, diag.Diagnostics) {
 	return CustomNamingProjectFilterAPIModel{

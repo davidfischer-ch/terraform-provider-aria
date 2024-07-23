@@ -59,7 +59,7 @@ func (self *ResourceActionRunnableModel) FromAPI(
 	return diags
 }
 
-func (self *ResourceActionRunnableModel) ToAPI(
+func (self ResourceActionRunnableModel) ToAPI(
 	ctx context.Context,
 ) (ResourceActionRunnableAPIModel, diag.Diagnostics) {
 
