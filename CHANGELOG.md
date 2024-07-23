@@ -2,19 +2,16 @@
 
 ## Release v0.3.1 (2024-07-23)
 
-Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.3.1...v0.3.0
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.3.0...v0.3.1
 
 ### Features
 
 * Resource `aria_resource_action`: Add attribute `criteria`
 * Resource `aria_resource_action`: Add attribute `form_definition`
 
-### Fix and enhancements
-
-
 ## Release v0.3.0 (2024-07-16)
 
-Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.3.0...v0.2.7
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.7...v0.3.0
 
 ### Minor compatibility breaks
 
@@ -34,7 +31,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.3.0.
 
 ## Release v0.2.7 (2024-07-11)
 
-Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.7...v0.2.6
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.6...v0.2.7
 
 ### Fix and enhancements
 
@@ -44,7 +41,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.7.
 
 ## Release v0.2.6 (2024-07-11)
 
-Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.6...v0.2.5
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.5...v0.2.6
 
 ### Fix and enhancements
 
@@ -52,7 +49,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.6.
 
 ## Release v0.2.5 (2024-07-10)
 
-Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.5...v0.2.4
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.4...v0.2.5
 
 ### Features
 
@@ -69,7 +66,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.5.
 
 ## Release v0.2.4 (2024-07-09)
 
-Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.4...v0.2.3
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.3...v0.2.4
 
 ### Fix and enhancements
 
@@ -77,7 +74,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.4.
 
 ## Release v0.2.3 (2024-07-09)
 
-Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.3...v0.2.2
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.2...v0.2.3
 
 ### Features
 
@@ -86,7 +83,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.3.
 
 ## Release v0.2.2 (2024-06-24)
 
-Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.2...v0.2.1
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.1...v0.2.2
 
 ### Features
 
@@ -94,7 +91,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.2.
 
 ## Release v0.2.1 (2204-06-24)
 
-Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.1...v0.2.0
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.0...v0.2.1
 
 ### Features
 
@@ -102,7 +99,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.1.
 
 ## Release v0.2.0 (2024-06-21)
 
-Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.0...v0.1.2
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.1.2...v0.2.0
 
 ### Minor compatibility breaks
 
@@ -110,7 +107,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.0.
 
 ## Release v0.1.2 (2024-06-19)
 
-Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.1.2...v0.1.1
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.1.1...v0.1.2
 
 ### Fix and enhancements
 
@@ -119,7 +116,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.1.2.
 
 ## Release v0.1.1 (2024-06-19)
 
-Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.1.1...v0.1.0
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.1.0...v0.1.1
 
 ### Features
 
