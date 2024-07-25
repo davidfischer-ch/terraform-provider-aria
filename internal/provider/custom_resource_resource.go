@@ -8,12 +8,8 @@ import (
 	"fmt"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
-	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -43,47 +39,7 @@ func (self *CustomResourceResource) Schema(
 	req resource.SchemaRequest,
 	resp *resource.SchemaResponse,
 ) {
-	resp.Schema = schema.Schema{
-		MarkdownDescription: "Custom Resource resource",
-		Attributes: map[string]schema.Attribute{
-			"id": ComputedIdentifierSchema(""),
-			"display_name": schema.StringAttribute{
-				MarkdownDescription: "A friendly name",
-				Required:            true,
-			},
-			"description": RequiredDescriptionSchema(),
-			"resource_type": schema.StringAttribute{
-				MarkdownDescription: "Define the type (must be unique, e.g. Custom.DB.PostgreSQL)",
-				Required:            true,
-			},
-			"schema_type": schema.StringAttribute{
-				MarkdownDescription: "Type of resource, one of ABX_USER_DEFINED (and that's all, maybe)",
-				Computed:            true,
-				Optional:            true,
-				Default:             stringdefault.StaticString("ABX_USER_DEFINED"),
-				Validators: []validator.String{
-					stringvalidator.OneOf([]string{"ABX_USER_DEFINED"}...),
-				},
-			},
-			"status": schema.StringAttribute{
-				MarkdownDescription: "Resource status, one of DRAFT, ON, or RELEASED",
-				Computed:            true,
-				Optional:            true,
-				Default:             stringdefault.StaticString("RELEASED"),
-				Validators: []validator.String{
-					stringvalidator.OneOf([]string{"DRAFT", "ON", "RELEASED"}...),
-				},
-			},
-			"properties": UnorderedPropertiesSchema("Resource's properties"),
-			/* "allocate:" TODO one of the optional main actions */
-			"create":     ResourceActionRunnableSchema("Create action"),
-			"read":       ResourceActionRunnableSchema("Read action"),
-			"update":     ResourceActionRunnableSchema("Update action"),
-			"delete":     ResourceActionRunnableSchema("Delete action"),
-			"project_id": OptionalImmutableProjectIdSchema(),
-			"org_id":     ComputedOrganizationIdSchema(),
-		},
-	}
+	resp.Schema = CustomResourceSchema()
 }
 
 func (self *CustomResourceResource) Configure(

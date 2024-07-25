@@ -9,8 +9,6 @@ import (
 
 	"github.com/go-resty/resty/v2"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -39,27 +37,7 @@ func (self *ABXSensitiveConstantResource) Schema(
 	req resource.SchemaRequest,
 	resp *resource.SchemaResponse,
 ) {
-	resp.Schema = schema.Schema{
-		MarkdownDescription: "ABX sensitive constant resource",
-		Attributes: map[string]schema.Attribute{
-			"id": ComputedIdentifierSchema(""),
-			"name": schema.StringAttribute{
-				MarkdownDescription: "Name",
-				Required:            true,
-			},
-			"value": schema.StringAttribute{
-				MarkdownDescription: "Value (cannot be enforced since API don't return it)",
-				Required:            true,
-				Sensitive:           true,
-			},
-			"encrypted": schema.BoolAttribute{
-				MarkdownDescription: "Should be always encrypted!",
-				Computed:            true,
-				Default:             booldefault.StaticBool(true),
-			},
-			"org_id": ComputedOrganizationIdSchema(),
-		},
-	}
+	resp.Schema = ABXSensitiveConstantSchema()
 }
 
 func (self *ABXSensitiveConstantResource) Configure(

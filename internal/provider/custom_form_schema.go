@@ -42,6 +42,7 @@ func CustomFormSchema() schema.SingleNestedAttribute {
 					stringvalidator.OneOf([]string{"requestForm"}...),
 				},
 			},
+			// FIXME https://github.com/davidfischer-ch/terraform-provider-aria/issues/50
 			"form": schema.StringAttribute{
 				MarkdownDescription: "Form content in JSON",
 				Computed:            true,

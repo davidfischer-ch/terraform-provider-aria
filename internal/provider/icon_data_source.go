@@ -9,7 +9,6 @@ import (
 
 	"github.com/go-resty/resty/v2"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -38,19 +37,7 @@ func (self *IconDataSource) Schema(
 	req datasource.SchemaRequest,
 	resp *datasource.SchemaResponse,
 ) {
-	resp.Schema = schema.Schema{
-		MarkdownDescription: "Icon data source",
-		Attributes: map[string]schema.Attribute{
-			"id": schema.StringAttribute{
-				MarkdownDescription: "Icon identifier",
-				Required:            true,
-			},
-			"content": schema.StringAttribute{
-				MarkdownDescription: "Icon content",
-				Computed:            true,
-			},
-		},
-	}
+	resp.Schema = IconDataSourceSchema()
 }
 
 func (self *IconDataSource) Configure(
