@@ -1,5 +1,18 @@
 # Changelog
 
+## Release v0.4.1 (2024-07-25)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.4.1...v0.4.0
+
+### Fix and enhancements
+
+* Resource `aria_resource_action`: Attribute `criteria` is now normalized with `jsontypes.Normalized`
+* Resource `aria_resource_action`: Attribute `form_definition.form` is now normalized with `jsontypes.Normalized`
+
+See https://pkg.go.dev/github.com/hashicorp/terraform-plugin-framework-jsontypes@v0.1.0/jsontypes#Normalized:
+
+Semantic equality logic is defined for Normalized such that inconsequential differences between JSON strings are ignored (whitespace, property order, etc). If you need strict, byte-for-byte, string equality, consider using ExactType.
+
 ## Release v0.4.0 (2024-07-23)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.4.0...v0.3.1
