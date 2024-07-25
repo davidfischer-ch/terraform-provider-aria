@@ -14,7 +14,7 @@ func ResourceActionRunnableSchema(description string) schema.SingleNestedAttribu
 		MarkdownDescription: description,
 		Required:            true,
 		Attributes: map[string]schema.Attribute{
-			"id": RequiredIdentifierSchema(""),
+			"id": RequiredIdentifierSchema(),
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Runnable name",
 				Required:            true,
@@ -26,7 +26,7 @@ func ResourceActionRunnableSchema(description string) schema.SingleNestedAttribu
 					stringvalidator.OneOf([]string{"abx.action", "vro.workflow"}...),
 				},
 			},
-			"project_id": RequiredProjectId(),
+			"project_id": RequiredProjectIdSchema(),
 			"input_parameters": schema.ListNestedAttribute{
 				Required: true,
 				NestedObject: schema.NestedAttributeObject{
@@ -39,10 +39,7 @@ func ResourceActionRunnableSchema(description string) schema.SingleNestedAttribu
 							MarkdownDescription: "Name",
 							Required:            true,
 						},
-						"description": schema.StringAttribute{
-							MarkdownDescription: "Description",
-							Required:            true,
-						},
+						"description": RequiredDescriptionSchema(),
 					},
 				},
 			},
@@ -58,10 +55,7 @@ func ResourceActionRunnableSchema(description string) schema.SingleNestedAttribu
 							MarkdownDescription: "Name",
 							Required:            true,
 						},
-						"description": schema.StringAttribute{
-							MarkdownDescription: "Description",
-							Required:            true,
-						},
+						"description": RequiredDescriptionSchema(),
 					},
 				},
 			},

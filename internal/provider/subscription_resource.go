@@ -58,10 +58,7 @@ func (self *SubscriptionResource) Schema(
 				MarkdownDescription: "Subscription name",
 				Required:            true,
 			},
-			"description": schema.StringAttribute{
-				MarkdownDescription: "Describe the subscription in few sentences",
-				Required:            true,
-			},
+			"description": RequiredDescriptionSchema(),
 			"type": schema.StringAttribute{
 				MarkdownDescription: "Subscription type, either RUNNABLE or SUBSCRIBABLE",
 				Required:            true,

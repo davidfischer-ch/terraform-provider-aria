@@ -109,7 +109,7 @@ resource "aria_property_group" "vm_common" {
 
 ### Optional
 
-- `project_id` (String) Project identifier
+- `project_id` (String) Project identifier. Empty or unset means available for all projects.
 
 ### Read-Only
 
@@ -121,7 +121,7 @@ resource "aria_property_group" "vm_common" {
 
 Required:
 
-- `description` (String) Description
+- `description` (String) Describe the resource in few sentences
 - `encrypted` (Boolean) Encrypted?
 - `name` (String) Name
 - `read_only` (Boolean) Make the field read-only (in the form)

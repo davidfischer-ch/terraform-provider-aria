@@ -51,10 +51,7 @@ func (self *CustomResourceResource) Schema(
 				MarkdownDescription: "A friendly name",
 				Required:            true,
 			},
-			"description": schema.StringAttribute{
-				MarkdownDescription: "Describe the resource in few sentences",
-				Required:            true,
-			},
+			"description": RequiredDescriptionSchema(),
 			"resource_type": schema.StringAttribute{
 				MarkdownDescription: "Define the type (must be unique, e.g. Custom.DB.PostgreSQL)",
 				Required:            true,

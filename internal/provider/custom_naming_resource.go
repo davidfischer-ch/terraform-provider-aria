@@ -78,10 +78,7 @@ func (self *CustomNamingResource) Schema(
 				MarkdownDescription: "A friendly name",
 				Required:            true,
 			},
-			"description": schema.StringAttribute{
-				MarkdownDescription: "Describe the resource in few sentences",
-				Required:            true,
-			},
+			"description": RequiredDescriptionSchema(),
 			"projects": schema.ListNestedAttribute{
 				MarkdownDescription: "Restrict the naming template to given projects (by filters).",
 				Required:            true,

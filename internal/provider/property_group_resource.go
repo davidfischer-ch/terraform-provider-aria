@@ -55,10 +55,7 @@ func (self *PropertyGroupResource) Schema(
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
-			"description": schema.StringAttribute{
-				MarkdownDescription: "Describe the resource in few sentences",
-				Required:            true,
-			},
+			"description": RequiredDescriptionSchema(),
 			"type": schema.StringAttribute{
 				MarkdownDescription: "Type, either INPUT or CONSTANT",
 				Required:            true,

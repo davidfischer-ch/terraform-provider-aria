@@ -136,10 +136,9 @@ EOT
 
 ### Required
 
-- `description` (String) Description
+- `description` (String) Describe the resource in few sentences
 - `display_name` (String) Action display name
 - `name` (String) Action name
-- `project_id` (String) Project ID. Set it to "" to make the action available for all projects.
 - `resource_type` (String) Native resource type
 - `runnable_item` (Attributes) Action's runnable (see [below for nested schema](#nestedatt--runnable_item))
 
@@ -147,6 +146,7 @@ EOT
 
 - `criteria` (String) Filtering criteria (JSON encoded)
 - `form_definition` (Attributes) Form definition (see [below for nested schema](#nestedatt--form_definition))
+- `project_id` (String) Project identifier. Empty or unset means available for all projects.
 - `provider_name` (String) Provider name, one of xaas (and that's all, maybe)
 - `status` (String) Action status, either DRAFT or RELEASED
 
@@ -172,7 +172,7 @@ Required:
 
 Required:
 
-- `description` (String) Description
+- `description` (String) Describe the resource in few sentences
 - `name` (String) Name
 - `type` (String) Type
 
@@ -182,7 +182,7 @@ Required:
 
 Required:
 
-- `description` (String) Description
+- `description` (String) Describe the resource in few sentences
 - `name` (String) Name
 - `type` (String) Type
 

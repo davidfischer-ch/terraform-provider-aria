@@ -60,10 +60,7 @@ func (self *ResourceActionResource) Schema(
 				MarkdownDescription: "Action display name",
 				Required:            true,
 			},
-			"description": schema.StringAttribute{
-				MarkdownDescription: "Description",
-				Required:            true,
-			},
+			"description": RequiredDescriptionSchema(),
 			"provider_name": schema.StringAttribute{
 				MarkdownDescription: "Provider name, one of xaas (and that's all, maybe)",
 				Computed:            true,
@@ -95,15 +92,8 @@ func (self *ResourceActionResource) Schema(
 					stringvalidator.OneOf([]string{"DRAFT", "RELEASED"}...),
 				},
 			},
-			"project_id": schema.StringAttribute{
-				MarkdownDescription: "Project ID. Set it to \"\" to make the action " +
-					"available for all projects.",
-				Required: true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
-				},
-			},
-			"org_id": ComputedOrganizationIdSchema(),
+			"project_id": OptionalImmutableProjectIdSchema(),
+			"org_id":     ComputedOrganizationIdSchema(),
 		},
 	}
 }
@@ -147,7 +137,7 @@ func (self *ResourceActionResource) Create(
 		return
 	}
 
-	// Save additional action into Terraform state
+	// Save resource action into Terraform state
 	resp.Diagnostics.Append(action.FromAPI(ctx, actionRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &action)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", action.String()))
@@ -188,7 +178,7 @@ func (self *ResourceActionResource) Read(
 		return
 	}
 
-	// Save updated additional action into Terraform state
+	// Save updated resource action into Terraform state
 	resp.Diagnostics.Append(action.FromAPI(ctx, actionRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &action)...)
 }
@@ -225,7 +215,7 @@ func (self *ResourceActionResource) Update(
 		return
 	}
 
-	// Save updated additional action into Terraform state
+	// Save updated resource action into Terraform state
 	resp.Diagnostics.Append(action.FromAPI(ctx, actionRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &action)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", action.String()))

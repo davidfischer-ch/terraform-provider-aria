@@ -73,11 +73,10 @@ EOT
 
 - `constants` (Set of String) ABX Constants to expose to the action
 - `dependencies` (List of String) Dependencies (python packages, ...)
-- `description` (String) Describe the action in few sentences
+- `description` (String) Describe the resource in few sentences
 - `entrypoint` (String) Main function's name
 - `memory_in_mb` (Number) Runtime memory constraint in MB
 - `name` (String) A name (must be unique)
-- `project_id` (String) Required for non-system actions
 - `runtime_name` (String) Runtime name (python, nodejs, ...)
 - `secrets` (Set of String) Secrets to expose to the action
 - `source` (String) Action source code
@@ -87,6 +86,7 @@ EOT
 - `cpu_shares` (Number) Runtime CPU shares
 - `deployment_timeout_seconds` (Number) How long ??
 - `faas_provider` (String) FaaS provider used for code execution, one of auto (default), on-prem, aws and azure (automatically set by the platform if unset)
+- `project_id` (String) Project identifier. Empty or unset means available for all projects.
 - `runtime_version` (String) Runtime version (3.10, ...)
 - `shared` (Boolean) Flag indicating if the action can be shared across projects
 - `timeout_seconds` (Number) How long an action can run (default to 600)

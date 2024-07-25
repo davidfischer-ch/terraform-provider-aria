@@ -17,7 +17,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int32default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -57,10 +56,7 @@ func (self *ABXActionResource) Schema(
 				MarkdownDescription: "A name (must be unique)",
 				Required:            true,
 			},
-			"description": schema.StringAttribute{
-				MarkdownDescription: "Describe the action in few sentences",
-				Required:            true,
-			},
+			"description": RequiredDescriptionSchema(),
 			"faas_provider": schema.StringAttribute{
 				MarkdownDescription: "FaaS provider used for code execution, one of auto (default), on-prem, aws and azure (automatically set by the platform if unset)",
 				Computed:            true,
@@ -139,14 +135,7 @@ func (self *ABXActionResource) Schema(
 				MarkdownDescription: "Action source code",
 				Required:            true,
 			},
-			// TODO Use OptionalImmutableProjectIdSchema() and test case where project_id is not set
-			"project_id": schema.StringAttribute{
-				MarkdownDescription: "Required for non-system actions",
-				Required:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.RequiresReplace(),
-				},
-			},
+			"project_id": OptionalImmutableProjectIdSchema(),
 			"shared": schema.BoolAttribute{
 				MarkdownDescription: "Flag indicating if the action can be shared across projects",
 				Computed:            true,

@@ -10,6 +10,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 )
 
+// Identifier
+
 func ComputedIdentifierSchema(description string) schema.StringAttribute {
 	if len(description) == 0 {
 		description = "Identifier"
@@ -30,6 +32,31 @@ func ComputedMutableIdentifierSchema() schema.StringAttribute {
 	}
 }
 
+func RequiredIdentifierSchema() schema.StringAttribute {
+	return schema.StringAttribute{
+		MarkdownDescription: "Identifier",
+		Required:            true,
+	}
+}
+
+// Description
+
+func ComputedDescriptionSchema() schema.StringAttribute {
+	return schema.StringAttribute{
+		MarkdownDescription: "Describe the resource in few sentences",
+		Computed:            true,
+	}
+}
+
+func RequiredDescriptionSchema() schema.StringAttribute {
+	return schema.StringAttribute{
+		MarkdownDescription: "Describe the resource in few sentences",
+		Required:            true,
+	}
+}
+
+// Organization ID
+
 func ComputedOrganizationIdSchema() schema.StringAttribute {
 	return schema.StringAttribute{
 		MarkdownDescription: "Organization identifier",
@@ -40,9 +67,11 @@ func ComputedOrganizationIdSchema() schema.StringAttribute {
 	}
 }
 
+// Project ID
+
 func OptionalImmutableProjectIdSchema() schema.StringAttribute {
 	return schema.StringAttribute{
-		MarkdownDescription: "Project identifier",
+		MarkdownDescription: "Project identifier. Empty or unset means available for all projects.",
 		Computed:            true,
 		Optional:            true,
 		Default:             stringdefault.StaticString(""),
@@ -53,20 +82,17 @@ func OptionalImmutableProjectIdSchema() schema.StringAttribute {
 	}
 }
 
-func RequiredIdentifierSchema(description string) schema.StringAttribute {
-	if len(description) == 0 {
-		description = "Identifier"
-	}
+func RequiredImmutableProjectIdSchema() schema.StringAttribute {
 	return schema.StringAttribute{
-		MarkdownDescription: description,
+		MarkdownDescription: "Project identifier",
 		Required:            true,
 		PlanModifiers: []planmodifier.String{
-			stringplanmodifier.UseStateForUnknown(),
+			stringplanmodifier.RequiresReplace(),
 		},
 	}
 }
 
-func RequiredProjectId() schema.StringAttribute {
+func RequiredProjectIdSchema() schema.StringAttribute {
 	return schema.StringAttribute{
 		MarkdownDescription: "Project identifier",
 		Required:            true,

@@ -23,13 +23,13 @@ data "aria_secret" "example" {
 
 ### Required
 
+- `description` (String) Describe the resource in few sentences
 - `id` (String) Secret identifier
 
 ### Read-Only
 
 - `created_at` (String) Creation date-time
 - `created_by` (String) Ask VMware
-- `description` (String) Describe the secret in few sentences
 - `name` (String) Secret name
 - `org_id` (String) Organization identifier
 - `org_scoped` (Boolean) Scoped to the organization?

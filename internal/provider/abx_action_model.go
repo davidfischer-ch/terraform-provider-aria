@@ -133,8 +133,8 @@ func (self *ABXActionModel) FromAPI(
 		diags.AddError(
 			"Client error",
 			fmt.Sprintf(
-				"Unable to manage ABX action %s, unhandled inputs keys %s",
-				self.Id.ValueString(), strings.Join(inputsKeys, ", ")))
+				"Unable to manage %s, unhandled inputs keys %s",
+				self.String(), strings.Join(inputsKeys, ", ")))
 	}
 
 	constants, constantsDiags := types.SetValueFrom(ctx, types.StringType, constantsIds)
@@ -165,8 +165,8 @@ func (self ABXActionModel) ToAPI(
 		diags.AddError(
 			"Configuration error",
 			fmt.Sprintf(
-				"Unable to manage ABX action %s, dependencies is either null or unknown",
-				self.Id.ValueString()))
+				"Unable to manage %s, dependencies is either null or unknown",
+				self.String()))
 		return ABXActionAPIModel{}, diags
 	}
 
@@ -175,8 +175,8 @@ func (self ABXActionModel) ToAPI(
 		diags.AddError(
 			"Configuration error",
 			fmt.Sprintf(
-				"Unable to manage ABX action %s, constants is either null or unknown",
-				self.Id.ValueString()))
+				"Unable to manage %s, constants is either null or unknown",
+				self.String()))
 		return ABXActionAPIModel{}, diags
 	}
 
@@ -185,8 +185,8 @@ func (self ABXActionModel) ToAPI(
 		diags.AddError(
 			"Configuration error",
 			fmt.Sprintf(
-				"Unable to manage ABX action %s, secrets is either null or unknown",
-				self.Id.ValueString()))
+				"Unable to manage %s, secrets is either null or unknown",
+				self.String()))
 		return ABXActionAPIModel{}, diags
 	}
 

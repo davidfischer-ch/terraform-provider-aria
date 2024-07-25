@@ -188,7 +188,7 @@ resource "aria_custom_resource" "redis" {
 
 ### Optional
 
-- `project_id` (String) Project identifier
+- `project_id` (String) Project identifier. Empty or unset means available for all projects.
 - `schema_type` (String) Type of resource, one of ABX_USER_DEFINED (and that's all, maybe)
 - `status` (String) Resource status, one of DRAFT, ON, or RELEASED
 
@@ -214,7 +214,7 @@ Required:
 
 Required:
 
-- `description` (String) Description
+- `description` (String) Describe the resource in few sentences
 - `name` (String) Name
 - `type` (String) Type
 
@@ -224,7 +224,7 @@ Required:
 
 Required:
 
-- `description` (String) Description
+- `description` (String) Describe the resource in few sentences
 - `name` (String) Name
 - `type` (String) Type
 
@@ -247,7 +247,7 @@ Required:
 
 Required:
 
-- `description` (String) Description
+- `description` (String) Describe the resource in few sentences
 - `name` (String) Name
 - `type` (String) Type
 
@@ -257,7 +257,7 @@ Required:
 
 Required:
 
-- `description` (String) Description
+- `description` (String) Describe the resource in few sentences
 - `name` (String) Name
 - `type` (String) Type
 
@@ -268,7 +268,7 @@ Required:
 
 Required:
 
-- `description` (String) Description
+- `description` (String) Describe the resource in few sentences
 - `encrypted` (Boolean) Encrypted?
 - `name` (String) Name
 - `read_only` (Boolean) Make the field read-only (in the form)
@@ -317,7 +317,7 @@ Required:
 
 Required:
 
-- `description` (String) Description
+- `description` (String) Describe the resource in few sentences
 - `name` (String) Name
 - `type` (String) Type
 
@@ -327,7 +327,7 @@ Required:
 
 Required:
 
-- `description` (String) Description
+- `description` (String) Describe the resource in few sentences
 - `name` (String) Name
 - `type` (String) Type
 
@@ -350,7 +350,7 @@ Required:
 
 Required:
 
-- `description` (String) Description
+- `description` (String) Describe the resource in few sentences
 - `name` (String) Name
 - `type` (String) Type
 
@@ -360,6 +360,6 @@ Required:
 
 Required:
 
-- `description` (String) Description
+- `description` (String) Describe the resource in few sentences
 - `name` (String) Name
 - `type` (String) Type

@@ -23,10 +23,7 @@ func PropertySchema() schema.NestedAttributeObject {
 				MarkdownDescription: "Title",
 				Required:            true,
 			},
-			"description": schema.StringAttribute{
-				MarkdownDescription: "Description",
-				Required:            true,
-			},
+			"description": RequiredDescriptionSchema(),
 			"type": schema.StringAttribute{
 				MarkdownDescription: "Type, one of string, integer, number or boolean. " +
 					"(handling object and array is not yet implemented)",
