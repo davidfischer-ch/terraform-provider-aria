@@ -8,7 +8,7 @@ import (
 )
 
 func CatalogTypeDataSourceSchema() schema.Schema {
-    resp.Schema = schema.Schema{
+    return schema.Schema{
         MarkdownDescription: "Catalog type data source",
         Attributes: map[string]schema.Attribute{
             "id": schema.StringAttribute{
