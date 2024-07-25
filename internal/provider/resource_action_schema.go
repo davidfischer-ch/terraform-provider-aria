@@ -4,6 +4,7 @@
 package provider
 
 import (
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
@@ -47,6 +48,7 @@ func ResourceActionSchema() schema.Schema {
 			},
 			"runnable_item": ResourceActionRunnableSchema("Action's runnable"),
 			"criteria": schema.StringAttribute{
+				CustomType:          jsontypes.NormalizedType{},
 				MarkdownDescription: "Filtering criteria (JSON encoded)",
 				Optional:            true,
 			},

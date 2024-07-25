@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -21,7 +22,7 @@ type ResourceActionModel struct {
 	ProviderName types.String                `tfsdk:"provider_name"`
 	ResourceType types.String                `tfsdk:"resource_type"`
 	RunnableItem ResourceActionRunnableModel `tfsdk:"runnable_item"`
-	Criteria     types.String                `tfsdk:"criteria"`
+	Criteria     jsontypes.Normalized        `tfsdk:"criteria"`
 	Status       types.String                `tfsdk:"status"`
 
 	// Of type CustomFormModel
@@ -78,7 +79,7 @@ func (self *ResourceActionModel) FromAPI(
 
 	// Criteria API data -> JSON Encoded
 	if raw.Criteria == nil {
-		self.Criteria = types.StringNull()
+		self.Criteria = jsontypes.NewNormalizedNull()
 	} else {
 		criteriaJson, err := json.Marshal(raw.Criteria)
 		if err != nil {
@@ -86,7 +87,7 @@ func (self *ResourceActionModel) FromAPI(
 				"Client error",
 				fmt.Sprintf("Unable to JSON encode %s criteria, got error: %s", self.String(), err))
 		} else {
-			self.Criteria = types.StringValue(string(criteriaJson))
+			self.Criteria = jsontypes.NewNormalizedValue(string(criteriaJson))
 		}
 	}
 
@@ -117,12 +118,7 @@ func (self ResourceActionModel) ToAPI(
 	if self.Criteria.IsNull() {
 		criteriaRaw = nil
 	} else {
-		err := json.Unmarshal([]byte(self.Criteria.ValueString()), &criteriaRaw)
-		if err != nil {
-			diags.AddError(
-				"Client error",
-				fmt.Sprintf("Unable to JSON decode %s criteria, got error: %s", self.String(), err))
-		}
+		diags.Append(self.Criteria.Unmarshal(&criteriaRaw)...)
 	}
 
 	return ResourceActionAPIModel{

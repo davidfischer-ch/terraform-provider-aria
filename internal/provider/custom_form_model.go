@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -15,16 +16,16 @@ import (
 
 // CustomFormModel describes the resource data model.
 type CustomFormModel struct {
-	Id         types.String `tfsdk:"id"`
-	Name       types.String `tfsdk:"name"`
-	Type       types.String `tfsdk:"type"`
-	Form       types.String `tfsdk:"form"` // TODO A struct to define this attribute
-	FormFormat types.String `tfsdk:"form_format"`
-	Styles     types.String `tfsdk:"styles"`
-	SourceId   types.String `tfsdk:"source_id"`
-	SourceType types.String `tfsdk:"source_type"`
-	Tenant     types.String `tfsdk:"tenant"`
-	Status     types.String `tfsdk:"status"`
+	Id         types.String         `tfsdk:"id"`
+	Name       types.String         `tfsdk:"name"`
+	Type       types.String         `tfsdk:"type"`
+	Form       jsontypes.Normalized `tfsdk:"form"` // TODO A struct to define this attribute
+	FormFormat types.String         `tfsdk:"form_format"`
+	Styles     types.String         `tfsdk:"styles"`
+	SourceId   types.String         `tfsdk:"source_id"`
+	SourceType types.String         `tfsdk:"source_type"`
+	Tenant     types.String         `tfsdk:"tenant"`
+	Status     types.String         `tfsdk:"status"`
 }
 
 // CustomFormAPIModel describes the resource API model.
@@ -55,17 +56,14 @@ func (self *CustomFormModel) FromAPI(
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
 	self.Type = types.StringValue(raw.Type)
+	self.Form = jsontypes.NewNormalizedValue(raw.Form)
 	self.FormFormat = types.StringValue(raw.FormFormat)
 	self.Styles = types.StringValue(raw.Styles)
 	self.SourceId = types.StringValue(raw.SourceId)
 	self.SourceType = types.StringValue(raw.SourceType)
 	self.Tenant = types.StringValue(raw.Tenant)
 	self.Status = types.StringValue(raw.Status)
-
-	// Deserialize then serialize form to stabilize ordering of attributes
-	form, diags := JSONRencode(raw.Form, self.String()+" form")
-	self.Form = types.StringValue(form)
-	return diags
+	return diag.Diagnostics{}
 }
 
 func (self *CustomFormModel) ToAPI(

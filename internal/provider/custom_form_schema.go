@@ -4,6 +4,7 @@
 package provider
 
 import (
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
@@ -42,8 +43,8 @@ func CustomFormSchema() schema.SingleNestedAttribute {
 					stringvalidator.OneOf([]string{"requestForm"}...),
 				},
 			},
-			// FIXME https://github.com/davidfischer-ch/terraform-provider-aria/issues/50
 			"form": schema.StringAttribute{
+				CustomType:          jsontypes.NormalizedType{},
 				MarkdownDescription: "Form content in JSON",
 				Computed:            true,
 				Optional:            true,
