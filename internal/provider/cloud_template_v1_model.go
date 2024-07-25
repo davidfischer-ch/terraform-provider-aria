@@ -11,8 +11,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-// CloudTemplateModel describes the resource data model.
-type CloudTemplateModel struct {
+// CloudTemplateV1Model describes the resource data model.
+type CloudTemplateV1Model struct {
 	Id              types.String `tfsdk:"id"`
 	Name            types.String `tfsdk:"name"`
 	Description     types.String `tfsdk:"description"`
@@ -25,8 +25,8 @@ type CloudTemplateModel struct {
 	OrgId     types.String `tfsdk:"org_id"`
 }
 
-// CloudTemplateAPIModel describes the resource API model.
-type CloudTemplateAPIModel struct {
+// CloudTemplateV1APIModel describes the resource API model.
+type CloudTemplateV1APIModel struct {
 	Id              string `json:"id,omitempty"`
 	Name            string `json:"name"`
 	Description     string `json:"description"`
@@ -39,13 +39,13 @@ type CloudTemplateAPIModel struct {
 	OrgId     string `json:"orgId"`
 }
 
-func (self CloudTemplateModel) String() string {
+func (self CloudTemplateV1Model) String() string {
 	return fmt.Sprintf("Cloud Template v1 %s", self.Name.ValueString())
 }
 
-func (self *CloudTemplateModel) FromAPI(
+func (self *CloudTemplateV1Model) FromAPI(
 	ctx context.Context,
-	raw CloudTemplateAPIModel,
+	raw CloudTemplateV1APIModel,
 ) diag.Diagnostics {
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
@@ -58,15 +58,15 @@ func (self *CloudTemplateModel) FromAPI(
 	return diags
 }
 
-func (self CloudTemplateModel) ToAPI(
+func (self CloudTemplateV1Model) ToAPI(
 	ctx context.Context,
-) (CloudTemplateAPIModel, diag.Diagnostics) {
+) (CloudTemplateV1APIModel, diag.Diagnostics) {
 
 	inputsRaw, diags := self.Inputs.ToAPI(ctx)
 	resourcesRaw, resourcesDiags := self.Resources.ToAPI(ctx)
 	diags.Append(resourcesDiags...)
 
-	return CloudTemplateAPIModel{
+	return CloudTemplateV1APIModel{
 		Id:          self.Id.ValueString(),
 		Name:        self.Name.ValueString(),
 		Description: CleanString(self.Description.ValueString()),

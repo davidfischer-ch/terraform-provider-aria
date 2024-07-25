@@ -225,7 +225,7 @@ func (self *AriaProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewABXActionResource,
 		NewABXConstantResource,
 		NewABXSensitiveConstantResource,
-		NewCloudTemplateResource,
+		NewCloudTemplateV1Resource,
 		NewCustomNamingResource,
 		NewCustomResourceResource,
 		NewIconResource,

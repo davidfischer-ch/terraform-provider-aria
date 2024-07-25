@@ -14,19 +14,19 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &CloudTemplateResource{}
-var _ resource.ResourceWithImportState = &CloudTemplateResource{}
+var _ resource.Resource = &CloudTemplateV1Resource{}
+var _ resource.ResourceWithImportState = &CloudTemplateV1Resource{}
 
-func NewCloudTemplateResource() resource.Resource {
-	return &CloudTemplateResource{}
+func NewCloudTemplateV1Resource() resource.Resource {
+	return &CloudTemplateV1Resource{}
 }
 
-// CloudTemplateResource defines the resource implementation.
-type CloudTemplateResource struct {
+// CloudTemplateV1Resource defines the resource implementation.
+type CloudTemplateV1Resource struct {
 	client *resty.Client
 }
 
-func (self *CloudTemplateResource) Metadata(
+func (self *CloudTemplateV1Resource) Metadata(
 	ctx context.Context,
 	req resource.MetadataRequest,
 	resp *resource.MetadataResponse,
@@ -34,7 +34,7 @@ func (self *CloudTemplateResource) Metadata(
 	resp.TypeName = req.ProviderTypeName + "_cloud_template_v1"
 }
 
-func (self *CloudTemplateResource) Schema(
+func (self *CloudTemplateV1Resource) Schema(
 	ctx context.Context,
 	req resource.SchemaRequest,
 	resp *resource.SchemaResponse,
@@ -42,7 +42,7 @@ func (self *CloudTemplateResource) Schema(
 	resp.Schema = CloudTemplateV1Schema()
 }
 
-func (self *CloudTemplateResource) Configure(
+func (self *CloudTemplateV1Resource) Configure(
 	ctx context.Context,
 	req resource.ConfigureRequest,
 	resp *resource.ConfigureResponse,
@@ -50,13 +50,13 @@ func (self *CloudTemplateResource) Configure(
 	self.client = GetResourceClient(ctx, req, resp)
 }
 
-func (self *CloudTemplateResource) Create(
+func (self *CloudTemplateV1Resource) Create(
 	ctx context.Context,
 	req resource.CreateRequest,
 	resp *resource.CreateResponse,
 ) {
 	// Read Terraform plan data into the model
-	var template CloudTemplateModel
+	var template CloudTemplateV1Model
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &template)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -87,20 +87,20 @@ func (self *CloudTemplateResource) Create(
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", template.String()))
 }
 
-func (self *CloudTemplateResource) Read(
+func (self *CloudTemplateV1Resource) Read(
 	ctx context.Context,
 	req resource.ReadRequest,
 	resp *resource.ReadResponse,
 ) {
 	// Read Terraform prior state data into the model
-	var template CloudTemplateModel
+	var template CloudTemplateV1Model
 	resp.Diagnostics.Append(req.State.Get(ctx, &template)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	templateId := template.Id.ValueString()
-	var templateRaw CloudTemplateAPIModel
+	var templateRaw CloudTemplateV1APIModel
 	response, err := self.client.R().
 		SetQueryParam("apiVersion", BLUEPRINT_API_VERSION).
 		SetResult(&templateRaw).
@@ -127,13 +127,13 @@ func (self *CloudTemplateResource) Read(
 	resp.Diagnostics.Append(resp.State.Set(ctx, &template)...)
 }
 
-func (self *CloudTemplateResource) Update(
+func (self *CloudTemplateV1Resource) Update(
 	ctx context.Context,
 	req resource.UpdateRequest,
 	resp *resource.UpdateResponse,
 ) {
 	// Read Terraform plan data into the model
-	var template CloudTemplateModel
+	var template CloudTemplateV1Model
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &template)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -166,13 +166,13 @@ func (self *CloudTemplateResource) Update(
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", template.String()))
 }
 
-func (self *CloudTemplateResource) Delete(
+func (self *CloudTemplateV1Resource) Delete(
 	ctx context.Context,
 	req resource.DeleteRequest,
 	resp *resource.DeleteResponse,
 ) {
 	// Read Terraform prior state data into the model
-	var template CloudTemplateModel
+	var template CloudTemplateV1Model
 	resp.Diagnostics.Append(req.State.Get(ctx, &template)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -194,7 +194,7 @@ func (self *CloudTemplateResource) Delete(
 	)
 }
 
-func (self *CloudTemplateResource) ImportState(
+func (self *CloudTemplateV1Resource) ImportState(
 	ctx context.Context,
 	req resource.ImportStateRequest,
 	resp *resource.ImportStateResponse,
