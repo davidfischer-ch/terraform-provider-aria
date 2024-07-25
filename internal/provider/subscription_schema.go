@@ -46,9 +46,9 @@ func SubscriptionSchema() schema.Schema {
 				Required:            true,
 			},
 			"recover_runnable_type": schema.StringAttribute{
-				MarkdownDescription: "Recovery runnable type, either extensibility.abx or "+
+				MarkdownDescription: "Recovery runnable type, either extensibility.abx or " +
 					"extensibility.vro",
-				Optional:            true,
+				Optional: true,
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{"extensibility.abx", "extensibility.vro"}...),
 				},
