@@ -23,7 +23,7 @@ data "aria_secret" "example" {
 
 ### Required
 
-- `id` (String) Secret identifier
+- `id` (String) Identifier
 
 ### Read-Only
 
