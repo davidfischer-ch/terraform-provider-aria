@@ -11,10 +11,7 @@ func CatalogTypeDataSourceSchema() schema.Schema {
 	return schema.Schema{
 		MarkdownDescription: "Catalog type data source",
 		Attributes: map[string]schema.Attribute{
-			"id": schema.StringAttribute{
-				MarkdownDescription: "Identifier",
-				Required:            true,
-			},
+			"id": RequiredIdentifierSchema(),
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Type name",
 				Computed:            true,

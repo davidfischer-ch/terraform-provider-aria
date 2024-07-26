@@ -12,10 +12,7 @@ func SecretDataSourceSchema() schema.Schema {
 	return schema.Schema{
 		MarkdownDescription: "Secret data source",
 		Attributes: map[string]schema.Attribute{
-			"id": schema.StringAttribute{
-				MarkdownDescription: "Secret identifier",
-				Required:            true,
-			},
+			"id": RequiredIdentifierSchema(),
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Secret name",
 				Computed:            true,

@@ -19,5 +19,7 @@ const ICON_API_VERSION = ""
 
 const POLICY_API_VERSION = "2020-08-25"
 
+const PROJECT_API_VERSION = "2019-01-15"
+
 // TODO then ensure its used (check related TODOs).
 const PLATFORM_API_VERSION = ""
