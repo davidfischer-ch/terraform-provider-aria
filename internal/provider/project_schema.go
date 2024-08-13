@@ -1,6 +1,8 @@
 // Copyright (c) State of Geneva (Switzerland)
 // SPDX-License-Identifier: MPL-2.0
 
+// Inspir: https://github.com/vmware/vra-sdk-go/blob/main/pkg/models/iaa_s_project_specification.go.
+
 package provider
 
 import (
