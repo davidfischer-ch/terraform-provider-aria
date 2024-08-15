@@ -16,20 +16,20 @@ type CloudTemplateResourceModel struct {
 	Name types.String `tfsdk:"name"`
 	Type types.String `tfsdk:"type"`
 
-	//Metadata   CloudTemplateResourceMetadataModel   `json:"metadata"`
-	//Properties CloudTemplateResourcePropertiesModel `json:"properties"`
+	/*Metadata   CloudTemplateResourceMetadataModel   `json:"metadata"`*/
+	/*Properties CloudTemplateResourcePropertiesModel `json:"properties"`*/
 
 	AllocatePerInstance types.Bool `tfsdk:"allocate_per_instance"`
 }
 
 // CloudTemplateResourceAPIModel describes the resource API model.
 type CloudTemplateResourceAPIModel struct {
-	Type string `json:"type"`
+	Type string `yaml:"type"`
 
-	//Metadata   CloudTemplateResourceMetadataModel   `json:"metadata"`
-	//Properties CloudTemplateResourcePropertiesModel `json:"properties"`
+	/*Metadata   CloudTemplateResourceMetadataModel   `json:"metadata"`*/
+	/*Properties CloudTemplateResourcePropertiesModel `json:"properties"`*/
 
-	AllocatePerInstance *bool `tfsdk:"allocate_per_instance,omitempty"`
+	AllocatePerInstance *bool `yaml:"allocatePerInstance,omitempty"`
 }
 
 func (self CloudTemplateResourceModel) String() string {
@@ -47,8 +47,8 @@ func (self *CloudTemplateResourceModel) FromAPI(
 	self.Name = types.StringValue(name)
 	self.Type = types.StringValue(raw.Type)
 
-	// self.Metadata =
-	// self.Properties =
+	/*self.Metadata =*/
+	/*self.Properties =*/
 
 	self.AllocatePerInstance = types.BoolPointerValue(raw.AllocatePerInstance)
 
@@ -64,8 +64,8 @@ func (self CloudTemplateResourceModel) ToAPI(
 	return self.Name.ValueString(),
 		CloudTemplateResourceAPIModel{
 			Type: self.Type.ValueString(),
-			// Metadata:
-			// Properties:
+			/*Metadata:*/
+			/*Properties:*/
 			AllocatePerInstance: self.AllocatePerInstance.ValueBoolPointer(),
 		},
 		diags

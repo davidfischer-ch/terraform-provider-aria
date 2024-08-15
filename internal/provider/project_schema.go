@@ -14,7 +14,7 @@ import (
 
 func ProjectSchema() schema.Schema {
 	return schema.Schema{
-		MarkdownDescription: "Project resource",
+		MarkdownDescription: "Project resource (WORK IN PROGRESS, DO NOT USE)",
 		Attributes: map[string]schema.Attribute{
 			"id": ComputedIdentifierSchema(""),
 			"name": schema.StringAttribute{

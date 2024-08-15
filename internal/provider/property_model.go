@@ -5,6 +5,7 @@ package provider
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -24,31 +25,33 @@ type PropertyModel struct {
 	RecreateOnUpdate types.Bool   `tfsdk:"recreate_on_update"`
 
 	// Specifications
-	Minimum   types.Int64          `tfsdk:"minimum"`
-	Maximum   types.Int64          `tfsdk:"maximum"`
-	MinLength types.Int32          `tfsdk:"min_length"`
-	MaxLength types.Int32          `tfsdk:"max_length"`
-	Pattern   types.String         `tfsdk:"pattern"`
-	OneOf     []PropertyOneOfModel `tfsdk:"one_of"`
+	Minimum   types.Int64  `tfsdk:"minimum"`
+	Maximum   types.Int64  `tfsdk:"maximum"`
+	MinLength types.Int32  `tfsdk:"min_length"`
+	MaxLength types.Int32  `tfsdk:"max_length"`
+	Pattern   types.String `tfsdk:"pattern"`
+	/*Items*/
+	OneOf []PropertyOneOfModel `tfsdk:"one_of"`
 }
 
 // PropertyAPIModel describes the resource API model.
 type PropertyAPIModel struct {
-	Title            string `json:"title"`
-	Description      string `json:"description"`
-	Type             string `json:"type"`
-	Default          any    `json:"default,omitempty"`
-	Encrypted        bool   `json:"encrypted"`
-	ReadOnly         bool   `tfsdk:"readOnly"`
-	RecreateOnUpdate bool   `json:"recreateOnUpdate"`
+	Title            string `json:"title" yaml:"title"`
+	Description      string `json:"description" yaml:"description"`
+	Type             string `json:"type" yaml:"type"`
+	Default          any    `json:"default,omitempty" yaml:"default"`
+	Encrypted        bool   `json:"encrypted" yaml:"encrypted"`
+	ReadOnly         bool   `json:"readOnly" yaml:"readOnly"`
+	RecreateOnUpdate bool   `json:"recreateOnUpdate" yaml:"recreateOnUpdate"`
 
 	// Specifications
-	Minimum   *int64                  `json:"minimum,omitempty"`
-	Maximum   *int64                  `json:"maximum,omitempty"`
-	MinLength *int32                  `json:"minLength,omitempty"`
-	MaxLength *int32                  `json:"maxLength,omitempty"`
-	Pattern   string                  `json:"pattern"`
-	OneOf     []PropertyOneOfAPIModel `json:"oneOf,omitempty"`
+	Minimum   *int64  `json:"minimum,omitempty" yaml:"minimum,omitempty"`
+	Maximum   *int64  `json:"maximum,omitempty" yaml:"maximum,omitempty"`
+	MinLength *int32  `json:"minLength,omitempty" yaml:"minLength,omitempty"`
+	MaxLength *int32  `json:"maxLength,omitempty" yaml:"maxLength,omitempty"`
+	Pattern   *string `json:"pattern,omitempty" yaml:"pattern,omitempty"`
+	/*Items*/
+	OneOf []PropertyOneOfAPIModel `json:"oneOf,omitempty" yaml:"oneOf,omitempty"`
 }
 
 func (self PropertyModel) String() string {
@@ -74,7 +77,7 @@ func (self *PropertyModel) FromAPI(
 	self.Maximum = types.Int64PointerValue(raw.Maximum)
 	self.MinLength = types.Int32PointerValue(raw.MinLength)
 	self.MaxLength = types.Int32PointerValue(raw.MaxLength)
-	self.Pattern = types.StringValue(raw.Pattern)
+	self.Pattern = types.StringPointerValue(raw.Pattern)
 
 	if raw.OneOf == nil {
 		self.OneOf = nil
@@ -93,6 +96,18 @@ func (self *PropertyModel) FromAPI(
 		// Convert default value from any to string, warn if default type mismatch
 		self.Default = types.StringValue(fmt.Sprintf("%s", raw.Default)) // Messy conversion first
 		switch raw.Type {
+		case "array":
+			// Can be anything that will be converted in JSON
+			defaultJSON, err := json.Marshal(raw.Default)
+			if err == nil {
+				self.Default = types.StringValue(string(defaultJSON))
+			} else {
+				diags.AddError(
+					"Configuration warning",
+					fmt.Sprintf(
+						"Unable to JSON encode property %s default \"%s\", got error: %s",
+						raw.Title, raw.Default, err))
+			}
 		case "boolean":
 			// Must be a boolean
 			if defaultBool, ok := raw.Default.(bool); ok {
@@ -127,6 +142,18 @@ func (self *PropertyModel) FromAPI(
 					fmt.Sprintf(
 						"Property %s default \"%s\" is not a number",
 						raw.Title, raw.Default))
+			}
+		case "object":
+			// Can be anything that will be converted in JSON
+			defaultJSON, err := json.Marshal(raw.Default)
+			if err == nil {
+				self.Default = types.StringValue(string(defaultJSON))
+			} else {
+				diags.AddError(
+					"Configuration warning",
+					fmt.Sprintf(
+						"Unable to JSON encode property %s default \"%s\", got error: %s",
+						raw.Title, raw.Default, err))
 			}
 		case "string":
 			// Must be a string
@@ -168,6 +195,9 @@ func (self PropertyModel) ToAPI(
 		var err error
 		defaultString := self.Default.ValueString()
 		switch typeRaw {
+		case "array":
+			// Can be anything that will be decoded from JSON
+			err = json.Unmarshal([]byte(defaultString), &defaultRaw)
 		case "boolean":
 			// Must be a boolean
 			defaultRaw, err = strconv.ParseBool(defaultString)
@@ -179,6 +209,9 @@ func (self PropertyModel) ToAPI(
 			if defaultRaw, err = strconv.ParseInt(defaultString, 10, 64); err != nil {
 				defaultRaw, err = strconv.ParseFloat(defaultString, 64)
 			}
+		case "object":
+			// Can be anything that will be decoded from JSON
+			err = json.Unmarshal([]byte(defaultString), &defaultRaw)
 		case "string":
 			// Nothing to do
 			defaultRaw = defaultString
@@ -228,7 +261,7 @@ func (self PropertyModel) ToAPI(
 			Maximum:          self.Maximum.ValueInt64Pointer(),
 			MinLength:        self.MinLength.ValueInt32Pointer(),
 			MaxLength:        self.MaxLength.ValueInt32Pointer(),
-			Pattern:          self.Pattern.ValueString(),
+			Pattern:          self.Pattern.ValueStringPointer(),
 			OneOf:            oneOfRawList,
 		},
 		diags

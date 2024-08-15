@@ -127,12 +127,15 @@ Required:
 - `read_only` (Boolean) Make the field read-only (in the form)
 - `recreate_on_update` (Boolean) Mark this field as writable once (resource will be recreated on change)
 - `title` (String) Title
-- `type` (String) Type, one of string, integer, number or boolean. (handling object and array is not yet implemented)
+- `type` (String) Type, one of array, boolean, integer, object, number or string.
 
 Optional:
 
 - `default` (String) Default value as string (will be seamlessly converted to appropriate type).
-This attribute should be a dynamic type, but Terraform SDK returns this issue:
+The string should be a JSON for arrays and objects.
+
+We should have implemented this attribute as a dynamic type (and not string).
+Unfortunately Terraform SDK returns this issue:
 Dynamic types inside of collections are not currently supported in terraform-plugin-framework.
 If underlying dynamic values are required, replace the 'properties' attribute definition with DynamicAttribute instead.
 - `max_length` (Number) Maximum length (valid for a string)

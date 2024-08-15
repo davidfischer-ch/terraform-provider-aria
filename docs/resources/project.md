@@ -3,12 +3,12 @@
 page_title: "aria_project Resource - aria"
 subcategory: ""
 description: |-
-  Project resource
+  Project resource (WORK IN PROGRESS, DO NOT USE)
 ---
 
 # aria_project (Resource)
 
-Project resource
+Project resource (WORK IN PROGRESS, DO NOT USE)
 
 
 

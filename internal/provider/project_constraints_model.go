@@ -7,8 +7,7 @@ import (
 	"context"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	/*"github.com/hashicorp/terraform-plugin-framework/types"*/
-)
+	/*"github.com/hashicorp/terraform-plugin-framework/types"*/)
 
 // ProjectConstraintsModel describes the resource data model.
 type ProjectConstraintsModel struct {
