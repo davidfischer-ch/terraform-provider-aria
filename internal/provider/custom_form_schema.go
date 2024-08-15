@@ -44,8 +44,8 @@ func CustomFormSchema() schema.SingleNestedAttribute {
 				},
 			},
 			"form": schema.StringAttribute{
-				CustomType:          jsontypes.NormalizedType{},
 				MarkdownDescription: "Form content in JSON",
+				CustomType:          jsontypes.NormalizedType{},
 				Computed:            true,
 				Optional:            true,
 				PlanModifiers: []planmodifier.String{

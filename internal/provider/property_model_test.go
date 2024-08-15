@@ -84,11 +84,10 @@ func TestPropertyModel_Default_FromAPI(t *testing.T) {
 			propertyInternal: types.StringValue("some text"),
 		},
 		{
-			name:             "array value (array)",
+			name:             "array value (nil)",
 			propertyType:     "array",
-			propertyRaw:      []int{1, 2, 3},
-			propertyInternal: types.StringValue("[%!s(int=1) %!s(int=2) %!s(int=3)]"),
-			errorMessage:     "type array is not yet implemented",
+			propertyRaw:      nil,
+			propertyInternal: types.StringNull(),
 		},
 	}
 
@@ -189,16 +188,16 @@ func TestPropertyModel_Default_ToAPI(t *testing.T) {
 			propertyJson:     "",
 		},
 		{
-			name:             "array value (array)",
+			name:             "array value (string empty)",
 			propertyType:     "array",
-			propertyInternal: types.StringValue("[1, 2, 3]"),
-			errorMessage:     "type array is not yet implemented",
+			propertyInternal: types.StringNull(),
+			propertyRaw:      nil,
+			propertyJson:     "",
 		},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
 			property := PropertyModel{
 				Name:    types.StringValue("p"),
 				Title:   types.StringValue("P"),
@@ -207,7 +206,7 @@ func TestPropertyModel_Default_ToAPI(t *testing.T) {
 			}
 			name, raw, diags := property.ToAPI(context.Background())
 			CheckDiagnostics(t, diags, tc.warningMessage, tc.errorMessage)
-			CheckEqual(t, raw.Default, tc.propertyRaw)
+			CheckDeepEqual(t, raw.Default, tc.propertyRaw)
 			CheckEqual(t, name, "p")
 
 			if !diags.HasError() {
@@ -222,9 +221,8 @@ func TestPropertyModel_Default_ToAPI(t *testing.T) {
 						"\"type\":\"%s\","+
 						"%s"+
 						"\"encrypted\":false,"+
-						"\"ReadOnly\":false,"+
-						"\"recreateOnUpdate\":false,"+
-						"\"pattern\":\"\""+
+						"\"readOnly\":false,"+
+						"\"recreateOnUpdate\":false"+
 						"}",
 						tc.propertyType,
 						tc.propertyJson))

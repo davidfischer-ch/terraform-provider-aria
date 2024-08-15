@@ -25,18 +25,27 @@ func PropertySchema() schema.NestedAttributeObject {
 			},
 			"description": RequiredDescriptionSchema(),
 			"type": schema.StringAttribute{
-				MarkdownDescription: "Type, one of string, integer, number or boolean. " +
-					"(handling object and array is not yet implemented)",
+				MarkdownDescription: "Type, one of array, boolean, integer, object, number or " +
+					"string.",
 				Required: true,
 				Validators: []validator.String{
-					stringvalidator.OneOf([]string{"boolean", "integer", "number", "string"}...),
+					stringvalidator.OneOf([]string{
+						"array",
+						"boolean",
+						"integer",
+						"object",
+						"number",
+						"string",
+					}...),
 				},
 			},
 			"default": schema.StringAttribute{
 				MarkdownDescription: strings.Join([]string{
 					"Default value as string (will be seamlessly converted to appropriate type).",
-					"This attribute should be a dynamic type, but Terraform SDK returns this " +
-						"issue:",
+					"The string should be a JSON for arrays and objects.",
+					"",
+					"We should have implemented this attribute as a dynamic type (and not string).",
+					"Unfortunately Terraform SDK returns this issue:",
 					"Dynamic types inside of collections are not currently supported in " +
 						"terraform-plugin-framework.",
 					"If underlying dynamic values are required, replace the 'properties' " +
@@ -79,6 +88,10 @@ func PropertySchema() schema.NestedAttributeObject {
 				Optional:            true,
 				Default:             stringdefault.StaticString(""),
 			},
+			/*"items": schema.StringAttribute{
+				MarkdownDescription: "Items in JSON"
+				CustomType:
+			}*/
 			"one_of": PropertyOneOfSchema(),
 		},
 	}

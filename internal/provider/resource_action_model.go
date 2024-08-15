@@ -81,13 +81,13 @@ func (self *ResourceActionModel) FromAPI(
 	if raw.Criteria == nil {
 		self.Criteria = jsontypes.NewNormalizedNull()
 	} else {
-		criteriaJson, err := json.Marshal(raw.Criteria)
+		criteriaJSON, err := json.Marshal(raw.Criteria)
 		if err != nil {
 			diags.AddError(
 				"Client error",
 				fmt.Sprintf("Unable to JSON encode %s criteria, got error: %s", self.String(), err))
 		} else {
-			self.Criteria = jsontypes.NewNormalizedValue(string(criteriaJson))
+			self.Criteria = jsontypes.NewNormalizedValue(string(criteriaJSON))
 		}
 	}
 

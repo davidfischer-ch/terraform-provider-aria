@@ -20,21 +20,31 @@ func CheckDiagnostics(
 
 	warnings := diags.Warnings()
 	if warningMessage != "" {
-		detail := warnings[len(warnings)-1].Detail()
-		if strings.Contains(detail, warningMessage) {
-			warnings = diag.Diagnostics{} // Warnings are processed
+		if len(warnings) == 0 {
+			t.Errorf("Message \"%s\" not found, there are no warnings.", warningMessage)
 		} else {
-			t.Errorf("Message \"%s\" not found in latest warning \"%s\".", warningMessage, detail)
+			detail := warnings[len(warnings)-1].Detail()
+			if strings.Contains(detail, warningMessage) {
+				warnings = diag.Diagnostics{} // Warnings are processed
+			} else {
+				t.Errorf(
+					"Message \"%s\" not found in latest warning \"%s\".",
+					warningMessage, detail)
+			}
 		}
 	}
 
 	errors := diags.Errors()
 	if errorMessage != "" {
-		detail := errors[len(errors)-1].Detail()
-		if strings.Contains(detail, errorMessage) {
-			errors = diag.Diagnostics{} // Errors are processed
+		if len(errors) == 0 {
+			t.Errorf("Message \"%s\" not found, there are no errors.", errorMessage)
 		} else {
-			t.Errorf("Message \"%s\" not found in latest error \"%s\".", errorMessage, detail)
+			detail := errors[len(errors)-1].Detail()
+			if strings.Contains(detail, errorMessage) {
+				errors = diag.Diagnostics{} // Errors are processed
+			} else {
+				t.Errorf("Message \"%s\" not found in latest error \"%s\".", errorMessage, detail)
+			}
 		}
 	}
 
@@ -55,12 +65,12 @@ func CheckDiagnostics(
 
 func CheckEqual(t *testing.T, actual interface{}, expected interface{}) {
 	if actual != expected {
-		t.Errorf("Result was incorrect, got: %s, expected %s", actual, expected)
+		t.Errorf("Result was incorrect,\nactual  : %s\nexpected: %s", actual, expected)
 	}
 }
 
 func CheckDeepEqual(t *testing.T, actual interface{}, expected interface{}) {
 	if !reflect.DeepEqual(actual, expected) {
-		t.Errorf("Result was incorrect, got: %s, expected %s", actual, expected)
+		t.Errorf("Result was incorrect,\nactual  : %s\nexpected: %s", actual, expected)
 	}
 }
