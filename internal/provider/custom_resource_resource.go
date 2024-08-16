@@ -145,6 +145,9 @@ func (self *CustomResourceResource) Update(
 		return
 	}
 
+	// FIXME Mutex
+	// FIXME Read resource to retrieve additional actions to keep them untouched
+
 	response, err := self.client.R().
 		SetQueryParam("apiVersion", FORM_API_VERSION).
 		SetBody(resourceRaw).

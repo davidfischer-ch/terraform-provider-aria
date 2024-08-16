@@ -68,17 +68,25 @@ func (self *ResourceActionResource) Create(
 		return
 	}
 
-	response, err := self.client.R().
-		SetQueryParam("apiVersion", FORM_API_VERSION).
-		SetBody(actionRaw).
-		SetResult(&actionRaw).
-		Post("form-service/api/custom/resource-actions")
-	err = handleAPIResponse(ctx, response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to create %s, got error: %s", action.String(), err))
+	resourceId := action.ResourceId.ValueString()
+	if len(resourceId) > 0 {
+		// Custom resource ...
+		resp.Diagnostics.AddError("Client error", "Not yet implemented")
 		return
+	} else {
+		// Native resource ...
+		response, err := self.client.R().
+			SetQueryParam("apiVersion", FORM_API_VERSION).
+			SetBody(actionRaw).
+			SetResult(&actionRaw).
+			Post("form-service/api/custom/resource-actions")
+		err = handleAPIResponse(ctx, response, err, []int{200})
+		if err != nil {
+			resp.Diagnostics.AddError(
+				"Client error",
+				fmt.Sprintf("Unable to create %s, got error: %s", action.String(), err))
+			return
+		}
 	}
 
 	// Save resource action into Terraform state
@@ -100,11 +108,24 @@ func (self *ResourceActionResource) Read(
 	}
 
 	actionId := action.Id.ValueString()
+	resourceId := action.ResourceId.ValueString()
+
+	var actionUrl string
+	if len(resourceId) > 0 {
+		// Custom resource ...
+		actionUrl = fmt.Sprintf(
+			"form-service/api/custom/resource-types/%s/resource-actions/%s",
+			resourceId, actionId)
+	} else {
+		// Native resource ...
+		actionUrl = "form-service/api/custom/resource-actions/" + actionId
+	}
+
 	var actionRaw ResourceActionAPIModel
 	response, err := self.client.R().
 		SetQueryParam("apiVersion", FORM_API_VERSION).
 		SetResult(&actionRaw).
-		Get("form-service/api/custom/resource-actions/" + actionId)
+		Get(actionUrl)
 
 	// Handle gracefully a resource that has vanished on the platform
 	// Beware that some APIs respond with HTTP 404 instead of 403 ...
@@ -145,18 +166,26 @@ func (self *ResourceActionResource) Update(
 		return
 	}
 
-	response, err := self.client.R().
-		SetQueryParam("apiVersion", FORM_API_VERSION).
-		SetBody(actionRaw).
-		SetResult(&actionRaw).
-		Post("form-service/api/custom/resource-actions") // Its not a mistake...
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to update %s, got error: %s", action.String(), err))
+	resourceId := action.ResourceId.ValueString()
+	if len(resourceId) > 0 {
+		// Custom resource ...
+		resp.Diagnostics.AddError("Client error", "Not yet implemented")
 		return
+	} else {
+		// Native resource ...
+		response, err := self.client.R().
+			SetQueryParam("apiVersion", FORM_API_VERSION).
+			SetBody(actionRaw).
+			SetResult(&actionRaw).
+			Post("form-service/api/custom/resource-actions") // Its not a mistake...
+
+		err = handleAPIResponse(ctx, response, err, []int{200})
+		if err != nil {
+			resp.Diagnostics.AddError(
+				"Client error",
+				fmt.Sprintf("Unable to update %s, got error: %s", action.String(), err))
+			return
+		}
 	}
 
 	// Save updated resource action into Terraform state
@@ -182,15 +211,23 @@ func (self *ResourceActionResource) Delete(
 		return
 	}
 
-	resp.Diagnostics.Append(
-		DeleteIt(
-			self.client,
-			ctx,
-			action.String(),
-			"form-service/api/custom/resource-actions/"+actionId,
-			FORM_API_VERSION,
-		)...,
-	)
+	resourceId := action.ResourceId.ValueString()
+	if len(resourceId) > 0 {
+		// Custom resource ...
+		// resp.Diagnostics.AddError("Client error", "Not yet implemented")
+		return
+	} else {
+		// Native resource ...
+		resp.Diagnostics.Append(
+			DeleteIt(
+				self.client,
+				ctx,
+				action.String(),
+				"form-service/api/custom/resource-actions/"+actionId,
+				FORM_API_VERSION,
+			)...,
+		)
+	}
 }
 
 func (self *ResourceActionResource) ImportState(

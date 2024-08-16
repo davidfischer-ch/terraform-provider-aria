@@ -20,6 +20,7 @@ type ResourceActionModel struct {
 	DisplayName  types.String                `tfsdk:"display_name"`
 	Description  types.String                `tfsdk:"description"`
 	ProviderName types.String                `tfsdk:"provider_name"`
+	ResourceId   types.String                `tfsdk:"resource_id"`
 	ResourceType types.String                `tfsdk:"resource_type"`
 	RunnableItem ResourceActionRunnableModel `tfsdk:"runnable_item"`
 	Criteria     jsontypes.Normalized        `tfsdk:"criteria"`

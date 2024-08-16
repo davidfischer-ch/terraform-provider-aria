@@ -27,6 +27,8 @@ type CustomResourceModel struct {
 	Update ResourceActionRunnableModel `tfsdk:"update"`
 	Delete ResourceActionRunnableModel `tfsdk:"delete"`
 
+	AdditionalActions []ResourceActionRunnableModel `tfsdk:"-"`
+
 	ProjectId types.String `tfsdk:"project_id"`
 	OrgId     types.String `tfsdk:"org_id"`
 }
@@ -42,7 +44,8 @@ type CustomResourceAPIModel struct {
 
 	Properties CustomResourcePropertiesAPIModel `json:"properties"`
 
-	MainActions map[string]ResourceActionRunnableAPIModel `json:"mainActions"`
+	MainActions       map[string]ResourceActionRunnableAPIModel `json:"mainActions"`
+	AdditionalActions []ResourceActionRunnableAPIModel          `json:"additionalActions"`
 
 	ProjectId string `json:"projectId"`
 	OrgId     string `json:"orgId"`

@@ -15,7 +15,7 @@ import (
 
 func ResourceActionSchema() schema.Schema {
 	return schema.Schema{
-		MarkdownDescription: "Native resource's action resource",
+		MarkdownDescription: "Resource's action resource (aka Day 2)",
 		Attributes: map[string]schema.Attribute{
 			"id": ComputedIdentifierSchema(""),
 			"name": schema.StringAttribute{
@@ -39,8 +39,15 @@ func ResourceActionSchema() schema.Schema {
 					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
+			"resource_id": schema.StringAttribute{
+				MarkdownDescription: "Resource identifier (required if its a custom resource)",
+				Optional: true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
+			},
 			"resource_type": schema.StringAttribute{
-				MarkdownDescription: "Native resource type",
+				MarkdownDescription: "Resource type",
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
