@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/go-resty/resty/v2"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -23,7 +22,7 @@ func NewProjectResource() resource.Resource {
 
 // ProjectResource defines the resource implementation.
 type ProjectResource struct {
-	client *resty.Client
+	client *AriaClient
 }
 
 func (self *ProjectResource) Metadata(
@@ -68,7 +67,7 @@ func (self *ProjectResource) Create(
 		return
 	}
 
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", PROJECT_API_VERSION).
 		SetQueryParam("validatePrincipals", "true").
 		SetQueryParam("syncPrincipals", "true").
@@ -103,7 +102,7 @@ func (self *ProjectResource) Read(
 
 	ProjectId := Project.Id.ValueString()
 	var ProjectRaw ProjectAPIModel
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", PROJECT_API_VERSION).
 		SetResult(&ProjectRaw).
 		Get("project-service/api/projects/" + ProjectId)
@@ -148,7 +147,7 @@ func (self *ProjectResource) Update(
 		return
 	}
 
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", PROJECT_API_VERSION).
 		SetQueryParam("validatePrincipals", "true").
 		SetQueryParam("syncPrincipals", "true").
@@ -192,8 +191,7 @@ func (self *ProjectResource) Delete(
 	}
 
 	resp.Diagnostics.Append(
-		DeleteIt(
-			self.client,
+		self.client.DeleteIt(
 			ctx,
 			Project.String(),
 			"project-service/api/projects/"+ProjectId,

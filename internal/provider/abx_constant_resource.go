@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/go-resty/resty/v2"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -23,7 +22,7 @@ func NewABXConstantResource() resource.Resource {
 
 // ABXConstantResource defines the resource implementation.
 type ABXConstantResource struct {
-	client *resty.Client
+	client *AriaClient
 }
 
 func (self *ABXConstantResource) Metadata(
@@ -63,7 +62,7 @@ func (self *ABXConstantResource) Create(
 	}
 
 	var constantRaw ABXConstantAPIModel
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", ABX_API_VERSION).
 		SetBody(constant.ToAPI()).
 		SetResult(&constantRaw).
@@ -97,7 +96,7 @@ func (self *ABXConstantResource) Read(
 
 	var constantRaw ABXConstantAPIModel
 	constantId := constant.Id.ValueString()
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", ABX_API_VERSION).
 		SetResult(&constantRaw).
 		Get("abx/api/resources/action-secrets/" + constantId)
@@ -136,7 +135,7 @@ func (self *ABXConstantResource) Update(
 
 	var constantRaw ABXConstantAPIModel
 	constantId := constant.Id.ValueString()
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", ABX_API_VERSION).
 		SetBody(constant.ToAPI()).
 		SetResult(&constantRaw).
@@ -174,8 +173,7 @@ func (self *ABXConstantResource) Delete(
 	}
 
 	resp.Diagnostics.Append(
-		DeleteIt(
-			self.client,
+		self.client.DeleteIt(
 			ctx,
 			constant.String(),
 			"abx/api/resources/action-secrets/"+constantId,

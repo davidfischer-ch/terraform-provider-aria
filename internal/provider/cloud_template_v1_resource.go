@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/go-resty/resty/v2"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -23,7 +22,7 @@ func NewCloudTemplateV1Resource() resource.Resource {
 
 // CloudTemplateV1Resource defines the resource implementation.
 type CloudTemplateV1Resource struct {
-	client *resty.Client
+	client *AriaClient
 }
 
 func (self *CloudTemplateV1Resource) Metadata(
@@ -68,7 +67,7 @@ func (self *CloudTemplateV1Resource) Create(
 		return
 	}
 
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", BLUEPRINT_API_VERSION).
 		SetBody(templateRaw).
 		SetResult(&templateRaw).
@@ -101,7 +100,7 @@ func (self *CloudTemplateV1Resource) Read(
 
 	templateId := template.Id.ValueString()
 	var templateRaw CloudTemplateV1APIModel
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", BLUEPRINT_API_VERSION).
 		SetResult(&templateRaw).
 		Get("blueprint/api/blueprints/" + templateId)
@@ -146,7 +145,7 @@ func (self *CloudTemplateV1Resource) Update(
 		return
 	}
 
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", BLUEPRINT_API_VERSION).
 		SetBody(templateRaw).
 		SetResult(&templateRaw).
@@ -184,8 +183,7 @@ func (self *CloudTemplateV1Resource) Delete(
 	}
 
 	resp.Diagnostics.Append(
-		DeleteIt(
-			self.client,
+		self.client.DeleteIt(
 			ctx,
 			template.String(),
 			"blueprint/api/blueprints/"+templateId,

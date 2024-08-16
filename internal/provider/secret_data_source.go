@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/go-resty/resty/v2"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 )
 
@@ -20,7 +19,7 @@ func NewSecretDataSource() datasource.DataSource {
 
 // SecretDataSource defines the data source implementation.
 type SecretDataSource struct {
-	client *resty.Client
+	client *AriaClient
 }
 
 func (self *SecretDataSource) Metadata(
@@ -61,7 +60,7 @@ func (self *SecretDataSource) Read(
 
 	var secretRaw SecretAPIModel
 	secretId := secret.Id.ValueString()
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		// TODO SetQueryParam("apiVersion", PLATFORM_API_VERSION).
 		SetResult(&secretRaw).
 		Get("/platform/api/secrets/" + secretId)

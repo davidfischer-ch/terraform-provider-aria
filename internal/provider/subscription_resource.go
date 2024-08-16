@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/go-resty/resty/v2"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -23,7 +22,7 @@ func NewSubscriptionResource() resource.Resource {
 
 // SubscriptionResource defines the resource implementation.
 type SubscriptionResource struct {
-	client *resty.Client
+	client *AriaClient
 }
 
 func (self *SubscriptionResource) Metadata(
@@ -70,7 +69,7 @@ func (self *SubscriptionResource) Create(
 		return
 	}
 
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		// TODO SetQueryParam("apiVersion", EVENT_BROKER_API_VERSION).
 		SetBody(subscriptionRaw).
 		Post("event-broker/api/subscriptions")
@@ -83,7 +82,7 @@ func (self *SubscriptionResource) Create(
 	}
 
 	// Read (using API) to retrieve the subscription content (and not empty stuff)
-	response, err = self.client.R().
+	response, err = self.client.Client.R().
 		// TODO SetQueryParam("apiVersion", EVENT_BROKER_API_VERSION).
 		SetResult(&subscriptionRaw).
 		Get("event-broker/api/subscriptions/" + subscriptionId)
@@ -116,7 +115,7 @@ func (self *SubscriptionResource) Read(
 
 	subscriptionId := subscription.Id.ValueString()
 	var subscriptionRaw SubscriptionAPIModel
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		// TODO SetQueryParam("apiVersion", EVENT_BROKER_API_VERSION).
 		SetResult(&subscriptionRaw).
 		Get("event-broker/api/subscriptions/" + subscriptionId)
@@ -161,7 +160,7 @@ func (self *SubscriptionResource) Update(
 		return
 	}
 
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		// TODO SetQueryParam("apiVersion", EVENT_BROKER_API_VERSION).
 		SetBody(subscriptionRaw).
 		Post("event-broker/api/subscriptions")
@@ -174,7 +173,7 @@ func (self *SubscriptionResource) Update(
 	}
 
 	// Read (using API) to retrieve the subscription content (and not empty stuff)
-	response, err = self.client.R().
+	response, err = self.client.Client.R().
 		SetResult(&subscriptionRaw).
 		Get("event-broker/api/subscriptions/" + subscriptionId)
 
@@ -211,8 +210,7 @@ func (self *SubscriptionResource) Delete(
 	}
 
 	resp.Diagnostics.Append(
-		DeleteIt(
-			self.client,
+		self.client.DeleteIt(
 			ctx,
 			subscription.String(),
 			"event-broker/api/subscriptions/"+subscriptionId,

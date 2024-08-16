@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/go-resty/resty/v2"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -23,7 +22,7 @@ func NewABXActionResource() resource.Resource {
 
 // ABXActionResource defines the resource implementation.
 type ABXActionResource struct {
-	client *resty.Client
+	client *AriaClient
 }
 
 func (self *ABXActionResource) Metadata(
@@ -68,7 +67,7 @@ func (self *ABXActionResource) Create(
 		return
 	}
 
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", ABX_API_VERSION).
 		SetBody(actionRaw).
 		SetResult(&actionRaw).
@@ -102,7 +101,7 @@ func (self *ABXActionResource) Read(
 	actionId := action.Id.ValueString()
 	projectId := action.ProjectId.ValueString()
 	var actionRaw ABXActionAPIModel
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", ABX_API_VERSION).
 		SetResult(&actionRaw).
 		Get(fmt.Sprintf("abx/api/resources/actions/%s?projectId=%s", actionId, projectId))
@@ -148,7 +147,7 @@ func (self *ABXActionResource) Update(
 		return
 	}
 
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", ABX_API_VERSION).
 		SetBody(actionRaw).
 		SetResult(&actionRaw).
@@ -187,8 +186,7 @@ func (self *ABXActionResource) Delete(
 	}
 
 	resp.Diagnostics.Append(
-		DeleteIt(
-			self.client,
+		self.client.DeleteIt(
 			ctx,
 			action.String(),
 			fmt.Sprintf("abx/api/resources/actions/%s?projectId=%s", actionId, projectId),

@@ -7,7 +7,6 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/url"
 	"slices"
@@ -20,7 +19,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
-type AriaClientConfig struct {
+type AriaClient struct {
 	// Add whatever fields, client or connection info, etc. here you would need to setup to
 	// communicate with the upstream API. Config holds the common attributes that can be
 	// passed to the client on initialization.
@@ -38,6 +37,8 @@ type AriaClientConfig struct {
 	UserAgent string
 
 	Context context.Context
+
+	Client *resty.Client
 }
 
 type AccessTokenResponse struct {
@@ -45,56 +46,69 @@ type AccessTokenResponse struct {
 	Token     string `json:"token"`
 }
 
-func (self *AriaClientConfig) Check() error {
-	if len(self.Host) == 0 {
-		return errors.New("Host is required to request the API.")
-	}
-	if len(self.RefreshToken) == 0 {
-		return errors.New("Refresh token is required to request an access token.")
-	}
-	return nil
-}
+func (self *AriaClient) Init() diag.Diagnostics {
 
-func (self *AriaClientConfig) Client() *resty.Client {
+	diags := self.CheckConfig()
+	if diags.HasError() {
+		return diags
+	}
+
 	client := resty.New()
 	client.SetBaseURL(self.Host)
 	client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: self.Insecure})
 	if len(self.AccessToken) > 0 {
 		client.SetAuthToken(self.AccessToken)
 	}
-	return client
+	self.Client = client
+
+	diags.Append(self.GetAccessToken()...)
+
+	return diags
 }
 
-func (self *AriaClientConfig) GetAccessToken() error {
-	// FIXME Handle refreshing token when required
+func (self *AriaClient) CheckConfig() diag.Diagnostics {
+	diags := diag.Diagnostics{}
+	if len(self.Host) == 0 {
+		diags.AddError("Missing host", "Host is required to request the API")
+	}
+	if len(self.RefreshToken) == 0 && len(self.AccessToken) == 0 {
+		diags.AddError("Missing token", "Either refresh or access token is required")
+	}
+	return diags
+}
 
+func (self *AriaClient) GetAccessToken() diag.Diagnostics {
+	diags := diag.Diagnostics{}
+	// FIXME Handle refreshing token when required
 	// Refresh access token if refresh token is set and access token is empty
 	if len(self.RefreshToken) > 0 && len(self.AccessToken) == 0 {
-		tflog.Debug(self.Context, "Requesting a new API access token at "+self.Host)
+		tflog.Debug(self.Context, "Requesting a new API access token at " + self.Host)
 
 		var token AccessTokenResponse
-		response, err := self.Client().R().
+		response, err := self.Client.R().
 			SetHeader("Content-Type", "application/json").
 			SetBody(map[string]string{"refreshToken": self.RefreshToken}).
 			SetResult(&token).
 			Post("iaas/api/login")
 		err = handleAPIResponse(self.Context, response, err, []int{200})
 		if err != nil {
-			return err
+			diags.AddError("Unable to retrieve a valid access token", err.Error())
+			return diags
 		}
 
 		self.AccessToken = token.Token
 	}
 
 	if len(self.AccessToken) == 0 {
-		return errors.New("Access Token cannot be empty")
+		diags.AddError(
+			"Empty Access Token",
+			"Access Token is empty, will be unable to make API calls")
 	}
 
-	return nil
+	return diags
 }
 
-func DeleteIt(
-	client *resty.Client,
+func (self AriaClient) DeleteIt(
 	ctx context.Context,
 	name string,
 	path string,
@@ -105,7 +119,7 @@ func DeleteIt(
 	tflog.Debug(ctx, fmt.Sprintf("Deleting %s...", name))
 
 	// Delete the resource
-	response, err := client.R().SetQueryParam("apiVersion", apiVersion).Delete(path)
+	response, err := self.Client.R().SetQueryParam("apiVersion", apiVersion).Delete(path)
 	err = handleAPIResponse(ctx, response, err, []int{200, 204})
 	if err != nil {
 		diags.AddError(
@@ -118,7 +132,7 @@ func DeleteIt(
 	for retry := range []int{0, 1, 2, 3, 4} {
 		time.Sleep(time.Duration(retry) * time.Second)
 		tflog.Debug(ctx, fmt.Sprintf("Poll %d of 5 - Check %s is deleted...", retry+1, name))
-		response, err := client.R().SetQueryParam("apiVersion", apiVersion).Get(path)
+		response, err := self.Client.R().SetQueryParam("apiVersion", apiVersion).Get(path)
 		err = handleAPIResponse(ctx, response, err, []int{200, 404})
 		if err != nil {
 			diags.AddError(

@@ -185,7 +185,7 @@ func (self *AriaProvider) Configure(
 	tflog.Debug(ctx, "Creating Aria client")
 
 	// Create a new Aria client using the configuration values
-	cfg := AriaClientConfig{
+	client := AriaClient{
 		Host:         host,
 		RefreshToken: refresh_token,
 		AccessToken:  access_token,
@@ -193,29 +193,15 @@ func (self *AriaProvider) Configure(
 		Context:      ctx,
 	}
 
-	err = cfg.Check()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Aria client configuration is invalid",
-			err.Error(),
-		)
+	clientDiags := client.Init()
+	resp.Diagnostics.Append(clientDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
-
-	err = cfg.GetAccessToken()
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Unable to retrieve a valid access token",
-			err.Error(),
-		)
-		return
-	}
-
-	client := cfg.Client()
 
 	// Make the Aria client available for DataSource and Resource type Configure methods
-	resp.DataSourceData = client
-	resp.ResourceData = client
+	resp.DataSourceData = &client
+	resp.ResourceData = &client
 
 	tflog.Info(ctx, "Configured Aria client", map[string]any{"success": true})
 }

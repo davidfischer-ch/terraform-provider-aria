@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/go-resty/resty/v2"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -23,7 +22,7 @@ func NewCustomResourceResource() resource.Resource {
 
 // CustomResourceResource defines the resource implementation.
 type CustomResourceResource struct {
-	client *resty.Client
+	client *AriaClient
 }
 
 func (self *CustomResourceResource) Metadata(
@@ -68,7 +67,7 @@ func (self *CustomResourceResource) Create(
 		return
 	}
 
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", FORM_API_VERSION).
 		SetBody(resourceRaw).
 		SetResult(&resourceRaw).
@@ -101,7 +100,7 @@ func (self *CustomResourceResource) Read(
 
 	resourceId := resource.Id.ValueString()
 	var resourceRaw CustomResourceAPIModel
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", FORM_API_VERSION).
 		SetResult(&resourceRaw).
 		Get("form-service/api/custom/resource-types/" + resourceId)
@@ -148,7 +147,7 @@ func (self *CustomResourceResource) Update(
 	// FIXME Mutex
 	// FIXME Read resource to retrieve additional actions to keep them untouched
 
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", FORM_API_VERSION).
 		SetBody(resourceRaw).
 		SetResult(&resourceRaw).
@@ -186,8 +185,7 @@ func (self *CustomResourceResource) Delete(
 	}
 
 	resp.Diagnostics.Append(
-		DeleteIt(
-			self.client,
+		self.client.DeleteIt(
 			ctx,
 			resource.String(),
 			"form-service/api/custom/resource-types/"+resourceId,

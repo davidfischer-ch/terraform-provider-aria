@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/go-resty/resty/v2"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -21,7 +20,7 @@ func NewABXSensitiveConstantResource() resource.Resource {
 
 // ABXSensitiveConstantResource defines the resource implementation.
 type ABXSensitiveConstantResource struct {
-	client *resty.Client
+	client *AriaClient
 }
 
 func (self *ABXSensitiveConstantResource) Metadata(
@@ -61,7 +60,7 @@ func (self *ABXSensitiveConstantResource) Create(
 	}
 
 	var constantRaw ABXSensitiveConstantAPIModel
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", ABX_API_VERSION).
 		SetBody(constant.ToAPI()).
 		SetResult(&constantRaw).
@@ -95,7 +94,7 @@ func (self *ABXSensitiveConstantResource) Read(
 
 	var constantRaw ABXSensitiveConstantAPIModel
 	constantId := constant.Id.ValueString()
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", ABX_API_VERSION).
 		SetResult(&constantRaw).
 		Get("abx/api/resources/action-secrets/" + constantId)
@@ -134,7 +133,7 @@ func (self *ABXSensitiveConstantResource) Update(
 
 	var constantRaw ABXSensitiveConstantAPIModel
 	constantId := constant.Id.ValueString()
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", ABX_API_VERSION).
 		SetBody(constant.ToAPI()).
 		SetResult(&constantRaw).
@@ -172,8 +171,7 @@ func (self *ABXSensitiveConstantResource) Delete(
 	}
 
 	resp.Diagnostics.Append(
-		DeleteIt(
-			self.client,
+		self.client.DeleteIt(
 			ctx,
 			constant.String(),
 			"abx/api/resources/action-secrets/"+constantId,

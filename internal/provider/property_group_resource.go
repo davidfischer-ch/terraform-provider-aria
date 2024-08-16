@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/go-resty/resty/v2"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -23,7 +22,7 @@ func NewPropertyGroupResource() resource.Resource {
 
 // PropertyGroupResource defines the resource implementation.
 type PropertyGroupResource struct {
-	client *resty.Client
+	client *AriaClient
 }
 
 func (self *PropertyGroupResource) Metadata(
@@ -68,7 +67,7 @@ func (self *PropertyGroupResource) Create(
 		return
 	}
 
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", BLUEPRINT_API_VERSION).
 		SetBody(propertyGroupRaw).
 		SetResult(&propertyGroupRaw).
@@ -101,7 +100,7 @@ func (self *PropertyGroupResource) Read(
 
 	propertyGroupId := propertyGroup.Id.ValueString()
 	var propertyGroupRaw PropertyGroupAPIModel
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", BLUEPRINT_API_VERSION).
 		SetResult(&propertyGroupRaw).
 		Get("properties/api/property-groups/" + propertyGroupId)
@@ -146,7 +145,7 @@ func (self *PropertyGroupResource) Update(
 		return
 	}
 
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", BLUEPRINT_API_VERSION).
 		SetBody(propertyGroupRaw).
 		SetResult(&propertyGroupRaw).
@@ -184,8 +183,7 @@ func (self *PropertyGroupResource) Delete(
 	}
 
 	resp.Diagnostics.Append(
-		DeleteIt(
-			self.client,
+		self.client.DeleteIt(
 			ctx,
 			propertyGroup.String(),
 			"properties/api/property-groups/"+propertyGroupId,

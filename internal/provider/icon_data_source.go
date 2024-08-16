@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/go-resty/resty/v2"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -21,7 +20,7 @@ func NewIconDataSource() datasource.DataSource {
 
 // IconDataSource defines the data source implementation.
 type IconDataSource struct {
-	client *resty.Client
+	client *AriaClient
 }
 
 func (self *IconDataSource) Metadata(
@@ -60,7 +59,7 @@ func (self *IconDataSource) Read(
 		return
 	}
 
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		// TODO SetQueryParam("apiVersion", ICON_API_VERSION).
 		Get("icon/api/icons/" + icon.Id.ValueString())
 	err = handleAPIResponse(ctx, response, err, []int{200})

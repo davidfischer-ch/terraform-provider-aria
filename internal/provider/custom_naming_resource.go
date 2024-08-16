@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/go-resty/resty/v2"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -23,7 +22,7 @@ func NewCustomNamingResource() resource.Resource {
 
 // CustomNamingResource defines the resource implementation.
 type CustomNamingResource struct {
-	client *resty.Client
+	client *AriaClient
 }
 
 func (self *CustomNamingResource) Metadata(
@@ -68,7 +67,7 @@ func (self *CustomNamingResource) Create(
 		return
 	}
 
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", IAAS_API_VERSION).
 		SetBody(namingRaw).
 		SetResult(&namingRaw).
@@ -101,7 +100,7 @@ func (self *CustomNamingResource) Read(
 
 	namingId := naming.Id.ValueString()
 	var namingRaw CustomNamingAPIModel
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", IAAS_API_VERSION).
 		SetResult(&namingRaw).
 		Get("iaas/api/naming/" + namingId)
@@ -146,7 +145,7 @@ func (self *CustomNamingResource) Update(
 		return
 	}
 
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", IAAS_API_VERSION).
 		SetBody(namingRaw).
 		SetResult(&namingRaw).
@@ -184,8 +183,7 @@ func (self *CustomNamingResource) Delete(
 	}
 
 	resp.Diagnostics.Append(
-		DeleteIt(
-			self.client,
+		self.client.DeleteIt(
 			ctx,
 			naming.String(),
 			"iaas/api/naming/"+namingId,

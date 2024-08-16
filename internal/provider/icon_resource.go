@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/go-resty/resty/v2"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -25,7 +24,7 @@ func NewIconResource() resource.Resource {
 
 // IconResource defines the resource implementation.
 type IconResource struct {
-	client *resty.Client
+	client *AriaClient
 }
 
 func (self *IconResource) Metadata(
@@ -64,7 +63,7 @@ func (self *IconResource) Create(
 		return
 	}
 
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		// TODO SetQueryParam("apiVersion", ICON_API_VERSION).
 		SetFileReader("file", "file", strings.NewReader(icon.Content.ValueString())).
 		Post("icon/api/icons")
@@ -104,7 +103,7 @@ func (self *IconResource) Read(
 	}
 
 	iconId := icon.Id.ValueString()
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		// TODO SetQueryParam("apiVersion", ICON_API_VERSION).
 		Get("icon/api/icons/" + iconId)
 
@@ -163,8 +162,7 @@ func (self *IconResource) Delete(
 	}
 
 	resp.Diagnostics.Append(
-		DeleteIt(
-			self.client,
+		self.client.DeleteIt(
 			ctx,
 			icon.String(),
 			"icon/api/icons/"+iconId,

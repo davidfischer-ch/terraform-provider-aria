@@ -7,7 +7,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/go-resty/resty/v2"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -23,7 +22,7 @@ func NewResourceActionResource() resource.Resource {
 
 // ResourceActionResource defines the resource implementation.
 type ResourceActionResource struct {
-	client *resty.Client
+	client *AriaClient
 }
 
 func (self *ResourceActionResource) Metadata(
@@ -75,7 +74,7 @@ func (self *ResourceActionResource) Create(
 		return
 	} else {
 		// Native resource ...
-		response, err := self.client.R().
+		response, err := self.client.Client.R().
 			SetQueryParam("apiVersion", FORM_API_VERSION).
 			SetBody(actionRaw).
 			SetResult(&actionRaw).
@@ -122,7 +121,7 @@ func (self *ResourceActionResource) Read(
 	}
 
 	var actionRaw ResourceActionAPIModel
-	response, err := self.client.R().
+	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", FORM_API_VERSION).
 		SetResult(&actionRaw).
 		Get(actionUrl)
@@ -173,7 +172,7 @@ func (self *ResourceActionResource) Update(
 		return
 	} else {
 		// Native resource ...
-		response, err := self.client.R().
+		response, err := self.client.Client.R().
 			SetQueryParam("apiVersion", FORM_API_VERSION).
 			SetBody(actionRaw).
 			SetResult(&actionRaw).
@@ -219,8 +218,7 @@ func (self *ResourceActionResource) Delete(
 	} else {
 		// Native resource ...
 		resp.Diagnostics.Append(
-			DeleteIt(
-				self.client,
+			self.client.DeleteIt(
 				ctx,
 				action.String(),
 				"form-service/api/custom/resource-actions/"+actionId,
