@@ -71,7 +71,7 @@ func (self *CustomResourceResource) Create(
 		SetQueryParam("apiVersion", FORM_API_VERSION).
 		SetBody(resourceRaw).
 		SetResult(&resourceRaw).
-		Post("form-service/api/custom/resource-types")
+		Post(resource.CreatePath())
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -98,31 +98,20 @@ func (self *CustomResourceResource) Read(
 		return
 	}
 
-	resourceId := resource.Id.ValueString()
-	var resourceRaw CustomResourceAPIModel
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", FORM_API_VERSION).
-		SetResult(&resourceRaw).
-		Get("form-service/api/custom/resource-types/" + resourceId)
-
-	// Handle gracefully a resource that has vanished on the platform
-	// Beware that some APIs respond with HTTP 404 instead of 403 ...
-	if response.StatusCode() == 404 {
-		tflog.Debug(ctx, fmt.Sprintf("%s not found", resource.String()))
+	var raw CustomResourceAPIModel
+	found, readDiags := self.client.ReadIt(ctx, &resource, &raw)
+	resp.Diagnostics.Append(readDiags...)
+	if !found {
 		resp.State.RemoveResource(ctx)
 		return
 	}
 
-	err = handleAPIResponse(ctx, response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to read %s, got error: %s", resource.String(), err))
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Save updated custom resource into Terraform state
-	resp.Diagnostics.Append(resource.FromAPI(ctx, resourceRaw)...)
+	resp.Diagnostics.Append(resource.FromAPI(ctx, raw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &resource)...)
 }
 
@@ -151,7 +140,7 @@ func (self *CustomResourceResource) Update(
 		SetQueryParam("apiVersion", FORM_API_VERSION).
 		SetBody(resourceRaw).
 		SetResult(&resourceRaw).
-		Post("form-service/api/custom/resource-types") // Its not a mistake...
+		Post(resource.UpdatePath())
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
@@ -175,23 +164,9 @@ func (self *CustomResourceResource) Delete(
 	// Read Terraform prior state data into the model
 	var resource CustomResourceModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &resource)...)
-	if resp.Diagnostics.HasError() {
-		return
+	if !resp.Diagnostics.HasError() {
+		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &resource)...)
 	}
-
-	resourceId := resource.Id.ValueString()
-	if len(resourceId) == 0 {
-		return
-	}
-
-	resp.Diagnostics.Append(
-		self.client.DeleteIt(
-			ctx,
-			resource.String(),
-			"form-service/api/custom/resource-types/"+resourceId,
-			FORM_API_VERSION,
-		)...,
-	)
 }
 
 func (self *CustomResourceResource) ImportState(

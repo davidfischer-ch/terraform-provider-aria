@@ -81,13 +81,31 @@ func (self ABXActionModel) String() string {
 		self.ProjectId.ValueString())
 }
 
+func (self ABXActionModel) CreatePath() string {
+	return "abx/api/resources/actions"
+}
+
+func (self ABXActionModel) ReadPath() string {
+	return fmt.Sprintf(
+		"abx/api/resources/actions/%s?projectId=%s",
+		self.Id.ValueString(),
+		self.ProjectId.ValueString())
+}
+
+func (self ABXActionModel) UpdatePath() string {
+	return self.ReadPath()
+}
+
+func (self ABXActionModel) DeletePath() string {
+	return self.ReadPath()
+}
+
 func (self *ABXActionModel) FromAPI(
 	ctx context.Context,
 	raw ABXActionAPIModel,
 ) diag.Diagnostics {
 
 	diags := diag.Diagnostics{}
-
 	faasProvider := raw.FAASProvider
 	if faasProvider == "" {
 		faasProvider = "auto"

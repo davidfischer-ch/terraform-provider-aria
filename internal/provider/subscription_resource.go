@@ -62,7 +62,6 @@ func (self *SubscriptionResource) Create(
 	}
 
 	subscription.GenerateId()
-	subscriptionId := subscription.Id.ValueString()
 	subscriptionRaw, diags := subscription.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -72,7 +71,7 @@ func (self *SubscriptionResource) Create(
 	response, err := self.client.Client.R().
 		// TODO SetQueryParam("apiVersion", EVENT_BROKER_API_VERSION).
 		SetBody(subscriptionRaw).
-		Post("event-broker/api/subscriptions")
+		Post(subscription.CreatePath())
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -85,7 +84,7 @@ func (self *SubscriptionResource) Create(
 	response, err = self.client.Client.R().
 		// TODO SetQueryParam("apiVersion", EVENT_BROKER_API_VERSION).
 		SetResult(&subscriptionRaw).
-		Get("event-broker/api/subscriptions/" + subscriptionId)
+		Get(subscription.ReadPath())
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
@@ -113,12 +112,11 @@ func (self *SubscriptionResource) Read(
 		return
 	}
 
-	subscriptionId := subscription.Id.ValueString()
 	var subscriptionRaw SubscriptionAPIModel
 	response, err := self.client.Client.R().
 		// TODO SetQueryParam("apiVersion", EVENT_BROKER_API_VERSION).
 		SetResult(&subscriptionRaw).
-		Get("event-broker/api/subscriptions/" + subscriptionId)
+		Get(subscription.ReadPath())
 
 	// Handle gracefully a resource that has vanished on the platform
 	// Beware that some APIs respond with HTTP 404 instead of 403 ...
@@ -153,7 +151,6 @@ func (self *SubscriptionResource) Update(
 		return
 	}
 
-	subscriptionId := subscription.Id.ValueString()
 	subscriptionRaw, diags := subscription.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -163,7 +160,7 @@ func (self *SubscriptionResource) Update(
 	response, err := self.client.Client.R().
 		// TODO SetQueryParam("apiVersion", EVENT_BROKER_API_VERSION).
 		SetBody(subscriptionRaw).
-		Post("event-broker/api/subscriptions")
+		Post(subscription.UpdatePath())
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -175,7 +172,7 @@ func (self *SubscriptionResource) Update(
 	// Read (using API) to retrieve the subscription content (and not empty stuff)
 	response, err = self.client.Client.R().
 		SetResult(&subscriptionRaw).
-		Get("event-broker/api/subscriptions/" + subscriptionId)
+		Get(subscription.ReadPath())
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
@@ -200,23 +197,9 @@ func (self *SubscriptionResource) Delete(
 
 	// Read Terraform prior state data into the model
 	resp.Diagnostics.Append(req.State.Get(ctx, &subscription)...)
-	if resp.Diagnostics.HasError() {
-		return
+	if !resp.Diagnostics.HasError() {
+		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &subscription)...)
 	}
-
-	subscriptionId := subscription.Id.ValueString()
-	if len(subscriptionId) == 0 {
-		return
-	}
-
-	resp.Diagnostics.Append(
-		self.client.DeleteIt(
-			ctx,
-			subscription.String(),
-			"event-broker/api/subscriptions/"+subscriptionId,
-			EVENT_BROKER_API_VERSION,
-		)...,
-	)
 }
 
 func (self *SubscriptionResource) ImportState(

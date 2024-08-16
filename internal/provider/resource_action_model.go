@@ -60,11 +60,48 @@ func (self ResourceActionModel) String() string {
 		self.ProjectId.ValueString())
 }
 
+func (self ResourceActionModel) CreatePath() string {
+	if len(self.ResourceId.ValueString()) > 0 {
+		// Custom resource ...
+		panic("not implemented")
+	}
+	// Native resource ...
+	return "form-service/api/custom/resource-actions"
+}
+
+func (self ResourceActionModel) ReadPath() string {
+	if len(self.ResourceId.ValueString()) > 0 {
+		return fmt.Sprintf(
+			// Custom Resource ...
+			"form-service/api/custom/resource-types/%s/resource-actions/%s",
+			self.ResourceId.ValueString(), self.Id.ValueString())
+	}
+	// Native resource ...
+	return "form-service/api/custom/resource-actions/" + self.Id.ValueString()
+}
+
+func (self ResourceActionModel) UpdatePath() string {
+	if len(self.ResourceId.ValueString()) > 0 {
+		// Custom resource ...
+		panic("not implemented")
+	}
+	// Native resource ...
+	return "form-service/api/custom/resource-actions"
+}
+
+func (self ResourceActionModel) DeletePath() string {
+	if len(self.ResourceId.ValueString()) > 0 {
+		// Custom resource ...
+		panic("not implemented")
+	}
+	// Native resource ...
+	return "form-service/api/custom/resource-actions/" + self.Id.ValueString()
+}
+
 func (self *ResourceActionModel) FromAPI(
 	ctx context.Context,
 	raw ResourceActionAPIModel,
 ) diag.Diagnostics {
-
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
 	self.DisplayName = types.StringValue(raw.DisplayName)

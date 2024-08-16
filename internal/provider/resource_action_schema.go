@@ -41,7 +41,7 @@ func ResourceActionSchema() schema.Schema {
 			},
 			"resource_id": schema.StringAttribute{
 				MarkdownDescription: "Resource identifier (required if its a custom resource)",
-				Optional: true,
+				Optional:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},

@@ -71,7 +71,7 @@ func (self *PropertyGroupResource) Create(
 		SetQueryParam("apiVersion", BLUEPRINT_API_VERSION).
 		SetBody(propertyGroupRaw).
 		SetResult(&propertyGroupRaw).
-		Post("properties/api/property-groups")
+		Post(propertyGroup.CreatePath())
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -98,12 +98,11 @@ func (self *PropertyGroupResource) Read(
 		return
 	}
 
-	propertyGroupId := propertyGroup.Id.ValueString()
 	var propertyGroupRaw PropertyGroupAPIModel
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", BLUEPRINT_API_VERSION).
 		SetResult(&propertyGroupRaw).
-		Get("properties/api/property-groups/" + propertyGroupId)
+		Get(propertyGroup.ReadPath())
 
 	// Handle gracefully a resource that has vanished on the platform
 	// Beware that some APIs respond with HTTP 404 instead of 403 ...
@@ -138,7 +137,6 @@ func (self *PropertyGroupResource) Update(
 		return
 	}
 
-	propertyGroupId := propertyGroup.Id.ValueString()
 	propertyGroupRaw, diags := propertyGroup.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -149,7 +147,7 @@ func (self *PropertyGroupResource) Update(
 		SetQueryParam("apiVersion", BLUEPRINT_API_VERSION).
 		SetBody(propertyGroupRaw).
 		SetResult(&propertyGroupRaw).
-		Put("properties/api/property-groups/" + propertyGroupId)
+		Put(propertyGroup.UpdatePath())
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
@@ -177,19 +175,7 @@ func (self *PropertyGroupResource) Delete(
 		return
 	}
 
-	propertyGroupId := propertyGroup.Id.ValueString()
-	if len(propertyGroupId) == 0 {
-		return
-	}
-
-	resp.Diagnostics.Append(
-		self.client.DeleteIt(
-			ctx,
-			propertyGroup.String(),
-			"properties/api/property-groups/"+propertyGroupId,
-			BLUEPRINT_API_VERSION,
-		)...,
-	)
+	resp.Diagnostics.Append(self.client.DeleteIt(ctx, &propertyGroup)...)
 }
 
 func (self *PropertyGroupResource) ImportState(

@@ -78,7 +78,7 @@ func (self *ResourceActionResource) Create(
 			SetQueryParam("apiVersion", FORM_API_VERSION).
 			SetBody(actionRaw).
 			SetResult(&actionRaw).
-			Post("form-service/api/custom/resource-actions")
+			Post(action.CreatePath())
 		err = handleAPIResponse(ctx, response, err, []int{200})
 		if err != nil {
 			resp.Diagnostics.AddError(
@@ -106,25 +106,11 @@ func (self *ResourceActionResource) Read(
 		return
 	}
 
-	actionId := action.Id.ValueString()
-	resourceId := action.ResourceId.ValueString()
-
-	var actionUrl string
-	if len(resourceId) > 0 {
-		// Custom resource ...
-		actionUrl = fmt.Sprintf(
-			"form-service/api/custom/resource-types/%s/resource-actions/%s",
-			resourceId, actionId)
-	} else {
-		// Native resource ...
-		actionUrl = "form-service/api/custom/resource-actions/" + actionId
-	}
-
 	var actionRaw ResourceActionAPIModel
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", FORM_API_VERSION).
 		SetResult(&actionRaw).
-		Get(actionUrl)
+		Get(action.ReadPath())
 
 	// Handle gracefully a resource that has vanished on the platform
 	// Beware that some APIs respond with HTTP 404 instead of 403 ...
@@ -176,7 +162,7 @@ func (self *ResourceActionResource) Update(
 			SetQueryParam("apiVersion", FORM_API_VERSION).
 			SetBody(actionRaw).
 			SetResult(&actionRaw).
-			Post("form-service/api/custom/resource-actions") // Its not a mistake...
+			Post(action.UpdatePath())
 
 		err = handleAPIResponse(ctx, response, err, []int{200})
 		if err != nil {
@@ -205,26 +191,13 @@ func (self *ResourceActionResource) Delete(
 		return
 	}
 
-	actionId := action.Id.ValueString()
-	if len(actionId) == 0 {
-		return
-	}
-
-	resourceId := action.ResourceId.ValueString()
-	if len(resourceId) > 0 {
+	if len(action.ResourceId.ValueString()) > 0 {
 		// Custom resource ...
-		// resp.Diagnostics.AddError("Client error", "Not yet implemented")
+		resp.Diagnostics.AddError("Client error", "Not yet implemented")
 		return
 	} else {
 		// Native resource ...
-		resp.Diagnostics.Append(
-			self.client.DeleteIt(
-				ctx,
-				action.String(),
-				"form-service/api/custom/resource-actions/"+actionId,
-				FORM_API_VERSION,
-			)...,
-		)
+		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &action)...)
 	}
 }
 

@@ -71,7 +71,7 @@ func (self *CustomNamingResource) Create(
 		SetQueryParam("apiVersion", IAAS_API_VERSION).
 		SetBody(namingRaw).
 		SetResult(&namingRaw).
-		Post("iaas/api/naming")
+		Post(naming.CreatePath())
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -98,12 +98,11 @@ func (self *CustomNamingResource) Read(
 		return
 	}
 
-	namingId := naming.Id.ValueString()
 	var namingRaw CustomNamingAPIModel
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", IAAS_API_VERSION).
 		SetResult(&namingRaw).
-		Get("iaas/api/naming/" + namingId)
+		Get(naming.ReadPath())
 
 	// Handle gracefully a resource that has vanished on the platform
 	// Beware that some APIs respond with HTTP 404 instead of 403 ...
@@ -149,7 +148,7 @@ func (self *CustomNamingResource) Update(
 		SetQueryParam("apiVersion", IAAS_API_VERSION).
 		SetBody(namingRaw).
 		SetResult(&namingRaw).
-		Put("iaas/api/naming") // Its not a mistake...
+		Put(naming.UpdatePath())
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
@@ -173,23 +172,9 @@ func (self *CustomNamingResource) Delete(
 	// Read Terraform prior state data into the model
 	var naming CustomNamingModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &naming)...)
-	if resp.Diagnostics.HasError() {
-		return
+	if !resp.Diagnostics.HasError() {
+		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &naming)...)
 	}
-
-	namingId := naming.Id.ValueString()
-	if len(namingId) == 0 {
-		return
-	}
-
-	resp.Diagnostics.Append(
-		self.client.DeleteIt(
-			ctx,
-			naming.String(),
-			"iaas/api/naming/"+namingId,
-			IAAS_API_VERSION,
-		)...,
-	)
 }
 
 func (self *CustomNamingResource) ImportState(

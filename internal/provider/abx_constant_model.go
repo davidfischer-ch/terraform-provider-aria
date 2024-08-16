@@ -37,6 +37,22 @@ func (self ABXConstantModel) String() string {
 		self.Name.ValueString())
 }
 
+func (self ABXConstantModel) CreatePath() string {
+	return "abx/api/resources/action-secrets"
+}
+
+func (self ABXConstantModel) ReadPath() string {
+	return "abx/api/resources/action-secrets/" + self.Id.ValueString()
+}
+
+func (self ABXConstantModel) UpdatePath() string {
+	return self.ReadPath()
+}
+
+func (self ABXConstantModel) DeletePath() string {
+	return self.ReadPath()
+}
+
 func (self *ABXConstantModel) FromAPI(
 	ctx context.Context,
 	raw ABXConstantAPIModel,

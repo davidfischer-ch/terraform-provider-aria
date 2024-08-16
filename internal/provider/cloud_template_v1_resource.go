@@ -71,7 +71,7 @@ func (self *CloudTemplateV1Resource) Create(
 		SetQueryParam("apiVersion", BLUEPRINT_API_VERSION).
 		SetBody(templateRaw).
 		SetResult(&templateRaw).
-		Post("blueprint/api/blueprints")
+		Post(template.CreatePath())
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -98,12 +98,11 @@ func (self *CloudTemplateV1Resource) Read(
 		return
 	}
 
-	templateId := template.Id.ValueString()
 	var templateRaw CloudTemplateV1APIModel
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", BLUEPRINT_API_VERSION).
 		SetResult(&templateRaw).
-		Get("blueprint/api/blueprints/" + templateId)
+		Get(template.ReadPath())
 
 	// Handle gracefully a resource that has vanished on the platform
 	// Beware that some APIs respond with HTTP 404 instead of 403 ...
@@ -138,7 +137,6 @@ func (self *CloudTemplateV1Resource) Update(
 		return
 	}
 
-	templateId := template.Id.ValueString()
 	templateRaw, diags := template.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -149,7 +147,7 @@ func (self *CloudTemplateV1Resource) Update(
 		SetQueryParam("apiVersion", BLUEPRINT_API_VERSION).
 		SetBody(templateRaw).
 		SetResult(&templateRaw).
-		Put("blueprint/api/blueprints/" + templateId)
+		Put(template.UpdatePath())
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
@@ -173,23 +171,9 @@ func (self *CloudTemplateV1Resource) Delete(
 	// Read Terraform prior state data into the model
 	var template CloudTemplateV1Model
 	resp.Diagnostics.Append(req.State.Get(ctx, &template)...)
-	if resp.Diagnostics.HasError() {
-		return
+	if !resp.Diagnostics.HasError() {
+		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &template)...)
 	}
-
-	templateId := template.Id.ValueString()
-	if len(templateId) == 0 {
-		return
-	}
-
-	resp.Diagnostics.Append(
-		self.client.DeleteIt(
-			ctx,
-			template.String(),
-			"blueprint/api/blueprints/"+templateId,
-			BLUEPRINT_API_VERSION,
-		)...,
-	)
 }
 
 func (self *CloudTemplateV1Resource) ImportState(

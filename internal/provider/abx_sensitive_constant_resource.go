@@ -64,7 +64,7 @@ func (self *ABXSensitiveConstantResource) Create(
 		SetQueryParam("apiVersion", ABX_API_VERSION).
 		SetBody(constant.ToAPI()).
 		SetResult(&constantRaw).
-		Post("abx/api/resources/action-secrets")
+		Post(constant.CreatePath())
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
@@ -93,11 +93,10 @@ func (self *ABXSensitiveConstantResource) Read(
 	}
 
 	var constantRaw ABXSensitiveConstantAPIModel
-	constantId := constant.Id.ValueString()
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", ABX_API_VERSION).
 		SetResult(&constantRaw).
-		Get("abx/api/resources/action-secrets/" + constantId)
+		Get(constant.ReadPath())
 
 	// Handle gracefully a resource that has vanished on the platform
 	// Beware that some APIs respond with HTTP 404 instead of 403 ...
@@ -132,12 +131,11 @@ func (self *ABXSensitiveConstantResource) Update(
 	}
 
 	var constantRaw ABXSensitiveConstantAPIModel
-	constantId := constant.Id.ValueString()
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", ABX_API_VERSION).
 		SetBody(constant.ToAPI()).
 		SetResult(&constantRaw).
-		Put("abx/api/resources/action-secrets/" + constantId)
+		Put(constant.UpdatePath())
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
@@ -161,21 +159,7 @@ func (self *ABXSensitiveConstantResource) Delete(
 	// Read Terraform prior state data into the model
 	var constant ABXSensitiveConstantModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &constant)...)
-	if resp.Diagnostics.HasError() {
-		return
+	if !resp.Diagnostics.HasError() {
+		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &constant)...)
 	}
-
-	constantId := constant.Id.ValueString()
-	if len(constantId) == 0 {
-		return
-	}
-
-	resp.Diagnostics.Append(
-		self.client.DeleteIt(
-			ctx,
-			constant.String(),
-			"abx/api/resources/action-secrets/"+constantId,
-			ABX_API_VERSION,
-		)...,
-	)
 }

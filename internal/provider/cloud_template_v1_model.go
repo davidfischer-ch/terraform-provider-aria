@@ -54,6 +54,22 @@ func (self CloudTemplateV1Model) String() string {
 		self.Name.ValueString())
 }
 
+func (self CloudTemplateV1Model) CreatePath() string {
+	return "blueprint/api/blueprints"
+}
+
+func (self CloudTemplateV1Model) ReadPath() string {
+	return "blueprint/api/blueprints/" + self.Id.ValueString()
+}
+
+func (self CloudTemplateV1Model) UpdatePath() string {
+	return self.ReadPath()
+}
+
+func (self CloudTemplateV1Model) DeletePath() string {
+	return self.ReadPath()
+}
+
 func (self *CloudTemplateV1Model) FromAPI(
 	ctx context.Context,
 	raw CloudTemplateV1APIModel,

@@ -98,13 +98,11 @@ func (self *ABXActionResource) Read(
 		return
 	}
 
-	actionId := action.Id.ValueString()
-	projectId := action.ProjectId.ValueString()
 	var actionRaw ABXActionAPIModel
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", ABX_API_VERSION).
 		SetResult(&actionRaw).
-		Get(fmt.Sprintf("abx/api/resources/actions/%s?projectId=%s", actionId, projectId))
+		Get(action.ReadPath())
 
 	// Handle gracefully a resource that has vanished on the platform
 	// Beware that some APIs respond with HTTP 404 instead of 403 ...
@@ -139,8 +137,6 @@ func (self *ABXActionResource) Update(
 		return
 	}
 
-	actionId := action.Id.ValueString()
-	projectId := action.ProjectId.ValueString()
 	actionRaw, diags := action.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -151,7 +147,7 @@ func (self *ABXActionResource) Update(
 		SetQueryParam("apiVersion", ABX_API_VERSION).
 		SetBody(actionRaw).
 		SetResult(&actionRaw).
-		Put(fmt.Sprintf("abx/api/resources/actions/%s?projectId=%s", actionId, projectId))
+		Put(action.UpdatePath())
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
@@ -175,24 +171,9 @@ func (self *ABXActionResource) Delete(
 	// Read Terraform prior state data into the model
 	var action ABXActionModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &action)...)
-	if resp.Diagnostics.HasError() {
-		return
+	if !resp.Diagnostics.HasError() {
+		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &action)...)
 	}
-
-	actionId := action.Id.ValueString()
-	projectId := action.ProjectId.ValueString()
-	if len(actionId) == 0 {
-		return
-	}
-
-	resp.Diagnostics.Append(
-		self.client.DeleteIt(
-			ctx,
-			action.String(),
-			fmt.Sprintf("abx/api/resources/actions/%s?projectId=%s", actionId, projectId),
-			ABX_API_VERSION,
-		)...,
-	)
 }
 
 func (self *ABXActionResource) ImportState(

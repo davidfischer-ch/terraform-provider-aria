@@ -3,12 +3,12 @@
 page_title: "aria_resource_action Resource - aria"
 subcategory: ""
 description: |-
-  Native resource's action resource
+  Resource's action resource (aka Day 2)
 ---
 
 # aria_resource_action (Resource)
 
-Native resource's action resource
+Resource's action resource (aka Day 2)
 
 ## Example Usage
 
@@ -139,7 +139,7 @@ EOT
 - `description` (String) Describe the resource in few sentences
 - `display_name` (String) Action display name
 - `name` (String) Action name
-- `resource_type` (String) Native resource type
+- `resource_type` (String) Resource type
 - `runnable_item` (Attributes) Action's runnable (see [below for nested schema](#nestedatt--runnable_item))
 
 ### Optional
@@ -148,6 +148,7 @@ EOT
 - `form_definition` (Attributes) Form definition (see [below for nested schema](#nestedatt--form_definition))
 - `project_id` (String) Project identifier. Empty or unset means available for all projects.
 - `provider_name` (String) Provider name, one of xaas (and that's all, maybe)
+- `resource_id` (String) Resource identifier (required if its a custom resource)
 - `status` (String) Action status, either DRAFT or RELEASED
 
 ### Read-Only

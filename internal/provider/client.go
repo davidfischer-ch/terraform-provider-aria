@@ -79,10 +79,10 @@ func (self *AriaClient) CheckConfig() diag.Diagnostics {
 
 func (self *AriaClient) GetAccessToken() diag.Diagnostics {
 	diags := diag.Diagnostics{}
-	// FIXME Handle refreshing token when required
+
 	// Refresh access token if refresh token is set and access token is empty
 	if len(self.RefreshToken) > 0 && len(self.AccessToken) == 0 {
-		tflog.Debug(self.Context, "Requesting a new API access token at " + self.Host)
+		tflog.Debug(self.Context, "Requesting a new API access token at "+self.Host)
 
 		var token AccessTokenResponse
 		response, err := self.Client.R().
@@ -108,18 +108,49 @@ func (self *AriaClient) GetAccessToken() diag.Diagnostics {
 	return diags
 }
 
+func (self AriaClient) ReadIt(
+	ctx context.Context,
+	instance Model,
+	instanceRaw APIModel,
+) (bool, diag.Diagnostics) {
+	diags := diag.Diagnostics{}
+	path := instance.ReadPath()
+	response, err := self.Client.R().
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+		SetResult(&instanceRaw).
+		Get(path)
+
+	if response.StatusCode() == 404 {
+		tflog.Debug(ctx, fmt.Sprintf("%s not found", instance.String()))
+		return false, diags
+	}
+
+	err = handleAPIResponse(ctx, response, err, []int{200})
+	if err != nil {
+		diags.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to read %s, got error: %s", instance.String(), err))
+	}
+
+	return true, diags
+}
+
 func (self AriaClient) DeleteIt(
 	ctx context.Context,
-	name string,
-	path string,
-	apiVersion string,
+	instance Model,
 ) diag.Diagnostics {
-	diags := diag.Diagnostics{}
-
+	name := instance.String()
 	tflog.Debug(ctx, fmt.Sprintf("Deleting %s...", name))
 
+	diags := diag.Diagnostics{}
+	path := instance.DeletePath()
+	apiVersion := GetVersionFromPath(path)
+
 	// Delete the resource
-	response, err := self.Client.R().SetQueryParam("apiVersion", apiVersion).Delete(path)
+	response, err := self.Client.R().
+		SetQueryParam("apiVersion", apiVersion).
+		Delete(path)
+
 	err = handleAPIResponse(ctx, response, err, []int{200, 204})
 	if err != nil {
 		diags.AddError(
@@ -223,4 +254,33 @@ func GetIdFromLocation(response *resty.Response) (string, error) {
 
 	parts := strings.Split(location.Path, "/")
 	return parts[len(parts)-1], nil
+}
+
+func GetVersionFromPath(path string) string {
+	// TODO Take first element of path before /, then map it (faster)
+	if strings.HasPrefix(path, "abx") {
+		return ABX_API_VERSION
+	}
+	if strings.HasPrefix(path, "blueprint") {
+		return BLUEPRINT_API_VERSION
+	}
+	if strings.HasPrefix(path, "event-broker") {
+		return EVENT_BROKER_API_VERSION
+	}
+	if strings.HasPrefix(path, "form-service") {
+		return FORM_API_VERSION
+	}
+	if strings.HasPrefix(path, "iaas") {
+		return IAAS_API_VERSION
+	}
+	if strings.HasPrefix(path, "icon") {
+		return ICON_API_VERSION
+	}
+	if strings.HasPrefix(path, "project-service") {
+		return PROJECT_API_VERSION
+	}
+	if strings.HasPrefix(path, "properties") {
+		return BLUEPRINT_API_VERSION
+	}
+	panic("FIXME_TODO")
 }

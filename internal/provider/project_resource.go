@@ -55,13 +55,13 @@ func (self *ProjectResource) Create(
 	resp *resource.CreateResponse,
 ) {
 	// Read Terraform plan data into the model
-	var Project ProjectModel
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &Project)...)
+	var project ProjectModel
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &project)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	ProjectRaw, diags := Project.ToAPI(ctx)
+	projectRaw, diags := project.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -71,21 +71,21 @@ func (self *ProjectResource) Create(
 		SetQueryParam("apiVersion", PROJECT_API_VERSION).
 		SetQueryParam("validatePrincipals", "true").
 		SetQueryParam("syncPrincipals", "true").
-		SetBody(ProjectRaw).
-		SetResult(&ProjectRaw).
-		Post("project-service/api/projects")
+		SetBody(projectRaw).
+		SetResult(&projectRaw).
+		Post(project.CreatePath())
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to create %s, got error: %s", Project.String(), err))
+			fmt.Sprintf("Unable to create %s, got error: %s", project.String(), err))
 		return
 	}
 
 	// Save property group into Terraform state
-	resp.Diagnostics.Append(Project.FromAPI(ctx, ProjectRaw)...)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &Project)...)
-	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", Project.String()))
+	resp.Diagnostics.Append(project.FromAPI(ctx, projectRaw)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &project)...)
+	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", project.String()))
 }
 
 func (self *ProjectResource) Read(
@@ -94,23 +94,22 @@ func (self *ProjectResource) Read(
 	resp *resource.ReadResponse,
 ) {
 	// Read Terraform prior state data into the model
-	var Project ProjectModel
-	resp.Diagnostics.Append(req.State.Get(ctx, &Project)...)
+	var project ProjectModel
+	resp.Diagnostics.Append(req.State.Get(ctx, &project)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	ProjectId := Project.Id.ValueString()
-	var ProjectRaw ProjectAPIModel
+	var projectRaw ProjectAPIModel
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", PROJECT_API_VERSION).
-		SetResult(&ProjectRaw).
-		Get("project-service/api/projects/" + ProjectId)
+		SetResult(&projectRaw).
+		Get(project.ReadPath())
 
 	// Handle gracefully a resource that has vanished on the platform
 	// Beware that some APIs respond with HTTP 404 instead of 403 ...
 	if response.StatusCode() == 404 {
-		tflog.Debug(ctx, fmt.Sprintf("%s not found", Project.String()))
+		tflog.Debug(ctx, fmt.Sprintf("%s not found", project.String()))
 		resp.State.RemoveResource(ctx)
 		return
 	}
@@ -119,13 +118,13 @@ func (self *ProjectResource) Read(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read %s, got error: %s", Project.String(), err))
+			fmt.Sprintf("Unable to read %s, got error: %s", project.String(), err))
 		return
 	}
 
 	// Save updated property group into Terraform state
-	resp.Diagnostics.Append(Project.FromAPI(ctx, ProjectRaw)...)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &Project)...)
+	resp.Diagnostics.Append(project.FromAPI(ctx, projectRaw)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &project)...)
 }
 
 func (self *ProjectResource) Update(
@@ -134,14 +133,13 @@ func (self *ProjectResource) Update(
 	resp *resource.UpdateResponse,
 ) {
 	// Read Terraform plan data into the model
-	var Project ProjectModel
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &Project)...)
+	var project ProjectModel
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &project)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	ProjectId := Project.Id.ValueString()
-	ProjectRaw, diags := Project.ToAPI(ctx)
+	projectRaw, diags := project.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -151,9 +149,9 @@ func (self *ProjectResource) Update(
 		SetQueryParam("apiVersion", PROJECT_API_VERSION).
 		SetQueryParam("validatePrincipals", "true").
 		SetQueryParam("syncPrincipals", "true").
-		SetBody(ProjectRaw).
-		SetResult(&ProjectRaw).
-		Patch("project-service/api/projects/" + ProjectId)
+		SetBody(projectRaw).
+		SetResult(&projectRaw).
+		Patch(project.UpdatePath())
 
 	// TODO Also call PATCH project-service/api/projects/{id}/cost
 	// TODO Also call PATCH project-service/api/projects/{id}/principals
@@ -163,14 +161,14 @@ func (self *ProjectResource) Update(
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to update %s, got error: %s", Project.String(), err))
+			fmt.Sprintf("Unable to update %s, got error: %s", project.String(), err))
 		return
 	}
 
 	// Save updated property group into Terraform state
-	resp.Diagnostics.Append(Project.FromAPI(ctx, ProjectRaw)...)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &Project)...)
-	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", Project.String()))
+	resp.Diagnostics.Append(project.FromAPI(ctx, projectRaw)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &project)...)
+	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", project.String()))
 }
 
 func (self *ProjectResource) Delete(
@@ -179,25 +177,11 @@ func (self *ProjectResource) Delete(
 	resp *resource.DeleteResponse,
 ) {
 	// Read Terraform prior state data into the model
-	var Project ProjectModel
-	resp.Diagnostics.Append(req.State.Get(ctx, &Project)...)
-	if resp.Diagnostics.HasError() {
-		return
+	var project ProjectModel
+	resp.Diagnostics.Append(req.State.Get(ctx, &project)...)
+	if !resp.Diagnostics.HasError() {
+		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &project)...)
 	}
-
-	ProjectId := Project.Id.ValueString()
-	if len(ProjectId) == 0 {
-		return
-	}
-
-	resp.Diagnostics.Append(
-		self.client.DeleteIt(
-			ctx,
-			Project.String(),
-			"project-service/api/projects/"+ProjectId,
-			PROJECT_API_VERSION,
-		)...,
-	)
 }
 
 func (self *ProjectResource) ImportState(

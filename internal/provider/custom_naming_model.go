@@ -38,6 +38,22 @@ func (self *CustomNamingModel) String() string {
 		self.Name.ValueString())
 }
 
+func (self CustomNamingModel) CreatePath() string {
+	return "iaas/api/naming"
+}
+
+func (self CustomNamingModel) ReadPath() string {
+	return "iaas/api/naming/" + self.Id.ValueString()
+}
+
+func (self CustomNamingModel) UpdatePath() string {
+	return self.CreatePath() // Its not a mistake...
+}
+
+func (self CustomNamingModel) DeletePath() string {
+	return self.ReadPath()
+}
+
 func (self *CustomNamingModel) FromAPI(
 	ctx context.Context,
 	raw CustomNamingAPIModel,

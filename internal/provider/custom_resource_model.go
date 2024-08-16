@@ -58,6 +58,22 @@ func (self CustomResourceModel) String() string {
 		self.DisplayName.ValueString())
 }
 
+func (self CustomResourceModel) CreatePath() string {
+	return "form-service/api/custom/resource-types"
+}
+
+func (self CustomResourceModel) ReadPath() string {
+	return "form-service/api/custom/resource-types/" + self.Id.ValueString()
+}
+
+func (self CustomResourceModel) UpdatePath() string {
+	return self.CreatePath() // Its not a mistake...
+}
+
+func (self CustomResourceModel) DeletePath() string {
+	return self.ReadPath()
+}
+
 func (self *CustomResourceModel) FromAPI(
 	ctx context.Context,
 	raw CustomResourceAPIModel,

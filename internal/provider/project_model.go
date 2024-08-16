@@ -46,6 +46,22 @@ func (self ProjectModel) String() string {
 		self.Name.ValueString())
 }
 
+func (self ProjectModel) CreatePath() string {
+	return "project-service/api/projects"
+}
+
+func (self ProjectModel) ReadPath() string {
+	return "project-service/api/projects/" + self.Id.ValueString()
+}
+
+func (self ProjectModel) UpdatePath() string {
+	return self.ReadPath()
+}
+
+func (self ProjectModel) DeletePath() string {
+	return self.ReadPath()
+}
+
 func (self *ProjectModel) FromAPI(
 	ctx context.Context,
 	raw ProjectAPIModel,

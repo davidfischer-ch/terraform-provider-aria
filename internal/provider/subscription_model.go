@@ -75,6 +75,22 @@ func (self SubscriptionModel) String() string {
 		self.Name.ValueString())
 }
 
+func (self SubscriptionModel) CreatePath() string {
+	return "event-broker/api/subscriptions"
+}
+
+func (self SubscriptionModel) ReadPath() string {
+	return "event-broker/api/subscriptions/" + self.Id.ValueString()
+}
+
+func (self SubscriptionModel) UpdatePath() string {
+	return self.CreatePath() // Its not a mistake ...
+}
+
+func (self SubscriptionModel) DeletePath() string {
+	return self.ReadPath()
+}
+
 func (self *SubscriptionModel) GenerateId() {
 	if len(self.Id.ValueString()) == 0 {
 		self.Id = types.StringValue(uuid.New().String())

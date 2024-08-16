@@ -37,6 +37,22 @@ func (self ABXSensitiveConstantModel) String() string {
 		self.Name.ValueString())
 }
 
+func (self ABXSensitiveConstantModel) CreatePath() string {
+	return "abx/api/resources/action-secrets"
+}
+
+func (self ABXSensitiveConstantModel) ReadPath() string {
+	return "abx/api/resources/action-secrets/" + self.Id.ValueString()
+}
+
+func (self ABXSensitiveConstantModel) UpdatePath() string {
+	return self.ReadPath()
+}
+
+func (self ABXSensitiveConstantModel) DeletePath() string {
+	return self.ReadPath()
+}
+
 func (self *ABXSensitiveConstantModel) FromAPI(
 	ctx context.Context,
 	raw ABXSensitiveConstantAPIModel,

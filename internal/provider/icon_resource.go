@@ -66,7 +66,7 @@ func (self *IconResource) Create(
 	response, err := self.client.Client.R().
 		// TODO SetQueryParam("apiVersion", ICON_API_VERSION).
 		SetFileReader("file", "file", strings.NewReader(icon.Content.ValueString())).
-		Post("icon/api/icons")
+		Post(icon.CreatePath())
 
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
@@ -102,10 +102,9 @@ func (self *IconResource) Read(
 		return
 	}
 
-	iconId := icon.Id.ValueString()
 	response, err := self.client.Client.R().
 		// TODO SetQueryParam("apiVersion", ICON_API_VERSION).
-		Get("icon/api/icons/" + iconId)
+		Get(icon.ReadPath())
 
 	// Handle gracefully a resource that has vanished on the platform
 	// Beware that some APIs respond with HTTP 404 instead of 403 ...
@@ -152,23 +151,9 @@ func (self *IconResource) Delete(
 	// Read Terraform prior state data into the model
 	var icon IconModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &icon)...)
-	if resp.Diagnostics.HasError() {
-		return
+	if !resp.Diagnostics.HasError() {
+		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &icon)...)
 	}
-
-	iconId := icon.Id.ValueString()
-	if len(iconId) == 0 {
-		return
-	}
-
-	resp.Diagnostics.Append(
-		self.client.DeleteIt(
-			ctx,
-			icon.String(),
-			"icon/api/icons/"+iconId,
-			ICON_API_VERSION,
-		)...,
-	)
 }
 
 func (self *IconResource) ImportState(

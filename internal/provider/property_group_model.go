@@ -44,6 +44,22 @@ func (self PropertyGroupModel) String() string {
 		self.Name.ValueString())
 }
 
+func (self PropertyGroupModel) CreatePath() string {
+	return "properties/api/property-groups"
+}
+
+func (self PropertyGroupModel) ReadPath() string {
+	return "properties/api/property-groups/" + self.Id.ValueString()
+}
+
+func (self PropertyGroupModel) UpdatePath() string {
+	return self.ReadPath()
+}
+
+func (self PropertyGroupModel) DeletePath() string {
+	return self.ReadPath()
+}
+
 func (self *PropertyGroupModel) FromAPI(
 	ctx context.Context,
 	raw PropertyGroupAPIModel,
