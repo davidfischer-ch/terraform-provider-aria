@@ -107,30 +107,18 @@ func (self *ResourceActionResource) Read(
 	}
 
 	var actionRaw ResourceActionAPIModel
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", FORM_API_VERSION).
-		SetResult(&actionRaw).
-		Get(action.ReadPath())
-
-	// Handle gracefully a resource that has vanished on the platform
-	// Beware that some APIs respond with HTTP 404 instead of 403 ...
-	if response.StatusCode() == 404 {
-		tflog.Debug(ctx, fmt.Sprintf("%s not found", action.String()))
+	found, readDiags := self.client.ReadIt(ctx, &action, &actionRaw)
+	resp.Diagnostics.Append(readDiags...)
+	if !found {
 		resp.State.RemoveResource(ctx)
 		return
 	}
 
-	err = handleAPIResponse(ctx, response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to read %s, got error: %s", action.String(), err))
-		return
+	if !resp.Diagnostics.HasError() {
+		// Save updated resource action into Terraform state
+		resp.Diagnostics.Append(action.FromAPI(ctx, actionRaw)...)
+		resp.Diagnostics.Append(resp.State.Set(ctx, &action)...)
 	}
-
-	// Save updated resource action into Terraform state
-	resp.Diagnostics.Append(action.FromAPI(ctx, actionRaw)...)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &action)...)
 }
 
 func (self *ResourceActionResource) Update(

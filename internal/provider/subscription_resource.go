@@ -113,30 +113,18 @@ func (self *SubscriptionResource) Read(
 	}
 
 	var subscriptionRaw SubscriptionAPIModel
-	response, err := self.client.Client.R().
-		// TODO SetQueryParam("apiVersion", EVENT_BROKER_API_VERSION).
-		SetResult(&subscriptionRaw).
-		Get(subscription.ReadPath())
-
-	// Handle gracefully a resource that has vanished on the platform
-	// Beware that some APIs respond with HTTP 404 instead of 403 ...
-	if response.StatusCode() == 404 {
-		tflog.Debug(ctx, fmt.Sprintf("%s not found", subscription.String()))
+	found, readDiags := self.client.ReadIt(ctx, &subscription, &subscriptionRaw)
+	resp.Diagnostics.Append(readDiags...)
+	if !found {
 		resp.State.RemoveResource(ctx)
 		return
 	}
 
-	err = handleAPIResponse(ctx, response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to read %s, got error: %s", subscription.String(), err))
-		return
+	if !resp.Diagnostics.HasError() {
+		// Save updated subscription into Terraform state
+		resp.Diagnostics.Append(subscription.FromAPI(ctx, subscriptionRaw)...)
+		resp.Diagnostics.Append(resp.State.Set(ctx, &subscription)...)
 	}
-
-	// Save updated subscription into Terraform state
-	resp.Diagnostics.Append(subscription.FromAPI(ctx, subscriptionRaw)...)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &subscription)...)
 }
 
 func (self *SubscriptionResource) Update(

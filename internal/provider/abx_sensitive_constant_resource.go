@@ -93,29 +93,18 @@ func (self *ABXSensitiveConstantResource) Read(
 	}
 
 	var constantRaw ABXSensitiveConstantAPIModel
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", ABX_API_VERSION).
-		SetResult(&constantRaw).
-		Get(constant.ReadPath())
-
-	// Handle gracefully a resource that has vanished on the platform
-	// Beware that some APIs respond with HTTP 404 instead of 403 ...
-	if response.StatusCode() == 404 {
+	found, readDiags := self.client.ReadIt(ctx, &constant, &constantRaw)
+	resp.Diagnostics.Append(readDiags...)
+	if !found {
 		resp.State.RemoveResource(ctx)
 		return
 	}
 
-	err = handleAPIResponse(ctx, response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to read %s, got error: %s", constant.String(), err))
-		return
+	if !resp.Diagnostics.HasError() {
+		// Save updated secret into Terraform state
+		resp.Diagnostics.Append(constant.FromAPI(ctx, constantRaw)...)
+		resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
 	}
-
-	// Save updated secret into Terraform state
-	resp.Diagnostics.Append(constant.FromAPI(ctx, constantRaw)...)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
 }
 
 func (self *ABXSensitiveConstantResource) Update(

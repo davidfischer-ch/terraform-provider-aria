@@ -139,17 +139,15 @@ func (self AriaClient) DeleteIt(
 	ctx context.Context,
 	instance Model,
 ) diag.Diagnostics {
+	diags := diag.Diagnostics{}
 	name := instance.String()
 	tflog.Debug(ctx, fmt.Sprintf("Deleting %s...", name))
 
-	diags := diag.Diagnostics{}
-	path := instance.DeletePath()
-	apiVersion := GetVersionFromPath(path)
-
 	// Delete the resource
+	deletePath := instance.DeletePath()
 	response, err := self.Client.R().
-		SetQueryParam("apiVersion", apiVersion).
-		Delete(path)
+		SetQueryParam("apiVersion", GetVersionFromPath(deletePath)).
+		Delete(deletePath)
 
 	err = handleAPIResponse(ctx, response, err, []int{200, 204})
 	if err != nil {
@@ -160,10 +158,15 @@ func (self AriaClient) DeleteIt(
 	}
 
 	// Poll resource until deleted
+	readPath := instance.ReadPath()
 	for retry := range []int{0, 1, 2, 3, 4} {
 		time.Sleep(time.Duration(retry) * time.Second)
 		tflog.Debug(ctx, fmt.Sprintf("Poll %d of 5 - Check %s is deleted...", retry+1, name))
-		response, err := self.Client.R().SetQueryParam("apiVersion", apiVersion).Get(path)
+
+		response, err := self.Client.R().
+			SetQueryParam("apiVersion", GetVersionFromPath(readPath)).
+			Get(readPath)
+
 		err = handleAPIResponse(ctx, response, err, []int{200, 404})
 		if err != nil {
 			diags.AddError(
@@ -171,6 +174,7 @@ func (self AriaClient) DeleteIt(
 				fmt.Sprintf("Unable to poll %s will deleting it, got error: %s", name, err))
 			return diags
 		}
+
 		if response.StatusCode() == 404 {
 			tflog.Debug(ctx, fmt.Sprintf("Deleted %s successfully", name))
 			return diags

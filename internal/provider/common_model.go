@@ -11,3 +11,5 @@ type Model interface {
 	UpdatePath() string
 	DeletePath() string
 }
+
+type APIModel interface{}

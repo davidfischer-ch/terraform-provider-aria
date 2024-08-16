@@ -106,13 +106,11 @@ func (self *CustomResourceResource) Read(
 		return
 	}
 
-	if resp.Diagnostics.HasError() {
-		return
+	if !resp.Diagnostics.HasError() {
+		// Save updated custom resource into Terraform state
+		resp.Diagnostics.Append(resource.FromAPI(ctx, raw)...)
+		resp.Diagnostics.Append(resp.State.Set(ctx, &resource)...)
 	}
-
-	// Save updated custom resource into Terraform state
-	resp.Diagnostics.Append(resource.FromAPI(ctx, raw)...)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &resource)...)
 }
 
 func (self *CustomResourceResource) Update(

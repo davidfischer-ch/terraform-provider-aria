@@ -99,30 +99,18 @@ func (self *CloudTemplateV1Resource) Read(
 	}
 
 	var templateRaw CloudTemplateV1APIModel
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", BLUEPRINT_API_VERSION).
-		SetResult(&templateRaw).
-		Get(template.ReadPath())
-
-	// Handle gracefully a resource that has vanished on the platform
-	// Beware that some APIs respond with HTTP 404 instead of 403 ...
-	if response.StatusCode() == 404 {
-		tflog.Debug(ctx, fmt.Sprintf("%s not found", template.String()))
+	found, readDiags := self.client.ReadIt(ctx, &template, &templateRaw)
+	resp.Diagnostics.Append(readDiags...)
+	if !found {
 		resp.State.RemoveResource(ctx)
 		return
 	}
 
-	err = handleAPIResponse(ctx, response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to read %s, got error: %s", template.String(), err))
-		return
+	if !resp.Diagnostics.HasError() {
+		// Save updated cloud template into Terraform state
+		resp.Diagnostics.Append(template.FromAPI(ctx, templateRaw)...)
+		resp.Diagnostics.Append(resp.State.Set(ctx, &template)...)
 	}
-
-	// Save updated cloud template into Terraform state
-	resp.Diagnostics.Append(template.FromAPI(ctx, templateRaw)...)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &template)...)
 }
 
 func (self *CloudTemplateV1Resource) Update(

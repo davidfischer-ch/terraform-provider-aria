@@ -101,30 +101,18 @@ func (self *ProjectResource) Read(
 	}
 
 	var projectRaw ProjectAPIModel
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", PROJECT_API_VERSION).
-		SetResult(&projectRaw).
-		Get(project.ReadPath())
-
-	// Handle gracefully a resource that has vanished on the platform
-	// Beware that some APIs respond with HTTP 404 instead of 403 ...
-	if response.StatusCode() == 404 {
-		tflog.Debug(ctx, fmt.Sprintf("%s not found", project.String()))
+	found, readDiags := self.client.ReadIt(ctx, &project, &projectRaw)
+	resp.Diagnostics.Append(readDiags...)
+	if !found {
 		resp.State.RemoveResource(ctx)
 		return
 	}
 
-	err = handleAPIResponse(ctx, response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to read %s, got error: %s", project.String(), err))
-		return
+	if !resp.Diagnostics.HasError() {
+		// Save updated property group into Terraform state
+		resp.Diagnostics.Append(project.FromAPI(ctx, projectRaw)...)
+		resp.Diagnostics.Append(resp.State.Set(ctx, &project)...)
 	}
-
-	// Save updated property group into Terraform state
-	resp.Diagnostics.Append(project.FromAPI(ctx, projectRaw)...)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &project)...)
 }
 
 func (self *ProjectResource) Update(

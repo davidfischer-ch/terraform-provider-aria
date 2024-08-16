@@ -99,30 +99,18 @@ func (self *PropertyGroupResource) Read(
 	}
 
 	var propertyGroupRaw PropertyGroupAPIModel
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", BLUEPRINT_API_VERSION).
-		SetResult(&propertyGroupRaw).
-		Get(propertyGroup.ReadPath())
-
-	// Handle gracefully a resource that has vanished on the platform
-	// Beware that some APIs respond with HTTP 404 instead of 403 ...
-	if response.StatusCode() == 404 {
-		tflog.Debug(ctx, fmt.Sprintf("%s not found", propertyGroup.String()))
+	found, readDiags := self.client.ReadIt(ctx, &propertyGroup, &propertyGroupRaw)
+	resp.Diagnostics.Append(readDiags...)
+	if !found {
 		resp.State.RemoveResource(ctx)
 		return
 	}
 
-	err = handleAPIResponse(ctx, response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to read %s, got error: %s", propertyGroup.String(), err))
-		return
+	if !resp.Diagnostics.HasError() {
+		// Save updated property group into Terraform state
+		resp.Diagnostics.Append(propertyGroup.FromAPI(ctx, propertyGroupRaw)...)
+		resp.Diagnostics.Append(resp.State.Set(ctx, &propertyGroup)...)
 	}
-
-	// Save updated property group into Terraform state
-	resp.Diagnostics.Append(propertyGroup.FromAPI(ctx, propertyGroupRaw)...)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &propertyGroup)...)
 }
 
 func (self *PropertyGroupResource) Update(
