@@ -4,10 +4,10 @@
 package provider
 
 import (
-	"context"
-	"sync"
+    "context"
+    "sync"
 
-	"github.com/hashicorp/terraform-plugin-log/tflog"
+    "github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
 // Copied and the modified from the helpers that were removed from Terraform Plugin SDKv2
@@ -25,7 +25,7 @@ type RWMutexKV struct {
     store map[string]*sync.RWMutex
 }
 
-// Returns a properly initialized RWMutexKV
+// Returns a properly initialized RWMutexKV.
 func NewRWMutexKV() *RWMutexKV {
     return &RWMutexKV{
         store: make(map[string]*sync.RWMutex),
