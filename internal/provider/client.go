@@ -39,6 +39,9 @@ type AriaClient struct {
 	Context context.Context
 
 	Client *resty.Client
+
+	// Named read-write mutexes for managing resources
+	Mutex *RWMutexKV
 }
 
 type AccessTokenResponse struct {
@@ -62,6 +65,8 @@ func (self *AriaClient) Init() diag.Diagnostics {
 	self.Client = client
 
 	diags.Append(self.GetAccessToken()...)
+
+	self.Mutex = NewRWMutexKV()
 
 	return diags
 }

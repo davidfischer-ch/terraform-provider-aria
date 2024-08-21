@@ -6,6 +6,8 @@ package provider
 type Model interface {
 	String() string
 
+	LockKey() string
+
 	CreatePath() string
 	ReadPath() string
 	UpdatePath() string

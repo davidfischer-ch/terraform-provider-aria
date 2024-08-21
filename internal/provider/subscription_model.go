@@ -75,6 +75,13 @@ func (self SubscriptionModel) String() string {
 		self.Name.ValueString())
 }
 
+// Return an appropriate key that can be used for naming mutexes.
+// Create: Identifier can be used to prevent concurrent creation of subscriptions.
+// Read Update Delete: Identifier can be used to prevent concurrent modifications on the instance.
+func (self SubscriptionModel) LockKey() string {
+	return "subscription-" + self.Id.ValueString()
+}
+
 func (self SubscriptionModel) CreatePath() string {
 	return "event-broker/api/subscriptions"
 }

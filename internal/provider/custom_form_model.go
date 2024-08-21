@@ -120,7 +120,7 @@ func CustomFormModelAttributeTypes() map[string]attr.Type {
 		"id":          types.StringType,
 		"name":        types.StringType,
 		"type":        types.StringType,
-		"form":        types.StringType,
+		"form":        jsontypes.NormalizedType{},
 		"form_format": types.StringType,
 		"styles":      types.StringType,
 		"source_id":   types.StringType,

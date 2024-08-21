@@ -98,9 +98,12 @@ func (self *CustomResourceResource) Read(
 		return
 	}
 
-	var raw CustomResourceAPIModel
-	found, readDiags := self.client.ReadIt(ctx, &resource, &raw)
-	resp.Diagnostics.Append(readDiags...)
+	var resourceRaw CustomResourceAPIModel
+	self.client.Mutex.RLock(ctx, resource.LockKey())
+	found, diags := self.client.ReadIt(ctx, &resource, &resourceRaw)
+	self.client.Mutex.RUnlock(ctx, resource.LockKey())
+	resp.Diagnostics.Append(diags...)
+
 	if !found {
 		resp.State.RemoveResource(ctx)
 		return
@@ -108,7 +111,7 @@ func (self *CustomResourceResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated custom resource into Terraform state
-		resp.Diagnostics.Append(resource.FromAPI(ctx, raw)...)
+		resp.Diagnostics.Append(resource.FromAPI(ctx, resourceRaw)...)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &resource)...)
 	}
 }
@@ -131,14 +134,36 @@ func (self *CustomResourceResource) Update(
 		return
 	}
 
-	// FIXME Mutex
-	// FIXME Read resource to retrieve additional actions to keep them untouched
+	self.client.Mutex.Lock(ctx, resource.LockKey())
+
+	// Read resource to retrieve latest value for additional actions
+	var resourceRawBis CustomResourceAPIModel
+	found, diags := self.client.ReadIt(ctx, &resource, &resourceRawBis)
+	resp.Diagnostics.Append(diags...)
+
+	if !found || resp.Diagnostics.HasError() {
+		if !found {
+			resp.Diagnostics.AddError(
+				"Client error",
+				fmt.Sprintf(
+					"Unable to update %s: Not found.",
+					resource.String()))
+		}
+
+		self.client.Mutex.Unlock(ctx, resource.LockKey())
+		return
+	}
+
+	// Ensure additional actions are left untouched
+	resourceRaw.AdditionalActions = resourceRawBis.AdditionalActions
 
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", FORM_API_VERSION).
 		SetBody(resourceRaw).
 		SetResult(&resourceRaw).
 		Post(resource.UpdatePath())
+
+	self.client.Mutex.Unlock(ctx, resource.LockKey())
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
@@ -163,7 +188,9 @@ func (self *CustomResourceResource) Delete(
 	var resource CustomResourceModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &resource)...)
 	if !resp.Diagnostics.HasError() {
+		self.client.Mutex.Lock(ctx, resource.LockKey())
 		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &resource)...)
+		self.client.Mutex.Unlock(ctx, resource.LockKey())
 	}
 }
 

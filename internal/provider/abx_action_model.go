@@ -81,6 +81,13 @@ func (self ABXActionModel) String() string {
 		self.ProjectId.ValueString())
 }
 
+// Return an appropriate key that can be used for naming mutexes.
+// Create: Identifier can be used to prevent concurrent creation of ABX actions.
+// Read Update Delete: Identifier can be used to prevent concurrent modifications on the instance.
+func (self ABXActionModel) LockKey() string {
+	return "abx-action-" + self.Id.ValueString()
+}
+
 func (self ABXActionModel) CreatePath() string {
 	return "abx/api/resources/actions"
 }

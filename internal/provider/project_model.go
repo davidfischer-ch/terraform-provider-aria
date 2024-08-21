@@ -46,6 +46,13 @@ func (self ProjectModel) String() string {
 		self.Name.ValueString())
 }
 
+// Return an appropriate key that can be used for naming mutexes.
+// Create: Identifier can be used to prevent concurrent creation of projects.
+// Read Update Delete: Identifier can be used to prevent concurrent modifications on the instance.
+func (self ProjectModel) LockKey() string {
+	return "project-" + self.Id.ValueString()
+}
+
 func (self ProjectModel) CreatePath() string {
 	return "project-service/api/projects"
 }
