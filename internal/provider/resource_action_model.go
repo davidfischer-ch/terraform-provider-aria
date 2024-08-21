@@ -60,6 +60,17 @@ func (self ResourceActionModel) String() string {
 		self.ProjectId.ValueString())
 }
 
+// Return an appropriate key that can be used for naming mutexes.
+// Create: Identifier can be used to prevent concurrent creation of resource actions.
+// Read Update Delete: Identifier can be used to prevent concurrent modifications on the instance.
+func (self ResourceActionModel) LockKey() string {
+	if self.ForCustom() {
+		// The custom resource is the object that will be manipulated to manage the action!
+		return CustomResourceModel{Id: self.ResourceId}.LockKey()
+	}
+	return "resource-actions-" + self.Id.ValueString()
+}
+
 func (self ResourceActionModel) CreatePath() string {
 	if len(self.ResourceId.ValueString()) > 0 {
 		// Custom resource ...
@@ -173,4 +184,8 @@ func (self ResourceActionModel) ToAPI(
 		ProjectId:      self.ProjectId.ValueString(),
 		OrgId:          self.OrgId.ValueString(),
 	}, diags
+}
+
+func (self ResourceActionModel) ForCustom() bool {
+	return len(self.ResourceId.ValueString()) > 0
 }

@@ -5,6 +5,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -28,6 +29,14 @@ type ResourceActionRunnableAPIModel struct {
 	ProjectId        string                    `json:"projectId"`
 	InputParameters  []ActionParameterAPIModel `json:"inputParameters"`
 	OutputParameters []ActionParameterAPIModel `json:"outputParameters"`
+}
+
+func (self *ResourceActionRunnableModel) String() string {
+	return fmt.Sprintf(
+		"Resource Action Runnable %s (%s) project %s",
+		self.Id.ValueString(),
+		self.Name.ValueString(),
+		self.ProjectId.ValueString())
 }
 
 func (self *ResourceActionRunnableModel) FromAPI(

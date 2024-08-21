@@ -54,6 +54,13 @@ func (self CloudTemplateV1Model) String() string {
 		self.Name.ValueString())
 }
 
+// Return an appropriate key that can be used for naming mutexes.
+// Create: Identifier can be used to prevent concurrent creation of cloud templates.
+// Read Update Delete: Identifier can be used to prevent concurrent modifications on the instance.
+func (self CloudTemplateV1Model) LockKey() string {
+	return "cloud-template-" + self.Id.ValueString()
+}
+
 func (self CloudTemplateV1Model) CreatePath() string {
 	return "blueprint/api/blueprints"
 }

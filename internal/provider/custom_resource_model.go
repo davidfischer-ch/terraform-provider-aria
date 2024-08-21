@@ -27,7 +27,7 @@ type CustomResourceModel struct {
 	Update ResourceActionRunnableModel `tfsdk:"update"`
 	Delete ResourceActionRunnableModel `tfsdk:"delete"`
 
-	AdditionalActions []ResourceActionRunnableModel `tfsdk:"-"`
+	AdditionalActions []ResourceActionModel `tfsdk:"-"`
 
 	ProjectId types.String `tfsdk:"project_id"`
 	OrgId     types.String `tfsdk:"org_id"`
@@ -45,7 +45,7 @@ type CustomResourceAPIModel struct {
 	Properties CustomResourcePropertiesAPIModel `json:"properties"`
 
 	MainActions       map[string]ResourceActionRunnableAPIModel `json:"mainActions"`
-	AdditionalActions []ResourceActionRunnableAPIModel          `json:"additionalActions"`
+	AdditionalActions []ResourceActionAPIModel                  `json:"additionalActions"`
 
 	ProjectId string `json:"projectId"`
 	OrgId     string `json:"orgId"`
@@ -53,9 +53,16 @@ type CustomResourceAPIModel struct {
 
 func (self CustomResourceModel) String() string {
 	return fmt.Sprintf(
-		"ABX Custom Resource %s (%s)",
+		"Custom Resource %s (%s)",
 		self.Id.ValueString(),
 		self.DisplayName.ValueString())
+}
+
+// Return an appropriate key that can be used for naming mutexes.
+// Create: Identifier can be used to prevent concurrent creation of custom resources.
+// Read Update Delete: Identifier can be used to prevent concurrent modifications on the instance.
+func (self CustomResourceModel) LockKey() string {
+	return "custom-resource-" + self.Id.ValueString()
 }
 
 func (self CustomResourceModel) CreatePath() string {
@@ -101,6 +108,13 @@ func (self *CustomResourceModel) FromAPI(
 	self.Delete = ResourceActionRunnableModel{}
 	diags.Append(self.Delete.FromAPI(ctx, raw.MainActions["delete"])...)
 
+	self.AdditionalActions = []ResourceActionModel{}
+	for _, actionRaw := range raw.AdditionalActions {
+		action := ResourceActionModel{}
+		diags.Append(action.FromAPI(ctx, actionRaw)...)
+		self.AdditionalActions = append(self.AdditionalActions, action)
+	}
+
 	return diags
 }
 
@@ -122,6 +136,13 @@ func (self CustomResourceModel) ToAPI(
 	deleteRaw, deleteDiags := self.Delete.ToAPI(ctx)
 	diags.Append(deleteDiags...)
 
+	var additionalActionsRaw []ResourceActionAPIModel
+	for _, action := range self.AdditionalActions {
+		actionRaw, actionDiags := action.ToAPI(ctx)
+		additionalActionsRaw = append(additionalActionsRaw, actionRaw)
+		diags.Append(actionDiags...)
+	}
+
 	return CustomResourceAPIModel{
 		Id:           self.Id.ValueString(),
 		DisplayName:  self.DisplayName.ValueString(),
@@ -140,5 +161,6 @@ func (self CustomResourceModel) ToAPI(
 			"update": updateRaw,
 			"delete": deleteRaw,
 		},
+		AdditionalActions: additionalActionsRaw,
 	}, diags
 }

@@ -38,6 +38,13 @@ func (self *CustomNamingModel) String() string {
 		self.Name.ValueString())
 }
 
+// Return an appropriate key that can be used for naming mutexes.
+// Create: Identifier can be used to prevent concurrent creation of custom naming.
+// Read Update Delete: Identifier can be used to prevent concurrent modifications on the instance.
+func (self CustomNamingModel) LockKey() string {
+	return "custom-naming-" + self.Id.ValueString()
+}
+
 func (self CustomNamingModel) CreatePath() string {
 	return "iaas/api/naming"
 }

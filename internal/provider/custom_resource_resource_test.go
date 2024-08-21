@@ -234,10 +234,11 @@ EOT
   }
 }
 
-/*resource "aria_resource_action" "test_reset" {
+resource "aria_resource_action" "test_reset" {
   name          = "reset_my_stuff"
   display_name  = "Reset My Stuff"
   description   = "Reset my stuff."
+  status        = aria_custom_resource.test.status
   resource_id   = aria_custom_resource.test.id
   resource_type = aria_custom_resource.test.resource_type
   project_id    = aria_custom_resource.test.project_id
@@ -251,15 +252,17 @@ EOT
   }
 }
 
-/*resource "aria_resource_action" "test_snapshot" {
+resource "aria_resource_action" "test_snapshot" {
   name          = "snapshot"
   display_name  = "Snaphsot"
   description   = "Snapshot the instance."
+  status        = aria_custom_resource.test.status
   resource_id   = aria_custom_resource.test.id
   resource_type = aria_custom_resource.test.resource_type
   project_id    = aria_custom_resource.test.project_id
   runnable_item = {
     id                = aria_abx_action.snapshot.id
+    name              = aria_abx_action.snapshot.name
     project_id        = aria_abx_action.snapshot.project_id
     type              = "abx.action"
     input_parameters  = []
@@ -267,14 +270,17 @@ EOT
   }
 }
 
-resource "aria_custom_resource_additional_action" "test_restore" {
+/* resource "aria_resource_action" "test_restore" {
   name          = "restore"
   display_name  = "Restore"
   description   = "Restore the instance from latest snapshot."
+  status        = aria_custom_resource.test.status
+  resource_id   = aria_custom_resource.test.id
   resource_type = aria_custom_resource.test.resource_type
   project_id    = aria_custom_resource.test.project_id
   runnable_item = {
     id                = aria_abx_action.restore.id
+    name              = aria_abx_action.restore.name
     project_id        = aria_abx_action.restore.project_id
     type              = "abx.action"
     input_parameters  = []

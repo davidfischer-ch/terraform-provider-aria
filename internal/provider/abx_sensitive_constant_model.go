@@ -37,6 +37,13 @@ func (self ABXSensitiveConstantModel) String() string {
 		self.Name.ValueString())
 }
 
+// Return an appropriate key that can be used for naming mutexes.
+// Create: Identifier can be used to prevent concurrent creation of ABX constants.
+// Read Update Delete: Identifier can be used to prevent concurrent modifications on the instance.
+func (self ABXSensitiveConstantModel) LockKey() string {
+	return "abx-constant-" + self.Id.ValueString() // Its not a mistake, shared.
+}
+
 func (self ABXSensitiveConstantModel) CreatePath() string {
 	return "abx/api/resources/action-secrets"
 }
