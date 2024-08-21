@@ -177,7 +177,7 @@ func (self *ResourceActionResource) ManageIt(
 		return actionRaw, diags
 	}
 
-	// Custom resource ...
+	/* Custom resource ... */
 	if action.ForCustom() {
 		var resourceRaw CustomResourceAPIModel
 		resource := CustomResourceModel{Id: action.ResourceId}
@@ -202,7 +202,7 @@ func (self *ResourceActionResource) ManageIt(
 
 		tflog.Debug(ctx, fmt.Sprintf("Analyze %s (status & additional actions)", resource.String()))
 
-		// Create & Update: Validate status
+		/* Create & Update: Validate status */
 		if method != "delete" && action.Status.ValueString() != resource.Status.ValueString() {
 			diags.AddError(
 				"Configuration error",
@@ -227,20 +227,20 @@ func (self *ResourceActionResource) ManageIt(
 			}
 		}
 
-		// Create: Insert the action to the custom resource's additional actions
+		/* Create: Insert the action to the custom resource's additional actions */
 		if method == "create" {
 			if actionIndex >= 0 {
 				// Prevent registering the same action twice (match by runnable ID)
 				diags.AddError(
 					"Configuration error",
 					fmt.Sprintf(
-						"Unable to create %s: %s is already registerd to %s.",
+						"Unable to create %s: %s is already registered to %s.",
 						action.String(), action.RunnableItem.String(), resource.String()))
 			} else {
 				resource.AdditionalActions = append(resource.AdditionalActions, *action)
 			}
 
-			// Update: Overwrite matching action inside the custom resource's additional actions
+			/* Update: Overwrite matching action inside the custom resource's additional actions */
 		} else if method == "update" {
 			if actionIndex < 0 {
 				diags.AddError(
@@ -252,7 +252,7 @@ func (self *ResourceActionResource) ManageIt(
 				resource.AdditionalActions[actionIndex] = *action
 			}
 
-			// Delete: Remove the action from the custom resource's additional actions
+			/* Delete: Remove the action from the custom resource's additional actions */
 		} else {
 			if actionIndex < 0 {
 				// Nothing to do, action is already deleted
@@ -303,7 +303,7 @@ func (self *ResourceActionResource) ManageIt(
 			}
 		}
 
-		// Delete: Ensure action was removed from additional actions
+		/* Delete: Ensure action was removed from additional actions */
 		if method == "delete" {
 			if actionIndex >= 0 {
 				diags.AddError(
@@ -313,7 +313,7 @@ func (self *ResourceActionResource) ManageIt(
 						method, action.String(), resource.String()))
 			}
 
-			// Create & Update: Ensure action is found in additional actions
+			/* Create & Update: Ensure action is found in additional actions */
 		} else {
 			if actionIndex < 0 {
 				diags.AddError(
@@ -324,7 +324,7 @@ func (self *ResourceActionResource) ManageIt(
 			}
 		}
 
-		// Native resource ...
+		/* Native resource ... */
 	} else {
 		actionRaw, tmpDiags = action.ToAPI(ctx)
 		diags.Append(tmpDiags...)
@@ -332,12 +332,13 @@ func (self *ResourceActionResource) ManageIt(
 			return actionRaw, diags
 		}
 
-		// Delete: Delete the resource action
+		/* Delete: Delete the resource action */
 		if method == "delete" {
 			diags.Append(self.client.DeleteIt(ctx, action)...)
 			return actionRaw, diags
 		}
 
+		/* Create or update the resource action */
 		var path string
 		if method == "create" {
 			path = action.CreatePath()
@@ -345,12 +346,12 @@ func (self *ResourceActionResource) ManageIt(
 			path = action.UpdatePath()
 		}
 
-		// Create or update the resource action
 		response, err := self.client.Client.R().
 			SetQueryParam("apiVersion", FORM_API_VERSION).
 			SetBody(actionRaw).
 			SetResult(&actionRaw).
 			Post(path)
+
 		err = handleAPIResponse(ctx, response, err, []int{200})
 		if err != nil {
 			diags.AddError(

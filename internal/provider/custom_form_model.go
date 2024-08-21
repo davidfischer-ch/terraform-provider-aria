@@ -117,11 +117,10 @@ func (self *CustomFormAPIModel) ToObject(
 // Used to convert structure to a types.Object.
 func CustomFormModelAttributeTypes() map[string]attr.Type {
 	return map[string]attr.Type{
-		"id":   types.StringType,
-		"name": types.StringType,
-		"type": types.StringType,
-		// https://discuss.hashicorp.com/t/how-to-declare-a-jsontypes-normalizedtype-inside-attributetype-response/69427
-		"form":        types.StringType, // jsontypes.NormalizedType,
+		"id":          types.StringType,
+		"name":        types.StringType,
+		"type":        types.StringType,
+		"form":        jsontypes.NormalizedType{},
 		"form_format": types.StringType,
 		"styles":      types.StringType,
 		"source_id":   types.StringType,
