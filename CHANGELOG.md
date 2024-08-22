@@ -2,7 +2,7 @@
 
 ## Release v0.4.1 (2024-07-25)
 
-Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.4.1...v0.4.0
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.4.0...v0.4.1
 
 ### Fix and enhancements
 
@@ -15,7 +15,7 @@ Semantic equality logic is defined for Normalized such that inconsequential diff
 
 ## Release v0.4.0 (2024-07-23)
 
-Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.4.0...v0.3.1
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.3.1...v0.4.0
 
 ### Minor compatibility breaks
 
