@@ -113,12 +113,22 @@ resource "aria_custom_resource" "redis" {
         { const = "8.0", title = "8.0", encrypted = false }
       ]
     }
+    description = {
+      name               = "description"
+      title              = "Description"
+      description        = "Some description here."
+      type               = "string"
+      default            = jsonencode("No description given.")
+      encrypted          = false
+      read_only          = false
+      recreate_on_update = false
+    }
     storage_size = {
       name               = "storage_size"
       title              = "Storage Size"
       description        = "Storage size (MB)."
       type               = "integer"
-      default            = tostring(10 * 1024)
+      default            = 10 * 1024
       encrypted          = false
       read_only          = false
       recreate_on_update = false
@@ -165,6 +175,75 @@ resource "aria_custom_resource" "redis" {
   delete = {
     id                = aria_abx_action.redis_delete.id
     project_id        = aria_abx_action.redis_delete.project_id
+    type              = "abx.action"
+    input_parameters  = []
+    output_parameters = []
+  }
+}
+
+# Additional actions (aka Day 2), managed using relational resources
+# This design is intentional for Terraform to be able to succesfully apply any changes
+
+resource "aria_abx_action" "redis_backup" {
+  name            = "Custom.Redis.backup"
+  description     = "Backup the Redis database (its data)."
+  runtime_name    = "python"
+  memory_in_mb    = 128
+  timeout_seconds = 60
+  entrypoint      = "handler"
+  dependencies    = []
+  constants       = []
+  secrets         = []
+  source          = local.source
+  shared          = true
+  project_id      = var.project_id
+}
+
+resource "aria_resource_action" "redis_backup" {
+  name          = "backup"
+  display_name  = "Backup data"
+  description   = aria_abx_action.redis_backup.description
+  status        = aria_custom_resource.redis.status
+  resource_id   = aria_custom_resource.redis.id
+  resource_type = aria_custom_resource.redis.resource_type
+  project_id    = aria_custom_resource.redis.project_id
+  runnable_item = {
+    id                = aria_abx_action.redis_backup.id
+    name              = aria_abx_action.redis_backup.name
+    project_id        = aria_abx_action.redis_backup.project_id
+    type              = "abx.action"
+    input_parameters  = []
+    output_parameters = []
+  }
+}
+
+resource "aria_abx_action" "redis_restore" {
+  name            = "Custom.Redis.restore"
+  description     = "Restore the Redis database (its data)."
+  runtime_name    = "python"
+  memory_in_mb    = 128
+  timeout_seconds = 60
+  entrypoint      = "handler"
+  dependencies    = []
+  constants       = []
+  secrets         = []
+  source          = local.source
+  shared          = true
+  project_id      = var.project_id
+}
+
+resource "aria_resource_action" "redis_restore" {
+  name          = "restore"
+  display_name  = "Restore"
+  description   = aria_abx_action.redis_restore.description
+  status        = aria_custom_resource.redis.status
+  resource_id   = aria_custom_resource.redis.id
+  resource_type = aria_custom_resource.redis.resource_type
+  project_id    = aria_custom_resource.redis.project_id
+  runnable_item = {
+    id                = aria_abx_action.redis_restore.id
+    name              = aria_abx_action.redis_restore.name
+    project_id        = aria_abx_action.redis_restore.project_id
     type              = "abx.action"
     input_parameters  = []
     output_parameters = []
@@ -278,13 +357,11 @@ Required:
 
 Optional:
 
-- `default` (String) Default value as string (will be seamlessly converted to appropriate type).
-The string should be a JSON for arrays and objects.
+- `default` (String) Default value (JSON encoded)
 
-We should have implemented this attribute as a dynamic type (and not string).
+We should have implemented this attribute as a dynamic type (and not JSON).
 Unfortunately Terraform SDK returns this issue:
 Dynamic types inside of collections are not currently supported in terraform-plugin-framework.
-If underlying dynamic values are required, replace the 'properties' attribute definition with DynamicAttribute instead.
 - `max_length` (Number) Maximum length (valid for a string)
 - `maximum` (Number) Maximum value (inclusive, valid for an integer)
 - `min_length` (Number) Minimum length (valid for a string)

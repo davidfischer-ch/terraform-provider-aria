@@ -127,6 +127,7 @@ func (self *ResourceActionModel) FromAPI(
 	diags := self.RunnableItem.FromAPI(ctx, raw.RunnableItem)
 
 	// Criteria API data -> JSON Encoded
+	// TODO Deduplicate this routine, used on many places
 	if raw.Criteria == nil {
 		self.Criteria = jsontypes.NewNormalizedNull()
 	} else {
@@ -163,6 +164,7 @@ func (self ResourceActionModel) ToAPI(
 	}
 
 	// Criteria JSON Encoded -> API data
+	// TODO Deduplicate this routine, used on many places
 	var criteriaRaw map[string]interface{}
 	if self.Criteria.IsNull() {
 		criteriaRaw = nil

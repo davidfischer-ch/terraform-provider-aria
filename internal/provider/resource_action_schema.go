@@ -55,8 +55,8 @@ func ResourceActionSchema() schema.Schema {
 			},
 			"runnable_item": ResourceActionRunnableSchema("Action's runnable"),
 			"criteria": schema.StringAttribute{
+				MarkdownDescription: "Filtering criteria" + JSON_INSTEAD_OF_DYNAMIC_DISCLAIMER,
 				CustomType:          jsontypes.NormalizedType{},
-				MarkdownDescription: "Filtering criteria (JSON encoded)",
 				Optional:            true,
 			},
 			"form_definition": CustomFormSchema(),

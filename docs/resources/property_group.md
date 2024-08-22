@@ -131,13 +131,11 @@ Required:
 
 Optional:
 
-- `default` (String) Default value as string (will be seamlessly converted to appropriate type).
-The string should be a JSON for arrays and objects.
+- `default` (String) Default value (JSON encoded)
 
-We should have implemented this attribute as a dynamic type (and not string).
+We should have implemented this attribute as a dynamic type (and not JSON).
 Unfortunately Terraform SDK returns this issue:
 Dynamic types inside of collections are not currently supported in terraform-plugin-framework.
-If underlying dynamic values are required, replace the 'properties' attribute definition with DynamicAttribute instead.
 - `max_length` (Number) Maximum length (valid for a string)
 - `maximum` (Number) Maximum value (inclusive, valid for an integer)
 - `min_length` (Number) Minimum length (valid for a string)

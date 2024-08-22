@@ -23,3 +23,11 @@ const PROJECT_API_VERSION = "2019-01-15"
 
 // TODO then ensure its used (check related TODOs).
 const PLATFORM_API_VERSION = ""
+
+const JSON_INSTEAD_OF_DYNAMIC_DISCLAIMER = "" +
+	" (JSON encoded)\n" +
+	"\n" +
+	"We should have implemented this attribute as a dynamic type (and not JSON).\n" +
+	"Unfortunately Terraform SDK returns this issue:\n" +
+	"Dynamic types inside of collections are not currently supported in " +
+	"terraform-plugin-framework.\n"

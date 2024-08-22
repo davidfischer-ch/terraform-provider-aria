@@ -7,6 +7,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -29,13 +30,13 @@ func TestCustomResourceModelToAPI(t *testing.T) {
 				Name:    types.StringValue("replicas"),
 				Title:   types.StringValue("Replicas"),
 				Type:    types.StringValue("integer"),
-				Default: types.StringValue("2"),
+				Default: jsontypes.NewNormalizedValue("2"),
 			},
 			"enabled": {
 				Name:    types.StringValue("enabled"),
 				Title:   types.StringValue("Enabled"),
 				Type:    types.StringValue("boolean"),
-				Default: types.StringValue("true"),
+				Default: jsontypes.NewNormalizedValue("true"),
 			},
 		},
 		Create: ResourceActionRunnableModel{
@@ -107,7 +108,7 @@ func TestCustomResourceModelToAPI(t *testing.T) {
 	properties := raw.Properties.Properties
 	CheckEqual(t, len(properties), 3)
 	CheckEqual(t, properties["identifier"].Title, "Identifier")
-	CheckEqual(t, properties["replicas"].Default, int64(2))
+	CheckEqual(t, properties["replicas"].Default, float64(2))
 	CheckEqual(t, properties["enabled"].Type, "boolean")
 }
 
@@ -197,7 +198,7 @@ func TestCustomResourceModelFromAPI(t *testing.T) {
 	CheckEqual(t, resource.Properties["identifier"].Name.ValueString(), "identifier")
 	CheckEqual(t, resource.Properties["identifier"].Title.ValueString(), "Identifier")
 	CheckEqual(t, resource.Properties["identifier"].Type.ValueString(), "string")
-	CheckEqual(t, resource.Properties["identifier"].Default, types.StringNull())
+	CheckEqual(t, resource.Properties["identifier"].Default, jsontypes.NewNormalizedNull())
 	CheckEqual(t, resource.Properties["replicas"].Name.ValueString(), "replicas")
 	CheckEqual(t, resource.Properties["replicas"].Title.ValueString(), "Replicas")
 	CheckEqual(t, resource.Properties["replicas"].Type.ValueString(), "integer")
@@ -213,7 +214,7 @@ func TestCustomResourceModelFromAPI(t *testing.T) {
 	CheckEqual(t, resource.Properties["else"].Name.ValueString(), "else")
 	CheckEqual(t, resource.Properties["else"].Title.ValueString(), "Else")
 	CheckEqual(t, resource.Properties["else"].Type.ValueString(), "boolean")
-	CheckEqual(t, resource.Properties["else"].Default, types.StringNull())
+	CheckEqual(t, resource.Properties["else"].Default, jsontypes.NewNormalizedNull())
 	CheckEqual(t, resource.Create.Id.ValueString(), "c974e486-9039-4b84-9152-0e5aa2074d26")
 	CheckEqual(t, resource.Create.Name.ValueString(), "SomeCreateFunction")
 	CheckEqual(t, resource.Create.Type.ValueString(), "abx.action")

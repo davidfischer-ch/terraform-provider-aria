@@ -103,7 +103,7 @@ resource "aria_cloud_template_v1" "test" {
       description        = "Flavor"
       title              = "Flavor"
       type               = "string"
-      default            = "Windows-S"
+      default            = jsonencode("Windows-S")
       encrypted          = false
       read_only          = false
       recreate_on_update = false

@@ -362,7 +362,7 @@ Some number.
 It can be an integer or a float.
 EOT
       type               = "number"
-      default            = "3.141592"
+      default            = 3.141592
       encrypted          = false
       read_only          = false
       recreate_on_update = false

@@ -4,8 +4,7 @@
 package provider
 
 import (
-	"strings"
-
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
@@ -40,18 +39,9 @@ func PropertySchema() schema.NestedAttributeObject {
 				},
 			},
 			"default": schema.StringAttribute{
-				MarkdownDescription: strings.Join([]string{
-					"Default value as string (will be seamlessly converted to appropriate type).",
-					"The string should be a JSON for arrays and objects.",
-					"",
-					"We should have implemented this attribute as a dynamic type (and not string).",
-					"Unfortunately Terraform SDK returns this issue:",
-					"Dynamic types inside of collections are not currently supported in " +
-						"terraform-plugin-framework.",
-					"If underlying dynamic values are required, replace the 'properties' " +
-						"attribute definition with DynamicAttribute instead.",
-				}, "\n"),
-				Optional: true,
+				MarkdownDescription: "Default value" + JSON_INSTEAD_OF_DYNAMIC_DISCLAIMER,
+				CustomType:          jsontypes.NormalizedType{},
+				Optional:            true,
 			},
 			"encrypted": schema.BoolAttribute{
 				MarkdownDescription: "Encrypted?",

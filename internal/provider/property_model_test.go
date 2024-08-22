@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -17,90 +18,81 @@ func TestPropertyModel_Default_FromAPI(t *testing.T) {
 		name             string
 		propertyType     string
 		propertyRaw      any
-		propertyInternal types.String
+		propertyInternal jsontypes.Normalized
 		warningMessage   string
 		errorMessage     string
 	}{
 		{
-			name:             "not a valid type (macaque)",
-			propertyType:     "macaque",
-			propertyRaw:      false,
-			propertyInternal: types.StringValue("%!s(bool=false)"),
-			errorMessage:     "Managing property P of type macaque is not yet implemented.",
-		},
-		{
 			name:             "boolean value (false)",
 			propertyType:     "boolean",
 			propertyRaw:      false,
-			propertyInternal: types.StringValue("false"),
+			propertyInternal: jsontypes.NewNormalizedValue("false"),
 		},
 		{
 			name:             "boolean value (true)",
 			propertyType:     "boolean",
 			propertyRaw:      true,
-			propertyInternal: types.StringValue("true"),
+			propertyInternal: jsontypes.NewNormalizedValue("true"),
 		},
 		{
 			name:             "boolean value (string)",
 			propertyType:     "boolean",
 			propertyRaw:      "not really a boolean",
-			propertyInternal: types.StringValue("not really a boolean"),
-			errorMessage:     "Property P default \"not really a boolean\" is not a boolean",
+			propertyInternal: jsontypes.NewNormalizedValue("\"not really a boolean\""),
 		},
 		{
 			name:             "integer value (integer)",
 			propertyType:     "integer",
 			propertyRaw:      int64(42),
-			propertyInternal: types.StringValue("42"),
+			propertyInternal: jsontypes.NewNormalizedValue("42"),
 		},
 		{
 			name:             "integer value (float round)",
 			propertyType:     "integer",
 			propertyRaw:      float64(99),
-			propertyInternal: types.StringValue("99"),
+			propertyInternal: jsontypes.NewNormalizedValue("99"),
 		},
 		{
 			name:             "integer value (float)",
 			propertyType:     "integer",
 			propertyRaw:      float64(1.2),
-			propertyInternal: types.StringValue("%!s(float64=1.2)"),
-			errorMessage:     "Property P default \"%!s(float64=1.2)\" is not an integer",
+			propertyInternal: jsontypes.NewNormalizedValue("1.2"),
 		},
 		{
 			name:             "integer value (nil)",
 			propertyType:     "integer",
 			propertyRaw:      nil,
-			propertyInternal: types.StringNull(),
+			propertyInternal: jsontypes.NewNormalizedNull(),
 		},
 		{
 			name:             "number value (integer)",
 			propertyType:     "number",
 			propertyRaw:      int64(-100),
-			propertyInternal: types.StringValue("-100"),
+			propertyInternal: jsontypes.NewNormalizedValue("-100"),
 		},
 		{
 			name:             "number value (float)",
 			propertyType:     "number",
 			propertyRaw:      float64(3.141592),
-			propertyInternal: types.StringValue("3.141592"),
+			propertyInternal: jsontypes.NewNormalizedValue("3.141592"),
 		},
 		{
 			name:             "number value (nil)",
 			propertyType:     "number",
 			propertyRaw:      nil,
-			propertyInternal: types.StringNull(),
+			propertyInternal: jsontypes.NewNormalizedNull(),
 		},
 		{
 			name:             "string value (string)",
 			propertyType:     "string",
 			propertyRaw:      "some text",
-			propertyInternal: types.StringValue("some text"),
+			propertyInternal: jsontypes.NewNormalizedValue("\"some text\""),
 		},
 		{
 			name:             "array value (nil)",
 			propertyType:     "array",
 			propertyRaw:      nil,
-			propertyInternal: types.StringNull(),
+			propertyInternal: jsontypes.NewNormalizedNull(),
 		},
 	}
 
@@ -123,7 +115,7 @@ func TestPropertyModel_Default_ToAPI(t *testing.T) {
 	cases := []struct {
 		name             string
 		propertyType     string
-		propertyInternal types.String
+		propertyInternal jsontypes.Normalized
 		propertyRaw      any
 		propertyJson     string
 		warningMessage   string
@@ -132,77 +124,77 @@ func TestPropertyModel_Default_ToAPI(t *testing.T) {
 		{
 			name:             "boolean value (false)",
 			propertyType:     "boolean",
-			propertyInternal: types.StringValue("false"),
+			propertyInternal: jsontypes.NewNormalizedValue("false"),
 			propertyRaw:      false,
 			propertyJson:     "\"default\":false,",
 		},
 		{
 			name:             "boolean value (true)",
 			propertyType:     "boolean",
-			propertyInternal: types.StringValue("true"),
+			propertyInternal: jsontypes.NewNormalizedValue("true"),
 			propertyRaw:      true,
 			propertyJson:     "\"default\":true,",
 		},
 		{
 			name:             "boolean value (string)",
 			propertyType:     "boolean",
-			propertyInternal: types.StringValue("not really a boolean"),
-			propertyRaw:      nil,
-			errorMessage:     "invalid syntax",
+			propertyInternal: jsontypes.NewNormalizedValue("\"not really a boolean\""),
+			propertyRaw:      "not really a boolean",
+			propertyJson:     "\"default\":\"not really a boolean\",",
 		},
 		{
 			name:             "boolean value (nil)",
 			propertyType:     "boolean",
-			propertyInternal: types.StringNull(),
+			propertyInternal: jsontypes.NewNormalizedNull(),
 			propertyRaw:      nil,
 			propertyJson:     "",
 		},
 		{
 			name:             "integer value (integer)",
 			propertyType:     "integer",
-			propertyInternal: types.StringValue("42"),
-			propertyRaw:      int64(42),
+			propertyInternal: jsontypes.NewNormalizedValue("42"),
+			propertyRaw:      float64(42), // Always float, don't mind it
 			propertyJson:     "\"default\":42,",
 		},
 		{
 			name:             "integer value (float)",
 			propertyType:     "integer",
-			propertyInternal: types.StringValue("1.2"),
-			propertyRaw:      nil,
-			errorMessage:     "invalid syntax",
+			propertyInternal: jsontypes.NewNormalizedValue("1.2"),
+			propertyRaw:      float64(1.2),
+			propertyJson:     "\"default\":1.2,",
 		},
 		{
 			name:             "number value (integer)",
 			propertyType:     "number",
-			propertyInternal: types.StringValue("-100"),
-			propertyRaw:      int64(-100),
+			propertyInternal: jsontypes.NewNormalizedValue("-100"),
+			propertyRaw:      float64(-100), // Always float, don't mind it
 			propertyJson:     "\"default\":-100,",
 		},
 		{
 			name:             "number value (float)",
 			propertyType:     "number",
-			propertyInternal: types.StringValue("3.141592"),
+			propertyInternal: jsontypes.NewNormalizedValue("3.141592"),
 			propertyRaw:      3.141592,
 			propertyJson:     "\"default\":3.141592,",
 		},
 		{
 			name:             "string value (string)",
 			propertyType:     "string",
-			propertyInternal: types.StringValue("some text"),
+			propertyInternal: jsontypes.NewNormalizedValue("\"some text\""),
 			propertyRaw:      "some text",
 			propertyJson:     "\"default\":\"some text\",",
 		},
 		{
 			name:             "string value (string empty)",
 			propertyType:     "string",
-			propertyInternal: types.StringNull(),
+			propertyInternal: jsontypes.NewNormalizedNull(),
 			propertyRaw:      nil,
 			propertyJson:     "",
 		},
 		{
 			name:             "array value (string empty)",
 			propertyType:     "array",
-			propertyInternal: types.StringNull(),
+			propertyInternal: jsontypes.NewNormalizedNull(),
 			propertyRaw:      nil,
 			propertyJson:     "",
 		},

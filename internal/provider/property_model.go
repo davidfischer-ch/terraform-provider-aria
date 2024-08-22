@@ -7,23 +7,22 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math"
-	"strconv"
 
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 // CustomResourcPropertyeModel describes the resource data model.
 type PropertyModel struct {
-	Name             types.String `tfsdk:"name"`
-	Title            types.String `tfsdk:"title"`
-	Description      types.String `tfsdk:"description"`
-	Type             types.String `tfsdk:"type"`
-	Default          types.String `tfsdk:"default"`
-	Encrypted        types.Bool   `tfsdk:"encrypted"`
-	ReadOnly         types.Bool   `tfsdk:"read_only"`
-	RecreateOnUpdate types.Bool   `tfsdk:"recreate_on_update"`
+	Name             types.String         `tfsdk:"name"`
+	Title            types.String         `tfsdk:"title"`
+	Description      types.String         `tfsdk:"description"`
+	Type             types.String         `tfsdk:"type"`
+	Default          jsontypes.Normalized `tfsdk:"default"`
+	Encrypted        types.Bool           `tfsdk:"encrypted"`
+	ReadOnly         types.Bool           `tfsdk:"read_only"`
+	RecreateOnUpdate types.Bool           `tfsdk:"recreate_on_update"`
 
 	// Specifications
 	Minimum   types.Int64  `tfsdk:"minimum"`
@@ -65,8 +64,6 @@ func (self *PropertyModel) FromAPI(
 	raw PropertyAPIModel,
 ) diag.Diagnostics {
 
-	diags := diag.Diagnostics{}
-
 	self.Name = types.StringValue(name)
 	self.Title = types.StringValue(raw.Title)
 	self.Description = types.StringValue(raw.Description)
@@ -80,6 +77,25 @@ func (self *PropertyModel) FromAPI(
 	self.MaxLength = types.Int32PointerValue(raw.MaxLength)
 	self.Pattern = types.StringPointerValue(raw.Pattern)
 
+	diags := diag.Diagnostics{}
+
+	// Default API data -> JSON Encoded
+	// TODO Deduplicate this routine, used on many places
+	if raw.Default == nil {
+		self.Default = jsontypes.NewNormalizedNull()
+	} else {
+		defaultJSON, err := json.Marshal(raw.Default)
+		if err != nil {
+			diags.AddError(
+				"Client error",
+				fmt.Sprintf(
+					"Unable to JSON encode %s default \"%s\", got error: %s",
+					self.String(), raw.Default, err))
+		} else {
+			self.Default = jsontypes.NewNormalizedValue(string(defaultJSON))
+		}
+	}
+
 	if raw.OneOf == nil {
 		self.OneOf = nil
 	} else {
@@ -91,99 +107,6 @@ func (self *PropertyModel) FromAPI(
 		}
 	}
 
-	if raw.Default == nil {
-		self.Default = types.StringNull()
-	} else {
-		// Convert default value from any to string, warn if default type mismatch
-		self.Default = types.StringValue(fmt.Sprintf("%s", raw.Default)) // Messy conversion first
-		switch raw.Type {
-		case "array":
-			// Can be anything that will be converted in JSON
-			defaultJSON, err := json.Marshal(raw.Default)
-			if err == nil {
-				self.Default = types.StringValue(string(defaultJSON))
-			} else {
-				diags.AddError(
-					"Configuration error",
-					fmt.Sprintf(
-						"Unable to JSON encode property %s default \"%s\", got error: %s",
-						raw.Title, raw.Default, err))
-			}
-		case "boolean":
-			// Must be a boolean
-			if defaultBool, ok := raw.Default.(bool); ok {
-				self.Default = types.StringValue(strconv.FormatBool(defaultBool))
-			} else {
-				diags.AddError(
-					"Configuration error",
-					fmt.Sprintf(
-						"Property %s default \"%s\" is not a boolean",
-						raw.Title, raw.Default))
-			}
-		case "integer":
-			// Try integer first, then float converted to int if its a whole number
-			valid := false
-			if defaultInt, ok := raw.Default.(int64); ok {
-				self.Default = types.StringValue(strconv.FormatInt(defaultInt, 10))
-				valid = true
-			} else if defaultFloat, ok := raw.Default.(float64); ok {
-				if math.Trunc(defaultFloat) == defaultFloat {
-					self.Default = types.StringValue(strconv.FormatInt(int64(defaultFloat), 10))
-					valid = true
-				}
-			}
-			if !valid {
-				diags.AddError(
-					"Configuration error",
-					fmt.Sprintf(
-						"Property %s default \"%s\" is not an integer",
-						raw.Title, raw.Default))
-			}
-		case "number":
-			// Try integer first, then float
-			if defaultInt, ok := raw.Default.(int64); ok {
-				self.Default = types.StringValue(strconv.FormatInt(defaultInt, 10))
-			} else if defaultFloat, ok := raw.Default.(float64); ok {
-				self.Default = types.StringValue(strconv.FormatFloat(defaultFloat, 'g', -1, 64))
-			} else {
-				diags.AddError(
-					"Configuration error",
-					fmt.Sprintf(
-						"Property %s default \"%s\" is not a number",
-						raw.Title, raw.Default))
-			}
-		case "object":
-			// Can be anything that will be converted in JSON
-			defaultJSON, err := json.Marshal(raw.Default)
-			if err == nil {
-				self.Default = types.StringValue(string(defaultJSON))
-			} else {
-				diags.AddError(
-					"Configuration error",
-					fmt.Sprintf(
-						"Unable to JSON encode property %s default \"%s\", got error: %s",
-						raw.Title, raw.Default, err))
-			}
-		case "string":
-			// Must be a string
-			if defaultString, ok := raw.Default.(string); ok {
-				self.Default = types.StringValue(defaultString)
-			} else {
-				diags.AddError(
-					"Configuration error",
-					fmt.Sprintf(
-						"Property %s default \"%s\" is not a string",
-						raw.Title, raw.Default))
-			}
-		default:
-			// Not implemented or wrong type
-			diags.AddError(
-				"Configuration error",
-				fmt.Sprintf(
-					"Managing property %s of type %s is not yet implemented.",
-					raw.Title, raw.Type))
-		}
-	}
 	return diags
 }
 
@@ -193,56 +116,13 @@ func (self PropertyModel) ToAPI(
 
 	diags := diag.Diagnostics{}
 
-	// Convert default value string to appropriate type
-	titleRaw := self.Title.ValueString()
-	typeRaw := self.Type.ValueString()
-
+	// Criteria JSON Encoded -> API data
+	// TODO Deduplicate this routine, used on many places
 	var defaultRaw any
-	if self.Default.IsNull() || self.Default.IsUnknown() {
+	if self.Default.IsNull() {
 		defaultRaw = nil
 	} else {
-		var err error
-		defaultString := self.Default.ValueString()
-		switch typeRaw {
-		case "array":
-			// Can be anything that will be decoded from JSON
-			err = json.Unmarshal([]byte(defaultString), &defaultRaw)
-		case "boolean":
-			// Must be a boolean
-			defaultRaw, err = strconv.ParseBool(defaultString)
-		case "integer":
-			// Must be an ineger
-			defaultRaw, err = strconv.ParseInt(defaultString, 10, 64)
-		case "number":
-			// Try integer first, then float
-			if defaultRaw, err = strconv.ParseInt(defaultString, 10, 64); err != nil {
-				defaultRaw, err = strconv.ParseFloat(defaultString, 64)
-			}
-		case "object":
-			// Can be anything that will be decoded from JSON
-			err = json.Unmarshal([]byte(defaultString), &defaultRaw)
-		case "string":
-			// Nothing to do
-			defaultRaw = defaultString
-			err = nil
-		default:
-			// Not implemented or wrong type
-			diags.AddError(
-				"Configuration error",
-				fmt.Sprintf(
-					"Managing property %s of type %s is not yet implemented.",
-					titleRaw, typeRaw))
-		}
-		if err != nil {
-			diags.AddError(
-				"Configuration error",
-				fmt.Sprintf(
-					"Unable to convert property %s default value \"%s\" to type %s, got error: %s",
-					titleRaw, defaultString, typeRaw, err))
-		}
-		if diags.HasError() {
-			return self.Name.ValueString(), PropertyAPIModel{}, diags
-		}
+		diags.Append(self.Default.Unmarshal(&defaultRaw)...)
 	}
 
 	var oneOfRawList []PropertyOneOfAPIModel
@@ -259,9 +139,9 @@ func (self PropertyModel) ToAPI(
 
 	return self.Name.ValueString(),
 		PropertyAPIModel{
-			Title:            titleRaw,
+			Title:            self.Title.ValueString(),
 			Description:      self.Description.ValueString(),
-			Type:             typeRaw,
+			Type:             self.Type.ValueString(),
 			Default:          defaultRaw,
 			Encrypted:        self.Encrypted.ValueBool(),
 			ReadOnly:         self.ReadOnly.ValueBool(),
