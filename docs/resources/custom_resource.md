@@ -32,6 +32,13 @@ def handler(*args, **kwargs):
 EOT
 }
 
+# constants.tf
+
+resource "aria_abx_constant" "example" {
+  name  = "THIS_IS_MY_CONSTANT"
+  value = "42"
+}
+
 # main.tf
 
 resource "aria_abx_action" "redis_create" {
@@ -99,15 +106,18 @@ resource "aria_custom_resource" "redis" {
   description   = "Manage an instance of a Redis database."
   resource_type = "Custom.Redis"
   schema_type   = "ABX_USER_DEFINED"
-  status        = "DRAFT"
+  status        = "RELEASED"
   project_id    = var.project_id
 
   properties = {
     version = {
-      name        = "version"
-      title       = "Version"
-      description = "Instance version."
-      type        = "string"
+      name               = "version"
+      title              = "Version"
+      description        = "Instance version."
+      type               = "string"
+      encrypted          = false
+      read_only          = false
+      recreate_on_update = false
       one_of = [
         { const = "7.4", title = "7.4", encrypted = false },
         { const = "8.0", title = "8.0", encrypted = false }
@@ -150,6 +160,7 @@ resource "aria_custom_resource" "redis" {
 
   create = {
     id                = aria_abx_action.redis_create.id
+    name              = aria_abx_action.redis_create.name
     project_id        = aria_abx_action.redis_create.project_id
     type              = "abx.action"
     input_parameters  = []
@@ -158,6 +169,7 @@ resource "aria_custom_resource" "redis" {
 
   read = {
     id                = aria_abx_action.redis_read.id
+    name              = aria_abx_action.redis_read.name
     project_id        = aria_abx_action.redis_read.project_id
     type              = "abx.action"
     input_parameters  = []
@@ -166,6 +178,7 @@ resource "aria_custom_resource" "redis" {
 
   update = {
     id                = aria_abx_action.redis_update.id
+    name              = aria_abx_action.redis_update.name
     project_id        = aria_abx_action.redis_update.project_id
     type              = "abx.action"
     input_parameters  = []
@@ -174,6 +187,7 @@ resource "aria_custom_resource" "redis" {
 
   delete = {
     id                = aria_abx_action.redis_delete.id
+    name              = aria_abx_action.redis_delete.name
     project_id        = aria_abx_action.redis_delete.project_id
     type              = "abx.action"
     input_parameters  = []
@@ -192,7 +206,7 @@ resource "aria_abx_action" "redis_backup" {
   timeout_seconds = 60
   entrypoint      = "handler"
   dependencies    = []
-  constants       = []
+  constants       = [aria_abx_constant.example.id]
   secrets         = []
   source          = local.source
   shared          = true
