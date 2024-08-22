@@ -71,40 +71,32 @@ func (self ResourceActionModel) LockKey() string {
 }
 
 func (self ResourceActionModel) CreatePath() string {
-	if len(self.ResourceId.ValueString()) > 0 {
-		// Custom resource ...
-		panic("not implemented")
+	if self.ForCustom() {
+		panic("Managing custom resource's action is made through the custom resource API")
 	}
-	// Native resource ...
 	return "form-service/api/custom/resource-actions"
 }
 
 func (self ResourceActionModel) ReadPath() string {
-	if len(self.ResourceId.ValueString()) > 0 {
+	if self.ForCustom() {
 		return fmt.Sprintf(
-			// Custom Resource ...
 			"form-service/api/custom/resource-types/%s/resource-actions/%s",
 			self.ResourceId.ValueString(), self.Id.ValueString())
 	}
-	// Native resource ...
 	return "form-service/api/custom/resource-actions/" + self.Id.ValueString()
 }
 
 func (self ResourceActionModel) UpdatePath() string {
-	if len(self.ResourceId.ValueString()) > 0 {
-		// Custom resource ...
-		panic("not implemented")
+	if self.ForCustom() {
+		panic("Managing custom resource's action is made through the custom resource API")
 	}
-	// Native resource ...
 	return "form-service/api/custom/resource-actions"
 }
 
 func (self ResourceActionModel) DeletePath() string {
-	if len(self.ResourceId.ValueString()) > 0 {
-		// Custom resource ...
-		panic("not implemented")
+	if self.ForCustom() {
+		panic("Managing custom resource's action is made through the custom resource API")
 	}
-	// Native resource ...
 	return "form-service/api/custom/resource-actions/" + self.Id.ValueString()
 }
 
