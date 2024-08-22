@@ -5,7 +5,6 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
@@ -77,24 +76,8 @@ func (self *PropertyModel) FromAPI(
 	self.MaxLength = types.Int32PointerValue(raw.MaxLength)
 	self.Pattern = types.StringPointerValue(raw.Pattern)
 
-	diags := diag.Diagnostics{}
-
-	// Default API data -> JSON Encoded
-	// TODO Deduplicate this routine, used on many places
-	if raw.Default == nil {
-		self.Default = jsontypes.NewNormalizedNull()
-	} else {
-		defaultJSON, err := json.Marshal(raw.Default)
-		if err != nil {
-			diags.AddError(
-				"Client error",
-				fmt.Sprintf(
-					"Unable to JSON encode %s default \"%s\", got error: %s",
-					self.String(), raw.Default, err))
-		} else {
-			self.Default = jsontypes.NewNormalizedValue(string(defaultJSON))
-		}
-	}
+	var diags diag.Diagnostics
+	self.Default, diags = JSONNormalizedFromAny(self.String(), raw.Default)
 
 	if raw.OneOf == nil {
 		self.OneOf = nil
@@ -113,17 +96,7 @@ func (self *PropertyModel) FromAPI(
 func (self PropertyModel) ToAPI(
 	ctx context.Context,
 ) (string, PropertyAPIModel, diag.Diagnostics) {
-
-	diags := diag.Diagnostics{}
-
-	// Criteria JSON Encoded -> API data
-	// TODO Deduplicate this routine, used on many places
-	var defaultRaw any
-	if self.Default.IsNull() {
-		defaultRaw = nil
-	} else {
-		diags.Append(self.Default.Unmarshal(&defaultRaw)...)
-	}
+	defaultRaw, diags := JSONNormalizedToAny(self.Default)
 
 	var oneOfRawList []PropertyOneOfAPIModel
 	if self.OneOf == nil {

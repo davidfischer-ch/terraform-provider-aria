@@ -5,7 +5,6 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
@@ -42,7 +41,7 @@ type ResourceActionAPIModel struct {
 	ProviderName string                         `json:"providerName"`
 	ResourceType string                         `json:"resourceType"`
 	RunnableItem ResourceActionRunnableAPIModel `json:"runnableItem"`
-	Criteria     map[string]interface{}         `json:"criteria,omitempty"`
+	Criteria     any                            `json:"criteria,omitempty"`
 	Status       string                         `json:"status"`
 
 	FormDefinition *CustomFormAPIModel `json:"formDefinition,omitempty"`
@@ -126,20 +125,9 @@ func (self *ResourceActionModel) FromAPI(
 	self.RunnableItem = ResourceActionRunnableModel{}
 	diags := self.RunnableItem.FromAPI(ctx, raw.RunnableItem)
 
-	// Criteria API data -> JSON Encoded
-	// TODO Deduplicate this routine, used on many places
-	if raw.Criteria == nil {
-		self.Criteria = jsontypes.NewNormalizedNull()
-	} else {
-		criteriaJSON, err := json.Marshal(raw.Criteria)
-		if err != nil {
-			diags.AddError(
-				"Client error",
-				fmt.Sprintf("Unable to JSON encode %s criteria, got error: %s", self.String(), err))
-		} else {
-			self.Criteria = jsontypes.NewNormalizedValue(string(criteriaJSON))
-		}
-	}
+	var criteriaDiags diag.Diagnostics
+	self.Criteria, criteriaDiags = JSONNormalizedFromAny(self.String(), raw.Criteria)
+	diags.Append(criteriaDiags...)
 
 	var formDiags diag.Diagnostics
 	self.FormDefinition, formDiags = raw.FormDefinition.ToObject(ctx)
@@ -164,13 +152,8 @@ func (self ResourceActionModel) ToAPI(
 	}
 
 	// Criteria JSON Encoded -> API data
-	// TODO Deduplicate this routine, used on many places
-	var criteriaRaw map[string]interface{}
-	if self.Criteria.IsNull() {
-		criteriaRaw = nil
-	} else {
-		diags.Append(self.Criteria.Unmarshal(&criteriaRaw)...)
-	}
+	criteriaRaw, criteriaDiags := JSONNormalizedToAny(self.Criteria)
+	diags.Append(criteriaDiags...)
 
 	return ResourceActionAPIModel{
 		Id:             self.Id.ValueString(),
