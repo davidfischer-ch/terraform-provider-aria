@@ -22,6 +22,13 @@ func TestPropertyModel_Default_FromAPI(t *testing.T) {
 		errorMessage     string
 	}{
 		{
+			name:             "not a valid type (macaque)",
+			propertyType:     "macaque",
+			propertyRaw:      false,
+			propertyInternal: types.StringValue("%!s(bool=false)"),
+			errorMessage:     "Managing property P of type macaque is not yet implemented.",
+		},
+		{
 			name:             "boolean value (false)",
 			propertyType:     "boolean",
 			propertyRaw:      false,
@@ -38,7 +45,7 @@ func TestPropertyModel_Default_FromAPI(t *testing.T) {
 			propertyType:     "boolean",
 			propertyRaw:      "not really a boolean",
 			propertyInternal: types.StringValue("not really a boolean"),
-			warningMessage:   "Property P default \"not really a boolean\" is not a boolean",
+			errorMessage:     "Property P default \"not really a boolean\" is not a boolean",
 		},
 		{
 			name:             "integer value (integer)",
@@ -47,11 +54,17 @@ func TestPropertyModel_Default_FromAPI(t *testing.T) {
 			propertyInternal: types.StringValue("42"),
 		},
 		{
+			name:             "integer value (float round)",
+			propertyType:     "integer",
+			propertyRaw:      float64(99),
+			propertyInternal: types.StringValue("99"),
+		},
+		{
 			name:             "integer value (float)",
 			propertyType:     "integer",
-			propertyRaw:      1.2,
+			propertyRaw:      float64(1.2),
 			propertyInternal: types.StringValue("%!s(float64=1.2)"),
-			warningMessage:   "Property P default \"%!s(float64=1.2)\" is not an integer",
+			errorMessage:     "Property P default \"%!s(float64=1.2)\" is not an integer",
 		},
 		{
 			name:             "integer value (nil)",
@@ -68,7 +81,7 @@ func TestPropertyModel_Default_FromAPI(t *testing.T) {
 		{
 			name:             "number value (float)",
 			propertyType:     "number",
-			propertyRaw:      3.141592,
+			propertyRaw:      float64(3.141592),
 			propertyInternal: types.StringValue("3.141592"),
 		},
 		{
@@ -93,7 +106,6 @@ func TestPropertyModel_Default_FromAPI(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
 			property := PropertyModel{}
 			diags := property.FromAPI(context.Background(), "p", PropertyAPIModel{
 				Title:   "P",

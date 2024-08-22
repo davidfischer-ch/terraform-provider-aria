@@ -539,6 +539,18 @@ resource "aria_custom_resource" "test" {
         { const = "b", title = "B", encrypted = false }
       ]
     }
+    integer = {
+      name        = "integer"
+      title       = "Some Integer"
+      description = "Some integer."
+      type               = "integer"
+      default            = 512
+      encrypted          = false
+      read_only          = false
+      recreate_on_update = false
+      minimum            = 0
+      maximum            = 1024
+    }
     number = {
       name        = "number"
       title       = "Some Number"

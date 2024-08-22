@@ -7,6 +7,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -103,7 +104,7 @@ func (self *PropertyModel) FromAPI(
 				self.Default = types.StringValue(string(defaultJSON))
 			} else {
 				diags.AddError(
-					"Configuration warning",
+					"Configuration error",
 					fmt.Sprintf(
 						"Unable to JSON encode property %s default \"%s\", got error: %s",
 						raw.Title, raw.Default, err))
@@ -113,19 +114,27 @@ func (self *PropertyModel) FromAPI(
 			if defaultBool, ok := raw.Default.(bool); ok {
 				self.Default = types.StringValue(strconv.FormatBool(defaultBool))
 			} else {
-				diags.AddWarning(
-					"Configuration warning",
+				diags.AddError(
+					"Configuration error",
 					fmt.Sprintf(
 						"Property %s default \"%s\" is not a boolean",
 						raw.Title, raw.Default))
 			}
 		case "integer":
-			// Must be an integer
+			// Try integer first, then float converted to int if its a whole number
+			valid := false
 			if defaultInt, ok := raw.Default.(int64); ok {
 				self.Default = types.StringValue(strconv.FormatInt(defaultInt, 10))
-			} else {
-				diags.AddWarning(
-					"Configuration warning",
+				valid = true
+			} else if defaultFloat, ok := raw.Default.(float64); ok {
+				if math.Trunc(defaultFloat) == defaultFloat {
+					self.Default = types.StringValue(strconv.FormatInt(int64(defaultFloat), 10))
+					valid = true
+				}
+			}
+			if !valid {
+				diags.AddError(
+					"Configuration error",
 					fmt.Sprintf(
 						"Property %s default \"%s\" is not an integer",
 						raw.Title, raw.Default))
@@ -137,8 +146,8 @@ func (self *PropertyModel) FromAPI(
 			} else if defaultFloat, ok := raw.Default.(float64); ok {
 				self.Default = types.StringValue(strconv.FormatFloat(defaultFloat, 'g', -1, 64))
 			} else {
-				diags.AddWarning(
-					"Configuration warning",
+				diags.AddError(
+					"Configuration error",
 					fmt.Sprintf(
 						"Property %s default \"%s\" is not a number",
 						raw.Title, raw.Default))
@@ -150,7 +159,7 @@ func (self *PropertyModel) FromAPI(
 				self.Default = types.StringValue(string(defaultJSON))
 			} else {
 				diags.AddError(
-					"Configuration warning",
+					"Configuration error",
 					fmt.Sprintf(
 						"Unable to JSON encode property %s default \"%s\", got error: %s",
 						raw.Title, raw.Default, err))
@@ -160,8 +169,8 @@ func (self *PropertyModel) FromAPI(
 			if defaultString, ok := raw.Default.(string); ok {
 				self.Default = types.StringValue(defaultString)
 			} else {
-				diags.AddWarning(
-					"Configuration warning",
+				diags.AddError(
+					"Configuration error",
 					fmt.Sprintf(
 						"Property %s default \"%s\" is not a string",
 						raw.Title, raw.Default))
