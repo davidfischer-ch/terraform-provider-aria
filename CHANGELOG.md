@@ -1,5 +1,70 @@
 # Changelog
 
+## Release v0.5.0 (2024-08-22)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.4.1...v0.5.0
+
+This is not a major release because its still a v0.x and incrementing to v1 will be done when used
+in production for at least few months.
+
+### Major compatibility breaks
+
+* Properties default value: Replace custom state storage encoding format by JSON (see migrations)
+
+### Migrations
+
+You have to manipulate the state and replace default values:
+
+* String: `some text` by `\"some text\"`
+* Float: `%!s(float64=10240)` by `10240`
+* ... (more jsonencoded values here) ...
+
+Here is the error:
+
+```
+│ Error: Invalid JSON String Value
+│
+│   with aria_custom_resource.redis,
+│   on redis.tf line 80, in resource "aria_custom_resource" "redis":
+│   80: resource "aria_custom_resource" "redis" {
+│
+│ A string value was provided that is not valid JSON string format (RFC 7159).
+│
+│ Given Value: %!s(float64=10240)
+╵
+```
+
+### Features
+
+* Resource `aria_resource_action`: Make it compatible with custom resources, fix #19
+
+#### Work in progress
+
+* Add work in progress resource `aria_project`
+* Add work in progress resource `aria_cloud_template_v1`
+
+### Fix and enhancements
+
+* Update `aria_custom_resource` example (doc)
+* Merge dependabot requests (terraform plugin testing, resty, ...)
+* Fix #61 by replacing propertie's default value custom state storage encoding format with JSON
+
+### Library
+
+#### Features
+
+* Add `AriaClient` in replacement of `AriaClientConfig`
+  * Add `Mutex` attribute, used internally by the resources
+  * Add `ReadIt` method to deduplicate resources Read methods
+  * Add a bunch of other methods
+* Library: Add `RWMutexKV` (key/value store for arbitrary read-write mutexes)
+* Add `Model` interface with utility methods (declaration) to be able to factorize code
+
+#### Fix and enhancements
+
+* Implement utility methods on models that are exposed as resources
+* Refactor resources to use `AriaClient` capabilities
+
 ## Release v0.4.1 (2024-07-25)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.4.0...v0.4.1
