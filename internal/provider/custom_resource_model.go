@@ -47,8 +47,9 @@ type CustomResourceAPIModel struct {
 	MainActions       map[string]ResourceActionRunnableAPIModel `json:"mainActions"`
 	AdditionalActions []ResourceActionAPIModel                  `json:"additionalActions"`
 
-	ProjectId string `json:"projectId"`
-	OrgId     string `json:"orgId"`
+	// Omit empty Project ID to prevent "projectId cannot be updated for type (...) on UPDATE"
+	ProjectId string `json:"projectId,omitempty"`
+	OrgId     string `json:"orgId,omitempty"`
 }
 
 func (self CustomResourceModel) String() string {
