@@ -1,5 +1,13 @@
 # Changelog
 
+## Release v0.5.1 (2024-08-26)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.0...v0.5.1
+
+### Fix and enhancements
+
+* Fix UPDATE on `aria_custom_resources` when projectID is empty (by omitting this field on update, crazy POST != full object)
+
 ## Release v0.5.0 (2024-08-22)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.4.1...v0.5.0
