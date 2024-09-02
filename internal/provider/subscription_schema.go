@@ -112,9 +112,6 @@ func SubscriptionSchema() schema.Schema {
 			"owner_id": schema.StringAttribute{
 				MarkdownDescription: "Owner identifier",
 				Computed:            true,
-				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
-				},
 			},
 			"subscriber_id": schema.StringAttribute{
 				MarkdownDescription: "Subscriber identifier",
