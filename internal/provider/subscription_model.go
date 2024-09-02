@@ -108,7 +108,15 @@ func (self *SubscriptionModel) FromAPI(
 	ctx context.Context,
 	raw SubscriptionAPIModel,
 ) diag.Diagnostics {
-	projectIds, diags := types.SetValueFrom(ctx, types.StringType, raw.Constraints["projectId"])
+
+	var diags diag.Diagnostics
+
+	if raw.Constraints["projectId"] == nil {
+		self.ProjectIds = types.SetNull(types.StringType)
+	} else {
+		self.ProjectIds, diags = types.SetValueFrom(
+			ctx, types.StringType, raw.Constraints["projectId"])
+	}
 
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
@@ -119,7 +127,6 @@ func (self *SubscriptionModel) FromAPI(
 	self.RecoverRunnableType = StringOrNullValue(raw.RecoverRunnableType)
 	self.RecoverRunnableId = StringOrNullValue(raw.RecoverRunnableId)
 	self.EventTopicId = types.StringValue(raw.EventTopicId)
-	self.ProjectIds = projectIds
 	self.Blocking = types.BoolValue(raw.Blocking)
 	self.Broadcast = types.BoolValue(raw.Broadcast)
 	self.Contextual = types.BoolValue(raw.Contextual)
@@ -142,19 +149,24 @@ func (self SubscriptionModel) ToAPI(
 	var diags diag.Diagnostics
 
 	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/set
-	if self.ProjectIds.IsNull() || self.ProjectIds.IsUnknown() {
+	if self.ProjectIds.IsUnknown() {
 		diags.AddError(
 			"Configuration error",
 			fmt.Sprintf(
-				"Unable to manage subscription %s, project_ids is either null or unknown",
+				"Unable to manage subscription %s, project_ids is unknown",
 				self.Id.ValueString()))
 		return SubscriptionAPIModel{}, diags
 	}
 
-	projectIds := make([]string, 0, len(self.ProjectIds.Elements()))
-	diags = self.ProjectIds.ElementsAs(ctx, &projectIds, false)
-	if diags.HasError() {
-		return SubscriptionAPIModel{}, diags
+	var projectIds []string
+	if self.ProjectIds.IsNull() {
+		projectIds = nil
+	} else {
+		projectIds = make([]string, 0, len(self.ProjectIds.Elements()))
+		diags = self.ProjectIds.ElementsAs(ctx, &projectIds, false)
+		if diags.HasError() {
+			return SubscriptionAPIModel{}, diags
+		}
 	}
 
 	return SubscriptionAPIModel{
