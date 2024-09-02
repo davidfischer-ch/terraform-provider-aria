@@ -1,5 +1,14 @@
 # Changelog
 
+## Release v0.5.2 (2024-09-02)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.1...v0.5.2
+
+### Fix and enhancements
+
+* Fix `aria_subscription`'s project scoping: Was scoped to 0 projects instead of being unscoped
+* Fix `aria_sbuscription`'s `owner_id`: It may change, cannot use previous known value
+
 ## Release v0.5.1 (2024-08-26)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.0...v0.5.1
