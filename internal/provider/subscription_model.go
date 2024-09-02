@@ -111,8 +111,12 @@ func (self *SubscriptionModel) FromAPI(
 
 	var diags diag.Diagnostics
 
+	// Convert the constraint from "nil" to empty list
 	if raw.Constraints["projectId"] == nil {
-		self.ProjectIds = types.SetNull(types.StringType)
+		self.ProjectIds, diags = types.SetValueFrom(ctx, types.StringType, []string{})
+	} else if len(raw.Constraints["projectId"]) == 0 {
+		// Show that the project IDs list is empty and that's an error
+		self.ProjectIds, diags = types.SetValueFrom(ctx, types.StringType, []string{"<empty list>"})
 	} else {
 		self.ProjectIds, diags = types.SetValueFrom(
 			ctx, types.StringType, raw.Constraints["projectId"])
@@ -149,24 +153,24 @@ func (self SubscriptionModel) ToAPI(
 	var diags diag.Diagnostics
 
 	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/set
-	if self.ProjectIds.IsUnknown() {
+	if self.ProjectIds.IsNull() || self.ProjectIds.IsUnknown() {
 		diags.AddError(
 			"Configuration error",
 			fmt.Sprintf(
-				"Unable to manage subscription %s, project_ids is unknown",
+				"Unable to manage subscription %s, project_ids is either null or unknown",
 				self.Id.ValueString()))
 		return SubscriptionAPIModel{}, diags
 	}
 
-	var projectIds []string
-	if self.ProjectIds.IsNull() {
+	projectIds := make([]string, 0, len(self.ProjectIds.Elements()))
+	diags.Append(self.ProjectIds.ElementsAs(ctx, &projectIds, false)...)
+	if diags.HasError() {
+		return SubscriptionAPIModel{}, diags
+	}
+
+	// Convert then constraint from empty list to "nil"
+	if len(projectIds) == 0 {
 		projectIds = nil
-	} else {
-		projectIds = make([]string, 0, len(self.ProjectIds.Elements()))
-		diags = self.ProjectIds.ElementsAs(ctx, &projectIds, false)
-		if diags.HasError() {
-			return SubscriptionAPIModel{}, diags
-		}
 	}
 
 	return SubscriptionAPIModel{
