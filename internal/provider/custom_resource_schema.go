@@ -6,7 +6,9 @@ package provider
 import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
@@ -23,6 +25,10 @@ func CustomResourceSchema() schema.Schema {
 			"resource_type": schema.StringAttribute{
 				MarkdownDescription: "Define the type (must be unique, e.g. Custom.DB.PostgreSQL)",
 				Required:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"schema_type": schema.StringAttribute{
 				MarkdownDescription: "Type of resource, one of ABX_USER_DEFINED (and that's all, maybe)",
