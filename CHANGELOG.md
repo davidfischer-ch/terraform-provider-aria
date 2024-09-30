@@ -1,5 +1,16 @@
 # Changelog
 
+## Release v0.5.3 (2024-09-30)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.2...v0.5.3
+
+### Fix and enhancements
+
+* Fix `aria_custom_resource`'s `resource_type` attribute change must force recreation of the resource #66
+  * Thanks to @selknsi
+* Bump `github.com/go-resty/resty/v2` from `2.14.0` to `2.15.1` #70
+* Drop "example" function
+
 ## Release v0.5.2 (2024-09-02)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.1...v0.5.2
