@@ -1,5 +1,13 @@
 # Changelog
 
+## Release v0.5.4 (2024-10-08)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.3...v0.5.4
+
+### Features
+
+* Add ressource `aria_custom_form`
+
 ## Release v0.5.3 (2024-09-30)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.2...v0.5.3
