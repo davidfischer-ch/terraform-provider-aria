@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -47,6 +48,35 @@ func (self *CustomFormModel) String() string {
 		"Custom Form %s (%s)",
 		self.Id.ValueString(),
 		self.Name.ValueString())
+}
+
+// Return an appropriate key that can be used for naming mutexes.
+// Create: Identifier can be used to prevent concurrent creation of custom forms.
+// Read Update Delete: Identifier can be used to prevent concurrent modifications on the instance.
+func (self CustomFormModel) LockKey() string {
+	return "custom-form-" + self.Id.ValueString()
+}
+
+func (self CustomFormModel) CreatePath() string {
+	return "form-service/api/forms"
+}
+
+func (self CustomFormModel) ReadPath() string {
+	return "form-service/api/forms/" + self.Id.ValueString()
+}
+
+func (self CustomFormModel) UpdatePath() string {
+	return self.CreatePath() // Its not a mistake ...
+}
+
+func (self CustomFormModel) DeletePath() string {
+	return self.ReadPath()
+}
+
+func (self *CustomFormModel) GenerateId() {
+	if len(self.Id.ValueString()) == 0 {
+		self.Id = types.StringValue(uuid.New().String())
+	}
 }
 
 func (self *CustomFormModel) FromAPI(

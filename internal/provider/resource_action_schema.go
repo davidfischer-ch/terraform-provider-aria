@@ -59,7 +59,7 @@ func ResourceActionSchema() schema.Schema {
 				CustomType:          jsontypes.NormalizedType{},
 				Optional:            true,
 			},
-			"form_definition": CustomFormSchema(),
+			"form_definition": NestedCustomFormSchema(),
 			"status": schema.StringAttribute{
 				MarkdownDescription: "Action status, either DRAFT or RELEASED",
 				Computed:            true,
