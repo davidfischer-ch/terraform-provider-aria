@@ -91,7 +91,7 @@ func CustomFormSchema() schema.Schema {
 	}
 }
 
-// The optional CustomForm embeded inside a ResourceActionSchema.
+// The optional CustomForm embedded inside a ResourceActionSchema.
 func NestedCustomFormSchema() schema.SingleNestedAttribute {
 	return schema.SingleNestedAttribute{
 		MarkdownDescription: "Form definition",
