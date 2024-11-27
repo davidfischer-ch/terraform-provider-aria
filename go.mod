@@ -1,7 +1,8 @@
 module github.com/davidfischer-ch/terraform-provider-aria
 
-go 1.21
-toolchain go1.22.5
+go 1.22.0
+
+toolchain go1.23.1
 
 require (
 	github.com/go-resty/resty/v2 v2.16.2
