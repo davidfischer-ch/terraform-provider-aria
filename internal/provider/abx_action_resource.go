@@ -71,7 +71,7 @@ func (self *ABXActionResource) Create(
 		SetQueryParam("apiVersion", ABX_API_VERSION).
 		SetBody(actionRaw).
 		SetResult(&actionRaw).
-		Post("abx/api/resources/actions")
+		Post(action.CreatePath())
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
