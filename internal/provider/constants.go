@@ -17,6 +17,8 @@ const IAAS_API_VERSION = "2021-07-15"
 // TODO then ensure its used (check related TODOs).
 const ICON_API_VERSION = ""
 
+const ORCHESTRATOR_API_VERION = ""
+
 const POLICY_API_VERSION = "2020-08-25"
 
 const PROJECT_API_VERSION = "2019-01-15"
