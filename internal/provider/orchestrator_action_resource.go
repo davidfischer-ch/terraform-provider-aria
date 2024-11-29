@@ -68,6 +68,7 @@ func (self *OrchestratorActionResource) Create(
 	}
 
 	response, err := self.client.Client.R().
+		// TODO SetQueryParam("apiVersion", ORCHESTRATOR_API_VERSION).
 		SetBody(actionRaw).
 		SetResult(&actionRaw).
 		Post(action.CreatePath())
@@ -131,6 +132,7 @@ func (self *OrchestratorActionResource) Update(
 	}
 
 	response, err := self.client.Client.R().
+		// TODO SetQueryParam("apiVersion", ORCHESTRATOR_API_VERSION).
 		SetBody(actionRaw).
 		SetResult(&actionRaw).
 		Put(action.UpdatePath())
