@@ -62,8 +62,8 @@ func CloudTemplateV1ValidationMessageAPIModelFromObject(
 
 	var message CloudTemplateV1ValidationMessageModel
 	diags := object.As(ctx, &message, basetypes.ObjectAsOptions{})
-	raw, formDiags := message.ToAPI(ctx)
-	diags.Append(formDiags...)
+	raw, messageDiags := message.ToAPI(ctx)
+	diags.Append(messageDiags...)
 	return &raw, diags
 }
 

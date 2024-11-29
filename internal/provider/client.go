@@ -291,5 +291,8 @@ func GetVersionFromPath(path string) string {
 	if strings.HasPrefix(path, "properties") {
 		return BLUEPRINT_API_VERSION
 	}
-	panic("FIXME_TODO")
+	if strings.HasPrefix(path, "vco") {
+		return ORCHESTRATOR_API_VERION
+	}
+	panic(fmt.Sprintf("GetVersionFromPath Not Implemented for path %s", path))
 }

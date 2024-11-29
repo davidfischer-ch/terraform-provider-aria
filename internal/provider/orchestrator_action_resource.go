@@ -13,35 +13,35 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &ABXActionResource{}
-var _ resource.ResourceWithImportState = &ABXActionResource{}
+var _ resource.Resource = &OrchestratorActionResource{}
+var _ resource.ResourceWithImportState = &OrchestratorActionResource{}
 
-func NewABXActionResource() resource.Resource {
-	return &ABXActionResource{}
+func NewOrchestratorActionResource() resource.Resource {
+	return &OrchestratorActionResource{}
 }
 
-// ABXActionResource defines the resource implementation.
-type ABXActionResource struct {
+// OrchestratorActionResource defines the resource implementation.
+type OrchestratorActionResource struct {
 	client *AriaClient
 }
 
-func (self *ABXActionResource) Metadata(
+func (self *OrchestratorActionResource) Metadata(
 	ctx context.Context,
 	req resource.MetadataRequest,
 	resp *resource.MetadataResponse,
 ) {
-	resp.TypeName = req.ProviderTypeName + "_abx_action"
+	resp.TypeName = req.ProviderTypeName + "_orchestrator_action"
 }
 
-func (self *ABXActionResource) Schema(
+func (self *OrchestratorActionResource) Schema(
 	ctx context.Context,
 	req resource.SchemaRequest,
 	resp *resource.SchemaResponse,
 ) {
-	resp.Schema = ABXActionSchema()
+	resp.Schema = OrchestratorActionSchema()
 }
 
-func (self *ABXActionResource) Configure(
+func (self *OrchestratorActionResource) Configure(
 	ctx context.Context,
 	req resource.ConfigureRequest,
 	resp *resource.ConfigureResponse,
@@ -49,13 +49,13 @@ func (self *ABXActionResource) Configure(
 	self.client = GetResourceClient(ctx, req, resp)
 }
 
-func (self *ABXActionResource) Create(
+func (self *OrchestratorActionResource) Create(
 	ctx context.Context,
 	req resource.CreateRequest,
 	resp *resource.CreateResponse,
 ) {
 	// Read Terraform plan data into the model
-	var action ABXActionModel
+	var action OrchestratorActionModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &action)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -68,11 +68,11 @@ func (self *ABXActionResource) Create(
 	}
 
 	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", ABX_API_VERSION).
+		// TODO SetQueryParam("apiVersion", ORCHESTRATOR_API_VERSION).
 		SetBody(actionRaw).
 		SetResult(&actionRaw).
 		Post(action.CreatePath())
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -86,19 +86,19 @@ func (self *ABXActionResource) Create(
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", action.String()))
 }
 
-func (self *ABXActionResource) Read(
+func (self *OrchestratorActionResource) Read(
 	ctx context.Context,
 	req resource.ReadRequest,
 	resp *resource.ReadResponse,
 ) {
 	// Read Terraform prior state data into the model
-	var action ABXActionModel
+	var action OrchestratorActionModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &action)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	var actionRaw ABXActionAPIModel
+	var actionRaw OrchestratorActionAPIModel
 	found, readDiags := self.client.ReadIt(ctx, &action, &actionRaw)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
@@ -113,13 +113,13 @@ func (self *ABXActionResource) Read(
 	}
 }
 
-func (self *ABXActionResource) Update(
+func (self *OrchestratorActionResource) Update(
 	ctx context.Context,
 	req resource.UpdateRequest,
 	resp *resource.UpdateResponse,
 ) {
 	// Read Terraform plan data into the model
-	var action ABXActionModel
+	var action OrchestratorActionModel
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &action)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -132,7 +132,7 @@ func (self *ABXActionResource) Update(
 	}
 
 	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", ABX_API_VERSION).
+		// TODO SetQueryParam("apiVersion", ORCHESTRATOR_API_VERSION).
 		SetBody(actionRaw).
 		SetResult(&actionRaw).
 		Put(action.UpdatePath())
@@ -151,20 +151,20 @@ func (self *ABXActionResource) Update(
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", action.String()))
 }
 
-func (self *ABXActionResource) Delete(
+func (self *OrchestratorActionResource) Delete(
 	ctx context.Context,
 	req resource.DeleteRequest,
 	resp *resource.DeleteResponse,
 ) {
 	// Read Terraform prior state data into the model
-	var action ABXActionModel
+	var action OrchestratorActionModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &action)...)
 	if !resp.Diagnostics.HasError() {
 		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &action)...)
 	}
 }
 
-func (self *ABXActionResource) ImportState(
+func (self *OrchestratorActionResource) ImportState(
 	ctx context.Context,
 	req resource.ImportStateRequest,
 	resp *resource.ImportStateResponse,

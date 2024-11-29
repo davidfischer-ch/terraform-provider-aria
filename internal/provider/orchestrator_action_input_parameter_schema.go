@@ -7,19 +7,19 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 )
 
-func PropertyOneOfSchema() schema.NestedAttributeObject {
+func OrchestratorActionInputParameterSchema() schema.NestedAttributeObject {
 	return schema.NestedAttributeObject{
 		Attributes: map[string]schema.Attribute{
-			"const": schema.StringAttribute{
-				MarkdownDescription: "Technical value",
+			"name": schema.StringAttribute{
+				MarkdownDescription: "Parameter name",
 				Required:            true,
 			},
-			"title": schema.StringAttribute{
-				MarkdownDescription: "Display value",
+			"description": schema.StringAttribute{
+				MarkdownDescription: "Parameter description",
 				Required:            true,
 			},
-			"encrypted": schema.BoolAttribute{
-				MarkdownDescription: "Encrypted?",
+			"type": schema.StringAttribute{
+				MarkdownDescription: "Parameter type",
 				Required:            true,
 			},
 		},
