@@ -1,5 +1,23 @@
 # Changelog
 
+## Release v0.5.5 (2024-11-29)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.4...v0.5.5
+
+### Features
+
+* Add resource `aria_orchestrator_action`
+* Add resource `aria_orchestrator_category`
+
+### Fix and enhancements
+
+* Merge dependabot merge requests:
+  * Bump github.com/go-resty/resty/v2 from 2.15.3 to 2.16.2
+  * Bump github.com/hashicorp/terraform-plugin-docs from 0.19.4 to 0.20.1
+  * Bump github.com/hashicorp/terraform-plugin-framework-validators from 0.13.0 to 0.15.0
+  * Bump github.com/hashicorp/terraform-plugin-testing from 1.10.0 to 1.11.0
+* Make code consistent
+
 ## Release v0.5.4 (2024-10-08)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.3...v0.5.4
