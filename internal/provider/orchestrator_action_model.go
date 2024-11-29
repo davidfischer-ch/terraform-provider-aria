@@ -153,17 +153,17 @@ func (self OrchestratorActionModel) ToAPI(
 	}
 
 	return OrchestratorActionAPIModel{
-		Id: self.Id.ValueString(),
-		Name: self.Name.ValueString(),
-		Module: self.Module.ValueString(),
-		FQN: self.FQN.ValueString(),
-		Description: CleanString(self.Description.ValueString()),
-		Version: self.Version.ValueString(),
-		Runtime: self.Runtime.ValueString(),
+		Id:                 self.Id.ValueString(),
+		Name:               self.Name.ValueString(),
+		Module:             self.Module.ValueString(),
+		FQN:                self.FQN.ValueString(),
+		Description:        CleanString(self.Description.ValueString()),
+		Version:            self.Version.ValueString(),
+		Runtime:            self.Runtime.ValueString(),
 		RuntimeMemoryLimit: self.RuntimeMemoryLimit.ValueInt64(),
-		RuntimeTimeout: self.RuntimeTimeout.ValueInt32(),
-		Script: self.Script.ValueString(),
-		InputParameters: parametersRaw,
-		OutputType: self.OutputType.ValueString(),
+		RuntimeTimeout:     self.RuntimeTimeout.ValueInt32(),
+		Script:             self.Script.ValueString(),
+		InputParameters:    parametersRaw,
+		OutputType:         self.OutputType.ValueString(),
 	}, diag.Diagnostics{}
 }

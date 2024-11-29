@@ -7,8 +7,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 )
 
-func PropertyOneOfSchema() schema.NestedAttributeObject{
-	return  schema.NestedAttributeObject{
+func PropertyOneOfSchema() schema.NestedAttributeObject {
+	return schema.NestedAttributeObject{
 		Attributes: map[string]schema.Attribute{
 			"const": schema.StringAttribute{
 				MarkdownDescription: "Technical value",

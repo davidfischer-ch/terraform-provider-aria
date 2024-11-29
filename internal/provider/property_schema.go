@@ -85,7 +85,7 @@ func PropertySchema() schema.NestedAttributeObject {
 			"one_of": schema.ListNestedAttribute{
 				MarkdownDescription: "Enumerate possible values",
 				Optional:            true,
-				NestedObject: PropertyOneOfSchema(),
+				NestedObject:        PropertyOneOfSchema(),
 			},
 		},
 	}

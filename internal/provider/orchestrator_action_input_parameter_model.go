@@ -56,8 +56,8 @@ func (self OrchestratorActionInputParameterModel) ToAPI(
 	ctx context.Context,
 ) (OrchestratorActionInputParameterAPIModel, diag.Diagnostics) {
 	return OrchestratorActionInputParameterAPIModel{
-		Name: self.Name.ValueString(),
+		Name:        self.Name.ValueString(),
 		Description: CleanString(self.Description.ValueString()),
-		Type: self.Type.ValueString(),
+		Type:        self.Type.ValueString(),
 	}, diag.Diagnostics{}
 }
