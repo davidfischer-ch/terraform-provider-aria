@@ -171,7 +171,7 @@ func (self AriaClient) DeleteIt(
 				time.Sleep(time.Duration(3) * time.Second) // TODO better with randomness?
 				continue
 			}
-			// Either its not a conflict error either we have made sufficent attempts...
+			// Either its not a conflict error either we have made sufficient attempts...
 			diags.AddError(
 				"Client error",
 				fmt.Sprintf("Unable to delete %s, got error: %s", name, err))
