@@ -69,6 +69,10 @@ EOT
 - `script` (String) Action source code
 - `version` (String) Action version
 
+### Optional
+
+- `force_delete` (Boolean) Force destroying the action (bypass references check).
+
 ### Read-Only
 
 - `id` (String) Identifier
