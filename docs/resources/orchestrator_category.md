@@ -53,3 +53,12 @@ resource "aria_orchestrator_category" "helpers" {
 
 - `id` (String) Identifier
 - `path` (String) Category's path
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+# Order can be imported by specifying the category's unique identifier.
+terraform import aria_orchestrator_category.example 7e788b40-a936-4c0e-8f33-b420c3b61446
+```
