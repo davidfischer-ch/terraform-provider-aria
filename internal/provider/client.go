@@ -143,46 +143,63 @@ func (self AriaClient) ReadIt(
 func (self AriaClient) DeleteIt(
 	ctx context.Context,
 	instance Model,
+	conflictMaxAttemptsOptional ...int,
 ) diag.Diagnostics {
+	// Default value, see https://stackoverflow.com/questions/19612449
+	conflictMaxAttempts := 5
+	if len(conflictMaxAttemptsOptional) > 0 {
+		conflictMaxAttempts = conflictMaxAttemptsOptional[0]
+	}
+
 	diags := diag.Diagnostics{}
 	name := instance.String()
 	tflog.Debug(ctx, fmt.Sprintf("Deleting %s...", name))
 
-	// Delete the resource
-	deletePath := instance.DeletePath()
-	response, err := self.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(deletePath)).
-		Delete(deletePath)
+	for attempt := 0; attempt <= conflictMaxAttempts; attempt++ {
 
-	err = handleAPIResponse(ctx, response, err, []int{200, 204})
-	if err != nil {
-		diags.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to delete %s, got error: %s", name, err))
-		return diags
-	}
-
-	// Poll resource until deleted
-	readPath := instance.ReadPath()
-	for retry := range []int{0, 1, 2, 3, 4} {
-		time.Sleep(time.Duration(retry) * time.Second)
-		tflog.Debug(ctx, fmt.Sprintf("Poll %d of 5 - Check %s is deleted...", retry+1, name))
-
+		// Delete the resource
+		deletePath := instance.DeletePath()
 		response, err := self.Client.R().
-			SetQueryParam("apiVersion", GetVersionFromPath(readPath)).
-			Get(readPath)
+			SetQueryParam("apiVersion", GetVersionFromPath(deletePath)).
+			Delete(deletePath)
 
-		err = handleAPIResponse(ctx, response, err, []int{200, 404})
+		err = handleAPIResponse(ctx, response, err, []int{200, 204})
 		if err != nil {
+			// This is potentially an error that will be solved by the deletion of other resources.
+			// We can retry the delete operation after some time to converge to desired state.
+			if attempt < conflictMaxAttempts && response.StatusCode() == 409 {
+				time.Sleep(time.Duration(3) * time.Second)  // TODO better with randomness?
+				continue
+			}
+			// Either its not a conflict error either we have made sufficent attempts...
 			diags.AddError(
 				"Client error",
-				fmt.Sprintf("Unable to poll %s will deleting it, got error: %s", name, err))
+				fmt.Sprintf("Unable to delete %s, got error: %s", name, err))
 			return diags
 		}
 
-		if response.StatusCode() == 404 {
-			tflog.Debug(ctx, fmt.Sprintf("Deleted %s successfully", name))
-			return diags
+		// Poll resource until deleted
+		readPath := instance.ReadPath()
+		for retry := range []int{0, 1, 2, 3, 4} {
+			time.Sleep(time.Duration(retry) * time.Second)
+			tflog.Debug(ctx, fmt.Sprintf("Poll %d of 5 - Check %s is deleted...", retry+1, name))
+
+			response, err := self.Client.R().
+				SetQueryParam("apiVersion", GetVersionFromPath(readPath)).
+				Get(readPath)
+
+			err = handleAPIResponse(ctx, response, err, []int{200, 404})
+			if err != nil {
+				diags.AddError(
+					"Client error",
+					fmt.Sprintf("Unable to poll %s will deleting it, got error: %s", name, err))
+				return diags
+			}
+
+			if response.StatusCode() == 404 {
+				tflog.Debug(ctx, fmt.Sprintf("Deleted %s successfully", name))
+				return diags
+			}
 		}
 	}
 
