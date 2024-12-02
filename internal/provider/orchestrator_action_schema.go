@@ -5,6 +5,7 @@ package provider
 
 import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 )
 
 func OrchestratorActionSchema() schema.Schema {
@@ -53,6 +54,12 @@ func OrchestratorActionSchema() schema.Schema {
 			"output_type": schema.StringAttribute{
 				MarkdownDescription: "Action return type",
 				Required:            true,
+			},
+			"force_delete": schema.BoolAttribute{
+				MarkdownDescription: "Force destroying the action (bypass references check).",
+				Computed:            true,
+				Optional:            true,
+				Default:             booldefault.StaticBool(false),
 			},
 		},
 	}

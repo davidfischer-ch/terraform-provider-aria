@@ -36,3 +36,12 @@ output "example_constant" {
 - `encrypted` (Boolean) Should be always unencrypted!
 - `id` (String) Identifier
 - `org_id` (String) Organization identifier
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+# Order can be imported by specifying the constant's unique identifier.
+terraform import aria_abx_constant.example 908f45e7-cf4a-4cc4-9954-c96784649061
+```

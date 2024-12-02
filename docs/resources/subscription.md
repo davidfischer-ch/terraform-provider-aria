@@ -96,3 +96,12 @@ resource "aria_subscription" "hello_world" {
 - `owner_id` (String) Owner identifier
 - `subscriber_id` (String) Subscriber identifier
 - `system` (Boolean) TODO
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+# Order can be imported by specifying the subscription's unique identifier.
+terraform import aria_property_group.example 72cfc94c-4706-4fd3-801d-c185d26266df
+```
