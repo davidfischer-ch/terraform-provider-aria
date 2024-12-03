@@ -30,6 +30,8 @@ type OrchestratorActionModel struct {
 	// Of type OrchestratorActionInputParameterModel
 
 	OutputType types.String `tfsdk:"output_type"`
+
+	ForceDelete types.Bool `tfsdk:"force_delete"`
 }
 
 // OrchestratorActionAPIModel describes the resource API model.
@@ -79,6 +81,9 @@ func (self OrchestratorActionModel) UpdatePath() string {
 }
 
 func (self OrchestratorActionModel) DeletePath() string {
+	if self.ForceDelete.ValueBool() {
+		return self.ReadPath() + "?force=true"
+	}
 	return self.ReadPath()
 }
 

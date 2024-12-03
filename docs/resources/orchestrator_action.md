@@ -69,6 +69,10 @@ EOT
 - `script` (String) Action source code
 - `version` (String) Action version
 
+### Optional
+
+- `force_delete` (Boolean) Force destroying the action (bypass references check).
+
 ### Read-Only
 
 - `id` (String) Identifier
@@ -81,3 +85,12 @@ Required:
 - `description` (String) Parameter description
 - `name` (String) Parameter name
 - `type` (String) Parameter type
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+# Order can be imported by specifying the action's unique identifier.
+terraform import aria_orchestrator_action.example 90c8291b-e71b-44f6-8f94-be9c0edc7867
+```

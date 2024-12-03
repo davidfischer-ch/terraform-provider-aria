@@ -151,3 +151,12 @@ Required:
 - `const` (String) Technical value
 - `encrypted` (Boolean) Encrypted?
 - `title` (String) Display value
+
+## Import
+
+Import is supported using the following syntax:
+
+```shell
+# Order can be imported by specifying the property group's unique identifier.
+terraform import aria_property_group.example ce238cb9-05e4-403a-9b31-d70ecb04466a
+```
