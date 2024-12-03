@@ -1,5 +1,28 @@
 # Changelog
 
+## Release v0.5.6 (2024-12-03)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.5...v0.5.6
+
+### Features
+
+* Implement `aria_orchestrator_action`'s forced deletion (opt-in with `force_delete = true`)
+* All resources : Retry deletion upon conflicts error (409's) to try to converge (up to 5 times)
+
+#### Deletion
+
+When deleting a resource, the conflict error (409) is potentially an error that will be solved by the deletion of other resources made in parallel in the same apply.
+
+Ideally, one should declare the dependencies with the `depends_on` or by using attribute's of a resource to configure another. However sometimes its not practical or even not possible (e.g. creating resources with a `for_each` loop). Hence Terraform will execute all delete operations in parallel.
+
+This is why the delete function now retries the delete operation up to 5 times to try to converge to desired state. This is not optimal but at least working for the common use cases.
+
+If this "magic number" of 5 (or the delay) has to be tuned per resource, please open an issue.
+
+### Fix and enhancements
+
+* Document import of resources when available
+
 ## Release v0.5.5 (2024-11-29)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.4...v0.5.5
