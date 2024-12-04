@@ -102,6 +102,6 @@ resource "aria_subscription" "hello_world" {
 Import is supported using the following syntax:
 
 ```shell
-# Order can be imported by specifying the subscription's unique identifier.
-terraform import aria_property_group.example 72cfc94c-4706-4fd3-801d-c185d26266df
+# Subscription can be imported by specifying the instance's unique identifier.
+terraform import aria_subscription.example 72cfc94c-4706-4fd3-801d-c185d26266df
 ```
