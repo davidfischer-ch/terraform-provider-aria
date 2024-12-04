@@ -25,16 +25,22 @@ func ComputedIdentifierSchema(description string) schema.StringAttribute {
 	}
 }
 
-func ComputedMutableIdentifierSchema() schema.StringAttribute {
+func ComputedMutableIdentifierSchema(description string) schema.StringAttribute {
+	if len(description) == 0 {
+		description = "Identifier"
+	}
 	return schema.StringAttribute{
-		MarkdownDescription: "Identifier",
+		MarkdownDescription: description,
 		Computed:            true,
 	}
 }
 
-func RequiredIdentifierSchema() schema.StringAttribute {
+func RequiredIdentifierSchema(description string) schema.StringAttribute {
+	if len(description) == 0 {
+		description = "Identifier"
+	}
 	return schema.StringAttribute{
-		MarkdownDescription: "Identifier",
+		MarkdownDescription: description,
 		Required:            true,
 	}
 }

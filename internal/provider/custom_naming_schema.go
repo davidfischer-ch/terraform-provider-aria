@@ -107,7 +107,7 @@ func CustomNamingSchema() schema.Schema {
 				Required: true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
-						"id": ComputedMutableIdentifierSchema(),
+						"id": ComputedMutableIdentifierSchema(""),
 						"name": schema.StringAttribute{
 							MarkdownDescription: "Template name (valid for types that supports " +
 								"named templates)",

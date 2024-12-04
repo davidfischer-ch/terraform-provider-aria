@@ -11,6 +11,13 @@ import (
 
 // IconModel describes the resource data model.
 type IconModel struct {
+	Id   types.String `tfsdk:"id"`
+	Path types.String `tfsdk:"path"`
+	Hash types.String `tfsdk:"hash"`
+}
+
+// IconModel describes the resource data model.
+type IconDataSourceModel struct {
 	Id      types.String `tfsdk:"id"`
 	Content types.String `tfsdk:"content"`
 }
@@ -40,4 +47,14 @@ func (self IconModel) UpdatePath() string {
 
 func (self IconModel) DeletePath() string {
 	return self.ReadPath()
+}
+
+// -------------------------------------------------------------------------------------------------
+
+func (self IconDataSourceModel) String() string {
+	return fmt.Sprintf("Icon %s", self.Id.ValueString())
+}
+
+func (self IconDataSourceModel) ReadPath() string {
+	return "icon/api/icons/" + self.Id.ValueString()
 }

@@ -53,7 +53,7 @@ func (self *IconDataSource) Read(
 	resp *datasource.ReadResponse,
 ) {
 	// Read Terraform configuration data into the model
-	var icon IconModel
+	var icon IconDataSourceModel
 	resp.Diagnostics.Append(req.Config.Get(ctx, &icon)...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -61,7 +61,7 @@ func (self *IconDataSource) Read(
 
 	response, err := self.client.Client.R().
 		// TODO SetQueryParam("apiVersion", ICON_API_VERSION).
-		Get("icon/api/icons/" + icon.Id.ValueString())
+		Get(icon.ReadPath())
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
