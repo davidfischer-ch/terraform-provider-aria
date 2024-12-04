@@ -1,5 +1,22 @@
 # Changelog
 
+## Release v0.6.0 (2024-12-04)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.6...v0.6.0
+
+### Major compatibility breaks
+
+* Icons resources are now declared with `path` & (optional) `hash` instead of `content`
+
+### Features
+
+* Add resource `catalog_item_icon`
+* Make `aria_icon` compatible with any kind of image
+
+### Fix and enhancements
+
+* Don't store `aria_icon`'s content inside the state (only path & its SHA-256 checksum)
+
 ## Release v0.5.6 (2024-12-03)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.5...v0.5.6
