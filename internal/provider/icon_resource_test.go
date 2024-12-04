@@ -4,10 +4,10 @@
 package provider
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/plancheck"
 )
 
 func TestAccIconResource(t *testing.T) {
@@ -17,38 +17,51 @@ func TestAccIconResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: testAccIconResourceConfig(svgIcon),
+				Config: `
+resource "aria_icon" "test" {
+  path = "../../tests/icon.svg"
+}
+`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("aria_icon.test", "id"),
-					resource.TestCheckResourceAttr("aria_icon.test", "content", svgIcon),
+					resource.TestCheckResourceAttr("aria_icon.test", "path", "../../tests/icon.svg"),
+					resource.TestCheckResourceAttr("aria_icon.test", "hash", "9eb36dc3af8fe94b1814dd419bb5bc6405cac9cbd13e42af1bcc545dc8b69a0c"),
 				),
 			},
-			// Update and Read testing
-			// TODO Implement this test
-			/* {
-				Config: testAccIconResourceConfig(bSvgIcon),
-				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("aria_icon.test", "content", bSvgIcon),
-				),
-			}, */
-			// ImportState testing
+			// Update (recreate) and Read testing
 			{
-				ResourceName:      "aria_icon.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				Config: `
+resource "aria_icon" "test" {
+  path = "../../tests/icon.png"
+}
+`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrSet("aria_icon.test", "id"),
+					resource.TestCheckResourceAttr("aria_icon.test", "path", "../../tests/icon.png"),
+					resource.TestCheckResourceAttr("aria_icon.test", "hash", "0e6822039f0795d0d02f2660c25e68a5fd31446083541922b8a9336ccbc75943"),
+				),
+			},
+			// No-op and Read testing
+			{
+				Config: `
+resource "aria_icon" "test" {
+  path = "../../tests/icon.png"
+  hash = "0e6822039f0795d0d02f2660c25e68a5fd31446083541922b8a9336ccbc75943"
+}
+`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrSet("aria_icon.test", "id"),
+					resource.TestCheckResourceAttr("aria_icon.test", "path", "../../tests/icon.png"),
+					resource.TestCheckResourceAttr("aria_icon.test", "hash", "0e6822039f0795d0d02f2660c25e68a5fd31446083541922b8a9336ccbc75943"),
+				),
+				ConfigPlanChecks: resource.ConfigPlanChecks{
+					PreApply: []plancheck.PlanCheck{
+						plancheck.ExpectEmptyPlan(),
+					},
+				},
 			},
 			// Delete testing automatically occurs in TestCase
-			// TODO Check https://developer.hashicorp.com/terraform/plugin/sdkv2/testing/acceptance-tests/testcase#checkdestroy
+			// Check https://developer.hashicorp.com/terraform/plugin/sdkv2/testing/acceptance-tests/testcase#checkdestroy
 		},
 	})
 }
-
-func testAccIconResourceConfig(content string) string {
-	return fmt.Sprintf(`
-resource "aria_icon" "test" {
-  content = %[1]q
-}
-`, content)
-}
-
-const svgIcon = `<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 0c6.623 0 12 5.377 12 12s-5.377 12-12 12-12-5.377-12-12 5.377-12 12-12zm0 1c6.071 0 11 4.929 11 11s-4.929 11-11 11-11-4.929-11-11 4.929-11 11-11z"/></svg>`

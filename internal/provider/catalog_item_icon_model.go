@@ -66,7 +66,7 @@ func (self CatalogItemIconModel) ToAPI(
 	ctx context.Context,
 ) (CatalogItemIconAPIModel, diag.Diagnostics) {
 	return CatalogItemIconAPIModel{
-		Id: self.Id.ValueString(),
+		Id:     self.Id.ValueString(),
 		IconId: self.IconId.ValueString(),
 	}, diag.Diagnostics{}
 }

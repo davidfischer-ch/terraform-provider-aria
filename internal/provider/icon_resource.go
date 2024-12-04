@@ -5,10 +5,9 @@ package provider
 
 import (
 	"context"
+	"crypto/sha256"
 	"fmt"
-	"strings"
 
-	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -16,7 +15,6 @@ import (
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &IconResource{}
-var _ resource.ResourceWithImportState = &IconResource{}
 
 func NewIconResource() resource.Resource {
 	return &IconResource{}
@@ -65,7 +63,7 @@ func (self *IconResource) Create(
 
 	response, err := self.client.Client.R().
 		// TODO SetQueryParam("apiVersion", ICON_API_VERSION).
-		SetFileReader("file", "file", strings.NewReader(icon.Content.ValueString())).
+		SetFile("file", icon.Path.ValueString()).
 		Post(icon.CreatePath())
 
 	err = handleAPIResponse(ctx, response, err, []int{201})
@@ -88,6 +86,26 @@ func (self *IconResource) Create(
 	icon.Id = types.StringValue(iconId)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &icon)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", icon.String()))
+
+	// Read the icon to retrieve its content (duplicated code with read)
+
+	response, err = self.client.Client.R().
+		// TODO SetQueryParam("apiVersion", ICON_API_VERSION).
+		Get(icon.ReadPath())
+
+	err = handleAPIResponse(ctx, response, err, []int{200})
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to read %s, got error: %s", icon.String(), err))
+		return
+	}
+
+	// Save updated icon into Terraform state
+	icon.Hash = types.StringValue(fmt.Sprintf("%x", sha256.Sum256(response.Body())))
+	resp.Diagnostics.Append(resp.State.Set(ctx, &icon)...)
+	tflog.Debug(ctx, fmt.Sprintf("Refreshed %s successfully", icon.String()))
+
 }
 
 func (self *IconResource) Read(
@@ -122,7 +140,7 @@ func (self *IconResource) Read(
 	}
 
 	// Save updated icon into Terraform state
-	icon.Content = types.StringValue(response.String())
+	icon.Hash = types.StringValue(fmt.Sprintf("%x", sha256.Sum256(response.Body())))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &icon)...)
 }
 
@@ -154,12 +172,4 @@ func (self *IconResource) Delete(
 	if !resp.Diagnostics.HasError() {
 		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &icon)...)
 	}
-}
-
-func (self *IconResource) ImportState(
-	ctx context.Context,
-	req resource.ImportStateRequest,
-	resp *resource.ImportStateResponse,
-) {
-	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }

@@ -14,14 +14,8 @@ Icon resource
 
 ```terraform
 resource "aria_icon" "example" {
-  content = file("icon.svg")
-}
-
-output "example_icon" {
-  value = {
-    id   = aria_icon.example.id
-    hash = sha256(aria_icon.example.content)
-  }
+  path = "icon.svg"
+  hash = filesha256("icon.svg") # Allow tracking content change
 }
 ```
 
@@ -30,17 +24,12 @@ output "example_icon" {
 
 ### Required
 
-- `content` (String) Content (force recreation on change)
+- `path` (String) Path (force recreation on change)
+
+### Optional
+
+- `hash` (String) Content SHA-256 (force recreation on change)
 
 ### Read-Only
 
 - `id` (String) Identifier (Aria seem to compute it from content)
-
-## Import
-
-Import is supported using the following syntax:
-
-```shell
-# Order can be imported by specifying the icon's unique identifier.
-terraform import aria_icon.example 9c14f724-46b4-4f4b-987b-9c35d5a8fec1
-```
