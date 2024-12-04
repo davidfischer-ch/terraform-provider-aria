@@ -290,6 +290,9 @@ func GetVersionFromPath(path string) string {
 	if strings.HasPrefix(path, "blueprint") {
 		return BLUEPRINT_API_VERSION
 	}
+	if strings.HasPrefix(path, "catalog") {
+		return CATALOG_API_VERSION
+	}
 	if strings.HasPrefix(path, "event-broker") {
 		return EVENT_BROKER_API_VERSION
 	}

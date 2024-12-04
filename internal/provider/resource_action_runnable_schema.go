@@ -14,7 +14,7 @@ func ResourceActionRunnableSchema(description string) schema.SingleNestedAttribu
 		MarkdownDescription: description,
 		Required:            true,
 		Attributes: map[string]schema.Attribute{
-			"id": RequiredIdentifierSchema(),
+			"id": RequiredIdentifierSchema(""),
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Runnable name",
 				Required:            true,
