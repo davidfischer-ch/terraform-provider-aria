@@ -61,6 +61,13 @@ func (self *IconResource) Create(
 		return
 	}
 
+	// Creating "icons" with the same content multiple times in parallel
+	// will lead to a platform's Internal Error (HTTP 500)...
+	// The platform is not handling properly concurrent requests to icon create/delete API
+	// So we implement this protection (mutex) at the client side (provider)
+
+	lockKey := icon.LockKey()
+	self.client.Mutex.Lock(ctx, lockKey)
 	response, err := self.client.Client.R().
 		// TODO SetQueryParam("apiVersion", ICON_API_VERSION).
 		SetFile("file", icon.Path.ValueString()).
@@ -93,6 +100,8 @@ func (self *IconResource) Create(
 		// TODO SetQueryParam("apiVersion", ICON_API_VERSION).
 		Get(icon.ReadPath())
 
+	self.client.Mutex.Unlock(ctx, lockKey)
+
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -120,9 +129,11 @@ func (self *IconResource) Read(
 		return
 	}
 
+	self.client.Mutex.RLock(ctx, icon.LockKey())
 	response, err := self.client.Client.R().
 		// TODO SetQueryParam("apiVersion", ICON_API_VERSION).
 		Get(icon.ReadPath())
+	self.client.Mutex.RUnlock(ctx, icon.LockKey())
 
 	// Handle gracefully a resource that has vanished on the platform
 	// Beware that some APIs respond with HTTP 404 instead of 403 ...
@@ -170,6 +181,8 @@ func (self *IconResource) Delete(
 	var icon IconModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &icon)...)
 	if !resp.Diagnostics.HasError() {
+		self.client.Mutex.Lock(ctx, icon.LockKey())
 		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &icon)...)
+		self.client.Mutex.Unlock(ctx, icon.LockKey())
 	}
 }

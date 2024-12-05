@@ -25,7 +25,7 @@ resource "aria_icon" "test" {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("aria_icon.test", "id"),
 					resource.TestCheckResourceAttr("aria_icon.test", "path", "../../tests/icon.svg"),
-					resource.TestCheckResourceAttr("aria_icon.test", "hash", "9eb36dc3af8fe94b1814dd419bb5bc6405cac9cbd13e42af1bcc545dc8b69a0c"),
+					resource.TestCheckResourceAttr("aria_icon.test", "hash", "1ef3f922f7072f1b2326f538f411cbe4d121a0ed50a308716f1f229628ae7d60"),
 				),
 			},
 			// Update (recreate) and Read testing
@@ -59,6 +59,35 @@ resource "aria_icon" "test" {
 						plancheck.ExpectEmptyPlan(),
 					},
 				},
+			},
+			// Delete testing automatically occurs in TestCase
+			// Check https://developer.hashicorp.com/terraform/plugin/sdkv2/testing/acceptance-tests/testcase#checkdestroy
+		},
+	})
+}
+
+func TestAccIconDuplicatedResource(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			// Create/delete same icon multiple times in "parallel" (protected by mutex) and Read testing
+			{
+				Config: `
+resource "aria_icon" "test" {
+  path = "../../tests/icon.svg"
+}
+
+resource "aria_icon" "test_others" {
+	count = 5
+  path  = "../../tests/icon.svg"
+}
+`,
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrSet("aria_icon.test", "id"),
+					resource.TestCheckResourceAttr("aria_icon.test", "path", "../../tests/icon.svg"),
+					resource.TestCheckResourceAttr("aria_icon.test", "hash", "1ef3f922f7072f1b2326f538f411cbe4d121a0ed50a308716f1f229628ae7d60"),
+				),
 			},
 			// Delete testing automatically occurs in TestCase
 			// Check https://developer.hashicorp.com/terraform/plugin/sdkv2/testing/acceptance-tests/testcase#checkdestroy
