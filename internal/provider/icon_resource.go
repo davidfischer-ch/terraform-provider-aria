@@ -180,7 +180,7 @@ func (self *IconResource) Delete(
 	// Read Terraform prior state data into the model
 	var icon IconModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &icon)...)
-	if !resp.Diagnostics.HasError() {
+	if !resp.Diagnostics.HasError() && !icon.KeepOnDestroy.ValueBool() {
 		self.client.Mutex.Lock(ctx, icon.LockKey())
 		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &icon)...)
 		self.client.Mutex.Unlock(ctx, icon.LockKey())
