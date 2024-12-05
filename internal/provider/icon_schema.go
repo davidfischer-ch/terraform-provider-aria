@@ -4,8 +4,11 @@
 package provider
 
 import (
+	"strings"
+
 	dataschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 )
@@ -29,6 +32,16 @@ func IconSchema() schema.Schema {
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
+			},
+			"keep_on_destroy": schema.BoolAttribute{
+				MarkdownDescription: strings.Join([]string{
+					"Keep the icon on destroy?",
+					"This can help preventing issues if sharing the same icon for multiple catalog items.",
+					"Default value is false.",
+				}, "\n"),
+				Optional: true,
+				Computed: true,
+				Default:  booldefault.StaticBool(false),
 			},
 		},
 	}

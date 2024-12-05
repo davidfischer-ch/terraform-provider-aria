@@ -11,9 +11,10 @@ import (
 
 // IconModel describes the resource data model.
 type IconModel struct {
-	Id   types.String `tfsdk:"id"`
-	Path types.String `tfsdk:"path"`
-	Hash types.String `tfsdk:"hash"`
+	Id            types.String `tfsdk:"id"`
+	Path          types.String `tfsdk:"path"`
+	Hash          types.String `tfsdk:"hash"`
+	KeepOnDestroy types.Bool   `tfsdk:"keep_on_destroy"`
 }
 
 // IconModel describes the resource data model.

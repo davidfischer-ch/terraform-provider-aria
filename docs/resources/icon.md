@@ -13,9 +13,16 @@ Icon resource
 ## Example Usage
 
 ```terraform
-resource "aria_icon" "example" {
-  path = "icon.svg"
-  hash = filesha256("icon.svg") # Allow tracking content change
+resource "aria_icon" "basic_example" {
+  path            = "icon.svg"
+  hash            = filesha256("icon.svg") # Allow tracking content change
+  keep_on_destroy = false                  # Let Terraform delete icon for real on destroy
+}
+
+resource "aria_icon" "shared_example" {
+  path            = "common.png"
+  hash            = filesha256("common.png") # Allow tracking content change
+  keep_on_destroy = true                     # Do not delete, preventing issues if same icon is declared multiple time
 }
 ```
 
@@ -29,6 +36,9 @@ resource "aria_icon" "example" {
 ### Optional
 
 - `hash` (String) Content SHA-256 (force recreation on change)
+- `keep_on_destroy` (Boolean) Keep the icon on destroy?
+This can help preventing issues if sharing the same icon for multiple catalog items.
+Default value is false.
 
 ### Read-Only
 
