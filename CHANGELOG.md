@@ -1,5 +1,22 @@
 # Changelog
 
+## Release v0.6.1 (2024-12-05)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.0...v0.6.1
+
+### Features
+
+The platform's icon API endpoint is not thread safe neither prevent the deletion of icons used by the catalog items ...
+
+So :
+
+* Implement `catalog_item_icon`'s soft deletion (opt-in with `keep_on_delete = true`)
+* Prevent Aria internal errors when manipulating multiple icons by using mutexes on `aria_icon`'s resource CRUD functions
+
+### Fix and enhancements
+
+* Cover `catalog_item_icon` with tests
+
 ## Release v0.6.0 (2024-12-04)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.6...v0.6.0
