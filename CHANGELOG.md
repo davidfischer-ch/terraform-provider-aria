@@ -10,7 +10,7 @@ The platform's icon API endpoint is not thread safe neither prevent the deletion
 
 So :
 
-* Implement `catalog_item_icon`'s soft deletion (opt-in with `keep_on_delete = true`)
+* Implement `catalog_item_icon`'s soft deletion (opt-in with `keep_on_destroy = true`)
 * Prevent Aria internal errors when manipulating multiple icons by using mutexes on `aria_icon`'s resource CRUD functions
 
 ### Fix and enhancements
