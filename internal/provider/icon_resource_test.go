@@ -40,7 +40,7 @@ resource "aria_icon" "test" {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("aria_icon.test", "id"),
 					resource.TestCheckResourceAttr("aria_icon.test", "path", "../../tests/icon.png"),
-					resource.TestCheckResourceAttr("aria_icon.test", "hash", "0e6822039f0795d0d02f2660c25e68a5fd31446083541922b8a9336ccbc75943"),
+					resource.TestCheckResourceAttr("aria_icon.test", "hash", "724d45fec592788dcaca7526cfbb68e0867adb48ed1a9f8d6f5a6fde094bcf7d"),
 					resource.TestCheckResourceAttr("aria_icon.test", "keep_on_destroy", "false"),
 				),
 			},
@@ -49,13 +49,13 @@ resource "aria_icon" "test" {
 				Config: `
 resource "aria_icon" "test" {
   path = "../../tests/icon.png"
-  hash = "0e6822039f0795d0d02f2660c25e68a5fd31446083541922b8a9336ccbc75943"
+  hash = "724d45fec592788dcaca7526cfbb68e0867adb48ed1a9f8d6f5a6fde094bcf7d"
 }
 `,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("aria_icon.test", "id"),
 					resource.TestCheckResourceAttr("aria_icon.test", "path", "../../tests/icon.png"),
-					resource.TestCheckResourceAttr("aria_icon.test", "hash", "0e6822039f0795d0d02f2660c25e68a5fd31446083541922b8a9336ccbc75943"),
+					resource.TestCheckResourceAttr("aria_icon.test", "hash", "724d45fec592788dcaca7526cfbb68e0867adb48ed1a9f8d6f5a6fde094bcf7d"),
 					resource.TestCheckResourceAttr("aria_icon.test", "keep_on_destroy", "false"),
 				),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
