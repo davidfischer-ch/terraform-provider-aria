@@ -85,6 +85,16 @@ func OrchestratorWorkflowSchema() schema.Schema {
 				Optional:            true,
 				Default:             stringdefault.StaticString("2.0"),
 			},
+			"input_parameters": schema.ListNestedAttribute{
+				MarkdownDescription: "Workflow input parameters",
+				Required:            true,
+				NestedObject:        ParameterSchema(),
+			},
+			"output_parameters": schema.ListNestedAttribute{
+				MarkdownDescription: "Workflow output parameters",
+				Required:            true,
+				NestedObject:        ParameterSchema(),
+			},
 			"force_delete": schema.BoolAttribute{
 				MarkdownDescription: "Force destroying the workflow (bypass references check).",
 				Computed:            true,

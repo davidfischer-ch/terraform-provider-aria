@@ -91,69 +91,30 @@ func (self *OrchestratorActionModel) FromAPI(
 	ctx context.Context,
 	raw OrchestratorActionAPIModel,
 ) diag.Diagnostics {
-
-	diags := diag.Diagnostics{}
-
+	parameters, diags := ParameterModelListFromAPI(ctx, raw.InputParameters)
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
 	self.Module = types.StringValue(raw.Module)
 	self.FQN = types.StringValue(raw.FQN)
 	self.Description = types.StringValue(raw.Description)
 	self.Version = types.StringValue(raw.Version)
-
 	self.Runtime = types.StringValue(raw.Runtime)
 	self.RuntimeMemoryLimit = types.Int64Value(raw.RuntimeMemoryLimit)
 	self.RuntimeTimeout = types.Int32Value(raw.RuntimeTimeout)
 	self.Script = types.StringValue(raw.Script)
+	self.InputParameters = parameters
 	self.OutputType = types.StringValue(raw.OutputType)
-
-	// Convert input parameters from raw
-	// Ensure array (not nil) to make practitioner's life easier
-	parameters := []ParameterModel{}
-	if raw.InputParameters != nil {
-		for _, parameterRaw := range raw.InputParameters {
-			parameter := ParameterModel{}
-			diags.Append(parameter.FromAPI(ctx, parameterRaw)...)
-			parameters = append(parameters, parameter)
-		}
-	}
-
-	// Store inputs parameters to list value
-	var parametersDiags diag.Diagnostics
-	parameterAttrs := types.ObjectType{AttrTypes: ParameterAttributeTypes()}
-	self.InputParameters, parametersDiags = types.ListValueFrom(ctx, parameterAttrs, parameters)
-	diags.Append(parametersDiags...)
-
 	return diags
 }
 
 func (self OrchestratorActionModel) ToAPI(
 	ctx context.Context,
 ) (OrchestratorActionAPIModel, diag.Diagnostics) {
-	diags := diag.Diagnostics{}
-
-	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/list
-	if self.InputParameters.IsNull() || self.InputParameters.IsUnknown() {
-		diags.AddError(
-			"Configuration error",
-			fmt.Sprintf(
-				"Unable to manage %s, input_parameters is either null or unknown",
-				self.String()))
-		return OrchestratorActionAPIModel{}, diags
-	}
-
-	// Extract input parameters from list value
-	parameters := make([]ParameterModel, 0, len(self.InputParameters.Elements()))
-	diags.Append(self.InputParameters.ElementsAs(ctx, &parameters, false)...)
-
-	// Convert input parameters to raw
-	parametersRaw := []ParameterAPIModel{}
-	for _, parameter := range parameters {
-		parameterRaw, parameterDiags := parameter.ToAPI(ctx)
-		parametersRaw = append(parametersRaw, parameterRaw)
-		diags.Append(parameterDiags...)
-	}
-
+	parametersRaw, diags := ParameterModelListToAPI(
+		ctx,
+		self.InputParameters,
+		fmt.Sprintf("%s, %s", self.String(), "input_parameters"),
+	)
 	return OrchestratorActionAPIModel{
 		Id:                 self.Id.ValueString(),
 		Name:               self.Name.ValueString(),
@@ -167,5 +128,5 @@ func (self OrchestratorActionModel) ToAPI(
 		Script:             self.Script.ValueString(),
 		InputParameters:    parametersRaw,
 		OutputType:         self.OutputType.ValueString(),
-	}, diag.Diagnostics{}
+	}, diags
 }

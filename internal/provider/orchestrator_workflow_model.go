@@ -23,8 +23,7 @@ type OrchestratorWorkflowModel struct {
 
 	//Attrib               jsontypes.Normalized `tfsdk:"attrib"`
 	AllowedOperations types.String `tfsdk:"allowed_operations"`
-	//Input                jsontypes.Normalized `tfsdk:"input"`
-	ObjectName types.String `tfsdk:"object_name"`
+	ObjectName        types.String `tfsdk:"object_name"`
 
 	// TODO types.Object ... "Of type PositionModel"
 	Position PositionModel `tfsdk:"position"`
@@ -34,6 +33,10 @@ type OrchestratorWorkflowModel struct {
 	ResumeFromFailedMode types.Int32  `tfsdk:"resume_from_failed_mode"`
 	RootName             types.String `tfsdk:"root_name"`
 	//WorkflowItem         jsontypes.Normalized `tfsdk:"workflow_item"`
+
+	InputParameters  types.List `tfsdk:"input_parameters"`
+	OutputParameters types.List `tfsdk:"output_parameters"`
+	// Of type ParameterModel
 
 	ApiVersion    types.String `tfsdk:"api_version"`
 	EditorVersion types.String `tfsdk:"editor_version"`
@@ -61,7 +64,6 @@ type OrchestratorWorkflowContentAPIModel struct {
 
 	Attrib               any              `json:"attrib"`
 	AllowedOperations    string           `json:"allowed-operations"`
-	Input                map[string]any   `json:"input"` // e.g. { param: [ name: type: ]}
 	ObjectName           string           `json:"object-name"`
 	Position             PositionAPIModel `json:"position"`
 	Presentation         any              `json:"presentation,omitempty"` // e.g. {}
@@ -70,8 +72,15 @@ type OrchestratorWorkflowContentAPIModel struct {
 	RootName             string           `json:"root-name"`
 	WorkflowItem         any              `json:"workflow-item"`
 
+	Input  OrchestratorWorkflowIOAPIModel `json:"input"`
+	Output OrchestratorWorkflowIOAPIModel `json:"output"`
+
 	ApiVersion    string `json:"api-version"`
 	EditorVersion string `json:"editor-version"`
+}
+
+type OrchestratorWorkflowIOAPIModel struct {
+	Param []ParameterAPIModel `json:"param"`
 }
 
 type OrchestratorWorkflowVersionAPIModel struct {
@@ -149,7 +158,6 @@ func (self *OrchestratorWorkflowModel) FromContentAPI(
 	ctx context.Context,
 	raw OrchestratorWorkflowContentAPIModel,
 ) diag.Diagnostics {
-	diags := self.Position.FromAPI(ctx, raw.Position)
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
 	self.Description = types.StringValue(raw.Description)
@@ -162,6 +170,16 @@ func (self *OrchestratorWorkflowModel) FromContentAPI(
 	self.RootName = types.StringValue(raw.RootName)
 	self.ApiVersion = types.StringValue(raw.ApiVersion)
 	self.EditorVersion = types.StringValue(raw.EditorVersion)
+
+	var parametersDiags diag.Diagnostics
+	diags := self.Position.FromAPI(ctx, raw.Position)
+
+	self.InputParameters, parametersDiags = ParameterModelListFromAPI(ctx, raw.Input.Param)
+	diags.Append(parametersDiags...)
+
+	self.OutputParameters, parametersDiags = ParameterModelListFromAPI(ctx, raw.Output.Param)
+	diags.Append(parametersDiags...)
+
 	return diags
 }
 
@@ -189,6 +207,21 @@ func (self OrchestratorWorkflowModel) ToContentAPI(
 	ctx context.Context,
 ) (OrchestratorWorkflowContentAPIModel, diag.Diagnostics) {
 	positionRaw, diags := self.Position.ToAPI(ctx)
+
+	inputRaw, inputDiags := ParameterModelListToAPI(
+		ctx,
+		self.InputParameters,
+		fmt.Sprintf("%s, %s", self.String(), "input_parameters"),
+	)
+	diags.Append(inputDiags...)
+
+	outputRaw, outputDiags := ParameterModelListToAPI(
+		ctx,
+		self.OutputParameters,
+		fmt.Sprintf("%s, %s", self.String(), "output_parameters"),
+	)
+	diags.Append(outputDiags...)
+
 	return OrchestratorWorkflowContentAPIModel{
 		Id:                   self.Id.ValueString(),
 		Name:                 self.Name.ValueString(),
@@ -201,8 +234,14 @@ func (self OrchestratorWorkflowModel) ToContentAPI(
 		RestartMode:          self.RestartMode.ValueInt32(),
 		ResumeFromFailedMode: self.ResumeFromFailedMode.ValueInt32(),
 		RootName:             self.RootName.ValueString(),
-		ApiVersion:           self.ApiVersion.ValueString(),
-		EditorVersion:        self.EditorVersion.ValueString(),
+		Input: OrchestratorWorkflowIOAPIModel{
+			Param: inputRaw,
+		},
+		Output: OrchestratorWorkflowIOAPIModel{
+			Param: outputRaw,
+		},
+		ApiVersion:    self.ApiVersion.ValueString(),
+		EditorVersion: self.EditorVersion.ValueString(),
 	}, diags
 }
 
