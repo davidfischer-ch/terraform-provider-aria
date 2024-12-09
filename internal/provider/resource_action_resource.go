@@ -160,6 +160,8 @@ func (self *ResourceActionResource) ImportState(
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
 
+// -------------------------------------------------------------------------------------------------
+
 // Implement the magic behind the create, update and delete methods.
 func (self *ResourceActionResource) ManageIt(
 	ctx context.Context,

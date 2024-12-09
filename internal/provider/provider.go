@@ -219,6 +219,7 @@ func (self *AriaProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewIconResource,
 		NewOrchestratorActionResource,
 		NewOrchestratorCategoryResource,
+		NewOrchestratorWorkflowResource,
 		NewProjectResource,
 		NewPropertyGroupResource,
 		NewResourceActionResource,

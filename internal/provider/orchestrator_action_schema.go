@@ -49,7 +49,7 @@ func OrchestratorActionSchema() schema.Schema {
 			"input_parameters": schema.ListNestedAttribute{
 				MarkdownDescription: "Action input parameters",
 				Required:            true,
-				NestedObject:        OrchestratorActionInputParameterSchema(),
+				NestedObject:        ParameterSchema(),
 			},
 			"output_type": schema.StringAttribute{
 				MarkdownDescription: "Action return type",

@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 )
 
-func OrchestratorActionInputParameterSchema() schema.NestedAttributeObject {
+func ParameterSchema() schema.NestedAttributeObject {
 	return schema.NestedAttributeObject{
 		Attributes: map[string]schema.Attribute{
 			"name": schema.StringAttribute{
