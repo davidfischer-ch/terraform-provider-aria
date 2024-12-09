@@ -27,7 +27,7 @@ type OrchestratorActionModel struct {
 	Script types.String `tfsdk:"script"`
 
 	InputParameters types.List `tfsdk:"input_parameters"`
-	// Of type OrchestratorActionInputParameterModel
+	// Of type ParameterModel
 
 	OutputType types.String `tfsdk:"output_type"`
 
@@ -49,7 +49,7 @@ type OrchestratorActionAPIModel struct {
 
 	Script string `json:"script"`
 
-	InputParameters []OrchestratorActionInputParameterAPIModel `json:"input-parameters,omitempty"`
+	InputParameters []ParameterAPIModel `json:"input-parameters,omitempty"`
 
 	OutputType string `json:"output-type"`
 }
@@ -109,10 +109,10 @@ func (self *OrchestratorActionModel) FromAPI(
 
 	// Convert input parameters from raw
 	// Ensure array (not nil) to make practitioner's life easier
-	parameters := []OrchestratorActionInputParameterModel{}
+	parameters := []ParameterModel{}
 	if raw.InputParameters != nil {
 		for _, parameterRaw := range raw.InputParameters {
-			parameter := OrchestratorActionInputParameterModel{}
+			parameter := ParameterModel{}
 			diags.Append(parameter.FromAPI(ctx, parameterRaw)...)
 			parameters = append(parameters, parameter)
 		}
@@ -120,7 +120,7 @@ func (self *OrchestratorActionModel) FromAPI(
 
 	// Store inputs parameters to list value
 	var parametersDiags diag.Diagnostics
-	parameterAttrs := types.ObjectType{AttrTypes: OrchestratorActionInputParameterAttributeTypes()}
+	parameterAttrs := types.ObjectType{AttrTypes: ParameterAttributeTypes()}
 	self.InputParameters, parametersDiags = types.ListValueFrom(ctx, parameterAttrs, parameters)
 	diags.Append(parametersDiags...)
 
@@ -143,14 +143,11 @@ func (self OrchestratorActionModel) ToAPI(
 	}
 
 	// Extract input parameters from list value
-	parameters := make(
-		[]OrchestratorActionInputParameterModel,
-		0, len(self.InputParameters.Elements()),
-	)
+	parameters := make([]ParameterModel, 0, len(self.InputParameters.Elements()))
 	diags.Append(self.InputParameters.ElementsAs(ctx, &parameters, false)...)
 
 	// Convert input parameters to raw
-	parametersRaw := []OrchestratorActionInputParameterAPIModel{}
+	parametersRaw := []ParameterAPIModel{}
 	for _, parameter := range parameters {
 		parameterRaw, parameterDiags := parameter.ToAPI(ctx)
 		parametersRaw = append(parametersRaw, parameterRaw)

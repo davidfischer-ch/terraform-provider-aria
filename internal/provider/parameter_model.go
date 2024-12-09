@@ -12,22 +12,22 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-// OrchestratorActionInputParameterModel describes the resource data model.
-type OrchestratorActionInputParameterModel struct {
+// ParameterModel describes the resource data model.
+type ParameterModel struct {
 	Name        types.String `tfsdk:"name"`
 	Description types.String `tfsdk:"description"`
 	Type        types.String `tfsdk:"type"`
 }
 
-// OrchestratorActionInputParameterAPIModel describes the resource API model.
-type OrchestratorActionInputParameterAPIModel struct {
+// ParameterAPIModel describes the resource API model.
+type ParameterAPIModel struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Type        string `json:"type"`
 }
 
 // Used to convert structure to a types.Object.
-func OrchestratorActionInputParameterAttributeTypes() map[string]attr.Type {
+func ParameterAttributeTypes() map[string]attr.Type {
 	return map[string]attr.Type{
 		"name":        types.StringType,
 		"description": types.StringType,
@@ -35,16 +35,16 @@ func OrchestratorActionInputParameterAttributeTypes() map[string]attr.Type {
 	}
 }
 
-func (self OrchestratorActionInputParameterModel) String() string {
+func (self ParameterModel) String() string {
 	return fmt.Sprintf(
-		"Orchestrator Action Input Parameter %s (%s)",
+		"Input Parameter %s (%s)",
 		self.Name.ValueString(),
 		self.Type.ValueString())
 }
 
-func (self *OrchestratorActionInputParameterModel) FromAPI(
+func (self *ParameterModel) FromAPI(
 	ctx context.Context,
-	raw OrchestratorActionInputParameterAPIModel,
+	raw ParameterAPIModel,
 ) diag.Diagnostics {
 	self.Name = types.StringValue(raw.Name)
 	self.Description = types.StringValue(raw.Description)
@@ -52,10 +52,10 @@ func (self *OrchestratorActionInputParameterModel) FromAPI(
 	return diag.Diagnostics{}
 }
 
-func (self OrchestratorActionInputParameterModel) ToAPI(
+func (self ParameterModel) ToAPI(
 	ctx context.Context,
-) (OrchestratorActionInputParameterAPIModel, diag.Diagnostics) {
-	return OrchestratorActionInputParameterAPIModel{
+) (ParameterAPIModel, diag.Diagnostics) {
+	return ParameterAPIModel{
 		Name:        self.Name.ValueString(),
 		Description: CleanString(self.Description.ValueString()),
 		Type:        self.Type.ValueString(),
