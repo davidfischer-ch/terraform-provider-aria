@@ -6,6 +6,7 @@ package provider
 import (
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	//"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
@@ -36,6 +37,11 @@ func OrchestratorWorkflowSchema() schema.Schema {
 				Optional:            true,
 				Default:             stringdefault.StaticString("vef"),
 			},
+			"attrib": schema.StringAttribute{
+				MarkdownDescription: "Workflow attributes",
+				CustomType:          jsontypes.NormalizedType{},
+				Required:            true,
+			},
 			"object_name": schema.StringAttribute{
 				MarkdownDescription: "TODO",
 				Computed:            true,
@@ -43,6 +49,11 @@ func OrchestratorWorkflowSchema() schema.Schema {
 				Default:             stringdefault.StaticString("workflow:name=generic"),
 			},
 			"position": NestedPositionSchema(),
+			"presentation": schema.StringAttribute{
+				MarkdownDescription: "Workflow presentation",
+				CustomType:          jsontypes.NormalizedType{},
+				Required:            true,
+			},
 			"restart_mode": schema.Int32Attribute{
 				MarkdownDescription: strings.Join([]string{
 					"Workflow restart mode:",
@@ -73,6 +84,26 @@ func OrchestratorWorkflowSchema() schema.Schema {
 				Optional:            true,
 				Default:             stringdefault.StaticString("item0"),
 			},
+			"workflow_item": schema.StringAttribute{
+				MarkdownDescription: "Workflow item",
+				CustomType:          jsontypes.NormalizedType{},
+				Required:            true,
+			},
+			"input_parameters": schema.ListNestedAttribute{
+				MarkdownDescription: "Workflow input parameters",
+				Required:            true,
+				NestedObject:        ParameterSchema(),
+			},
+			"output_parameters": schema.ListNestedAttribute{
+				MarkdownDescription: "Workflow output parameters",
+				Required:            true,
+				NestedObject:        ParameterSchema(),
+			},
+			"input_forms": schema.StringAttribute{
+				MarkdownDescription: "Workflow input forms",
+				CustomType:          jsontypes.NormalizedType{},
+				Required:            true,
+			},
 			"api_version": schema.StringAttribute{
 				MarkdownDescription: "Orchestrator API Version.",
 				Computed:            true,
@@ -84,16 +115,6 @@ func OrchestratorWorkflowSchema() schema.Schema {
 				Computed:            true,
 				Optional:            true,
 				Default:             stringdefault.StaticString("2.0"),
-			},
-			"input_parameters": schema.ListNestedAttribute{
-				MarkdownDescription: "Workflow input parameters",
-				Required:            true,
-				NestedObject:        ParameterSchema(),
-			},
-			"output_parameters": schema.ListNestedAttribute{
-				MarkdownDescription: "Workflow output parameters",
-				Required:            true,
-				NestedObject:        ParameterSchema(),
 			},
 			"force_delete": schema.BoolAttribute{
 				MarkdownDescription: "Force destroying the workflow (bypass references check).",

@@ -34,8 +34,14 @@ resource "aria_orchestrator_workflow" "test" {
   restart_mode            = 1 # resume
   resume_from_failed_mode = 0 # default
 
+  attrib        = jsonencode([])
+  presentation  = jsonencode({})
+  workflow_item = jsonencode([])
+
   input_parameters  = []
   output_parameters = []
+
+  input_forms = jsonencode([])
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("aria_orchestrator_workflow.test", "id"),
@@ -45,12 +51,16 @@ resource "aria_orchestrator_workflow" "test" {
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "position.x", "100"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "position.y", "50"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "allowed_operations", "vef"),
+					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "attrib", "[]"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "object_name", "workflow:name=generic"),
+					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "presentation", "{}"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "restart_mode", "1"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "resume_from_failed_mode", "0"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "root_name", "item0"),
+					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "workflow_item", "[]"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "api_version", "6.0.0"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "editor_version", "2.0"),
+					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "input_forms", "[]"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "force_delete", "false"),
 					resource.TestCheckResourceAttrPair(
 						"aria_orchestrator_workflow.test", "category_id",
@@ -78,8 +88,14 @@ resource "aria_orchestrator_workflow" "test" {
   restart_mode            = 0 # skip
   resume_from_failed_mode = 2 # disabled
 
+  attrib       = jsonencode([])
+  presentation = jsonencode({})
+  workflow_item = jsonencode([])
+
   input_parameters  = []
   output_parameters = []
+
+  input_forms = jsonencode([])
 
   force_delete = true
 }`,
@@ -91,12 +107,16 @@ resource "aria_orchestrator_workflow" "test" {
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "position.x", "60"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "position.y", "10"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "allowed_operations", "vef"),
+					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "attrib", "[]"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "object_name", "workflow:name=generic"),
+					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "presentation", "{}"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "restart_mode", "0"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "resume_from_failed_mode", "2"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "root_name", "item0"),
+					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "workflow_item", "[]"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "api_version", "6.0.0"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "editor_version", "2.0"),
+					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "input_forms", "[]"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "force_delete", "true"),
 					resource.TestCheckResourceAttrPair(
 						"aria_orchestrator_workflow.test", "category_id",
@@ -130,8 +150,14 @@ resource "aria_orchestrator_workflow" "test" {
   restart_mode            = 0 # skip
   resume_from_failed_mode = 2 # disabled
 
+  attrib       = jsonencode([])
+  presentation = jsonencode({})
+  workflow_item = jsonencode([])
+
   input_parameters  = []
   output_parameters = []
+
+  input_forms = jsonencode([])
 
   force_delete = true
 }`,
@@ -143,12 +169,16 @@ resource "aria_orchestrator_workflow" "test" {
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "position.x", "60"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "position.y", "10"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "allowed_operations", "vef"),
+					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "attrib", "[]"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "object_name", "workflow:name=generic"),
+					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "presentation", "{}"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "restart_mode", "0"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "resume_from_failed_mode", "2"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "root_name", "item0"),
+					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "workflow_item", "[]"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "api_version", "6.0.0"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "editor_version", "2.0"),
+					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "input_forms", "[]"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "force_delete", "true"),
 					resource.TestCheckResourceAttrPair(
 						"aria_orchestrator_workflow.test", "category_id",
@@ -182,6 +212,10 @@ resource "aria_orchestrator_workflow" "test" {
   restart_mode            = 0 # skip
   resume_from_failed_mode = 2 # disabled
 
+  attrib       = jsonencode([])
+  presentation = jsonencode({})
+  workflow_item = jsonencode([])
+
   input_parameters = [
     {
       name        = "vraHost"
@@ -212,6 +246,8 @@ resource "aria_orchestrator_workflow" "test" {
       description = "Result of running the SSH command"
     }
   ]
+
+  input_forms = jsonencode([])
 
   force_delete = true
 
@@ -261,12 +297,16 @@ resource "aria_orchestrator_workflow" "test" {
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "position.x", "60"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "position.y", "10"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "allowed_operations", "vef"),
+					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "attrib", "[]"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "object_name", "workflow:name=generic"),
+					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "presentation", "{}"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "restart_mode", "0"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "resume_from_failed_mode", "2"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "root_name", "item0"),
+					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "workflow_item", "[]"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "api_version", "6.0.0"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "editor_version", "2.0"),
+					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "input_forms", "[]"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "force_delete", "true"),
 					resource.TestCheckResourceAttrPair(
 						"aria_orchestrator_workflow.test", "category_id",

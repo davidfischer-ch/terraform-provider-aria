@@ -7,42 +7,37 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 // OrchestratorWorkflowModel describes the resource data model.
 type OrchestratorWorkflowModel struct {
-	// Schema
-
 	Id          types.String `tfsdk:"id"`
 	Name        types.String `tfsdk:"name"`
 	Description types.String `tfsdk:"description"`
 	CategoryId  types.String `tfsdk:"category_id"`
 	Version     types.String `tfsdk:"version"`
 
-	//Attrib               jsontypes.Normalized `tfsdk:"attrib"`
-	AllowedOperations types.String `tfsdk:"allowed_operations"`
-	ObjectName        types.String `tfsdk:"object_name"`
-
-	// TODO types.Object ... "Of type PositionModel"
-	Position PositionModel `tfsdk:"position"`
-
-	//Presentation         jsontypes.Normalized `tfsdk:"presentation"`
-	RestartMode          types.Int32  `tfsdk:"restart_mode"`
-	ResumeFromFailedMode types.Int32  `tfsdk:"resume_from_failed_mode"`
-	RootName             types.String `tfsdk:"root_name"`
-	//WorkflowItem         jsontypes.Normalized `tfsdk:"workflow_item"`
+	AllowedOperations    types.String         `tfsdk:"allowed_operations"`
+	Attrib               jsontypes.Normalized `tfsdk:"attrib"`
+	ObjectName           types.String         `tfsdk:"object_name"`
+	Position             PositionModel        `tfsdk:"position"` // TODO types.Object
+	Presentation         jsontypes.Normalized `tfsdk:"presentation"`
+	RestartMode          types.Int32          `tfsdk:"restart_mode"`
+	ResumeFromFailedMode types.Int32          `tfsdk:"resume_from_failed_mode"`
+	RootName             types.String         `tfsdk:"root_name"`
+	WorkflowItem         jsontypes.Normalized `tfsdk:"workflow_item"`
 
 	InputParameters  types.List `tfsdk:"input_parameters"`
 	OutputParameters types.List `tfsdk:"output_parameters"`
 	// Of type ParameterModel
 
+	InputForms jsontypes.Normalized `tfsdk:"input_forms"`
+
 	ApiVersion    types.String `tfsdk:"api_version"`
 	EditorVersion types.String `tfsdk:"editor_version"`
-
-	// Of type OrchestratorWorkflowInputForm
-	//InputForms types.List `tfsdk:"input_forms"`
 
 	ForceDelete types.Bool `tfsdk:"force_delete"`
 }
@@ -62,15 +57,15 @@ type OrchestratorWorkflowContentAPIModel struct {
 	CategoryId  string `json:"category-id"`
 	Version     string `json:"version"`
 
-	Attrib               any              `json:"attrib"`
 	AllowedOperations    string           `json:"allowed-operations"`
+	Attrib               any              `json:"attrib"`
 	ObjectName           string           `json:"object-name"`
 	Position             PositionAPIModel `json:"position"`
-	Presentation         any              `json:"presentation,omitempty"` // e.g. {}
+	Presentation         any              `json:"presentation,omitempty"`
 	RestartMode          int32            `json:"restartMode"`
 	ResumeFromFailedMode int32            `json:"resumeFromFailedMode"`
 	RootName             string           `json:"root-name"`
-	WorkflowItem         any              `json:"workflow-item"`
+	WorkflowItem         any              `json:"workflow-item,omitempty"`
 
 	Input  OrchestratorWorkflowIOAPIModel `json:"input"`
 	Output OrchestratorWorkflowIOAPIModel `json:"output"`
@@ -84,7 +79,7 @@ type OrchestratorWorkflowIOAPIModel struct {
 }
 
 type OrchestratorWorkflowVersionAPIModel struct {
-	InputForms []map[string]any                    `json:"inputForms"`
+	InputForms any                                 `json:"inputForms"`
 	ParentId   string                              `json:"parentId,omitempty"`
 	Schema     OrchestratorWorkflowContentAPIModel `json:"workflowSchema"`
 }
@@ -171,14 +166,25 @@ func (self *OrchestratorWorkflowModel) FromContentAPI(
 	self.ApiVersion = types.StringValue(raw.ApiVersion)
 	self.EditorVersion = types.StringValue(raw.EditorVersion)
 
-	var parametersDiags diag.Diagnostics
+	var attributeDiags diag.Diagnostics
 	diags := self.Position.FromAPI(ctx, raw.Position)
 
-	self.InputParameters, parametersDiags = ParameterModelListFromAPI(ctx, raw.Input.Param)
-	diags.Append(parametersDiags...)
+	self.Attrib, attributeDiags = JSONNormalizedFromAny(self.String(), raw.Attrib)
+	diags.Append(attributeDiags...)
 
-	self.OutputParameters, parametersDiags = ParameterModelListFromAPI(ctx, raw.Output.Param)
-	diags.Append(parametersDiags...)
+	self.Presentation, attributeDiags = JSONNormalizedFromAny(self.String(), raw.Presentation)
+	diags.Append(attributeDiags...)
+
+	if raw.WorkflowItem != nil {
+		self.WorkflowItem, attributeDiags = JSONNormalizedFromAny(self.String(), raw.WorkflowItem)
+		diags.Append(attributeDiags...)
+	}
+
+	self.InputParameters, attributeDiags = ParameterModelListFromAPI(ctx, raw.Input.Param)
+	diags.Append(attributeDiags...)
+
+	self.OutputParameters, attributeDiags = ParameterModelListFromAPI(ctx, raw.Output.Param)
+	diags.Append(attributeDiags...)
 
 	return diags
 }
@@ -206,21 +212,31 @@ func (self OrchestratorWorkflowModel) ToCreateAPI(
 func (self OrchestratorWorkflowModel) ToContentAPI(
 	ctx context.Context,
 ) (OrchestratorWorkflowContentAPIModel, diag.Diagnostics) {
+	var attributeDiags diag.Diagnostics
 	positionRaw, diags := self.Position.ToAPI(ctx)
 
-	inputRaw, inputDiags := ParameterModelListToAPI(
+	attribRaw, attributeDiags := JSONNormalizedToAny(self.Attrib)
+	diags.Append(attributeDiags...)
+
+	presentationRaw, attributeDiags := JSONNormalizedToAny(self.Presentation)
+	diags.Append(attributeDiags...)
+
+	workflowItemRaw, attributeDiags := JSONNormalizedToAny(self.WorkflowItem)
+	diags.Append(attributeDiags...)
+
+	inputRaw, attributeDiags := ParameterModelListToAPI(
 		ctx,
 		self.InputParameters,
 		fmt.Sprintf("%s, %s", self.String(), "input_parameters"),
 	)
-	diags.Append(inputDiags...)
+	diags.Append(attributeDiags...)
 
-	outputRaw, outputDiags := ParameterModelListToAPI(
+	outputRaw, attributeDiags := ParameterModelListToAPI(
 		ctx,
 		self.OutputParameters,
 		fmt.Sprintf("%s, %s", self.String(), "output_parameters"),
 	)
-	diags.Append(outputDiags...)
+	diags.Append(attributeDiags...)
 
 	return OrchestratorWorkflowContentAPIModel{
 		Id:                   self.Id.ValueString(),
@@ -229,11 +245,14 @@ func (self OrchestratorWorkflowModel) ToContentAPI(
 		Description:          self.Description.ValueString(),
 		Version:              self.Version.ValueString(),
 		AllowedOperations:    self.AllowedOperations.ValueString(),
+		Attrib:               attribRaw,
 		ObjectName:           self.ObjectName.ValueString(),
 		Position:             positionRaw,
+		Presentation:         presentationRaw,
 		RestartMode:          self.RestartMode.ValueInt32(),
 		ResumeFromFailedMode: self.ResumeFromFailedMode.ValueInt32(),
 		RootName:             self.RootName.ValueString(),
+		WorkflowItem:         workflowItemRaw,
 		Input: OrchestratorWorkflowIOAPIModel{
 			Param: inputRaw,
 		},
@@ -249,10 +268,12 @@ func (self OrchestratorWorkflowModel) ToContentAPI(
 func (self OrchestratorWorkflowModel) ToVersionAPI(
 	ctx context.Context,
 ) (OrchestratorWorkflowVersionAPIModel, diag.Diagnostics) {
-	schema, diags := self.ToContentAPI(ctx)
+	schemaRaw, diags := self.ToContentAPI(ctx)
+	formsRaw, formsDiags := JSONNormalizedToAny(self.InputForms)
+	diags.Append(formsDiags...)
 	return OrchestratorWorkflowVersionAPIModel{
-		InputForms: []map[string]any{},
+		InputForms: formsRaw,
 		ParentId:   "",
-		Schema:     schema,
+		Schema:     schemaRaw,
 	}, diags
 }
