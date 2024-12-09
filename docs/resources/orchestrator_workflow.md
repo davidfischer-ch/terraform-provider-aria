@@ -18,7 +18,9 @@ Orchestrator workflow resource
 ### Required
 
 - `category_id` (String) Where to store the workflow (Category's identifier)
+- `description` (String) Describe the resource in few sentences
 - `name` (String) Workflow name (e.g. Send Mail)
+- `position` (Attributes) Position (see [below for nested schema](#nestedatt--position))
 - `restart_mode` (Number) Workflow restart mode:
 Skip (0) - do not resume run from failure.
 Resume (1) - Resume workflow run failure.
@@ -30,8 +32,21 @@ Disabled (2) - If a workflow run fails, it cannot be resumed.
 
 ### Optional
 
+- `allowed_operations` (String) TODO
+- `api_version` (String) Orchestrator API Version.
+- `editor_version` (String) Orchestrator Editor Version.
 - `force_delete` (Boolean) Force destroying the workflow (bypass references check).
+- `object_name` (String) TODO
+- `root_name` (String) TODO
 
 ### Read-Only
 
 - `id` (String) Identifier
+
+<a id="nestedatt--position"></a>
+### Nested Schema for `position`
+
+Required:
+
+- `x` (Number) X
+- `y` (Number) Y

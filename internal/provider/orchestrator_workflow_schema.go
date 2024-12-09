@@ -6,8 +6,10 @@ package provider
 import (
 	"strings"
 
+	//"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 )
 
 func OrchestratorWorkflowSchema() schema.Schema {
@@ -19,6 +21,7 @@ func OrchestratorWorkflowSchema() schema.Schema {
 				MarkdownDescription: "Workflow name (e.g. Send Mail)",
 				Required:            true,
 			},
+			"description": RequiredDescriptionSchema(),
 			"category_id": schema.StringAttribute{
 				MarkdownDescription: "Where to store the workflow (Category's identifier)",
 				Required:            true,
@@ -27,6 +30,19 @@ func OrchestratorWorkflowSchema() schema.Schema {
 				MarkdownDescription: "Workflow version (e.g. 1.0.0)",
 				Required:            true,
 			},
+			"allowed_operations": schema.StringAttribute{
+				MarkdownDescription: "TODO",
+				Computed:            true,
+				Optional:            true,
+				Default:             stringdefault.StaticString("vef"),
+			},
+			"object_name": schema.StringAttribute{
+				MarkdownDescription: "TODO",
+				Computed:            true,
+				Optional:            true,
+				Default:             stringdefault.StaticString("workflow:name=generic"),
+			},
+			"position": NestedPositionSchema(),
 			"restart_mode": schema.Int32Attribute{
 				MarkdownDescription: strings.Join([]string{
 					"Workflow restart mode:",
@@ -34,6 +50,9 @@ func OrchestratorWorkflowSchema() schema.Schema {
 					"Resume (1) - Resume workflow run failure.",
 				}, "\n"),
 				Required: true,
+				/*Validators: []validator.String{
+					stringvalidator.OneOf([]string{"skip", "resume"}...),
+				},*/
 			},
 			"resume_from_failed_mode": schema.Int32Attribute{
 				MarkdownDescription: strings.Join([]string{
@@ -44,6 +63,27 @@ func OrchestratorWorkflowSchema() schema.Schema {
 					"Disabled (2) - If a workflow run fails, it cannot be resumed.",
 				}, "\n"),
 				Required: true,
+				/*Validators: []validator.String{
+					stringvalidator.OneOf([]string{"default", "enabled", "disabled"}...),
+				},*/
+			},
+			"root_name": schema.StringAttribute{
+				MarkdownDescription: "TODO",
+				Computed:            true,
+				Optional:            true,
+				Default:             stringdefault.StaticString("item0"),
+			},
+			"api_version": schema.StringAttribute{
+				MarkdownDescription: "Orchestrator API Version.",
+				Computed:            true,
+				Optional:            true,
+				Default:             stringdefault.StaticString("6.0.0"),
+			},
+			"editor_version": schema.StringAttribute{
+				MarkdownDescription: "Orchestrator Editor Version.",
+				Computed:            true,
+				Optional:            true,
+				Default:             stringdefault.StaticString("2.0"),
 			},
 			"force_delete": schema.BoolAttribute{
 				MarkdownDescription: "Force destroying the workflow (bypass references check).",

@@ -13,23 +13,30 @@ import (
 
 // OrchestratorWorkflowModel describes the resource data model.
 type OrchestratorWorkflowModel struct {
-	Id      types.String `tfsdk:"id"`
-	Name    types.String `tfsdk:"name"`
-	Version types.String `tfsdk:"version"`
+	// Schema
 
-	CategoryId types.String `tfsdk:"category_id"`
+	Id          types.String `tfsdk:"id"`
+	Name        types.String `tfsdk:"name"`
+	Description types.String `tfsdk:"description"`
+	CategoryId  types.String `tfsdk:"category_id"`
+	Version     types.String `tfsdk:"version"`
 
-	//ApiVersion
-	//EditorVersion
-	//ObjectName
-	//Position
-	//Presentation
-	RestartMode          types.Int32 `tfsdk:"restart_mode"`
-	ResumeFromFailedMode types.Int32 `tfsdk:"resume_from_failed_mode"`
-	//RootName
+	//Attrib               jsontypes.Normalized `tfsdk:"attrib"`
+	AllowedOperations types.String `tfsdk:"allowed_operations"`
+	//Input                jsontypes.Normalized `tfsdk:"input"`
+	ObjectName types.String `tfsdk:"object_name"`
 
-	// Other fields that are not yet enforced by this model
-	//Schema jsontypes.Normalized `tfsdk:"schema"`
+	// TODO types.Object ... "Of type PositionModel"
+	Position PositionModel `tfsdk:"position"`
+
+	//Presentation         jsontypes.Normalized `tfsdk:"presentation"`
+	RestartMode          types.Int32  `tfsdk:"restart_mode"`
+	ResumeFromFailedMode types.Int32  `tfsdk:"resume_from_failed_mode"`
+	RootName             types.String `tfsdk:"root_name"`
+	//WorkflowItem         jsontypes.Normalized `tfsdk:"workflow_item"`
+
+	ApiVersion    types.String `tfsdk:"api_version"`
+	EditorVersion types.String `tfsdk:"editor_version"`
 
 	// Of type OrchestratorWorkflowInputForm
 	//InputForms types.List `tfsdk:"input_forms"`
@@ -44,36 +51,37 @@ type OrchestratorWorkflowCreateAPIModel struct {
 	CategoryId string `json:"category-id"`
 }
 
-// OrchestratorWorkflowUpdateAPIModel describes the resource read & update API model.
-// TODO Use versions API endpoint instead (and rename it OrchestratorWorkflowVersionAPIModel)
-type OrchestratorWorkflowUpdateAPIModel struct {
-	Id                   string           `json:"id,omitempty"`
-	Name                 string           `json:"display-name"`
-	Version              string           `json:"version"`              // e.g. "1.0.0"
-	ApiVersion           string           `json:"api-version"`          // e.g. "6.0.0"
-	EditorVersion        string           `json:"editor-version"`       // e.g. "2.0"
-	ObjectName           string           `json:"object-name"`          // e.g. workflow:name=generic
-	Position             PositionAPIModel `json:"position"`             // e.g. {"x": 100.0, "y": 50.0}
-	Presentation         any              `json:"presentation"`         // e.g. {}
-	RestartMode          int32            `json:"restartMode"`          // e.g. 1
-	ResumeFromFailedMode int32            `json:"resumeFromFailedMode"` // e.g. 0
-	RootName             string           `json:"root-name"`            // e.g. "item0"
+// OrchestratorWorkflowContentAPIModel describes the version API model.
+type OrchestratorWorkflowContentAPIModel struct {
+	Id          string `json:"id,omitempty"`
+	Name        string `json:"display-name"`
+	Description string `json:"description"`
+	CategoryId  string `json:"category-id"`
+	Version     string `json:"version"`
 
-	CategoryId string `json:"category-id"`
+	Attrib               any              `json:"attrib"`
+	AllowedOperations    string           `json:"allowed-operations"`
+	Input                map[string]any   `json:"input"` // e.g. { param: [ name: type: ]}
+	ObjectName           string           `json:"object-name"`
+	Position             PositionAPIModel `json:"position"`
+	Presentation         any              `json:"presentation,omitempty"` // e.g. {}
+	RestartMode          int32            `json:"restartMode"`
+	ResumeFromFailedMode int32            `json:"resumeFromFailedMode"`
+	RootName             string           `json:"root-name"`
+	WorkflowItem         any              `json:"workflow-item"`
 
-	// List of ... {
-	//   "position": {"y":50.0,"x":240.0},
-	//   "name":"item0",
-	//   "type":"end",
-	//   "end-mode":"0",
-	//   "comparator":0
-	// }
-	WorkflowItem any `json:"workflow-item"`
+	ApiVersion    string `json:"api-version"`
+	EditorVersion string `json:"editor-version"`
 }
 
-type PositionAPIModel struct {
-	X float64 `json:"x"`
-	Y float64 `json:"y"`
+type OrchestratorWorkflowVersionAPIModel struct {
+	InputForms []map[string]any                    `json:"inputForms"`
+	ParentId   string                              `json:"parentId,omitempty"`
+	Schema     OrchestratorWorkflowContentAPIModel `json:"workflowSchema"`
+}
+
+type OrchestratorWorkflowVersionResponseAPIModel struct {
+	ObjectId string `json:"objectId"`
 }
 
 func (self OrchestratorWorkflowModel) String() string {
@@ -95,12 +103,27 @@ func (self OrchestratorWorkflowModel) CreatePath() string {
 }
 
 func (self OrchestratorWorkflowModel) ReadPath() string {
-	// TODO Use versions API endpoint instead
+	return self.ReadContentPath()
+}
+
+func (self OrchestratorWorkflowModel) ReadContentPath() string {
 	return fmt.Sprintf("vco/api/workflows/%s/content", self.Id.ValueString())
+}
+
+func (self OrchestratorWorkflowModel) ReadVersionsPath() string {
+	return fmt.Sprintf("vco/api/workflows/%s/versions", self.Id.ValueString())
+}
+
+func (self OrchestratorWorkflowModel) ReadVersionPath(versionId string) string {
+	return fmt.Sprintf("vco/api/workflows/%s/versions/%s", self.Id.ValueString(), versionId)
 }
 
 func (self OrchestratorWorkflowModel) UpdatePath() string {
 	return self.ReadPath()
+}
+
+func (self OrchestratorWorkflowModel) UpdateContentPath() string {
+	return self.ReadContentPath()
 }
 
 func (self OrchestratorWorkflowModel) DeletePath() string {
@@ -110,7 +133,7 @@ func (self OrchestratorWorkflowModel) DeletePath() string {
 	return fmt.Sprintf("vco/api/workflows/%s", self.Id.ValueString())
 }
 
-// Save response from create API endpoint (only ID, name and category attributes are available).
+// Save response from create API endpoint (only ID, name and category attributes are available)
 func (self *OrchestratorWorkflowModel) FromCreateAPI(
 	ctx context.Context,
 	raw OrchestratorWorkflowCreateAPIModel,
@@ -121,25 +144,33 @@ func (self *OrchestratorWorkflowModel) FromCreateAPI(
 	return diag.Diagnostics{}
 }
 
-// Save response from read & update API endpoint
-// TODO Use versions API endpoint instead (and rename it FromVersionAPI)
-func (self *OrchestratorWorkflowModel) FromUpdateAPI(
+// Save response from content API endpoint
+func (self *OrchestratorWorkflowModel) FromContentAPI(
 	ctx context.Context,
-	raw OrchestratorWorkflowUpdateAPIModel,
+	raw OrchestratorWorkflowContentAPIModel,
 ) diag.Diagnostics {
+	diags := self.Position.FromAPI(ctx, raw.Position)
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
+	self.Description = types.StringValue(raw.Description)
 	// FIXME How to retrieve CategoryId ? Yet another API endpoint to call?
 	self.Version = types.StringValue(raw.Version)
-	//ApiVersion
-	//EditorVersion
-	//ObjectName
-	//Position
-	//Presentation
+	self.AllowedOperations = types.StringValue(raw.AllowedOperations)
+	self.ObjectName = types.StringValue(raw.ObjectName)
 	self.RestartMode = types.Int32Value(raw.RestartMode)
 	self.ResumeFromFailedMode = types.Int32Value(raw.ResumeFromFailedMode)
-	//RootName
-	return diag.Diagnostics{}
+	self.RootName = types.StringValue(raw.RootName)
+	self.ApiVersion = types.StringValue(raw.ApiVersion)
+	self.EditorVersion = types.StringValue(raw.EditorVersion)
+	return diags
+}
+
+// Save response from version API endpoint
+func (self *OrchestratorWorkflowModel) FromVersionAPI(
+	ctx context.Context,
+	raw OrchestratorWorkflowVersionAPIModel,
+) diag.Diagnostics {
+	return self.FromContentAPI(ctx, raw.Schema)
 }
 
 // Create data for calling the create API endpoint (only ID, name and category attributes are set).
@@ -153,23 +184,36 @@ func (self OrchestratorWorkflowModel) ToCreateAPI(
 	}, diag.Diagnostics{}
 }
 
-// Create data for calling the update API endpoint
-// TODO Use versions API endpoint instead (and rename it ToVersionAPI)
-func (self OrchestratorWorkflowModel) ToUpdateAPI(
+// Create data for calling the content API endpoint
+func (self OrchestratorWorkflowModel) ToContentAPI(
 	ctx context.Context,
-) (OrchestratorWorkflowUpdateAPIModel, diag.Diagnostics) {
-	return OrchestratorWorkflowUpdateAPIModel{
-		Id:      self.Id.ValueString(),
-		Name:    self.Name.ValueString(),
-		Version: self.Version.ValueString(),
-		//ApiVersion
-		//EditorVersion
-		//ObjectName
-		//Position
-		//Presentation
+) (OrchestratorWorkflowContentAPIModel, diag.Diagnostics) {
+	positionRaw, diags := self.Position.ToAPI(ctx)
+	return OrchestratorWorkflowContentAPIModel{
+		Id:                   self.Id.ValueString(),
+		Name:                 self.Name.ValueString(),
+		CategoryId:           self.CategoryId.ValueString(),
+		Description:          self.Description.ValueString(),
+		Version:              self.Version.ValueString(),
+		AllowedOperations:    self.AllowedOperations.ValueString(),
+		ObjectName:           self.ObjectName.ValueString(),
+		Position:             positionRaw,
 		RestartMode:          self.RestartMode.ValueInt32(),
 		ResumeFromFailedMode: self.ResumeFromFailedMode.ValueInt32(),
-		//RootName
-		CategoryId: self.CategoryId.ValueString(),
-	}, diag.Diagnostics{}
+		RootName:             self.RootName.ValueString(),
+		ApiVersion:           self.ApiVersion.ValueString(),
+		EditorVersion:        self.EditorVersion.ValueString(),
+	}, diags
+}
+
+// Create data for calling the version API endpoint
+func (self OrchestratorWorkflowModel) ToVersionAPI(
+	ctx context.Context,
+) (OrchestratorWorkflowVersionAPIModel, diag.Diagnostics) {
+	schema, diags := self.ToContentAPI(ctx)
+	return OrchestratorWorkflowVersionAPIModel{
+		InputForms: []map[string]any{},
+		ParentId:   "",
+		Schema:     schema,
+	}, diags
 }
