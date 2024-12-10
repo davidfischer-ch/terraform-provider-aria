@@ -31,6 +31,10 @@ func OrchestratorWorkflowSchema() schema.Schema {
 				MarkdownDescription: "Workflow version (e.g. 1.0.0)",
 				Required:            true,
 			},
+			"version_id": schema.StringAttribute{
+				MarkdownDescription: "Workflow's latest changeset identifier",
+				Computed:            true,
+			},
 			"allowed_operations": schema.StringAttribute{
 				MarkdownDescription: "TODO",
 				Computed:            true,

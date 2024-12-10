@@ -99,7 +99,7 @@ func (self *PropertyGroupResource) Read(
 	}
 
 	var propertyGroupRaw PropertyGroupAPIModel
-	found, readDiags := self.client.ReadIt(ctx, &propertyGroup, &propertyGroupRaw)
+	found, _, readDiags := self.client.ReadIt(ctx, &propertyGroup, &propertyGroupRaw)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)

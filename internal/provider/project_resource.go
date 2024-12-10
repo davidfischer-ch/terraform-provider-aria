@@ -101,7 +101,7 @@ func (self *ProjectResource) Read(
 	}
 
 	var projectRaw ProjectAPIModel
-	found, readDiags := self.client.ReadIt(ctx, &project, &projectRaw)
+	found, _, readDiags := self.client.ReadIt(ctx, &project, &projectRaw)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)

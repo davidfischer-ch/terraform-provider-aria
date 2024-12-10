@@ -93,7 +93,7 @@ func (self *ABXSensitiveConstantResource) Read(
 	}
 
 	var constantRaw ABXSensitiveConstantAPIModel
-	found, readDiags := self.client.ReadIt(ctx, &constant, &constantRaw)
+	found, _, readDiags := self.client.ReadIt(ctx, &constant, &constantRaw)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)

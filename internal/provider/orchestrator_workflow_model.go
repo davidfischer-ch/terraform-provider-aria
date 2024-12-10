@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/go-resty/resty/v2"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -19,6 +20,7 @@ type OrchestratorWorkflowModel struct {
 	Description types.String `tfsdk:"description"`
 	CategoryId  types.String `tfsdk:"category_id"`
 	Version     types.String `tfsdk:"version"`
+	VersionId   types.String `tfsdk:"version_id"`
 
 	AllowedOperations    types.String         `tfsdk:"allowed_operations"`
 	Attrib               jsontypes.Normalized `tfsdk:"attrib"`
@@ -60,7 +62,7 @@ type OrchestratorWorkflowContentAPIModel struct {
 	AllowedOperations    string           `json:"allowed-operations"`
 	Attrib               any              `json:"attrib"`
 	ObjectName           string           `json:"object-name"`
-	Position             PositionAPIModel `json:"position"`
+	Position             PositionAPIModel `json:"position,omitempty"`
 	Presentation         any              `json:"presentation,omitempty"`
 	RestartMode          int32            `json:"restartMode"`
 	ResumeFromFailedMode int32            `json:"resumeFromFailedMode"`
@@ -80,7 +82,7 @@ type OrchestratorWorkflowIOAPIModel struct {
 
 type OrchestratorWorkflowVersionAPIModel struct {
 	InputForms any                                 `json:"inputForms"`
-	ParentId   string                              `json:"parentId,omitempty"`
+	ParentId   string                              `json:"parentId"`
 	Schema     OrchestratorWorkflowContentAPIModel `json:"workflowSchema"`
 }
 
@@ -114,20 +116,14 @@ func (self OrchestratorWorkflowModel) ReadContentPath() string {
 	return fmt.Sprintf("vco/api/workflows/%s/content", self.Id.ValueString())
 }
 
-func (self OrchestratorWorkflowModel) ReadVersionsPath() string {
-	return fmt.Sprintf("vco/api/workflows/%s/versions", self.Id.ValueString())
-}
-
-func (self OrchestratorWorkflowModel) ReadVersionPath(versionId string) string {
-	return fmt.Sprintf("vco/api/workflows/%s/versions/%s", self.Id.ValueString(), versionId)
+func (self OrchestratorWorkflowModel) ReadFormPath() string {
+	return fmt.Sprintf(
+		"vco/api/forms/?conditions=workflow=%s&designerMod=true",
+		self.Id.ValueString())
 }
 
 func (self OrchestratorWorkflowModel) UpdatePath() string {
-	return self.ReadPath()
-}
-
-func (self OrchestratorWorkflowModel) UpdateContentPath() string {
-	return self.ReadContentPath()
+	return fmt.Sprintf("vco/api/workflows/%s/versions", self.Id.ValueString())
 }
 
 func (self OrchestratorWorkflowModel) DeletePath() string {
@@ -152,12 +148,14 @@ func (self *OrchestratorWorkflowModel) FromCreateAPI(
 func (self *OrchestratorWorkflowModel) FromContentAPI(
 	ctx context.Context,
 	raw OrchestratorWorkflowContentAPIModel,
+	response *resty.Response,
 ) diag.Diagnostics {
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
 	self.Description = types.StringValue(raw.Description)
 	// FIXME How to retrieve CategoryId ? Yet another API endpoint to call?
 	self.Version = types.StringValue(raw.Version)
+	self.VersionId = types.StringValue(response.Header().Get("x-vro-changeset-sha"))
 	self.AllowedOperations = types.StringValue(raw.AllowedOperations)
 	self.ObjectName = types.StringValue(raw.ObjectName)
 	self.RestartMode = types.Int32Value(raw.RestartMode)
@@ -189,12 +187,19 @@ func (self *OrchestratorWorkflowModel) FromContentAPI(
 	return diags
 }
 
+func (self *OrchestratorWorkflowModel) FromFormAPI(ctx context.Context, raw any) diag.Diagnostics {
+	var diags diag.Diagnostics
+	self.InputForms, diags = JSONNormalizedFromAny(self.String(), raw)
+	return diags
+}
+
 // Save response from version API endpoint
 func (self *OrchestratorWorkflowModel) FromVersionAPI(
 	ctx context.Context,
-	raw OrchestratorWorkflowVersionAPIModel,
+	raw OrchestratorWorkflowVersionResponseAPIModel,
 ) diag.Diagnostics {
-	return self.FromContentAPI(ctx, raw.Schema)
+	self.VersionId = types.StringValue(raw.ObjectId)
+	return diag.Diagnostics{}
 }
 
 // Create data for calling the create API endpoint (only ID, name and category attributes are set).
@@ -273,7 +278,7 @@ func (self OrchestratorWorkflowModel) ToVersionAPI(
 	diags.Append(formsDiags...)
 	return OrchestratorWorkflowVersionAPIModel{
 		InputForms: formsRaw,
-		ParentId:   "",
+		ParentId:   self.VersionId.ValueString(),
 		Schema:     schemaRaw,
 	}, diags
 }

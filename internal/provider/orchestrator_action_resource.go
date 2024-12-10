@@ -99,7 +99,7 @@ func (self *OrchestratorActionResource) Read(
 	}
 
 	var actionRaw OrchestratorActionAPIModel
-	found, readDiags := self.client.ReadIt(ctx, &action, &actionRaw)
+	found, _, readDiags := self.client.ReadIt(ctx, &action, &actionRaw)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)

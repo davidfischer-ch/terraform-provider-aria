@@ -99,7 +99,7 @@ func (self *CatalogItemIconResource) Read(
 	}
 
 	var itemIconRaw CatalogItemIconAPIModel
-	found, readDiags := self.client.ReadIt(ctx, &itemIcon, &itemIconRaw)
+	found, _, readDiags := self.client.ReadIt(ctx, &itemIcon, &itemIconRaw)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)

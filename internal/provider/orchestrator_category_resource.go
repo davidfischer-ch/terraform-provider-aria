@@ -99,7 +99,7 @@ func (self *OrchestratorCategoryResource) Read(
 	}
 
 	var categoryRaw OrchestratorCategoryAPIModel
-	found, readDiags := self.client.ReadIt(ctx, &category, &categoryRaw)
+	found, _, readDiags := self.client.ReadIt(ctx, &category, &categoryRaw)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)

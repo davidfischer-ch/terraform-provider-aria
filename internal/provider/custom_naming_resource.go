@@ -99,7 +99,7 @@ func (self *CustomNamingResource) Read(
 	}
 
 	var namingRaw CustomNamingAPIModel
-	found, readDiags := self.client.ReadIt(ctx, &naming, &namingRaw)
+	found, _, readDiags := self.client.ReadIt(ctx, &naming, &namingRaw)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)

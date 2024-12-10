@@ -846,12 +846,15 @@ resource "aria_orchestrator_workflow" "notification_by_mail" {
 
 ### Required
 
+- `attrib` (String) Workflow attributes
 - `category_id` (String) Where to store the workflow (Category's identifier)
 - `description` (String) Describe the resource in few sentences
+- `input_forms` (String) Workflow input forms
 - `input_parameters` (Attributes List) Workflow input parameters (see [below for nested schema](#nestedatt--input_parameters))
 - `name` (String) Workflow name (e.g. Send Mail)
 - `output_parameters` (Attributes List) Workflow output parameters (see [below for nested schema](#nestedatt--output_parameters))
 - `position` (Attributes) Position (see [below for nested schema](#nestedatt--position))
+- `presentation` (String) Workflow presentation
 - `restart_mode` (Number) Workflow restart mode:
 Skip (0) - do not resume run from failure.
 Resume (1) - Resume workflow run failure.
@@ -860,6 +863,7 @@ Default (0) - System default - Follows the default behavior.
 Enabled (1) - If a workflow run fails, a pop-up window displays an option to resume the workflow run.
 Disabled (2) - If a workflow run fails, it cannot be resumed.
 - `version` (String) Workflow version (e.g. 1.0.0)
+- `workflow_item` (String) Workflow item
 
 ### Optional
 
@@ -873,6 +877,7 @@ Disabled (2) - If a workflow run fails, it cannot be resumed.
 ### Read-Only
 
 - `id` (String) Identifier
+- `version_id` (String) Workflow's latest changeset identifier
 
 <a id="nestedatt--input_parameters"></a>
 ### Nested Schema for `input_parameters`

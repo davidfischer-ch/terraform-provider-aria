@@ -117,9 +117,23 @@ func (self AriaClient) ReadIt(
 	ctx context.Context,
 	instance Model,
 	instanceRaw APIModel,
-) (bool, diag.Diagnostics) {
+	readPath ...string,
+) (bool, *resty.Response, diag.Diagnostics) {
 	diags := diag.Diagnostics{}
-	path := instance.ReadPath()
+
+	// Path may be given
+	var path string
+	if len(readPath) == 0 {
+		path = instance.ReadPath()
+	} else {
+		path = readPath[0]
+		if len(readPath) > 1 {
+			diags.AddError(
+				"Internal error",
+				fmt.Sprintf("ReadIt - Must have at most 1 readPath, got %s", len(readPath)))
+		}
+	}
+
 	response, err := self.Client.R().
 		SetQueryParam("apiVersion", GetVersionFromPath(path)).
 		SetResult(&instanceRaw).
@@ -127,7 +141,7 @@ func (self AriaClient) ReadIt(
 
 	if response.StatusCode() == 404 {
 		tflog.Debug(ctx, fmt.Sprintf("%s not found", instance.String()))
-		return false, diags
+		return false, response, diags
 	}
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
@@ -137,7 +151,7 @@ func (self AriaClient) ReadIt(
 			fmt.Sprintf("Unable to read %s, got error: %s", instance.String(), err))
 	}
 
-	return true, diags
+	return true, response, diags
 }
 
 func (self AriaClient) DeleteIt(
