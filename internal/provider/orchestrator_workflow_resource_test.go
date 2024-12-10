@@ -88,8 +88,8 @@ resource "aria_orchestrator_workflow" "test" {
   restart_mode            = 0 # skip
   resume_from_failed_mode = 2 # disabled
 
-  attrib       = jsonencode([])
-  presentation = jsonencode({})
+  attrib        = jsonencode([])
+  presentation  = jsonencode({})
   workflow_item = jsonencode([])
 
   input_parameters  = []
@@ -150,8 +150,8 @@ resource "aria_orchestrator_workflow" "test" {
   restart_mode            = 0 # skip
   resume_from_failed_mode = 2 # disabled
 
-  attrib       = jsonencode([])
-  presentation = jsonencode({})
+  attrib        = jsonencode([])
+  presentation  = jsonencode({})
   workflow_item = jsonencode([])
 
   input_parameters  = []
@@ -212,8 +212,8 @@ resource "aria_orchestrator_workflow" "test" {
   restart_mode            = 0 # skip
   resume_from_failed_mode = 2 # disabled
 
-  attrib       = jsonencode([])
-  presentation = jsonencode({})
+  attrib        = jsonencode([])
+  presentation  = jsonencode({})
   workflow_item = jsonencode([])
 
   input_parameters = [
