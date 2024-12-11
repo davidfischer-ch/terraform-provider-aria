@@ -126,7 +126,7 @@ func (self *OrchestratorWorkflowResource) Create(
 
 	// Read forms
 	var formsRaw any
-	found, _, readDiags = self.client.ReadIt(ctx, &workflow, &formsRaw, workflow.ReadFormPath())
+	_, _, readDiags = self.client.ReadIt(ctx, &workflow, &formsRaw, workflow.ReadFormPath())
 	resp.Diagnostics.Append(readDiags...)
 
 	if !resp.Diagnostics.HasError() {
@@ -160,7 +160,7 @@ func (self *OrchestratorWorkflowResource) Read(
 
 	// Read forms
 	var formsRaw any
-	found, _, readDiags = self.client.ReadIt(ctx, &workflow, &formsRaw, workflow.ReadFormPath())
+	_, _, readDiags = self.client.ReadIt(ctx, &workflow, &formsRaw, workflow.ReadFormPath())
 	resp.Diagnostics.Append(readDiags...)
 
 	if !resp.Diagnostics.HasError() {

@@ -7,7 +7,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 )
 
-// The Positon embedded inside an Orchestrator Workflow.
+// The Position embedded inside an Orchestrator Workflow.
 func NestedPositionSchema() schema.SingleNestedAttribute {
 	return schema.SingleNestedAttribute{
 		MarkdownDescription: "Position",

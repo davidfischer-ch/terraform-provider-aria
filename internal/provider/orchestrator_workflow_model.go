@@ -133,7 +133,7 @@ func (self OrchestratorWorkflowModel) DeletePath() string {
 	return fmt.Sprintf("vco/api/workflows/%s", self.Id.ValueString())
 }
 
-// Save response from create API endpoint (only ID, name and category attributes are available)
+// Save response from create API endpoint.
 func (self *OrchestratorWorkflowModel) FromCreateAPI(
 	ctx context.Context,
 	raw OrchestratorWorkflowCreateAPIModel,
@@ -144,7 +144,7 @@ func (self *OrchestratorWorkflowModel) FromCreateAPI(
 	return diag.Diagnostics{}
 }
 
-// Save response from content API endpoint
+// Save response from content API endpoint.
 func (self *OrchestratorWorkflowModel) FromContentAPI(
 	ctx context.Context,
 	raw OrchestratorWorkflowContentAPIModel,
@@ -187,13 +187,14 @@ func (self *OrchestratorWorkflowModel) FromContentAPI(
 	return diags
 }
 
+// Save response from form API endpoint.
 func (self *OrchestratorWorkflowModel) FromFormAPI(ctx context.Context, raw any) diag.Diagnostics {
 	var diags diag.Diagnostics
 	self.InputForms, diags = JSONNormalizedFromAny(self.String(), raw)
 	return diags
 }
 
-// Save response from version API endpoint
+// Save response from version API endpoint.
 func (self *OrchestratorWorkflowModel) FromVersionAPI(
 	ctx context.Context,
 	raw OrchestratorWorkflowVersionResponseAPIModel,
@@ -202,7 +203,7 @@ func (self *OrchestratorWorkflowModel) FromVersionAPI(
 	return diag.Diagnostics{}
 }
 
-// Create data for calling the create API endpoint (only ID, name and category attributes are set).
+// Prepare data for calling the create API endpoint.
 func (self OrchestratorWorkflowModel) ToCreateAPI(
 	ctx context.Context,
 ) (OrchestratorWorkflowCreateAPIModel, diag.Diagnostics) {
@@ -213,7 +214,7 @@ func (self OrchestratorWorkflowModel) ToCreateAPI(
 	}, diag.Diagnostics{}
 }
 
-// Create data for calling the content API endpoint
+// Prepare data for calling the content API endpoint.
 func (self OrchestratorWorkflowModel) ToContentAPI(
 	ctx context.Context,
 ) (OrchestratorWorkflowContentAPIModel, diag.Diagnostics) {
@@ -269,7 +270,7 @@ func (self OrchestratorWorkflowModel) ToContentAPI(
 	}, diags
 }
 
-// Create data for calling the version API endpoint
+// Prepare data for calling the version API endpoint.
 func (self OrchestratorWorkflowModel) ToVersionAPI(
 	ctx context.Context,
 ) (OrchestratorWorkflowVersionAPIModel, diag.Diagnostics) {

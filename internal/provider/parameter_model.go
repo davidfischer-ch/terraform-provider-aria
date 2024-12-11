@@ -69,15 +69,12 @@ func ParameterModelListFromAPI(
 	parametersRaw []ParameterAPIModel,
 ) (types.List, diag.Diagnostics) {
 	// Convert input parameters from raw
-	// Ensure array (not nil) to make practitioner's life easier
 	diags := diag.Diagnostics{}
 	parameters := []ParameterModel{}
-	if parametersRaw != nil {
-		for _, parameterRaw := range parametersRaw {
-			parameter := ParameterModel{}
-			diags.Append(parameter.FromAPI(ctx, parameterRaw)...)
-			parameters = append(parameters, parameter)
-		}
+	for _, parameterRaw := range parametersRaw {
+		parameter := ParameterModel{}
+		diags.Append(parameter.FromAPI(ctx, parameterRaw)...)
+		parameters = append(parameters, parameter)
 	}
 
 	// Store inputs parameters to list value

@@ -130,7 +130,7 @@ func (self AriaClient) ReadIt(
 		if len(readPath) > 1 {
 			diags.AddError(
 				"Internal error",
-				fmt.Sprintf("ReadIt - Must have at most 1 readPath, got %s", len(readPath)))
+				fmt.Sprintf("ReadIt - Must have at most 1 readPath, got %d", len(readPath)))
 		}
 	}
 
