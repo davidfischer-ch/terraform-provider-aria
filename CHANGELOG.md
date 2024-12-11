@@ -16,7 +16,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.1.
 ### Fix and enhancements
 
 * API client's `ReadIt` method: Add `readPath` optional argument
-* Deduplicate
+* Deduplicate parameter models and schemas
 * Change icon used by tests to prevent a conflict with icons we use at OCSIN
 * Fix Changelog
 
