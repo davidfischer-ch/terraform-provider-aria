@@ -1,5 +1,25 @@
 # Changelog
 
+## Release v0.6.2 (2024-12-11)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.1...v0.6.2
+
+### Minor compatibility breaks
+
+* SDK: API client's `ReadIt` method also return API call's response (e.g. to let you read headers)
+* SDK: Drop `ActionParameter<API>Model` (replaced by `Parameter<API>Model`)
+
+### Features
+
+* Add resource `aria_orchestrator_workflow`
+
+### Fix and enhancements
+
+* API client's `ReadIt` method: Add `readPath` optional argument
+* Deduplicate
+* Change icon used by tests to prevent a conflict with icons we use at OCSIN
+* Fix Changelog
+
 ## Release v0.6.1 (2024-12-05)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.0...v0.6.1
