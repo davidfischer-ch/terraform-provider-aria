@@ -10,12 +10,12 @@ The platform's icon API endpoint is not thread safe neither prevent the deletion
 
 So :
 
-* Implement `catalog_item_icon`'s soft deletion (opt-in with `keep_on_destroy = true`)
+* Implement `aria_catalog_item_icon`'s soft deletion (opt-in with `keep_on_destroy = true`)
 * Prevent Aria internal errors when manipulating multiple icons by using mutexes on `aria_icon`'s resource CRUD functions
 
 ### Fix and enhancements
 
-* Cover `catalog_item_icon` with tests
+* Cover `aria_catalog_item_icon` with tests
 
 ## Release v0.6.0 (2024-12-04)
 
@@ -27,7 +27,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.6.
 
 ### Features
 
-* Add resource `catalog_item_icon`
+* Add resource `aria_catalog_item_icon`
 * Make `aria_icon` compatible with any kind of image
 
 ### Fix and enhancements
