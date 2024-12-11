@@ -99,7 +99,7 @@ func (self *CustomFormResource) Read(
 	}
 
 	var formRaw CustomFormAPIModel
-	found, readDiags := self.client.ReadIt(ctx, &form, &formRaw)
+	found, _, readDiags := self.client.ReadIt(ctx, &form, &formRaw)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)

@@ -113,7 +113,7 @@ func (self *SubscriptionResource) Read(
 	}
 
 	var subscriptionRaw SubscriptionAPIModel
-	found, readDiags := self.client.ReadIt(ctx, &subscription, &subscriptionRaw)
+	found, _, readDiags := self.client.ReadIt(ctx, &subscription, &subscriptionRaw)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)

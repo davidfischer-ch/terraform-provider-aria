@@ -100,7 +100,7 @@ func (self *CustomResourceResource) Read(
 
 	var resourceRaw CustomResourceAPIModel
 	self.client.Mutex.RLock(ctx, resource.LockKey())
-	found, diags := self.client.ReadIt(ctx, &resource, &resourceRaw)
+	found, _, diags := self.client.ReadIt(ctx, &resource, &resourceRaw)
 	self.client.Mutex.RUnlock(ctx, resource.LockKey())
 	resp.Diagnostics.Append(diags...)
 
@@ -138,7 +138,7 @@ func (self *CustomResourceResource) Update(
 
 	// Read resource to retrieve latest value for additional actions
 	var resourceRawBis CustomResourceAPIModel
-	found, diags := self.client.ReadIt(ctx, &resource, &resourceRawBis)
+	found, _, diags := self.client.ReadIt(ctx, &resource, &resourceRawBis)
 	resp.Diagnostics.Append(diags...)
 
 	if !found || resp.Diagnostics.HasError() {

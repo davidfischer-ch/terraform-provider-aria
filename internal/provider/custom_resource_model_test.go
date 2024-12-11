@@ -43,29 +43,29 @@ func TestCustomResourceModelToAPI(t *testing.T) {
 			Id:               types.StringValue("c974e486-9039-4b84-9152-0e5aa2074d26"),
 			Type:             types.StringValue("abx.action"),
 			ProjectId:        types.StringValue("175bed78-dd9e-4999-8669-cc62388e9abb"),
-			InputParameters:  []ActionParameterModel{},
-			OutputParameters: []ActionParameterModel{},
+			InputParameters:  []ParameterModel{},
+			OutputParameters: []ParameterModel{},
 		},
 		Read: ResourceActionRunnableModel{
 			Id:               types.StringValue("7d59017f-cf0d-4f74-8aac-ffa351ba54d8"),
 			Type:             types.StringValue("abx.action"),
 			ProjectId:        types.StringValue("175bed78-dd9e-4999-8669-cc62388e9abb"),
-			InputParameters:  []ActionParameterModel{},
-			OutputParameters: []ActionParameterModel{},
+			InputParameters:  []ParameterModel{},
+			OutputParameters: []ParameterModel{},
 		},
 		Update: ResourceActionRunnableModel{
 			Id:               types.StringValue("edb1824c-ca47-4df4-8804-4de3c20a28a4"),
 			Type:             types.StringValue("abx.action"),
 			ProjectId:        types.StringValue("175bed78-dd9e-4999-8669-cc62388e9abb"),
-			InputParameters:  []ActionParameterModel{},
-			OutputParameters: []ActionParameterModel{},
+			InputParameters:  []ParameterModel{},
+			OutputParameters: []ParameterModel{},
 		},
 		Delete: ResourceActionRunnableModel{
 			Id:               types.StringValue("d40c0ca0-9d65-463e-a4ee-b1d99c0e23a8"),
 			Type:             types.StringValue("abx.action"),
 			ProjectId:        types.StringValue("175bed78-dd9e-4999-8669-cc62388e9abb"),
-			InputParameters:  []ActionParameterModel{},
-			OutputParameters: []ActionParameterModel{},
+			InputParameters:  []ParameterModel{},
+			OutputParameters: []ParameterModel{},
 		},
 		ProjectId: types.StringValue("175bed78-dd9e-4999-8669-cc62388e9abb"),
 	}
@@ -82,26 +82,26 @@ func TestCustomResourceModelToAPI(t *testing.T) {
 	CheckEqual(t, raw.MainActions["create"].Name, "")
 	CheckEqual(t, raw.MainActions["create"].Type, "abx.action")
 	CheckEqual(t, raw.MainActions["create"].ProjectId, "175bed78-dd9e-4999-8669-cc62388e9abb")
-	CheckDeepEqual(t, raw.MainActions["create"].InputParameters, []ActionParameterAPIModel{})
-	CheckDeepEqual(t, raw.MainActions["create"].OutputParameters, []ActionParameterAPIModel{})
+	CheckDeepEqual(t, raw.MainActions["create"].InputParameters, []ParameterAPIModel{})
+	CheckDeepEqual(t, raw.MainActions["create"].OutputParameters, []ParameterAPIModel{})
 	CheckEqual(t, raw.MainActions["read"].Id, "7d59017f-cf0d-4f74-8aac-ffa351ba54d8")
 	CheckEqual(t, raw.MainActions["read"].Name, "")
 	CheckEqual(t, raw.MainActions["read"].Type, "abx.action")
 	CheckEqual(t, raw.MainActions["read"].ProjectId, "175bed78-dd9e-4999-8669-cc62388e9abb")
-	CheckDeepEqual(t, raw.MainActions["read"].InputParameters, []ActionParameterAPIModel{})
-	CheckDeepEqual(t, raw.MainActions["read"].OutputParameters, []ActionParameterAPIModel{})
+	CheckDeepEqual(t, raw.MainActions["read"].InputParameters, []ParameterAPIModel{})
+	CheckDeepEqual(t, raw.MainActions["read"].OutputParameters, []ParameterAPIModel{})
 	CheckEqual(t, raw.MainActions["update"].Id, "edb1824c-ca47-4df4-8804-4de3c20a28a4")
 	CheckEqual(t, raw.MainActions["update"].Name, "")
 	CheckEqual(t, raw.MainActions["update"].Type, "abx.action")
 	CheckEqual(t, raw.MainActions["update"].ProjectId, "175bed78-dd9e-4999-8669-cc62388e9abb")
-	CheckDeepEqual(t, raw.MainActions["update"].InputParameters, []ActionParameterAPIModel{})
-	CheckDeepEqual(t, raw.MainActions["update"].OutputParameters, []ActionParameterAPIModel{})
+	CheckDeepEqual(t, raw.MainActions["update"].InputParameters, []ParameterAPIModel{})
+	CheckDeepEqual(t, raw.MainActions["update"].OutputParameters, []ParameterAPIModel{})
 	CheckEqual(t, raw.MainActions["delete"].Id, "d40c0ca0-9d65-463e-a4ee-b1d99c0e23a8")
 	CheckEqual(t, raw.MainActions["delete"].Name, "")
 	CheckEqual(t, raw.MainActions["delete"].Type, "abx.action")
 	CheckEqual(t, raw.MainActions["delete"].ProjectId, "175bed78-dd9e-4999-8669-cc62388e9abb")
-	CheckDeepEqual(t, raw.MainActions["delete"].InputParameters, []ActionParameterAPIModel{})
-	CheckDeepEqual(t, raw.MainActions["delete"].OutputParameters, []ActionParameterAPIModel{})
+	CheckDeepEqual(t, raw.MainActions["delete"].InputParameters, []ParameterAPIModel{})
+	CheckDeepEqual(t, raw.MainActions["delete"].OutputParameters, []ParameterAPIModel{})
 	CheckEqual(t, raw.ProjectId, "175bed78-dd9e-4999-8669-cc62388e9abb")
 	CheckEqual(t, raw.OrgId, "")
 
@@ -155,32 +155,32 @@ func TestCustomResourceModelFromAPI(t *testing.T) {
 				Type:             "abx.action",
 				Name:             "SomeCreateFunction",
 				ProjectId:        "175bed78-dd9e-4999-8669-cc62388e9abb",
-				InputParameters:  []ActionParameterAPIModel{},
-				OutputParameters: []ActionParameterAPIModel{},
+				InputParameters:  []ParameterAPIModel{},
+				OutputParameters: []ParameterAPIModel{},
 			},
 			"read": {
 				Id:               "7d59017f-cf0d-4f74-8aac-ffa351ba54d8",
 				Type:             "abx.action",
 				Name:             "SomeReadFunction",
 				ProjectId:        "175bed78-dd9e-4999-8669-cc62388e9abb",
-				InputParameters:  []ActionParameterAPIModel{},
-				OutputParameters: []ActionParameterAPIModel{},
+				InputParameters:  []ParameterAPIModel{},
+				OutputParameters: []ParameterAPIModel{},
 			},
 			"update": {
 				Id:               "edb1824c-ca47-4df4-8804-4de3c20a28a4",
 				Type:             "abx.action",
 				Name:             "SomeUpdateFunction",
 				ProjectId:        "175bed78-dd9e-4999-8669-cc62388e9abb",
-				InputParameters:  []ActionParameterAPIModel{},
-				OutputParameters: []ActionParameterAPIModel{},
+				InputParameters:  []ParameterAPIModel{},
+				OutputParameters: []ParameterAPIModel{},
 			},
 			"delete": {
 				Id:               "d40c0ca0-9d65-463e-a4ee-b1d99c0e23a8",
 				Type:             "abx.action",
 				Name:             "SomeDeleteFunction",
 				ProjectId:        "175bed78-dd9e-4999-8669-cc62388e9abb",
-				InputParameters:  []ActionParameterAPIModel{},
-				OutputParameters: []ActionParameterAPIModel{},
+				InputParameters:  []ParameterAPIModel{},
+				OutputParameters: []ParameterAPIModel{},
 			},
 		},
 		ProjectId: "175bed78-dd9e-4999-8669-cc62388e9abb",
@@ -219,26 +219,26 @@ func TestCustomResourceModelFromAPI(t *testing.T) {
 	CheckEqual(t, resource.Create.Name.ValueString(), "SomeCreateFunction")
 	CheckEqual(t, resource.Create.Type.ValueString(), "abx.action")
 	CheckEqual(t, resource.Create.ProjectId.ValueString(), "175bed78-dd9e-4999-8669-cc62388e9abb")
-	CheckDeepEqual(t, resource.Create.InputParameters, []ActionParameterModel{})
-	CheckDeepEqual(t, resource.Create.OutputParameters, []ActionParameterModel{})
+	CheckDeepEqual(t, resource.Create.InputParameters, []ParameterModel{})
+	CheckDeepEqual(t, resource.Create.OutputParameters, []ParameterModel{})
 	CheckEqual(t, resource.Read.Id.ValueString(), "7d59017f-cf0d-4f74-8aac-ffa351ba54d8")
 	CheckEqual(t, resource.Read.Name.ValueString(), "SomeReadFunction")
 	CheckEqual(t, resource.Read.Type.ValueString(), "abx.action")
 	CheckEqual(t, resource.Read.ProjectId.ValueString(), "175bed78-dd9e-4999-8669-cc62388e9abb")
-	CheckDeepEqual(t, resource.Read.InputParameters, []ActionParameterModel{})
-	CheckDeepEqual(t, resource.Read.OutputParameters, []ActionParameterModel{})
+	CheckDeepEqual(t, resource.Read.InputParameters, []ParameterModel{})
+	CheckDeepEqual(t, resource.Read.OutputParameters, []ParameterModel{})
 	CheckEqual(t, resource.Update.Id.ValueString(), "edb1824c-ca47-4df4-8804-4de3c20a28a4")
 	CheckEqual(t, resource.Update.Name.ValueString(), "SomeUpdateFunction")
 	CheckEqual(t, resource.Update.Type.ValueString(), "abx.action")
 	CheckEqual(t, resource.Update.ProjectId.ValueString(), "175bed78-dd9e-4999-8669-cc62388e9abb")
-	CheckDeepEqual(t, resource.Update.InputParameters, []ActionParameterModel{})
-	CheckDeepEqual(t, resource.Update.OutputParameters, []ActionParameterModel{})
+	CheckDeepEqual(t, resource.Update.InputParameters, []ParameterModel{})
+	CheckDeepEqual(t, resource.Update.OutputParameters, []ParameterModel{})
 	CheckEqual(t, resource.Delete.Id.ValueString(), "d40c0ca0-9d65-463e-a4ee-b1d99c0e23a8")
 	CheckEqual(t, resource.Delete.Name.ValueString(), "SomeDeleteFunction")
 	CheckEqual(t, resource.Delete.Type.ValueString(), "abx.action")
 	CheckEqual(t, resource.Delete.ProjectId.ValueString(), "175bed78-dd9e-4999-8669-cc62388e9abb")
-	CheckDeepEqual(t, resource.Delete.InputParameters, []ActionParameterModel{})
-	CheckDeepEqual(t, resource.Delete.OutputParameters, []ActionParameterModel{})
+	CheckDeepEqual(t, resource.Delete.InputParameters, []ParameterModel{})
+	CheckDeepEqual(t, resource.Delete.OutputParameters, []ParameterModel{})
 	CheckEqual(t, resource.ProjectId.ValueString(), "175bed78-dd9e-4999-8669-cc62388e9abb")
 	CheckEqual(t, resource.OrgId.ValueString(), "f57768e3-6710-4864-982b-68456c8ea29a")
 }

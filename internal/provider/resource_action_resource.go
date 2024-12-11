@@ -92,7 +92,7 @@ func (self *ResourceActionResource) Read(
 
 	var actionRaw ResourceActionAPIModel
 	self.client.Mutex.RLock(ctx, action.LockKey())
-	found, diags := self.client.ReadIt(ctx, &action, &actionRaw)
+	found, _, diags := self.client.ReadIt(ctx, &action, &actionRaw)
 	self.client.Mutex.RUnlock(ctx, action.LockKey())
 	resp.Diagnostics.Append(diags...)
 	if !found {
@@ -160,6 +160,8 @@ func (self *ResourceActionResource) ImportState(
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }
 
+// -------------------------------------------------------------------------------------------------
+
 // Implement the magic behind the create, update and delete methods.
 func (self *ResourceActionResource) ManageIt(
 	ctx context.Context,
@@ -184,7 +186,7 @@ func (self *ResourceActionResource) ManageIt(
 
 		// Retrieve the custom resource
 		tflog.Debug(ctx, fmt.Sprintf("Retrieve %s", resource.String()))
-		found, tmpDiags := self.client.ReadIt(ctx, &resource, &resourceRaw)
+		found, _, tmpDiags := self.client.ReadIt(ctx, &resource, &resourceRaw)
 		diags.Append(tmpDiags...)
 		diags.Append(resource.FromAPI(ctx, resourceRaw)...)
 

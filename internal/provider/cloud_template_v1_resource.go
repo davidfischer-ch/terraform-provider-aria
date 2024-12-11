@@ -99,7 +99,7 @@ func (self *CloudTemplateV1Resource) Read(
 	}
 
 	var templateRaw CloudTemplateV1APIModel
-	found, readDiags := self.client.ReadIt(ctx, &template, &templateRaw)
+	found, _, readDiags := self.client.ReadIt(ctx, &template, &templateRaw)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
