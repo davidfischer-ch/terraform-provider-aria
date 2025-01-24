@@ -5,6 +5,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -26,8 +27,9 @@ func (self *CatalogSourceConfigModel) FromAPI(
 	ctx context.Context,
 	raw CatalogSourceConfigAPIModel,
 ) diag.Diagnostics {
-	var diags diag.Diagnostics
 	self.SourceProjectId = types.StringValue(raw.SourceProjectId)
+
+	diags := diag.Diagnostics{}
 
 	// Convert input workflows from raw
 	workflows := []CatalogSourceWorkflowModel{}
@@ -38,9 +40,9 @@ func (self *CatalogSourceConfigModel) FromAPI(
 	}
 
 	// Store inputs workflows to list value
-	var listDiags diag.Diagnostics
-	self.Workflows, listDiags = types.ListValueFrom(ctx, self.Workflows.ElementType(ctx), workflows)
-	diags.Append(listDiags...)
+	someDiags := diag.Diagnostics{}
+	self.Workflows, someDiags = types.ListValueFrom(ctx, self.Workflows.ElementType(ctx), workflows)
+	diags.Append(someDiags...)
 
 	return diags
 }
@@ -49,7 +51,28 @@ func (self CatalogSourceConfigModel) ToAPI(
 	ctx context.Context,
 	name string,
 ) (CatalogSourceConfigAPIModel, diag.Diagnostics) {
-	workflowsRaw, diags := CatalogSourceWorkflowModelListToAPI(ctx, self.Workflows, name)
+
+	diags := diag.Diagnostics{}
+	workflowsRaw := []CatalogSourceWorkflowAPIModel{}
+
+	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/list
+	if self.Workflows.IsNull() || self.Workflows.IsUnknown() {
+		diags.AddError(
+			"Configuration error",
+			fmt.Sprintf("Unable to manage %s, workflows is either null or unknown", name))
+	} else {
+		// Extract input workflows from list value
+		workflows := make([]CatalogSourceWorkflowModel, 0, len(self.Workflows.Elements()))
+		diags.Append(self.Workflows.ElementsAs(ctx, &workflows, false)...)
+
+		// Convert input workflows to raw
+		for _, workflow := range workflows {
+			workflowRaw, someDiags := workflow.ToAPI(ctx)
+			workflowsRaw = append(workflowsRaw, workflowRaw)
+			diags.Append(someDiags...)
+		}
+	}
+
 	return CatalogSourceConfigAPIModel{
 		SourceProjectId: self.SourceProjectId.ValueString(),
 		Workflows:       workflowsRaw,

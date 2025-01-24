@@ -59,6 +59,7 @@ func (self *CatalogSourceResource) Create(
 		return
 	}
 
+	source.CompleteWorkflows(ctx, self.client)
 	sourceRaw, diags := source.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -107,6 +108,8 @@ func (self *CatalogSourceResource) Read(
 	}
 
 	if !resp.Diagnostics.HasError() {
+		source.CompleteWorkflows(ctx, self.client)
+
 		// Save updated catalog source into Terraform state
 		resp.Diagnostics.Append(source.FromAPI(ctx, sourceRaw)...)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &source)...)
@@ -164,4 +167,20 @@ func (self *CatalogSourceResource) Delete(
 	if !resp.Diagnostics.HasError() {
 		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &source)...)
 	}
+}
+
+// Retrieve Workflow's integration attribute by calling the resources API endpoint
+func (self *CatalogSourceModel) CompleteWorkflows(
+	ctx context.Context,
+	client *AriaClient,
+) {
+	// FIXME iterate over workflows and retrieve its details
+  	/* client.Get() "/catalog/api/types/com.vmw.vro.workflow/data/workflows"
+	  query = {
+	    size   = ["20"]
+	    page   = ["0"]
+	    sort   = ["name,asc"]
+	    filter = ["substringof('${aria_orchestrator_workflow.test.id}',id)"]
+	  }
+	} */
 }

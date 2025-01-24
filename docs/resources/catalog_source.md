@@ -47,7 +47,26 @@ Optional:
 
 Required:
 
-- `description` (String) Workflow description
 - `id` (String) Identifier
+
+Optional:
+
+- `description` (String) Workflow description
 - `name` (String) Workflow name
 - `version` (String) Workflow version
+
+Read-Only:
+
+- `integration` (Attributes) Integration (see [below for nested schema](#nestedatt--config--workflows--integration))
+
+<a id="nestedatt--config--workflows--integration"></a>
+### Nested Schema for `config.workflows.integration`
+
+Read-Only:
+
+- `endpoint_configuration_link` (String) Integration endpoint configuration link
+- `endpoint_uri` (String) Integration endpoint URI
+- `name` (Attributes List) Integration name (see [below for nested schema](#nestedatt--config--workflows--integration--name))
+
+<a id="nestedatt--config--workflows--integration--name"></a>
+### Nested Schema for `config.workflows.integration.name`

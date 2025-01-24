@@ -9,6 +9,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
 
 // CatalogSourceWorkflowModel describes the resource data model.
@@ -17,6 +18,9 @@ type CatalogSourceWorkflowModel struct {
 	Name        types.String `tfsdk:"name"`
 	Description types.String `tfsdk:"description"`
 	Version     types.String `tfsdk:"version"`
+
+	// Of type IntegrationModel
+	Integration types.Object `tfsdk:"integration"`
 }
 
 // CatalogSourceWorkflowAPIModel describes the resource API model.
@@ -25,12 +29,15 @@ type CatalogSourceWorkflowAPIModel struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Version     string `json:"version"`
-	/*Integration map[string]string `json:"integration"`
-	  "integration": {
-	      "name": "embedded-VRO",
-	      "endpointUri": "https://vralab.ceti.etat-ge.ch:443",
-	      "endpointConfigurationLink": "/resources/endpoints/8a430db3-924c-4d58-a29a-da811f9c992e"
-	  }*/
+
+	Integration IntegrationAPIModel `json:"integration,omitempty"`
+}
+
+func (self *CatalogSourceWorkflowModel) String() string {
+	return fmt.Sprintf(
+		"Catalog Source Workflow %s (%s)",
+		self.Id.ValueString(),
+		self.Name.ValueString())
 }
 
 func (self *CatalogSourceWorkflowModel) FromAPI(
@@ -41,48 +48,46 @@ func (self *CatalogSourceWorkflowModel) FromAPI(
 	self.Name = types.StringValue(raw.Name)
 	self.Description = types.StringValue(raw.Description)
 	self.Version = types.StringValue(raw.Version)
-	return diag.Diagnostics{}
+
+	// Convert integration from raw and then to object
+	someDiags := diag.Diagnostics{}
+	integration := IntegrationModel{}
+	diags := integration.FromAPI(ctx, raw.Integration)
+	integrationAttrs := self.Integration.AttributeTypes(ctx)
+	self.Integration, someDiags = types.ObjectValueFrom(ctx, integrationAttrs, integration)
+	diags.Append(someDiags...)
+
+	return diags
 }
 
 func (self CatalogSourceWorkflowModel) ToAPI(
 	ctx context.Context,
 ) (CatalogSourceWorkflowAPIModel, diag.Diagnostics) {
+
+	diags := diag.Diagnostics{}
+	integrationRaw := IntegrationAPIModel{}
+
+	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/object
+	if self.Integration.IsNull() || self.Integration.IsUnknown() {
+		diags.AddError(
+			"Configuration error",
+			fmt.Sprintf(
+				"Unable to manage %s, integration is either null or unknown",
+				self.String()))
+	} else {
+		// Convert integration from object to raw
+		someDiags := diag.Diagnostics{}
+		integration := IntegrationModel{}
+		diags.Append(self.Integration.As(ctx, &integration, basetypes.ObjectAsOptions{})...)
+		integrationRaw, someDiags = integration.ToAPI(ctx)
+		diags.Append(someDiags...)
+	}
+
 	return CatalogSourceWorkflowAPIModel{
 		Id:          self.Id.ValueString(),
 		Name:        self.Name.ValueString(),
 		Description: self.Description.ValueString(),
 		Version:     self.Version.ValueString(),
-	}, diag.Diagnostics{}
-}
-
-// Utils -------------------------------------------------------------------------------------------
-
-func CatalogSourceWorkflowModelListToAPI(
-	ctx context.Context,
-	workflowsList types.List,
-	name string,
-) ([]CatalogSourceWorkflowAPIModel, diag.Diagnostics) {
-	diags := diag.Diagnostics{}
-	workflowsRaw := []CatalogSourceWorkflowAPIModel{}
-
-	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/list
-	if workflowsList.IsNull() || workflowsList.IsUnknown() {
-		diags.AddError(
-			"Configuration error",
-			fmt.Sprintf("Unable to manage %s is either null or unknown", name))
-		return workflowsRaw, diags
-	}
-
-	// Extract input workflows from list value
-	workflows := make([]CatalogSourceWorkflowModel, 0, len(workflowsList.Elements()))
-	diags.Append(workflowsList.ElementsAs(ctx, &workflows, false)...)
-
-	// Convert input workflows to raw
-	for _, workflow := range workflows {
-		workflowRaw, workflowDiags := workflow.ToAPI(ctx)
-		workflowsRaw = append(workflowsRaw, workflowRaw)
-		diags.Append(workflowDiags...)
-	}
-
-	return workflowsRaw, diags
+		Integration: integrationRaw,
+	}, diags
 }
