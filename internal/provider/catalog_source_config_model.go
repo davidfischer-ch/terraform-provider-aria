@@ -40,7 +40,7 @@ func (self *CatalogSourceConfigModel) FromAPI(
 	}
 
 	// Store inputs workflows to list value
-	someDiags := diag.Diagnostics{}
+	var someDiags diag.Diagnostics
 	self.Workflows, someDiags = types.ListValueFrom(ctx, self.Workflows.ElementType(ctx), workflows)
 	diags.Append(someDiags...)
 
@@ -61,20 +61,40 @@ func (self CatalogSourceConfigModel) ToAPI(
 			"Configuration error",
 			fmt.Sprintf("Unable to manage %s, workflows is either null or unknown", name))
 	} else {
-		// Extract input workflows from list value
+		// Extract input workflows from list value and then convert to raw
 		workflows := make([]CatalogSourceWorkflowModel, 0, len(self.Workflows.Elements()))
 		diags.Append(self.Workflows.ElementsAs(ctx, &workflows, false)...)
-
-		// Convert input workflows to raw
-		for _, workflow := range workflows {
-			workflowRaw, someDiags := workflow.ToAPI(ctx)
-			workflowsRaw = append(workflowsRaw, workflowRaw)
-			diags.Append(someDiags...)
+		if !diags.HasError() {
+			for _, workflow := range workflows {
+				workflowRaw, someDiags := workflow.ToAPI(ctx)
+				workflowsRaw = append(workflowsRaw, workflowRaw)
+				diags.Append(someDiags...)
+			}
 		}
 	}
 
 	return CatalogSourceConfigAPIModel{
 		SourceProjectId: self.SourceProjectId.ValueString(),
-		Workflows:       workflowsRaw,
+		Workflows: workflowsRaw,
 	}, diags
+}
+
+// Refresh integration's attributes by calling the resources API endpoint.
+func (self *CatalogSourceConfigModel) RefreshIntegrationsFromAPI(
+	ctx context.Context,
+	client *AriaClient,
+) diag.Diagnostics {
+	// FIXME iterate over workflows and retrieve its details
+	diags := diag.Diagnostics{}
+	if !self.Workflows.IsNull() && !self.Workflows.IsUnknown() {
+		// Extract input workflows from list value and then refresh integration
+		workflows := make([]CatalogSourceWorkflowModel, 0, len(self.Workflows.Elements()))
+		diags.Append(self.Workflows.ElementsAs(ctx, &workflows, false)...)
+		if !diags.HasError() {
+			for _, workflow := range workflows {
+				diags.Append(workflow.RefreshIntegrationFromAPI(ctx, client)...)
+			}
+		}
+	}
+	return diags
 }

@@ -154,6 +154,7 @@ func (self *ABXActionModel) FromAPI(
 	}
 
 	diags := diag.Diagnostics{}
+	var someDiags diag.Diagnostics
 
 	if len(inputsKeys) > 0 {
 		diags.AddError(
@@ -163,7 +164,6 @@ func (self *ABXActionModel) FromAPI(
 				self.String(), strings.Join(inputsKeys, ", ")))
 	}
 
-	someDiags := diag.Diagnostics{}
 	self.Constants, someDiags = types.SetValueFrom(ctx, types.StringType, constantsIds)
 	diags.Append(someDiags...)
 
