@@ -117,19 +117,13 @@ func (self *ResourceActionModel) FromAPI(
 	self.RunnableItem = ResourceActionRunnableModel{}
 	diags := self.RunnableItem.FromAPI(ctx, raw.RunnableItem)
 
-	someDiags := diag.Diagnostics{}
+	var someDiags diag.Diagnostics
+
 	self.Criteria, someDiags = JSONNormalizedFromAny(self.String(), raw.Criteria)
 	diags.Append(someDiags...)
 
-	formAttrs := self.FormDefinition.AttributeTypes(ctx)
-	if raw.FormDefinition == nil {
-		self.FormDefinition = types.ObjectNull(formAttrs)
-	} else {
-		form := CustomFormModel{}
-		diags := form.FromAPI(ctx, *raw.FormDefinition)
-		self.FormDefinition, someDiags = types.ObjectValueFrom(ctx, formAttrs, form)
-		diags.Append(someDiags...)
-	}
+	self.FormDefinition, someDiags = raw.FormDefinition.ToObject(ctx)
+	diags.Append(someDiags...)
 
 	return diags
 }

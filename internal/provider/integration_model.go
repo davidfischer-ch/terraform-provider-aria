@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -50,4 +51,15 @@ func (self *IntegrationModel) ToAPI(
 		EndpointConfigurationLink: self.EndpointConfigurationLink.ValueString(),
 		EndpointURI:               self.EndpointURI.ValueString(),
 	}, diag.Diagnostics{}
+}
+
+// Utils -------------------------------------------------------------------------------------------
+
+// Used to convert structure to a types.Object.
+func IntegrationModelAttributeTypes() map[string]attr.Type {
+	return map[string]attr.Type{
+		"name":                        types.StringType,
+		"endpoint_configuration_link": types.StringType,
+		"endpoint_uri":                types.StringType,
+	}
 }

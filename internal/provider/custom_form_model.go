@@ -9,6 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -114,6 +115,22 @@ func (self *CustomFormModel) ToAPI(
 
 // Utils -------------------------------------------------------------------------------------------
 
+// Used to convert structure to a types.Object.
+func CustomFormModelAttributeTypes() map[string]attr.Type {
+	return map[string]attr.Type{
+		"id":          types.StringType,
+		"name":        types.StringType,
+		"type":        types.StringType,
+		"form":        jsontypes.NormalizedType{},
+		"form_format": types.StringType,
+		"styles":      types.StringType,
+		"source_id":   types.StringType,
+		"source_type": types.StringType,
+		"tenant":      types.StringType,
+		"status":      types.StringType,
+	}
+}
+
 // Convert an object to a CustomFormAPIModel.
 func CustomFormAPIModelFromObject(
 	ctx context.Context,
@@ -129,4 +146,16 @@ func CustomFormAPIModelFromObject(
 	raw, someDiags := formDefinition.ToAPI(ctx)
 	diags.Append(someDiags...)
 	return &raw, diags
+}
+
+// Convert a CustomFormAPIModel to an object.
+func (self *CustomFormAPIModel) ToObject(ctx context.Context) (types.Object, diag.Diagnostics) {
+	if self == nil {
+		return types.ObjectNull(CustomFormModelAttributeTypes()), diag.Diagnostics{}
+	}
+	form := CustomFormModel{}
+	diags := form.FromAPI(ctx, *self)
+	object, someDiags := types.ObjectValueFrom(ctx, CustomFormModelAttributeTypes(), form)
+	diags.Append(someDiags...)
+	return object, diags
 }
