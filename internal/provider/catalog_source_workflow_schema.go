@@ -16,6 +16,11 @@ func CatalogSourceWorkflowSchema() schema.NestedAttributeObject {
 				MarkdownDescription: "Workflow name",
 				Required:            true,
 			},
+			// FIXME Make description and version optional & computed, add integration
+			"description": schema.StringAttribute{
+				MarkdownDescription: "Workflow description",
+				Required:            true,
+			},
 			"version": schema.StringAttribute{
 				MarkdownDescription: "Workflow version",
 				Required:            true,

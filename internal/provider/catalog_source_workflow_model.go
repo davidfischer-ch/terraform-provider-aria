@@ -7,32 +7,30 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 // CatalogSourceWorkflowModel describes the resource data model.
 type CatalogSourceWorkflowModel struct {
-	Id      types.String `tfsdk:"id"`
-	Name    types.String `tfsdk:"name"`
-	Version types.String `tfsdk:"version"`
+	Id          types.String `tfsdk:"id"`
+	Name        types.String `tfsdk:"name"`
+	Description types.String `tfsdk:"description"`
+	Version     types.String `tfsdk:"version"`
 }
 
 // CatalogSourceWorkflowAPIModel describes the resource API model.
 type CatalogSourceWorkflowAPIModel struct {
-	Id      string `tfsdk:"id,omitempty"`
-	Name    string `tfsdk:"name"`
-	Version string `tfsdk:"version"`
-}
-
-// Used to convert structure to a types.Object.
-func CatalogSourceWorkflowAttributeTypes() map[string]attr.Type {
-	return map[string]attr.Type{
-		"id":      types.StringType,
-		"name":    types.StringType,
-		"version": types.StringType,
-	}
+	Id          string `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Version     string `json:"version"`
+	/*Integration map[string]string `json:"integration"`
+	  "integration": {
+	      "name": "embedded-VRO",
+	      "endpointUri": "https://vralab.ceti.etat-ge.ch:443",
+	      "endpointConfigurationLink": "/resources/endpoints/8a430db3-924c-4d58-a29a-da811f9c992e"
+	  }*/
 }
 
 func (self *CatalogSourceWorkflowModel) FromAPI(
@@ -41,6 +39,7 @@ func (self *CatalogSourceWorkflowModel) FromAPI(
 ) diag.Diagnostics {
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
+	self.Description = types.StringValue(raw.Description)
 	self.Version = types.StringValue(raw.Version)
 	return diag.Diagnostics{}
 }
@@ -49,34 +48,14 @@ func (self CatalogSourceWorkflowModel) ToAPI(
 	ctx context.Context,
 ) (CatalogSourceWorkflowAPIModel, diag.Diagnostics) {
 	return CatalogSourceWorkflowAPIModel{
-		Id:      self.Id.ValueString(),
-		Name:    self.Name.ValueString(),
-		Version: self.Version.ValueString(),
+		Id:          self.Id.ValueString(),
+		Name:        self.Name.ValueString(),
+		Description: self.Description.ValueString(),
+		Version:     self.Version.ValueString(),
 	}, diag.Diagnostics{}
 }
 
 // Utils -------------------------------------------------------------------------------------------
-
-func CatalogSourceWorkflowModelListFromAPI(
-	ctx context.Context,
-	workflowsRaw []CatalogSourceWorkflowAPIModel,
-) (types.List, diag.Diagnostics) {
-	// Convert input workflows from raw
-	diags := diag.Diagnostics{}
-	workflows := []CatalogSourceWorkflowModel{}
-	for _, workflowRaw := range workflowsRaw {
-		workflow := CatalogSourceWorkflowModel{}
-		diags.Append(workflow.FromAPI(ctx, workflowRaw)...)
-		workflows = append(workflows, workflow)
-	}
-
-	// Store inputs workflows to list value
-	workflowAttrs := types.ObjectType{AttrTypes: CatalogSourceWorkflowAttributeTypes()}
-	workflowsList, workflowsDiags := types.ListValueFrom(ctx, workflowAttrs, workflows)
-	diags.Append(workflowsDiags...)
-
-	return workflowsList, diags
-}
 
 func CatalogSourceWorkflowModelListToAPI(
 	ctx context.Context,

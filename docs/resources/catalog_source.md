@@ -29,6 +29,10 @@ Catalog source resource
 - `id` (String) Identifier
 - `items_found` (Number) Number of existing items
 - `items_imported` (Number) Number of imported items
+- `last_import_completed_at` (String) Last import end timestamp (RFC3339)
+- `last_import_started_at` (String) Last import start timestamp (RFC3339)
+- `last_updated_at` (String) Last update timestamp (RFC3339)
+- `last_updated_by` (String) Last user who updated the resource
 
 <a id="nestedatt--config"></a>
 ### Nested Schema for `config`
@@ -43,6 +47,7 @@ Optional:
 
 Required:
 
+- `description` (String) Workflow description
 - `id` (String) Identifier
 - `name` (String) Workflow name
 - `version` (String) Workflow version

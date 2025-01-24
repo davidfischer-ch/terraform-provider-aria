@@ -26,9 +26,22 @@ func (self *CatalogSourceConfigModel) FromAPI(
 	ctx context.Context,
 	raw CatalogSourceConfigAPIModel,
 ) diag.Diagnostics {
-	workflows, diags := CatalogSourceWorkflowModelListFromAPI(ctx, raw.Workflows)
+	var diags diag.Diagnostics
 	self.SourceProjectId = types.StringValue(raw.SourceProjectId)
-	self.Workflows = workflows
+
+	// Convert input workflows from raw
+	workflows := []CatalogSourceWorkflowModel{}
+	for _, workflowRaw := range raw.Workflows {
+		workflow := CatalogSourceWorkflowModel{}
+		diags.Append(workflow.FromAPI(ctx, workflowRaw)...)
+		workflows = append(workflows, workflow)
+	}
+
+	// Store inputs workflows to list value
+	var listDiags diag.Diagnostics
+	self.Workflows, listDiags = types.ListValueFrom(ctx, self.Workflows.ElementType(ctx), workflows)
+	diags.Append(listDiags...)
+
 	return diags
 }
 

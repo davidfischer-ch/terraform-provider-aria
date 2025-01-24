@@ -21,13 +21,13 @@ type CatalogSourceModel struct {
 
 	Config CatalogSourceConfigModel `tfsdk:"config"`
 
-	CreatedAt timetypes.RFC3339 `tfsdk:"created_at"`
-	CreatedBy types.String      `tfsdk:"created_by"`
-	/*LastUpdatedAt         timetypes.RFC3339 `tfsdk:"last_updated_at"`
+	CreatedAt             timetypes.RFC3339 `tfsdk:"created_at"`
+	CreatedBy             types.String      `tfsdk:"created_by"`
+	LastUpdatedAt         timetypes.RFC3339 `tfsdk:"last_updated_at"`
 	LastUpdatedBy         types.String      `tfsdk:"last_updated_by"`
 	LastImportStartedAt   timetypes.RFC3339 `tfsdk:"last_import_started_at"`
 	LastImportCompletedAt timetypes.RFC3339 `tfsdk:"last_import_completed_at"`
-	LastImportErrors      types.List        `tfsdk:"last_import_errors"`*/
+	/*LastImportErrors      types.List        `tfsdk:"last_import_errors"`*/
 
 	ItemsImported types.Int32 `tfsdk:"items_imported"`
 	ItemsFound    types.Int32 `tfsdk:"items_found"`
@@ -35,23 +35,23 @@ type CatalogSourceModel struct {
 
 // CatalogSourceAPIModel describes the resource API model.
 type CatalogSourceAPIModel struct {
-	Id     string `tfsdk:"id,omitempty"`
-	Name   string `tfsdk:"name"`
-	TypeId string `tfsdk:"typeId"`
-	Global *bool  `tfsdk:"global,omitempty"`
+	Id     string `json:"id,omitempty"`
+	Name   string `json:"name"`
+	TypeId string `json:"typeId"`
+	Global bool   `json:"global,omitempty"`
 
 	Config CatalogSourceConfigAPIModel `json:"config"`
 
-	CreatedAt string `tfsdk:"createdAt,omitempty"`
-	CreatedBy string `tfsdk:"createdBy,omitempty"`
-	/*LastUpdatedAt         string   `tfsdk:"lastUpdatedAt,omitempty"`
-	LastUpdatedBy         string   `tfsdk:"lastUpdatedBy,omitempty"`
-	LastImportStartedAt   string   `tfsdk:"lastImportStartedAt,omitempty"`
-	LastImportCompletedAt string   `tfsdk:"lastImportCompletedAt,omitempty"`*/
-	LastImportErrors []string `tfsdk:"lastImportErrors,omitempty"`
+	CreatedAt             string   `json:"createdAt,omitempty"`
+	CreatedBy             string   `json:"createdBy,omitempty"`
+	LastUpdatedAt         string   `json:"lastUpdatedAt,omitempty"`
+	LastUpdatedBy         string   `json:"lastUpdatedBy,omitempty"`
+	LastImportStartedAt   string   `json:"lastImportStartedAt,omitempty"`
+	LastImportCompletedAt string   `json:"lastImportCompletedAt,omitempty"`
+	LastImportErrors      []string `json:"lastImportErrors,omitempty"`
 
-	ItemsImported int32 `tfsdk:"itemsImported,omitempty"`
-	ItemsFound    int32 `tfsdk:"itemsFound,omitempty"`
+	ItemsImported int32 `json:"itemsImported,omitempty"`
+	ItemsFound    int32 `json:"itemsFound,omitempty"`
 }
 
 func (self CatalogSourceModel) String() string {
@@ -91,31 +91,29 @@ func (self *CatalogSourceModel) FromAPI(
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
 	self.TypeId = types.StringValue(raw.TypeId)
-	self.Global = types.BoolValue(*raw.Global)
+	self.Global = types.BoolValue(raw.Global)
 	self.CreatedBy = types.StringValue(raw.CreatedBy)
-	/*self.LastUpdatedBy = types.StringValue(raw.LastUpdatedBy)*/
+	self.LastUpdatedBy = types.StringValue(raw.LastUpdatedBy)
 	self.ItemsImported = types.Int32Value(raw.ItemsImported)
 	self.ItemsFound = types.Int32Value(raw.ItemsFound)
 
 	diags := self.Config.FromAPI(ctx, raw.Config)
 
-	var timestampDiags diag.Diagnostics
-	self.CreatedAt, timestampDiags = timetypes.NewRFC3339Value(raw.CreatedAt)
-	diags.Append(timestampDiags...)
+	var timeDiags diag.Diagnostics
 
-	/*dateTime, timeDiags = timetypes.NewRFC3339PointerValue(raw.LastUpdatedAt)
+	self.CreatedAt, timeDiags = timetypes.NewRFC3339Value(raw.CreatedAt)
 	diags.Append(timeDiags...)
-	self.LastUpdatedAt = dateTime
 
-	dateTime, timeDiags = timetypes.NewRFC3339PointerValue(raw.LastImportStartedAt)
+	self.LastUpdatedAt, timeDiags = timetypes.NewRFC3339Value(raw.LastUpdatedAt)
 	diags.Append(timeDiags...)
-	self.LastImportStartedAt = dateTime
 
-	dateTime, timeDiags = timetypes.NewRFC3339PointerValue(raw.LastImportCompletedAt)
+	self.LastImportStartedAt, timeDiags = timetypes.NewRFC3339Value(raw.LastImportStartedAt)
 	diags.Append(timeDiags...)
-	self.LastImportCompletedAt = dateTime
 
-	errors, errorsDiags := types.ListValueFrom(ctx, types.StringType, raw.LastImportErrors)
+	self.LastImportCompletedAt, timeDiags = timetypes.NewRFC3339Value(raw.LastImportCompletedAt)
+	diags.Append(timeDiags...)
+
+	/*errors, errorsDiags := types.ListValueFrom(ctx, types.StringType, raw.LastImportErrors)
 	self.LastImportErrors = errors
 	diags.Append(errorsDiags...)*/
 

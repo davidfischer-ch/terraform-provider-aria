@@ -68,6 +68,7 @@ func (self *CatalogSourceResource) Create(
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", FORM_API_VERSION).
 		SetBody(sourceRaw).
+		SetResult(&sourceRaw).
 		Post(source.CreatePath())
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
@@ -76,6 +77,8 @@ func (self *CatalogSourceResource) Create(
 			fmt.Sprintf("Unable to create %s, got error: %s", source.String(), err))
 		return
 	}
+
+	// FIXME Add wait attribute and if enabled then wait until last_import_completed_at > last_import_started_at
 
 	// Save catalog source into Terraform state
 	resp.Diagnostics.Append(source.FromAPI(ctx, sourceRaw)...)
@@ -131,6 +134,7 @@ func (self *CatalogSourceResource) Update(
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", CATALOG_API_VERSION).
 		SetBody(sourceRaw).
+		SetResult(&sourceRaw).
 		Post(source.UpdatePath())
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
@@ -139,6 +143,8 @@ func (self *CatalogSourceResource) Update(
 			fmt.Sprintf("Unable to update %s, got error: %s", source.String(), err))
 		return
 	}
+
+	// FIXME Add wait attribute and if enabled then wait until last_import_completed_at > last_import_started_at
 
 	// Save catalog source into Terraform state
 	resp.Diagnostics.Append(source.FromAPI(ctx, sourceRaw)...)

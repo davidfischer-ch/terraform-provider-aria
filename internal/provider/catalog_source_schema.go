@@ -33,13 +33,12 @@ func CatalogSourceSchema() schema.Schema {
 			},
 			"created_by": schema.StringAttribute{
 				MarkdownDescription: "User who created the resource",
-				CustomType:          timetypes.RFC3339Type{},
 				Computed:            true,
 			},
-			/*"last_updated_at": schema.StringAttribute{
+			"last_updated_at": schema.StringAttribute{
 				MarkdownDescription: "Last update timestamp (RFC3339)",
-				CustomType: timetypes.RFC3339Type{},
-				Computed:   true,
+				CustomType:          timetypes.RFC3339Type{},
+				Computed:            true,
 			},
 			"last_updated_by": schema.StringAttribute{
 				MarkdownDescription: "Last user who updated the resource",
@@ -47,15 +46,15 @@ func CatalogSourceSchema() schema.Schema {
 			},
 			"last_import_started_at": schema.StringAttribute{
 				MarkdownDescription: "Last import start timestamp (RFC3339)",
-				CustomType: timetypes.RFC3339Type{},
-				Computed:   true,
+				CustomType:          timetypes.RFC3339Type{},
+				Computed:            true,
 			},
 			"last_import_completed_at": schema.StringAttribute{
 				MarkdownDescription: "Last import end timestamp (RFC3339)",
-				CustomType: timetypes.RFC3339Type{},
-				Computed:   true,
+				CustomType:          timetypes.RFC3339Type{},
+				Computed:            true,
 			},
-			"last_import_errors": schema.ListNestedAttribute{
+			/*"last_import_errors": schema.ListNestedAttribute{
 				MarkdownDescription: "Action input parameters",
 				Required:            true,
 				NestedObject:        ParameterSchema(),
