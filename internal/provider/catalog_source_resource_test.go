@@ -17,6 +17,10 @@ func TestAccCatalogSourceResource(t *testing.T) {
 			// Create and Read testing
 			{
 				Config: `
+data "aria_integration" "workflows" {
+  type_id = "com.vmw.vro.workflow"
+}
+
 resource "aria_orchestrator_category" "root" {
   name      = "TEST_ARIA_PROVIDER"
   type      = "WorkflowCategory"
@@ -53,17 +57,22 @@ resource "aria_orchestrator_workflow" "test" {
 
 resource "aria_catalog_source" "test" {
   name    = "ARIA_PROVIDER_TEST_CATALOG_SOURCE"
-  type_id = "com.vmw.vro.workflow"
+  type_id = data.aria_integration.workflows.type_id
 
   config = {
     workflows = [
-    	{
-	      id          = aria_orchestrator_workflow.test.id
-	      name        = aria_orchestrator_workflow.test.name
-	      description = aria_orchestrator_workflow.test.description
-	      version     = aria_orchestrator_workflow.test.version
-	    }
-	  ]
+      {
+        id          = aria_orchestrator_workflow.test.id
+        name        = aria_orchestrator_workflow.test.name
+        description = aria_orchestrator_workflow.test.description
+        version     = aria_orchestrator_workflow.test.version
+        integration = {
+          name                        = data.aria_integration.workflows.name
+          endpoint_configuration_link = data.aria_integration.workflows.endpoint_configuration_link
+          endpoint_uri                = data.aria_integration.workflows.endpoint_uri
+        }
+      }
+    ]
   }
 }
 `,
@@ -74,16 +83,16 @@ resource "aria_catalog_source" "test" {
 					resource.TestCheckResourceAttr("aria_catalog_source.test", "global", "false"),
 					resource.TestCheckResourceAttr("aria_catalog_source.test", "config.source_project_id", ""),
 					/*resource.TestCheckResourceAttrPair(
-					  	"aria_catalog_source.test", "config.workflows[0].id",
-					  	"aria_orchestrator_workflow.test", "id",
+					    "aria_catalog_source.test", "config.workflows[0].id",
+					    "aria_orchestrator_workflow.test", "id",
 					  ),
 					  resource.TestCheckResourceAttrPair(
-					  	"aria_catalog_source.test", "config.workflows[0].name",
-					  	"aria_orchestrator_workflow.test", "name",
+					    "aria_catalog_source.test", "config.workflows[0].name",
+					    "aria_orchestrator_workflow.test", "name",
 					  ),
 					  resource.TestCheckResourceAttrPair(
-					  	"aria_catalog_source.test", "config.workflows[0].version",
-					  	"aria_orchestrator_workflow.test", "version",
+					    "aria_catalog_source.test", "config.workflows[0].version",
+					    "aria_orchestrator_workflow.test", "version",
 					  ),*/
 				),
 			},

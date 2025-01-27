@@ -4,29 +4,54 @@
 package provider
 
 import (
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	dataschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/objectplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
-// The computed integration embedded inside a CatalogSourceWorkflowSchema.
+// The integration embedded inside a CatalogSourceWorkflowSchema.
 func NestedIntegrationSchema() schema.SingleNestedAttribute {
 	return schema.SingleNestedAttribute{
 		MarkdownDescription: "Integration",
-		Computed:            true,
-		PlanModifiers: []planmodifier.Object{
-			objectplanmodifier.UseStateForUnknown(),
-		},
+		Required:            true,
 		Attributes: map[string]schema.Attribute{
-			"name": schema.ListNestedAttribute{
+			"name": schema.StringAttribute{
 				MarkdownDescription: "Integration name",
-				Computed:            true,
+				Required:            true,
 			},
 			"endpoint_configuration_link": schema.StringAttribute{
 				MarkdownDescription: "Integration endpoint configuration link",
-				Computed:            true,
+				Required:            true,
 			},
 			"endpoint_uri": schema.StringAttribute{
+				MarkdownDescription: "Integration endpoint URI",
+				Required:            true,
+			},
+		},
+	}
+}
+
+func IntegrationDataSourceSchema() dataschema.Schema {
+	return dataschema.Schema{
+		MarkdownDescription: "Integration data source",
+		Attributes: map[string]dataschema.Attribute{
+			"type_id": dataschema.StringAttribute{
+				MarkdownDescription: "Source type (e.g. com.vmw.vro.workflow)",
+				Required:            true,
+				Validators: []validator.String{
+					stringvalidator.OneOf([]string{"com.vmw.vro.workflow"}...),
+				},
+			},
+			"name": dataschema.StringAttribute{
+				MarkdownDescription: "Integration name",
+				Computed:            true,
+			},
+			"endpoint_configuration_link": dataschema.StringAttribute{
+				MarkdownDescription: "Integration endpoint configuration link",
+				Computed:            true,
+			},
+			"endpoint_uri": dataschema.StringAttribute{
 				MarkdownDescription: "Integration endpoint URI",
 				Computed:            true,
 			},

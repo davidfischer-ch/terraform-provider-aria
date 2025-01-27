@@ -50,7 +50,7 @@ func (self *CatalogSourceWorkflowModel) FromAPI(
 	self.Version = types.StringValue(raw.Version)
 
 	// Convert integration from raw and then to object
-	someDiags := diag.Diagnostics{}
+	var someDiags diag.Diagnostics
 	integration := IntegrationModel{}
 	diags := integration.FromAPI(ctx, raw.Integration)
 	self.Integration, someDiags = types.ObjectValueFrom(
@@ -92,21 +92,3 @@ func (self CatalogSourceWorkflowModel) ToAPI(
 		Integration: integrationRaw,
 	}, diags
 }
-
-// Utils -------------------------------------------------------------------------------------------
-
-// Refresh integration's attribute by calling the resources API endpoint.
-func (self* CatalogSourceWorkflowModel) RefreshIntegrationFromAPI(
-	ctx context.Context,
-	client *AriaClient,
-) diag.Diagnostics {
-	return diag.Diagnostics{}
-}
-  	/* client.Get() "/catalog/api/types/com.vmw.vro.workflow/data/workflows"
-	  query = {
-	    size   = ["20"]
-	    page   = ["0"]
-	    sort   = ["name,asc"]
-	    filter = ["substringof('${aria_orchestrator_workflow.test.id}',id)"]
-	  }
-	} */

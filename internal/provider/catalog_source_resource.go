@@ -59,7 +59,6 @@ func (self *CatalogSourceResource) Create(
 		return
 	}
 
-	resp.Diagnostics.Append((&source.Config).RefreshIntegrationsFromAPI(ctx, self.client)...)
 	sourceRaw, diags := source.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -106,12 +105,6 @@ func (self *CatalogSourceResource) Read(
 		resp.State.RemoveResource(ctx)
 		return
 	}
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	resp.Diagnostics.Append((&source.Config).RefreshIntegrationsFromAPI(ctx, self.client)...)
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated catalog source into Terraform state

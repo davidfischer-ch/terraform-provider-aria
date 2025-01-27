@@ -19,11 +19,27 @@ type IntegrationModel struct {
 	EndpointURI               types.String `tfsdk:"endpoint_uri"`
 }
 
+// IntegrationDataSourceModel describes the data source data model.
+type IntegrationDataSourceModel struct {
+	TypeId types.String `tfsdk:"type_id"`
+	IntegrationModel
+}
+
 // IntegrationAPIModel describes the resource API model.
 type IntegrationAPIModel struct {
 	Name                      string `json:"name"`
 	EndpointConfigurationLink string `json:"endpointConfigurationLink"`
 	EndpointURI               string `json:"endpointUri"`
+}
+
+// IntegrationResponseAPIodel describes the resource API model.
+type IntegrationResponseAPIodel struct {
+	Content []IntegrationResponseContentAPIModel `json:"content"`
+}
+
+// IntegrationResponseContentAPIModel describes the resource API model.
+type IntegrationResponseContentAPIModel struct {
+	Integration IntegrationAPIModel `json:"integration"`
 }
 
 func (self *IntegrationModel) String() string {
@@ -51,6 +67,17 @@ func (self *IntegrationModel) ToAPI(
 		EndpointConfigurationLink: self.EndpointConfigurationLink.ValueString(),
 		EndpointURI:               self.EndpointURI.ValueString(),
 	}, diag.Diagnostics{}
+}
+
+func (self IntegrationDataSourceModel) ReadPath() string {
+	var resource string
+	typeId := self.TypeId.ValueString()
+	if typeId == "com.vmw.vro.workflow" {
+		resource = "workflows"
+	} else {
+		panic(fmt.Sprintf("Internal error: %s as unexpected type: %s.", self.String(), typeId))
+	}
+	return fmt.Sprintf("/catalog/api/types/%s/data/%s", typeId, resource)
 }
 
 // Utils -------------------------------------------------------------------------------------------

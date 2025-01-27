@@ -22,7 +22,7 @@ output "abx_actions_catalog_type" {
 }
 
 # Changes to Outputs:
-#   ~ abx_actions_catalog_type = {
+#   + abx_actions_catalog_type = {
 #       + base_uri   = "http://abx-service.prelude.svc.cluster.local/abx/api/catalog"
 #       + created_at = "2023-05-05T00:37:14.955948Z"
 #       + created_by = "abx-KfXBHw4DSir1X516"

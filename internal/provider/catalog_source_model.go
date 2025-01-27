@@ -110,8 +110,12 @@ func (self *CatalogSourceModel) FromAPI(
 	self.LastImportStartedAt, timeDiags = timetypes.NewRFC3339Value(raw.LastImportStartedAt)
 	diags.Append(timeDiags...)
 
-	self.LastImportCompletedAt, timeDiags = timetypes.NewRFC3339Value(raw.LastImportCompletedAt)
-	diags.Append(timeDiags...)
+	if len(raw.LastImportCompletedAt) == 0 {
+		self.LastImportCompletedAt = timetypes.NewRFC3339Null()
+	} else {
+		self.LastImportCompletedAt, timeDiags = timetypes.NewRFC3339Value(raw.LastImportCompletedAt)
+		diags.Append(timeDiags...)
+	}
 
 	/*errors, errorsDiags := types.ListValueFrom(ctx, types.StringType, raw.LastImportErrors)
 	self.LastImportErrors = errors

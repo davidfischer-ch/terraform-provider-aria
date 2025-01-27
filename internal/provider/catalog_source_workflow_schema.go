@@ -14,18 +14,15 @@ func CatalogSourceWorkflowSchema() schema.NestedAttributeObject {
 			"id": RequiredIdentifierSchema(""),
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Workflow name",
-				Computed:            true,
-				Optional:            true,
+				Required:            true,
 			},
 			"description": schema.StringAttribute{
 				MarkdownDescription: "Workflow description",
-				Computed:            true,
-				Optional:            true,
+				Required:            true,
 			},
 			"version": schema.StringAttribute{
 				MarkdownDescription: "Workflow version",
-				Computed:            true,
-				Optional:            true,
+				Required:            true,
 			},
 			"integration": NestedIntegrationSchema(),
 		},
