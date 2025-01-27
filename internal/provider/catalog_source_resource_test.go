@@ -80,9 +80,18 @@ resource "aria_catalog_source" "test" {
 					resource.TestCheckResourceAttrSet("aria_catalog_source.test", "id"),
 					resource.TestCheckResourceAttr("aria_catalog_source.test", "name", "ARIA_PROVIDER_TEST_CATALOG_SOURCE"),
 					resource.TestCheckResourceAttr("aria_catalog_source.test", "type_id", "com.vmw.vro.workflow"),
-					resource.TestCheckResourceAttr("aria_catalog_source.test", "global", "false"),
+					resource.TestCheckResourceAttr("aria_catalog_source.test", "global", "true"),
+					resource.TestCheckResourceAttrSet("aria_catalog_source.test", "created_at"),
+					resource.TestCheckResourceAttrSet("aria_catalog_source.test", "created_by"),
+					resource.TestCheckResourceAttrSet("aria_catalog_source.test", "last_updated_at"),
+					resource.TestCheckResourceAttrSet("aria_catalog_source.test", "last_updated_by"),
+					resource.TestCheckResourceAttrSet("aria_catalog_source.test", "last_import_started_at"),
+					resource.TestCheckResourceAttrSet("aria_catalog_source.test", "last_import_completed_at"),
+					resource.TestCheckResourceAttr("aria_catalog_source.test", "items_found", "1"),
+					resource.TestCheckResourceAttr("aria_catalog_source.test", "items_imported", "1"),
+					resource.TestCheckResourceAttr("aria_catalog_source.test", "wait_imported", "true"),
 					resource.TestCheckResourceAttr("aria_catalog_source.test", "config.source_project_id", ""),
-					/*resource.TestCheckResourceAttrPair(
+					resource.TestCheckResourceAttrPair(
 					    "aria_catalog_source.test", "config.workflows[0].id",
 					    "aria_orchestrator_workflow.test", "id",
 					  ),
@@ -93,7 +102,7 @@ resource "aria_catalog_source" "test" {
 					  resource.TestCheckResourceAttrPair(
 					    "aria_catalog_source.test", "config.workflows[0].version",
 					    "aria_orchestrator_workflow.test", "version",
-					  ),*/
+					  ),
 				),
 			},
 

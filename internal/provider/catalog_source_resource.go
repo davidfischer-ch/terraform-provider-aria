@@ -6,7 +6,10 @@ package provider
 import (
 	"context"
 	"fmt"
+	"slices"
+	"time"
 
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -59,26 +62,8 @@ func (self *CatalogSourceResource) Create(
 		return
 	}
 
-	sourceRaw, diags := source.ToAPI(ctx)
+	sourceRaw, diags := self.ManageIt(ctx, &source, "create")
 	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", FORM_API_VERSION).
-		SetBody(sourceRaw).
-		SetResult(&sourceRaw).
-		Post(source.CreatePath())
-	err = handleAPIResponse(ctx, response, err, []int{201})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to create %s, got error: %s", source.String(), err))
-		return
-	}
-
-	// FIXME Add wait attribute and if enabled then wait until last_import_completed_at > last_import_started_at
 
 	// Save catalog source into Terraform state
 	resp.Diagnostics.Append(source.FromAPI(ctx, sourceRaw)...)
@@ -125,26 +110,8 @@ func (self *CatalogSourceResource) Update(
 		return
 	}
 
-	sourceRaw, diags := source.ToAPI(ctx)
+	sourceRaw, diags := self.ManageIt(ctx, &source, "update")
 	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", CATALOG_API_VERSION).
-		SetBody(sourceRaw).
-		SetResult(&sourceRaw).
-		Post(source.UpdatePath())
-	err = handleAPIResponse(ctx, response, err, []int{201})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to update %s, got error: %s", source.String(), err))
-		return
-	}
-
-	// FIXME Add wait attribute and if enabled then wait until last_import_completed_at > last_import_started_at
 
 	// Save catalog source into Terraform state
 	resp.Diagnostics.Append(source.FromAPI(ctx, sourceRaw)...)
@@ -164,4 +131,87 @@ func (self *CatalogSourceResource) Delete(
 	if !resp.Diagnostics.HasError() {
 		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &source)...)
 	}
+}
+
+// -------------------------------------------------------------------------------------------------
+
+// Implement the magic behind the create and update methods.
+func (self *CatalogSourceResource) ManageIt(
+	ctx context.Context,
+	source *CatalogSourceModel,
+	method string,
+) (CatalogSourceAPIModel, diag.Diagnostics) {
+
+	var sourceRaw CatalogSourceAPIModel
+	diags := diag.Diagnostics{}
+
+	// Check method is valid
+	if !slices.Contains([]string{"create", "update"}, method) {
+		diags.AddError("Client error", fmt.Sprintf("BUG: Wrong method %s", method))
+		return sourceRaw, diags
+	}
+
+	sourceRaw, someDiags := source.ToAPI(ctx)
+	diags.Append(someDiags...)
+	if diags.HasError() {
+		return sourceRaw, diags
+	}
+
+	var path string
+	if method == "create" {
+		path = source.CreatePath()
+	} else {
+		path = source.UpdatePath()
+	}
+
+	response, err := self.client.Client.R().
+		SetQueryParam("apiVersion", FORM_API_VERSION).
+		SetBody(sourceRaw).
+		SetResult(&sourceRaw).
+		Post(path)
+	err = handleAPIResponse(ctx, response, err, []int{200, 201})
+	if err != nil {
+		diags.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to %s %s, got error: %s", method, source.String(), err))
+		return sourceRaw, diags
+	}
+
+	// Do not wait for catalog items to be imported
+	diags.Append(source.FromAPI(ctx, sourceRaw)...)
+	if diags.HasError() || !source.WaitImported.ValueBool() || !source.IsImporting(ctx) {
+		return sourceRaw, diags
+	}
+
+	name := source.String()
+	tflog.Debug(ctx, fmt.Sprintf("Wait %s to be imported...", name))
+
+	// Poll for catalog items to be imported up to 10 minutes (60 x 10 seconds)
+	maxAttempts := 60
+	for attempt := 0; attempt < maxAttempts; attempt++ {
+		// Poll resource until imported
+		time.Sleep(time.Duration(10 * time.Second))
+		tflog.Debug(
+			ctx,
+			fmt.Sprintf("Poll %d of %d - Check %s is imported...", attempt+1, maxAttempts, name))
+
+		found, _, someDiags := self.client.ReadIt(ctx, source, &sourceRaw)
+		diags.Append(someDiags...)
+		if !found {
+			diags.AddError(
+				"Client error",
+				fmt.Sprintf("Resource %s has vanished while waiting to be imported.", name))
+			return sourceRaw, diags
+		}
+
+		diags.Append(source.FromAPI(ctx, sourceRaw)...)
+		if diags.HasError() || !source.IsImporting(ctx) {
+			return sourceRaw, diags
+		}
+	}
+
+	diags.AddError(
+		"Client error",
+		fmt.Sprintf("Timeout while waiting for %s to be imported.", name))
+	return sourceRaw, diags
 }

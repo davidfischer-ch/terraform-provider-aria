@@ -6,6 +6,9 @@ package provider
 import (
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 )
 
 func CatalogSourceSchema() schema.Schema {
@@ -30,10 +33,16 @@ func CatalogSourceSchema() schema.Schema {
 				MarkdownDescription: "Creation timestamp (RFC3339)",
 				CustomType:          timetypes.RFC3339Type{},
 				Computed:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"created_by": schema.StringAttribute{
 				MarkdownDescription: "User who created the resource",
 				Computed:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"last_updated_at": schema.StringAttribute{
 				MarkdownDescription: "Last update timestamp (RFC3339)",
@@ -59,13 +68,19 @@ func CatalogSourceSchema() schema.Schema {
 				Required:            true,
 				NestedObject:        ParameterSchema(),
 			},*/
+			"items_found": schema.Int32Attribute{
+				MarkdownDescription: "Number of existing items",
+				Computed:            true,
+			},
 			"items_imported": schema.Int32Attribute{
 				MarkdownDescription: "Number of imported items",
 				Computed:            true,
 			},
-			"items_found": schema.Int32Attribute{
-				MarkdownDescription: "Number of existing items",
+			"wait_imported": schema.BoolAttribute{
+				MarkdownDescription: "Wait for import to be completed (up to 10 minutes, checked every 10 seconds)",
+				Optional:            true,
 				Computed:            true,
+				Default:             booldefault.StaticBool(true),
 			},
 		},
 	}

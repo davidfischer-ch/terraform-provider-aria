@@ -7,9 +7,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
 // CatalogSourceModel describes the resource data model.
@@ -31,6 +32,8 @@ type CatalogSourceModel struct {
 
 	ItemsImported types.Int32 `tfsdk:"items_imported"`
 	ItemsFound    types.Int32 `tfsdk:"items_found"`
+
+	WaitImported types.Bool `tfsdk:"wait_imported"`
 }
 
 // CatalogSourceAPIModel describes the resource API model.
@@ -50,8 +53,8 @@ type CatalogSourceAPIModel struct {
 	LastImportCompletedAt string   `json:"lastImportCompletedAt,omitempty"`
 	LastImportErrors      []string `json:"lastImportErrors,omitempty"`
 
-	ItemsImported int32 `json:"itemsImported,omitempty"`
-	ItemsFound    int32 `json:"itemsFound,omitempty"`
+	ItemsImported         int32    `json:"itemsImported,omitempty"`
+	ItemsFound            int32    `json:"itemsFound,omitempty"`
 }
 
 func (self CatalogSourceModel) String() string {
@@ -129,9 +132,26 @@ func (self CatalogSourceModel) ToAPI(
 ) (CatalogSourceAPIModel, diag.Diagnostics) {
 	configRaw, diags := self.Config.ToAPI(ctx, self.String())
 	return CatalogSourceAPIModel{
-		Id:     self.Id.ValueString(),
-		Name:   self.Name.ValueString(),
+		Id: self.Id.ValueString(),
+		Name: self.Name.ValueString(),
 		TypeId: self.TypeId.ValueString(),
 		Config: configRaw,
 	}, diags
+}
+
+// Utils -------------------------------------------------------------------------------------------
+
+func (self CatalogSourceModel) IsImporting(ctx context.Context) bool {
+	startedAt, startedDiags := self.LastImportStartedAt.ValueRFC3339Time()
+	completedAt, completedDiags := self.LastImportCompletedAt.ValueRFC3339Time()
+	tflog.Debug(
+		ctx,
+		fmt.Sprintf(
+			"Resource %s last_import_started_at=%s last_import_completed_at=%s",
+			self.String(), startedAt.String(), completedAt.String()))
+
+	if startedDiags.HasError()   { return false } // Is not importing since not started
+	if completedDiags.HasError() { return true } // Is importing since not completed
+
+	return startedAt.After(completedAt)
 }

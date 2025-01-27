@@ -170,7 +170,7 @@ func (self *ResourceActionResource) ManageIt(
 ) (ResourceActionAPIModel, diag.Diagnostics) {
 
 	var actionRaw ResourceActionAPIModel
-	var tmpDiags diag.Diagnostics
+	var someDiags diag.Diagnostics
 	diags := diag.Diagnostics{}
 
 	// Check method is valid
@@ -186,8 +186,8 @@ func (self *ResourceActionResource) ManageIt(
 
 		// Retrieve the custom resource
 		tflog.Debug(ctx, fmt.Sprintf("Retrieve %s", resource.String()))
-		found, _, tmpDiags := self.client.ReadIt(ctx, &resource, &resourceRaw)
-		diags.Append(tmpDiags...)
+		found, _, someDiags := self.client.ReadIt(ctx, &resource, &resourceRaw)
+		diags.Append(someDiags...)
 		diags.Append(resource.FromAPI(ctx, resourceRaw)...)
 
 		if !found || diags.HasError() {
@@ -274,8 +274,8 @@ func (self *ResourceActionResource) ManageIt(
 
 		// FIXME Deduplicate code by implementing UpdateIt
 		// Copied from custom_resource_resource.go -> Update
-		resourceRaw, tmpDiags = resource.ToAPI(ctx)
-		diags.Append(tmpDiags...)
+		resourceRaw, someDiags = resource.ToAPI(ctx)
+		diags.Append(someDiags...)
 		if diags.HasError() {
 			return actionRaw, diags
 		}
@@ -328,8 +328,8 @@ func (self *ResourceActionResource) ManageIt(
 
 		/* Native resource ... */
 	} else {
-		actionRaw, tmpDiags = action.ToAPI(ctx)
-		diags.Append(tmpDiags...)
+		actionRaw, someDiags = action.ToAPI(ctx)
+		diags.Append(someDiags...)
 		if diags.HasError() {
 			return actionRaw, diags
 		}
