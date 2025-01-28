@@ -17,10 +17,6 @@ func TestAccCatalogSourceResource(t *testing.T) {
 			// Create and Read testing
 			{
 				Config: `
-data "aria_integration" "workflows" {
-  type_id = "com.vmw.vro.workflow"
-}
-
 resource "aria_orchestrator_category" "root" {
   name      = "TEST_ARIA_PROVIDER"
   type      = "WorkflowCategory"
@@ -55,6 +51,11 @@ resource "aria_orchestrator_workflow" "test" {
   ])
 }
 
+data "aria_integration" "workflows" {
+  type_id = "com.vmw.vro.workflow"
+}
+
+# Publish the workflow we manage
 resource "aria_catalog_source" "test" {
   name    = "ARIA_PROVIDER_TEST_CATALOG_SOURCE"
   type_id = data.aria_integration.workflows.type_id
@@ -87,6 +88,7 @@ resource "aria_catalog_source" "test" {
 					resource.TestCheckResourceAttrSet("aria_catalog_source.test", "last_updated_by"),
 					resource.TestCheckResourceAttrSet("aria_catalog_source.test", "last_import_started_at"),
 					resource.TestCheckResourceAttrSet("aria_catalog_source.test", "last_import_completed_at"),
+					resource.TestCheckResourceAttr("aria_catalog_source.test", "last_import_errors.#", "0"),
 					resource.TestCheckResourceAttr("aria_catalog_source.test", "items_found", "1"),
 					resource.TestCheckResourceAttr("aria_catalog_source.test", "items_imported", "1"),
 					resource.TestCheckResourceAttr("aria_catalog_source.test", "wait_imported", "true"),

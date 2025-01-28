@@ -208,6 +208,12 @@ func (self *CatalogSourceResource) ManageIt(
 		if diags.HasError() || !source.IsImporting(ctx) {
 			return sourceRaw, diags
 		}
+
+		// FIXME Ensure the catalog item is available before creating the catalog source?
+		// FIXME Chicken & Egg Problem ...
+
+		// Error downloading catalog item '/workflow/98789b67-8813-4fb1-b093-677d85d1017b'
+		// (Error: Content provider error).
 	}
 
 	diags.AddError(

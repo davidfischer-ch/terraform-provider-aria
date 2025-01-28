@@ -28,7 +28,7 @@ type CatalogSourceModel struct {
 	LastUpdatedBy         types.String      `tfsdk:"last_updated_by"`
 	LastImportStartedAt   timetypes.RFC3339 `tfsdk:"last_import_started_at"`
 	LastImportCompletedAt timetypes.RFC3339 `tfsdk:"last_import_completed_at"`
-	/*LastImportErrors      types.List        `tfsdk:"last_import_errors"`*/
+	LastImportErrors      types.List        `tfsdk:"last_import_errors"`
 
 	ItemsImported types.Int32 `tfsdk:"items_imported"`
 	ItemsFound    types.Int32 `tfsdk:"items_found"`
@@ -102,27 +102,26 @@ func (self *CatalogSourceModel) FromAPI(
 
 	diags := self.Config.FromAPI(ctx, raw.Config)
 
-	var timeDiags diag.Diagnostics
+	var someDiags diag.Diagnostics
 
-	self.CreatedAt, timeDiags = timetypes.NewRFC3339Value(raw.CreatedAt)
-	diags.Append(timeDiags...)
+	self.CreatedAt, someDiags = timetypes.NewRFC3339Value(raw.CreatedAt)
+	diags.Append(someDiags...)
 
-	self.LastUpdatedAt, timeDiags = timetypes.NewRFC3339Value(raw.LastUpdatedAt)
-	diags.Append(timeDiags...)
+	self.LastUpdatedAt, someDiags = timetypes.NewRFC3339Value(raw.LastUpdatedAt)
+	diags.Append(someDiags...)
 
-	self.LastImportStartedAt, timeDiags = timetypes.NewRFC3339Value(raw.LastImportStartedAt)
-	diags.Append(timeDiags...)
+	self.LastImportStartedAt, someDiags = timetypes.NewRFC3339Value(raw.LastImportStartedAt)
+	diags.Append(someDiags...)
 
 	if len(raw.LastImportCompletedAt) == 0 {
 		self.LastImportCompletedAt = timetypes.NewRFC3339Null()
 	} else {
-		self.LastImportCompletedAt, timeDiags = timetypes.NewRFC3339Value(raw.LastImportCompletedAt)
-		diags.Append(timeDiags...)
+		self.LastImportCompletedAt, someDiags = timetypes.NewRFC3339Value(raw.LastImportCompletedAt)
+		diags.Append(someDiags...)
 	}
 
-	/*errors, errorsDiags := types.ListValueFrom(ctx, types.StringType, raw.LastImportErrors)
-	self.LastImportErrors = errors
-	diags.Append(errorsDiags...)*/
+	self.LastImportErrors, someDiags = types.ListValueFrom(ctx, types.StringType, raw.LastImportErrors)
+	diags.Append(someDiags...)
 
 	return diags
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 func CatalogSourceSchema() schema.Schema {
@@ -63,11 +64,11 @@ func CatalogSourceSchema() schema.Schema {
 				CustomType:          timetypes.RFC3339Type{},
 				Computed:            true,
 			},
-			/*"last_import_errors": schema.ListNestedAttribute{
+			"last_import_errors": schema.ListAttribute{
 				MarkdownDescription: "Action input parameters",
-				Required:            true,
-				NestedObject:        ParameterSchema(),
-			},*/
+				ElementType:         types.StringType,
+				Computed:            true,
+			},
 			"items_found": schema.Int32Attribute{
 				MarkdownDescription: "Number of existing items",
 				Computed:            true,
