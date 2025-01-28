@@ -124,7 +124,7 @@ func (self *PolicyModel) FromAPI(ctx context.Context, raw PolicyAPIModel) diag.D
 
 func (self PolicyModel) ToAPI(ctx context.Context) (PolicyAPIModel, diag.Diagnostics) {
 
-	// Criterias & Definition JSON Encoded -> API data
+	// Criteria & Definition JSON Encoded -> API data
 
 	criteriaRaw, diags := JSONNormalizedToAny(self.Criteria)
 

@@ -78,7 +78,7 @@ func (self *IntegrationDataSource) Read(
 	if len(responseRaw.Content) == 0 {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to get %s, no content found.", integration.String(), err))
+			fmt.Sprintf("Unable to get %s, no content found.", integration.String()))
 		return
 	}
 

@@ -77,7 +77,7 @@ func (self CatalogSourceWorkflowModel) ToAPI(
 				self.String()))
 	} else {
 		// Convert integration from object to raw
-		someDiags := diag.Diagnostics{}
+		var someDiags diag.Diagnostics
 		integration := IntegrationModel{}
 		diags.Append(self.Integration.As(ctx, &integration, basetypes.ObjectAsOptions{})...)
 		integrationRaw, someDiags = integration.ToAPI(ctx)
