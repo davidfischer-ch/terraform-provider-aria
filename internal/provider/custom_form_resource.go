@@ -71,6 +71,7 @@ func (self *CustomFormResource) Create(
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", FORM_API_VERSION).
 		SetBody(formRaw).
+		SetResult(&formRaw).
 		Post(form.CreatePath())
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
@@ -134,6 +135,7 @@ func (self *CustomFormResource) Update(
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", FORM_API_VERSION).
 		SetBody(formRaw).
+		SetResult(&formRaw).
 		Post(form.UpdatePath())
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
