@@ -62,13 +62,34 @@ func (self *CatalogSourceResource) Create(
 		return
 	}
 
-	sourceRaw, diags := self.ManageIt(ctx, &source, "create")
-	resp.Diagnostics.Append(diags...)
+	sourceRaw, someDiags := source.ToAPI(ctx)
+	resp.Diagnostics.Append(someDiags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	response, err := self.client.Client.R().
+		SetQueryParam("apiVersion", CATALOG_API_VERSION).
+		SetBody(sourceRaw).
+		SetResult(&sourceRaw).
+		Post(source.CreatePath())
+	err = handleAPIResponse(ctx, response, err, []int{201})
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to create %s, got error: %s", source.String(), err))
+		return
+	}
 
 	// Save catalog source into Terraform state
 	resp.Diagnostics.Append(source.FromAPI(ctx, sourceRaw)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &source)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", source.String()))
+
+	// Optionally wait imported then save updated catalog source into Terraform state
+	resp.Diagnostics.Append(self.WaitImported(ctx, &source)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &source)...)
+	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", source.String()))
 }
 
 func (self *CatalogSourceResource) Read(
@@ -110,11 +131,32 @@ func (self *CatalogSourceResource) Update(
 		return
 	}
 
-	sourceRaw, diags := self.ManageIt(ctx, &source, "update")
-	resp.Diagnostics.Append(diags...)
+	sourceRaw, someDiags := source.ToAPI(ctx)
+	resp.Diagnostics.Append(someDiags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	response, err := self.client.Client.R().
+		SetQueryParam("apiVersion", CATALOG_API_VERSION).
+		SetBody(sourceRaw).
+		SetResult(&sourceRaw).
+		Post(source.UpdatePath())
+	err = handleAPIResponse(ctx, response, err, []int{200})
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to update %s, got error: %s", source.String(), err))
+		return
+	}
 
 	// Save catalog source into Terraform state
 	resp.Diagnostics.Append(source.FromAPI(ctx, sourceRaw)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &source)...)
+	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", source.String()))
+
+	// Optionally wait imported then save updated catalog source into Terraform state
+	resp.Diagnostics.Append(self.WaitImported(ctx, &source)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &source)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", source.String()))
 }
@@ -135,52 +177,18 @@ func (self *CatalogSourceResource) Delete(
 
 // -------------------------------------------------------------------------------------------------
 
-// Implement the magic behind the create and update methods.
-func (self *CatalogSourceResource) ManageIt(
+func (self *CatalogSourceResource) WaitImported(
 	ctx context.Context,
 	source *CatalogSourceModel,
-	method string,
-) (CatalogSourceAPIModel, diag.Diagnostics) {
+) diag.Diagnostics {
 
-	var sourceRaw CatalogSourceAPIModel
-	diags := diag.Diagnostics{}
-
-	// Check method is valid
-	if !slices.Contains([]string{"create", "update"}, method) {
-		diags.AddError("Client error", fmt.Sprintf("BUG: Wrong method %s", method))
-		return sourceRaw, diags
+	if !source.WaitImported.ValueBool() {
+		return diag.Diagnostics{}
 	}
 
-	sourceRaw, someDiags := source.ToAPI(ctx)
-	diags.Append(someDiags...)
+	sourceRaw, diags := source.ToAPI(ctx)
 	if diags.HasError() {
-		return sourceRaw, diags
-	}
-
-	var path string
-	if method == "create" {
-		path = source.CreatePath()
-	} else {
-		path = source.UpdatePath()
-	}
-
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", FORM_API_VERSION).
-		SetBody(sourceRaw).
-		SetResult(&sourceRaw).
-		Post(path)
-	err = handleAPIResponse(ctx, response, err, []int{200, 201})
-	if err != nil {
-		diags.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to %s %s, got error: %s", method, source.String(), err))
-		return sourceRaw, diags
-	}
-
-	// Do not wait for catalog items to be imported
-	diags.Append(source.FromAPI(ctx, sourceRaw)...)
-	if diags.HasError() || !source.WaitImported.ValueBool() || !source.IsImporting(ctx) {
-		return sourceRaw, diags
+		return diags
 	}
 
 	name := source.String()
@@ -201,23 +209,17 @@ func (self *CatalogSourceResource) ManageIt(
 			diags.AddError(
 				"Client error",
 				fmt.Sprintf("Resource %s has vanished while waiting to be imported.", name))
-			return sourceRaw, diags
+			return diags
 		}
 
 		diags.Append(source.FromAPI(ctx, sourceRaw)...)
 		if diags.HasError() || !source.IsImporting(ctx) {
-			return sourceRaw, diags
+			return diags
 		}
-
-		// FIXME Ensure the catalog item is available before creating the catalog source?
-		// FIXME Chicken & Egg Problem ...
-
-		// Error downloading catalog item '/workflow/98789b67-8813-4fb1-b093-677d85d1017b'
-		// (Error: Content provider error).
 	}
 
 	diags.AddError(
 		"Client error",
 		fmt.Sprintf("Timeout while waiting for %s to be imported.", name))
-	return sourceRaw, diags
+	return diags
 }
