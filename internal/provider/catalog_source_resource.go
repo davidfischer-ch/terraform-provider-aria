@@ -6,7 +6,6 @@ package provider
 import (
 	"context"
 	"fmt"
-	"slices"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
