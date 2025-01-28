@@ -87,6 +87,10 @@ resource "aria_catalog_source" "dummy" {
 - `name` (String) Source name (e.g. getVRAHost)
 - `type_id` (String) Source type (e.g. com.vmw.vro.workflow)
 
+### Optional
+
+- `wait_imported` (Boolean) Wait for import to be completed (up to 10 minutes, checked every 10 seconds)
+
 ### Read-Only
 
 - `created_at` (String) Creation timestamp (RFC3339)
@@ -96,6 +100,7 @@ resource "aria_catalog_source" "dummy" {
 - `items_found` (Number) Number of existing items
 - `items_imported` (Number) Number of imported items
 - `last_import_completed_at` (String) Last import end timestamp (RFC3339)
+- `last_import_errors` (List of String) Action input parameters
 - `last_import_started_at` (String) Last import start timestamp (RFC3339)
 - `last_updated_at` (String) Last update timestamp (RFC3339)
 - `last_updated_by` (String) Last user who updated the resource

@@ -37,7 +37,7 @@ func IntegrationDataSourceSchema() dataschema.Schema {
 		MarkdownDescription: "Integration data source",
 		Attributes: map[string]dataschema.Attribute{
 			"type_id": dataschema.StringAttribute{
-				MarkdownDescription: "Source type (e.g. com.vmw.vro.workflow)",
+				MarkdownDescription: "Source type (com.vmw.vro.workflow, and that's all for now)",
 				Required:            true,
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{"com.vmw.vro.workflow"}...),
