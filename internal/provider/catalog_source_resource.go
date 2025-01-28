@@ -197,7 +197,7 @@ func (self *CatalogSourceResource) WaitImported(
 	maxAttempts := 60
 	for attempt := 0; attempt < maxAttempts; attempt++ {
 		// Poll resource until imported
-		time.Sleep(10 * time.Second)
+		time.Sleep(time.Duration(10) * time.Second)
 		tflog.Debug(
 			ctx,
 			fmt.Sprintf("Poll %d of %d - Check %s is imported...", attempt+1, maxAttempts, name))
