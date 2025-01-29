@@ -47,7 +47,7 @@ resource "aria_orchestrator_category" "helpers" {
 
 - `name` (String) Category's name
 - `parent_id` (String) Category's parent (empty string to make a root category).
-- `type` (String) Category's type (e.g. WorkflowCategory)
+- `type` (String) Category's type, ConfigurationElementCategory, PolicyTemplateCategory, ResourceElementCategory or WorkflowCategory
 
 ### Read-Only
 

@@ -28,7 +28,7 @@ func OrchestratorCategorySchema() schema.Schema {
 					"PolicyTemplateCategory, " +
 					"ResourceElementCategory or " +
 					"WorkflowCategory",
-				Required:            true,
+				Required: true,
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{
 						"ConfigurationElementCategory",
