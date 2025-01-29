@@ -11,7 +11,7 @@ import (
 )
 
 // The integration embedded inside a CatalogSourceWorkflowSchema.
-func NestedIntegrationSchema() schema.SingleNestedAttribute {
+func IntegrationSchema() schema.SingleNestedAttribute {
 	return schema.SingleNestedAttribute{
 		MarkdownDescription: "Integration",
 		Required:            true,

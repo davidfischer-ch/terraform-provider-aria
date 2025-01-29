@@ -24,7 +24,7 @@ func CatalogSourceWorkflowSchema() schema.NestedAttributeObject {
 				MarkdownDescription: "Workflow version",
 				Required:            true,
 			},
-			"integration": NestedIntegrationSchema(),
+			"integration": IntegrationSchema(),
 		},
 	}
 }
