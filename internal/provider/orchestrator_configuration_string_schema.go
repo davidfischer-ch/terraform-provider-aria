@@ -13,7 +13,7 @@ func OrchestratorConfigurationStringSchema() schema.SingleNestedAttribute {
 		MarkdownDescription: "String",
 		Optional:            true,
 		Attributes: map[string]schema.Attribute{
-			"value": schema.BoolAttribute{
+			"value": schema.StringAttribute{
 				MarkdownDescription: "Value",
 				Required:            true,
 			},

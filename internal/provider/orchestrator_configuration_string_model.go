@@ -18,7 +18,7 @@ type OrchestratorConfigurationStringModel struct {
 
 // OrchestratorConfigurationStringAPIModel describes the resource API model.
 type OrchestratorConfigurationStringAPIModel struct {
-	Value string `tfsdk:"value"`
+	Value string `json:"value"`
 }
 
 func (self *OrchestratorConfigurationStringModel) FromAPI(

@@ -7,12 +7,14 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &OrchestratorConfigurationResource{}
+var _ resource.ResourceWithImportState = &OrchestratorConfigurationResource{}
 
 func NewOrchestratorConfigurationResource() resource.Resource {
 	return &OrchestratorConfigurationResource{}
@@ -59,7 +61,7 @@ func (self *OrchestratorConfigurationResource) Create(
 		return
 	}
 
-	configurationRaw, _, diags := configuration.ToAPI(ctx)
+	configurationRaw, diags := configuration.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -123,7 +125,14 @@ func (self *OrchestratorConfigurationResource) Update(
 		return
 	}
 
-	configurationRaw, versionId, diags := configuration.ToAPI(ctx)
+	// Read Terraform state data into the model
+	var configurationFromState OrchestratorConfigurationModel
+	resp.Diagnostics.Append(req.State.Get(ctx, &configurationFromState)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	configurationRaw, diags := configuration.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -132,11 +141,11 @@ func (self *OrchestratorConfigurationResource) Update(
 	// No response body from API, only the changeset (version) available in response headers
 	response, err := self.client.Client.R().
 		// TODO SetQueryParam("apiVersion", ORCHESTRATOR_API_VERSION).
-		SetHeader("x-vro-changeset-sha", versionId).
+		SetHeader("x-vro-changeset-sha", configurationFromState.VersionId.ValueString()).
 		SetBody(configurationRaw).
 		Put(configuration.UpdatePath())
 
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	err = handleAPIResponse(ctx, response, err, []int{204})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -161,4 +170,12 @@ func (self *OrchestratorConfigurationResource) Delete(
 	if !resp.Diagnostics.HasError() {
 		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &configuration)...)
 	}
+}
+
+func (self *OrchestratorConfigurationResource) ImportState(
+	ctx context.Context,
+	req resource.ImportStateRequest,
+	resp *resource.ImportStateResponse,
+) {
+	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 }

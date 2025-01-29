@@ -105,7 +105,7 @@ func (self *OrchestratorConfigurationModel) FromAPI(
 
 func (self OrchestratorConfigurationModel) ToAPI(
 	ctx context.Context,
-) (OrchestratorConfigurationAPIModel, string, diag.Diagnostics) {
+) (OrchestratorConfigurationAPIModel, diag.Diagnostics) {
 
 	diags := diag.Diagnostics{}
 	attributesRaw := []OrchestratorConfigurationAttributeAPIModel{}
@@ -118,7 +118,8 @@ func (self OrchestratorConfigurationModel) ToAPI(
 	} else {
 		// Extract attributes from list value and then convert to raw
 		attributes := make(
-			[]OrchestratorConfigurationAttributeModel, 0, len(self.Attributes.Elements()))
+			[]OrchestratorConfigurationAttributeModel, 0, len(self.Attributes.Elements()),
+		)
 		diags.Append(self.Attributes.ElementsAs(ctx, &attributes, false)...)
 		if !diags.HasError() {
 			for _, attribute := range attributes {
@@ -136,5 +137,5 @@ func (self OrchestratorConfigurationModel) ToAPI(
 		Description: self.Description.ValueString(),
 		Version:     self.Version.ValueString(),
 		Attributes:  attributesRaw,
-	}, self.VersionId.ValueString(), diag.Diagnostics{}
+	}, diag.Diagnostics{}
 }

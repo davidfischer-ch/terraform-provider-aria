@@ -18,7 +18,7 @@ type OrchestratorConfigurationBooleanModel struct {
 
 // OrchestratorConfigurationBooleanAPIModel describes the resource API model.
 type OrchestratorConfigurationBooleanAPIModel struct {
-	Value bool `tfsdk:"value"`
+	Value bool `json:"value"`
 }
 
 func (self *OrchestratorConfigurationBooleanModel) FromAPI(

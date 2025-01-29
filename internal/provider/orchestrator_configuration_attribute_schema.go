@@ -17,6 +17,7 @@ func OrchestratorConfigurationAttributeSchema() schema.NestedAttributeObject {
 				MarkdownDescription: "Name",
 				Required:            true,
 			},
+			"description": RequiredDescriptionSchema(),
 			"type": schema.StringAttribute{
 				MarkdownDescription: "Type, one of boolean or string.",
 				Required:            true,

@@ -14,8 +14,9 @@ import (
 
 // OrchestratorConfigurationAttributeModel describes the resource data model.
 type OrchestratorConfigurationAttributeModel struct {
-	Name types.String `tfsdk:"name"`
-	Type types.String `tfsdk:"type"`
+	Name        types.String `tfsdk:"name"`
+	Description types.String `tfsdk:"description"`
+	Type        types.String `tfsdk:"type"`
 
 	// Of type OrchestratorConfigurationValueModel
 	Value types.Object `tfsdk:"value"`
@@ -23,8 +24,9 @@ type OrchestratorConfigurationAttributeModel struct {
 
 // OrchestratorConfigurationAttributeAPIModel describes the resource API model.
 type OrchestratorConfigurationAttributeAPIModel struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Type        string `json:"type"`
 
 	Value OrchestratorConfigurationValueAPIModel `json:"value"`
 }
@@ -41,6 +43,7 @@ func (self *OrchestratorConfigurationAttributeModel) FromAPI(
 	raw OrchestratorConfigurationAttributeAPIModel,
 ) diag.Diagnostics {
 	self.Name = types.StringValue(raw.Name)
+	self.Description = types.StringValue(raw.Description)
 	self.Type = types.StringValue(raw.Type)
 
 	// Convert value from raw and then to object
@@ -75,8 +78,9 @@ func (self OrchestratorConfigurationAttributeModel) ToAPI(
 	}
 
 	return OrchestratorConfigurationAttributeAPIModel{
-		Name:  self.Name.ValueString(),
-		Type:  self.Type.ValueString(),
-		Value: valueRaw,
+		Name:        self.Name.ValueString(),
+		Description: self.Description.ValueString(),
+		Type:        self.Type.ValueString(),
+		Value:       valueRaw,
 	}, diags
 }
