@@ -32,24 +32,24 @@ func (self *OrchestratorConfigurationValueModel) FromAPI(
 	diags := diag.Diagnostics{}
 
 	// Convert boolean from raw and then to object
-	boolean := OrchestratorConfigurationBooleanModel{}
+	boolVal := OrchestratorConfigurationBooleanModel{}
 	if raw.Boolean == nil {
-		self.Boolean = types.ObjectNull(boolean.AttributeTypes())
+		self.Boolean = types.ObjectNull(boolVal.AttributeTypes())
 	} else {
 		var someDiags diag.Diagnostics
-		diags := boolean.FromAPI(ctx, *raw.Boolean)
-		self.Boolean, someDiags = types.ObjectValueFrom(ctx, boolean.AttributeTypes(), boolean)
+		diags := boolVal.FromAPI(ctx, *raw.Boolean)
+		self.Boolean, someDiags = types.ObjectValueFrom(ctx, boolVal.AttributeTypes(), boolVal)
 		diags.Append(someDiags...)
 	}
 
 	// Convert string from raw and then to object
-	string := OrchestratorConfigurationStringModel{}
+	stringVal := OrchestratorConfigurationStringModel{}
 	if raw.String == nil {
-		self.String = types.ObjectNull(string.AttributeTypes())
+		self.String = types.ObjectNull(stringVal.AttributeTypes())
 	} else {
 		var someDiags diag.Diagnostics
-		diags := string.FromAPI(ctx, *raw.String)
-		self.String, someDiags = types.ObjectValueFrom(ctx, string.AttributeTypes(), string)
+		diags := stringVal.FromAPI(ctx, *raw.String)
+		self.String, someDiags = types.ObjectValueFrom(ctx, stringVal.AttributeTypes(), stringVal)
 		diags.Append(someDiags...)
 	}
 
@@ -66,9 +66,9 @@ func (self OrchestratorConfigurationValueModel) ToAPI(
 	if self.Boolean.IsNull() || self.Boolean.IsUnknown() {
 		raw.Boolean = nil
 	} else {
-		var boolean OrchestratorConfigurationBooleanModel
-		diags.Append(self.Boolean.As(ctx, &boolean, basetypes.ObjectAsOptions{})...)
-		booleanRaw, someDiags := boolean.ToAPI(ctx)
+		var boolVal OrchestratorConfigurationBooleanModel
+		diags.Append(self.Boolean.As(ctx, &boolVal, basetypes.ObjectAsOptions{})...)
+		booleanRaw, someDiags := boolVal.ToAPI(ctx)
 		raw.Boolean = &booleanRaw
 		diags.Append(someDiags...)
 	}
@@ -76,9 +76,9 @@ func (self OrchestratorConfigurationValueModel) ToAPI(
 	if self.String.IsNull() || self.String.IsUnknown() {
 		raw.String = nil
 	} else {
-		var string OrchestratorConfigurationStringModel
-		diags.Append(self.String.As(ctx, &string, basetypes.ObjectAsOptions{})...)
-		stringRaw, someDiags := string.ToAPI(ctx)
+		var stringVal OrchestratorConfigurationStringModel
+		diags.Append(self.String.As(ctx, &stringVal, basetypes.ObjectAsOptions{})...)
+		stringRaw, someDiags := stringVal.ToAPI(ctx)
 		raw.String = &stringRaw
 		diags.Append(someDiags...)
 	}
