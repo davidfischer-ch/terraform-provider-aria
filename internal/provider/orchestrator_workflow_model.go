@@ -98,7 +98,7 @@ func (self OrchestratorWorkflowModel) String() string {
 }
 
 // Return an appropriate key that can be used for naming mutexes.
-// Create: Identifier can be used to prevent concurrent creation of vRO actions.
+// Create: Identifier can be used to prevent concurrent creation of vRO workflows.
 // Read Update Delete: Identifier can be used to prevent concurrent modifications on the instance.
 func (self OrchestratorWorkflowModel) LockKey() string {
 	return "orchestrator-workflow-" + self.Id.ValueString()

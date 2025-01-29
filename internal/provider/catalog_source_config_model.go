@@ -31,7 +31,7 @@ func (self *CatalogSourceConfigModel) FromAPI(
 
 	diags := diag.Diagnostics{}
 
-	// Convert input workflows from raw
+	// Convert workflows from raw
 	workflows := []CatalogSourceWorkflowModel{}
 	for _, workflowRaw := range raw.Workflows {
 		workflow := CatalogSourceWorkflowModel{}
@@ -39,7 +39,7 @@ func (self *CatalogSourceConfigModel) FromAPI(
 		workflows = append(workflows, workflow)
 	}
 
-	// Store inputs workflows to list value
+	// Store workflows to list value
 	var someDiags diag.Diagnostics
 	self.Workflows, someDiags = types.ListValueFrom(ctx, self.Workflows.ElementType(ctx), workflows)
 	diags.Append(someDiags...)
@@ -61,7 +61,7 @@ func (self CatalogSourceConfigModel) ToAPI(
 			"Configuration error",
 			fmt.Sprintf("Unable to manage %s, workflows is either null or unknown", name))
 	} else {
-		// Extract input workflows from list value and then convert to raw
+		// Extract workflows from list value and then convert to raw
 		workflows := make([]CatalogSourceWorkflowModel, 0, len(self.Workflows.Elements()))
 		diags.Append(self.Workflows.ElementsAs(ctx, &workflows, false)...)
 		if !diags.HasError() {
