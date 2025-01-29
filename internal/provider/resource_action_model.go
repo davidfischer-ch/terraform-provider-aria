@@ -117,13 +117,13 @@ func (self *ResourceActionModel) FromAPI(
 	self.RunnableItem = ResourceActionRunnableModel{}
 	diags := self.RunnableItem.FromAPI(ctx, raw.RunnableItem)
 
-	var criteriaDiags diag.Diagnostics
-	self.Criteria, criteriaDiags = JSONNormalizedFromAny(self.String(), raw.Criteria)
-	diags.Append(criteriaDiags...)
+	var someDiags diag.Diagnostics
 
-	var formDiags diag.Diagnostics
-	self.FormDefinition, formDiags = raw.FormDefinition.ToObject(ctx)
-	diags.Append(formDiags...)
+	self.Criteria, someDiags = JSONNormalizedFromAny(self.String(), raw.Criteria)
+	diags.Append(someDiags...)
+
+	self.FormDefinition, someDiags = raw.FormDefinition.ToObject(ctx)
+	diags.Append(someDiags...)
 
 	return diags
 }
@@ -133,8 +133,8 @@ func (self ResourceActionModel) ToAPI(
 ) (ResourceActionAPIModel, diag.Diagnostics) {
 
 	formDefinitionRaw, diags := CustomFormAPIModelFromObject(ctx, self.FormDefinition)
-	runnableItemRaw, runnableItemDiags := self.RunnableItem.ToAPI(ctx)
-	diags.Append(runnableItemDiags...)
+	runnableItemRaw, someDiags := self.RunnableItem.ToAPI(ctx)
+	diags.Append(someDiags...)
 
 	// Defining name is mandatory when passing other form attributes such as styles...
 	// Otherwise we trigger an Hibernate exception on Aria. Fortunately We known that
@@ -144,8 +144,8 @@ func (self ResourceActionModel) ToAPI(
 	}
 
 	// Criteria JSON Encoded -> API data
-	criteriaRaw, criteriaDiags := JSONNormalizedToAny(self.Criteria)
-	diags.Append(criteriaDiags...)
+	criteriaRaw, someDiags := JSONNormalizedToAny(self.Criteria)
+	diags.Append(someDiags...)
 
 	return ResourceActionAPIModel{
 		Id:             self.Id.ValueString(),

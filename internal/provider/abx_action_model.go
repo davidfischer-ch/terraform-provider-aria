@@ -112,7 +112,6 @@ func (self *ABXActionModel) FromAPI(
 	raw ABXActionAPIModel,
 ) diag.Diagnostics {
 
-	diags := diag.Diagnostics{}
 	faasProvider := raw.FAASProvider
 	if faasProvider == "" {
 		faasProvider = "auto"
@@ -154,6 +153,9 @@ func (self *ABXActionModel) FromAPI(
 		}
 	}
 
+	diags := diag.Diagnostics{}
+	var someDiags diag.Diagnostics
+
 	if len(inputsKeys) > 0 {
 		diags.AddError(
 			"Client error",
@@ -162,19 +164,16 @@ func (self *ABXActionModel) FromAPI(
 				self.String(), strings.Join(inputsKeys, ", ")))
 	}
 
-	constants, constantsDiags := types.SetValueFrom(ctx, types.StringType, constantsIds)
-	self.Constants = constants
-	diags.Append(constantsDiags...)
+	self.Constants, someDiags = types.SetValueFrom(ctx, types.StringType, constantsIds)
+	diags.Append(someDiags...)
 
-	secrets, secretsDiags := types.SetValueFrom(ctx, types.StringType, secretsIds)
-	self.Secrets = secrets
-	diags.Append(secretsDiags...)
+	self.Secrets, someDiags = types.SetValueFrom(ctx, types.StringType, secretsIds)
+	diags.Append(someDiags...)
 
-	dependencies, dependenciesDiags := types.ListValueFrom(
+	self.Dependencies, someDiags = types.ListValueFrom(
 		ctx, types.StringType, SkipEmpty(strings.Split(raw.Dependencies, "\n")),
 	)
-	self.Dependencies = dependencies
-	diags.Append(dependenciesDiags...)
+	diags.Append(someDiags...)
 
 	return diags
 }

@@ -51,7 +51,7 @@ func OrchestratorWorkflowSchema() schema.Schema {
 				Optional:            true,
 				Default:             stringdefault.StaticString("workflow:name=generic"),
 			},
-			"position": NestedPositionSchema(),
+			"position": PositionSchema(),
 			"presentation": schema.StringAttribute{
 				MarkdownDescription: "Workflow presentation",
 				CustomType:          jsontypes.NormalizedType{},

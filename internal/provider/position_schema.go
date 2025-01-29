@@ -8,7 +8,7 @@ import (
 )
 
 // The Position embedded inside an Orchestrator Workflow.
-func NestedPositionSchema() schema.SingleNestedAttribute {
+func PositionSchema() schema.SingleNestedAttribute {
 	return schema.SingleNestedAttribute{
 		MarkdownDescription: "Position",
 		Required:            true,

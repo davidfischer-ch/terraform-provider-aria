@@ -319,6 +319,9 @@ func GetVersionFromPath(path string) string {
 	if strings.HasPrefix(path, "icon") {
 		return ICON_API_VERSION
 	}
+	if strings.HasPrefix(path, "policy") {
+		return POLICY_API_VERSION
+	}
 	if strings.HasPrefix(path, "project-service") {
 		return PROJECT_API_VERSION
 	}

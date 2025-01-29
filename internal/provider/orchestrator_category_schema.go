@@ -4,7 +4,9 @@
 package provider
 
 import (
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
 func OrchestratorCategorySchema() schema.Schema {
@@ -21,8 +23,20 @@ func OrchestratorCategorySchema() schema.Schema {
 				Computed:            true,
 			},
 			"type": schema.StringAttribute{
-				MarkdownDescription: "Category's type (e.g. WorkflowCategory)",
-				Required:            true,
+				MarkdownDescription: "Category's type, " +
+					"ConfigurationElementCategory, " +
+					"PolicyTemplateCategory, " +
+					"ResourceElementCategory or " +
+					"WorkflowCategory",
+				Required: true,
+				Validators: []validator.String{
+					stringvalidator.OneOf([]string{
+						"ConfigurationElementCategory",
+						"PolicyTemplateCategory",
+						"ResourceElementCategory",
+						"WorkflowCategory",
+					}...),
+				},
 			},
 			"parent_id": schema.StringAttribute{
 				MarkdownDescription: "Category's parent (empty string to make a root category).",

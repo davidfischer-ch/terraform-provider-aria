@@ -212,6 +212,7 @@ func (self *AriaProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewABXConstantResource,
 		NewABXSensitiveConstantResource,
 		NewCatalogItemIconResource,
+		NewCatalogSourceResource,
 		NewCloudTemplateV1Resource,
 		NewCustomFormResource,
 		NewCustomNamingResource,
@@ -219,7 +220,9 @@ func (self *AriaProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewIconResource,
 		NewOrchestratorActionResource,
 		NewOrchestratorCategoryResource,
+		NewOrchestratorConfigurationResource,
 		NewOrchestratorWorkflowResource,
+		NewPolicyResource,
 		NewProjectResource,
 		NewPropertyGroupResource,
 		NewResourceActionResource,
@@ -231,6 +234,7 @@ func (self *AriaProvider) DataSources(ctx context.Context) []func() datasource.D
 	return []func() datasource.DataSource{
 		NewCatalogTypeDataSource,
 		NewIconDataSource,
+		NewIntegrationDataSource,
 		NewSecretDataSource,
 	}
 }

@@ -113,39 +113,10 @@ func (self *CustomFormModel) ToAPI(
 	}, diag.Diagnostics{}
 }
 
-// Convert an object to a CustomFormAPIModel.
-func CustomFormAPIModelFromObject(
-	ctx context.Context,
-	object types.Object,
-) (*CustomFormAPIModel, diag.Diagnostics) {
-
-	if object.IsNull() || object.IsUnknown() {
-		return nil, diag.Diagnostics{}
-	}
-
-	var formDefinition CustomFormModel
-	diags := object.As(ctx, &formDefinition, basetypes.ObjectAsOptions{})
-	raw, formDiags := formDefinition.ToAPI(ctx)
-	diags.Append(formDiags...)
-	return &raw, diags
-}
-
-// Convert a CustomFormAPIModel to an object.
-func (self *CustomFormAPIModel) ToObject(
-	ctx context.Context,
-) (types.Object, diag.Diagnostics) {
-	if self == nil {
-		return types.ObjectNull(CustomFormModelAttributeTypes()), diag.Diagnostics{}
-	}
-	form := CustomFormModel{}
-	diags := form.FromAPI(ctx, *self)
-	object, objectDiags := types.ObjectValueFrom(ctx, CustomFormModelAttributeTypes(), form)
-	diags.Append(objectDiags...)
-	return object, diags
-}
+// Utils -------------------------------------------------------------------------------------------
 
 // Used to convert structure to a types.Object.
-func CustomFormModelAttributeTypes() map[string]attr.Type {
+func (self CustomFormModel) AttributeTypes() map[string]attr.Type {
 	return map[string]attr.Type{
 		"id":          types.StringType,
 		"name":        types.StringType,
@@ -158,4 +129,33 @@ func CustomFormModelAttributeTypes() map[string]attr.Type {
 		"tenant":      types.StringType,
 		"status":      types.StringType,
 	}
+}
+
+// Convert an object to a CustomFormAPIModel.
+func CustomFormAPIModelFromObject(
+	ctx context.Context,
+	object types.Object,
+) (*CustomFormAPIModel, diag.Diagnostics) {
+
+	if object.IsNull() || object.IsUnknown() {
+		return nil, diag.Diagnostics{}
+	}
+
+	formDefinition := CustomFormModel{}
+	diags := object.As(ctx, &formDefinition, basetypes.ObjectAsOptions{})
+	raw, someDiags := formDefinition.ToAPI(ctx)
+	diags.Append(someDiags...)
+	return &raw, diags
+}
+
+// Convert a CustomFormAPIModel to an object.
+func (self *CustomFormAPIModel) ToObject(ctx context.Context) (types.Object, diag.Diagnostics) {
+	form := CustomFormModel{}
+	if self == nil {
+		return types.ObjectNull(form.AttributeTypes()), diag.Diagnostics{}
+	}
+	diags := form.FromAPI(ctx, *self)
+	object, someDiags := types.ObjectValueFrom(ctx, form.AttributeTypes(), form)
+	diags.Append(someDiags...)
+	return object, diags
 }
