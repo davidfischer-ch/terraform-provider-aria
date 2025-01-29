@@ -27,7 +27,7 @@ type ParameterAPIModel struct {
 }
 
 // Used to convert structure to a types.Object.
-func ParameterAttributeTypes() map[string]attr.Type {
+func (self ParameterModel) AttributeTypes() map[string]attr.Type {
 	return map[string]attr.Type{
 		"name":        types.StringType,
 		"description": types.StringType,
@@ -78,7 +78,7 @@ func ParameterModelListFromAPI(
 	}
 
 	// Store inputs parameters to list value
-	parameterAttrs := types.ObjectType{AttrTypes: ParameterAttributeTypes()}
+	parameterAttrs := types.ObjectType{AttrTypes: ParameterModel{}.AttributeTypes()}
 	parametersList, parametersDiags := types.ListValueFrom(ctx, parameterAttrs, parameters)
 	diags.Append(parametersDiags...)
 

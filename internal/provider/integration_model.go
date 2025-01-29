@@ -83,7 +83,7 @@ func (self IntegrationDataSourceModel) ReadPath() string {
 // Utils -------------------------------------------------------------------------------------------
 
 // Used to convert structure to a types.Object.
-func IntegrationModelAttributeTypes() map[string]attr.Type {
+func (self IntegrationModel) AttributeTypes() map[string]attr.Type {
 	return map[string]attr.Type{
 		"name":                        types.StringType,
 		"endpoint_configuration_link": types.StringType,

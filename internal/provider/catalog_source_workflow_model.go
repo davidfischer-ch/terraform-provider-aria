@@ -54,7 +54,7 @@ func (self *CatalogSourceWorkflowModel) FromAPI(
 	integration := IntegrationModel{}
 	diags := integration.FromAPI(ctx, raw.Integration)
 	self.Integration, someDiags = types.ObjectValueFrom(
-		ctx, IntegrationModelAttributeTypes(), integration,
+		ctx, integration.AttributeTypes(), integration,
 	)
 	diags.Append(someDiags...)
 

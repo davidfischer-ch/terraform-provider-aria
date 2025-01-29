@@ -114,8 +114,8 @@ func (self *CloudTemplateV1Model) FromAPI(
 	}
 
 	var messagesDiags diag.Diagnostics
-	messageAttrs := types.ObjectType{AttrTypes: CloudTemplateV1ValidationMessageAttributeTypes()}
-	self.ValidationMessages, messagesDiags = types.ListValueFrom(ctx, messageAttrs, messages)
+	attrs := types.ObjectType{AttrTypes: CloudTemplateV1ValidationMessageModel{}.AttributeTypes()}
+	self.ValidationMessages, messagesDiags = types.ListValueFrom(ctx, attrs, messages)
 	diags.Append(messagesDiags...)
 
 	return diags

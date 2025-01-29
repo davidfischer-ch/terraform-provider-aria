@@ -71,21 +71,18 @@ func CloudTemplateV1ValidationMessageAPIModelFromObject(
 func (self *CloudTemplateV1ValidationMessageAPIModel) ToObject(
 	ctx context.Context,
 ) (types.Object, diag.Diagnostics) {
-	if self == nil {
-		return types.ObjectNull(
-				CloudTemplateV1ValidationMessageAttributeTypes()),
-			diag.Diagnostics{}
-	}
 	message := CloudTemplateV1ValidationMessageModel{}
+	if self == nil {
+		return types.ObjectNull(message.AttributeTypes()), diag.Diagnostics{}
+	}
 	diags := message.FromAPI(ctx, *self)
-	object, objectDiags := types.ObjectValueFrom(
-		ctx, CloudTemplateV1ValidationMessageAttributeTypes(), message)
+	object, objectDiags := types.ObjectValueFrom(ctx, message.AttributeTypes(), message)
 	diags.Append(objectDiags...)
 	return object, diags
 }
 
 // Used to convert structure to a types.Object.
-func CloudTemplateV1ValidationMessageAttributeTypes() map[string]attr.Type {
+func (self CloudTemplateV1ValidationMessageModel) AttributeTypes() map[string]attr.Type {
 	return map[string]attr.Type{
 		"resource_name": types.StringType,
 		"path":          types.StringType,
