@@ -1,5 +1,22 @@
 # Changelog
 
+## Release v0.6.3 (2025-01-30)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.2...v0.6.3
+
+### Features
+
+* Add data source `aria_integration`
+* Add resource `aria_catalog_source` (with an open isse, see [#114](https://github.com/davidfischer-ch/terraform-provider-aria/issues/114)
+* Add resource `aria_orchestrator_configuration`
+* Add resource `aria_policy`
+
+### Fix and enhancements
+
+* Validate `aria_orchestrator_category`'s `type` attribute
+* SDK: Make `AttributeTypes` a func of `*Model` struct (as per in doc)
+* Merge dependabot dependencies update requests
+
 ## Release v0.6.2 (2024-12-11)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.1...v0.6.2
