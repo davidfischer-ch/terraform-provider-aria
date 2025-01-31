@@ -20,3 +20,17 @@ func OrchestratorConfigurationStringSchema() schema.SingleNestedAttribute {
 		},
 	}
 }
+
+// A String embedded inside a Computed Orchestrator Configuration Value.
+func ComputedOrchestratorConfigurationStringSchema() schema.SingleNestedAttribute {
+	return schema.SingleNestedAttribute{
+		MarkdownDescription: "String",
+		Computed:            true,
+		Attributes: map[string]schema.Attribute{
+			"value": schema.StringAttribute{
+				MarkdownDescription: "Value",
+				Computed:            true,
+			},
+		},
+	}
+}

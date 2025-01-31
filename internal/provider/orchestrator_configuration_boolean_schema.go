@@ -20,3 +20,17 @@ func OrchestratorConfigurationBooleanSchema() schema.SingleNestedAttribute {
 		},
 	}
 }
+
+// A Boolean embedded inside a Computed Orchestrator Configuration Value.
+func ComputedOrchestratorConfigurationBooleanSchema() schema.SingleNestedAttribute {
+	return schema.SingleNestedAttribute{
+		MarkdownDescription: "Boolean",
+		Computed:            true,
+		Attributes: map[string]schema.Attribute{
+			"value": schema.BoolAttribute{
+				MarkdownDescription: "Value",
+				Computed:            true,
+			},
+		},
+	}
+}

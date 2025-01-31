@@ -236,6 +236,7 @@ func (self *AriaProvider) DataSources(ctx context.Context) []func() datasource.D
 		NewCatalogTypeDataSource,
 		NewIconDataSource,
 		NewIntegrationDataSource,
+		NewOrchestratorConfigurationDataSource,
 		NewSecretDataSource,
 	}
 }

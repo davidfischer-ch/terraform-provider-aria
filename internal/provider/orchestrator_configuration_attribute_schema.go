@@ -24,3 +24,21 @@ func OrchestratorConfigurationAttributeSchema() schema.NestedAttributeObject {
 		},
 	}
 }
+
+// An Attribute declared inside a OrchestratorConfigurationDataSourceSchema.
+func ComputedOrchestratorConfigurationAttributeSchema() schema.NestedAttributeObject {
+	return schema.NestedAttributeObject{
+		Attributes: map[string]schema.Attribute{
+			"name": schema.StringAttribute{
+				MarkdownDescription: "Name",
+				Computed:            true,
+			},
+			"description": ComputedDescriptionSchema(),
+			"type": schema.StringAttribute{
+				MarkdownDescription: "Type",
+				Computed:            true,
+			},
+			"value": ComputedOrchestratorConfigurationValueSchema(),
+		},
+	}
+}

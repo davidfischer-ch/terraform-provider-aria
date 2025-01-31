@@ -17,6 +17,18 @@ func OrchestratorConfigurationValueSchema() schema.SingleNestedAttribute {
 			"string":        OrchestratorConfigurationStringSchema(),
 			"secure_string": OrchestratorConfigurationSecureStringSchema(),
 		},
+	}
+}
+
+// The Value embedded inside a Computed Orchestrator Configuration Attribute.
+func ComputedOrchestratorConfigurationValueSchema() schema.SingleNestedAttribute {
+	return schema.SingleNestedAttribute{
+		MarkdownDescription: "Value",
+		Computed:            true,
+		Attributes: map[string]schema.Attribute{
+			"boolean":       ComputedOrchestratorConfigurationBooleanSchema(),
+			"string":        ComputedOrchestratorConfigurationStringSchema(),
+			"secure_string": ComputedOrchestratorConfigurationSecureStringSchema(),
 		},
 	}
 }

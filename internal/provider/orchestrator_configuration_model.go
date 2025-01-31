@@ -13,7 +13,7 @@ import (
 )
 
 // OrchestratorConfigurationModel describes the resource data model.
-type OrchestratorConfigurationModel struct {
+type OrchestratorConfigurationDataSourceModel struct {
 	Id          types.String `tfsdk:"id"`
 	Name        types.String `tfsdk:"name"`
 	Description types.String `tfsdk:"description"`
@@ -22,6 +22,11 @@ type OrchestratorConfigurationModel struct {
 	VersionId   types.String `tfsdk:"version_id"`
 
 	Attributes types.List `tfsdk:"attributes"`
+}
+
+// OrchestratorConfigurationModel describes the resource data model.
+type OrchestratorConfigurationModel struct {
+	OrchestratorConfigurationDataSourceModel
 
 	ForceDelete types.Bool `tfsdk:"force_delete"`
 }
@@ -37,7 +42,7 @@ type OrchestratorConfigurationAPIModel struct {
 	Attributes []OrchestratorConfigurationAttributeAPIModel `json:"attributes"`
 }
 
-func (self OrchestratorConfigurationModel) String() string {
+func (self OrchestratorConfigurationDataSourceModel) String() string {
 	return fmt.Sprintf(
 		"Orchestrator Configuration %s (%s)",
 		self.Id.ValueString(),
@@ -47,7 +52,7 @@ func (self OrchestratorConfigurationModel) String() string {
 // Return an appropriate key that can be used for naming mutexes.
 // Create: Identifier can be used to prevent concurrent creation of vRO configurations.
 // Read Update Delete: Identifier can be used to prevent concurrent modifications on the instance.
-func (self OrchestratorConfigurationModel) LockKey() string {
+func (self OrchestratorConfigurationDataSourceModel) LockKey() string {
 	return "orchestrator-configuration-" + self.Id.ValueString()
 }
 
@@ -55,7 +60,7 @@ func (self OrchestratorConfigurationModel) CreatePath() string {
 	return "vco/api/configurations"
 }
 
-func (self OrchestratorConfigurationModel) ReadPath() string {
+func (self OrchestratorConfigurationDataSourceModel) ReadPath() string {
 	return fmt.Sprintf("vco/api/configurations/%s", self.Id.ValueString())
 }
 
@@ -71,7 +76,7 @@ func (self OrchestratorConfigurationModel) DeletePath() string {
 	return path
 }
 
-func (self *OrchestratorConfigurationModel) FromAPI(
+func (self *OrchestratorConfigurationDataSourceModel) FromAPI(
 	ctx context.Context,
 	raw OrchestratorConfigurationAPIModel,
 	response *resty.Response,
@@ -103,7 +108,7 @@ func (self *OrchestratorConfigurationModel) FromAPI(
 	return diags
 }
 
-func (self OrchestratorConfigurationModel) ToAPI(
+func (self OrchestratorConfigurationDataSourceModel) ToAPI(
 	ctx context.Context,
 ) (OrchestratorConfigurationAPIModel, diag.Diagnostics) {
 
