@@ -1,5 +1,21 @@
 # Changelog
 
+## Release v0.6.4 (2025-01-31)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.3...v0.6.4
+
+### Features
+
+* Add data source `aria_orchestrator_configuration`
+* Add resource `aria_tag`
+
+### Fix and enhancements
+
+* Mark `aria_policy`'s `scope_criteria` as immutable
+* Fix `aria_icon`'s `keep_on_destroy` attribute cannot be updated
+* SDK: Simplify code (do not return & manage empty diagnostics)
+* Doc: Improve it with more examples & declare immutable attributes
+
 ## Release v0.6.3 (2025-01-30)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.2...v0.6.3
