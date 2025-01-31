@@ -109,7 +109,7 @@ func (self *CloudTemplateV1Model) FromAPI(
 	messages := []CloudTemplateV1ValidationMessageModel{}
 	for _, messageRaw := range raw.ValidationMessages {
 		message := CloudTemplateV1ValidationMessageModel{}
-		diags.Append(message.FromAPI(ctx, messageRaw)...)
+		message.FromAPI(messageRaw)
 		messages = append(messages, message)
 	}
 

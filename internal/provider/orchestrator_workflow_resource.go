@@ -61,12 +61,7 @@ func (self *OrchestratorWorkflowResource) Create(
 		return
 	}
 
-	workflowCreateRaw, diags := workflow.ToCreateAPI(ctx)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
+	workflowCreateRaw := workflow.ToCreateAPI()
 	response, err := self.client.Client.R().
 		// TODO SetQueryParam("apiVersion", ORCHESTRATOR_API_VERSION).
 		SetBody(workflowCreateRaw).
@@ -81,7 +76,7 @@ func (self *OrchestratorWorkflowResource) Create(
 	}
 
 	// Save workflow into Terraform state
-	resp.Diagnostics.Append(workflow.FromCreateAPI(ctx, workflowCreateRaw)...)
+	workflow.FromCreateAPI(workflowCreateRaw)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &workflow)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully, now updating", workflow.String()))
 
@@ -109,7 +104,7 @@ func (self *OrchestratorWorkflowResource) Create(
 	}
 
 	// Save updated workflow into Terraform state
-	resp.Diagnostics.Append(workflow.FromVersionAPI(ctx, workflowVersionResponsRaw)...)
+	workflow.FromVersionAPI(workflowVersionResponsRaw)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &workflow)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", workflow.String()))
 
@@ -205,7 +200,7 @@ func (self *OrchestratorWorkflowResource) Update(
 	}
 
 	// Save updated workflow into Terraform state
-	resp.Diagnostics.Append(workflow.FromVersionAPI(ctx, workflowVersionResponsRaw)...)
+	workflow.FromVersionAPI(workflowVersionResponsRaw)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &workflow)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", workflow.String()))
 }
@@ -229,4 +224,5 @@ func (self *OrchestratorWorkflowResource) ImportState(
 	resp *resource.ImportStateResponse,
 ) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("force_delete"), false)...)
 }

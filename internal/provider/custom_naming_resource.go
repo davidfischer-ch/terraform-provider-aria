@@ -61,12 +61,7 @@ func (self *CustomNamingResource) Create(
 		return
 	}
 
-	namingRaw, diags := naming.ToAPI(ctx, CustomNamingModel{})
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
+	namingRaw := naming.ToAPI(CustomNamingModel{})
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", IAAS_API_VERSION).
 		SetBody(namingRaw).
@@ -81,7 +76,7 @@ func (self *CustomNamingResource) Create(
 	}
 
 	// Save custom naming into Terraform state
-	resp.Diagnostics.Append(naming.FromAPI(ctx, namingRaw)...)
+	naming.FromAPI(namingRaw)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &naming)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", naming.String()))
 }
@@ -108,7 +103,7 @@ func (self *CustomNamingResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated custom naming into Terraform state
-		resp.Diagnostics.Append(naming.FromAPI(ctx, namingRaw)...)
+		naming.FromAPI(namingRaw)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &naming)...)
 	}
 }
@@ -126,12 +121,7 @@ func (self *CustomNamingResource) Update(
 		return
 	}
 
-	namingRaw, diags := naming.ToAPI(ctx, namingState)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
+	namingRaw := naming.ToAPI(namingState)
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", IAAS_API_VERSION).
 		SetBody(namingRaw).
@@ -147,7 +137,7 @@ func (self *CustomNamingResource) Update(
 	}
 
 	// Save updated custom naming into Terraform state
-	resp.Diagnostics.Append(naming.FromAPI(ctx, namingRaw)...)
+	naming.FromAPI(namingRaw)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &naming)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", naming.String()))
 }

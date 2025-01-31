@@ -134,6 +134,11 @@ func (self AriaClient) ReadIt(
 		}
 	}
 
+	if path == "" {
+		diags.AddError("Internal error", "ReadIt - Instance cannot be retrieved (empty path).")
+		return false, nil, diags
+	}
+
 	response, err := self.Client.R().
 		SetQueryParam("apiVersion", GetVersionFromPath(path)).
 		SetResult(&instanceRaw).
@@ -192,8 +197,13 @@ func (self AriaClient) DeleteIt(
 			return diags
 		}
 
-		// Poll resource until deleted
+		// Poll resource until deleted, but if we cant read it...
 		readPath := instance.ReadPath()
+		if len(readPath) == 0 {
+			tflog.Debug(ctx, fmt.Sprintf("Deleted %s successfully (without polling)", name))
+			return diags
+		}
+
 		for retry := range []int{0, 1, 2, 3, 4} {
 			time.Sleep(time.Duration(retry) * time.Second)
 			tflog.Debug(ctx, fmt.Sprintf("Poll %d of 5 - Check %s is deleted...", retry+1, name))

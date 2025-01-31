@@ -4,10 +4,8 @@
 package provider
 
 import (
-	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -55,10 +53,7 @@ func (self CustomNamingTemplateModel) Key() string {
 		pattern)
 }
 
-func (self *CustomNamingTemplateModel) FromAPI(
-	ctx context.Context,
-	raw CustomNamingTemplateAPIModel,
-) diag.Diagnostics {
+func (self *CustomNamingTemplateModel) FromAPI(raw CustomNamingTemplateAPIModel) {
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
 	self.ResourceType = types.StringValue(raw.ResourceType)
@@ -69,7 +64,6 @@ func (self *CustomNamingTemplateModel) FromAPI(
 	self.StaticPattern = types.StringValue(raw.StaticPattern)
 	self.StartCounter = types.Int32Value(raw.StartCounter)
 	self.IncrementStep = types.Int32Value(raw.IncrementStep)
-	return diag.Diagnostics{}
 }
 
 func (self CustomNamingTemplateModel) toAPI() CustomNamingTemplateAPIModel {
@@ -88,9 +82,8 @@ func (self CustomNamingTemplateModel) toAPI() CustomNamingTemplateAPIModel {
 }
 
 func (self CustomNamingTemplateModel) ToAPI(
-	ctx context.Context,
 	state CustomNamingTemplateModel,
-) (CustomNamingTemplateAPIModel, diag.Diagnostics) {
+) CustomNamingTemplateAPIModel {
 	raw := self.toAPI()
 	// If the identifier is set, means its an UPDATE
 	if len(raw.Id) > 0 {
@@ -109,5 +102,5 @@ func (self CustomNamingTemplateModel) ToAPI(
 			raw.Id = ""
 		}
 	}
-	return raw, diag.Diagnostics{}
+	return raw
 }

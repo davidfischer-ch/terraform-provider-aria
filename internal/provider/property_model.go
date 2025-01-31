@@ -85,7 +85,7 @@ func (self *PropertyModel) FromAPI(
 		self.OneOf = []PropertyOneOfModel{}
 		for _, oneOfRaw := range raw.OneOf {
 			oneOf := PropertyOneOfModel{}
-			diags.Append(oneOf.FromAPI(ctx, oneOfRaw)...)
+			oneOf.FromAPI(oneOfRaw)
 			self.OneOf = append(self.OneOf, oneOf)
 		}
 	}
@@ -104,9 +104,7 @@ func (self PropertyModel) ToAPI(
 	} else {
 		oneOfRawList = []PropertyOneOfAPIModel{}
 		for _, oneOf := range self.OneOf {
-			oneOfRaw, oneOfDiags := oneOf.ToAPI(ctx)
-			oneOfRawList = append(oneOfRawList, oneOfRaw)
-			diags.Append(oneOfDiags...)
+			oneOfRawList = append(oneOfRawList, oneOf.ToAPI())
 		}
 	}
 

@@ -4,10 +4,8 @@
 package provider
 
 import (
-	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -33,22 +31,16 @@ func (self ProjectMembershipModel) String() string {
 		self.Email.ValueString())
 }
 
-func (self *ProjectMembershipModel) FromAPI(
-	ctx context.Context,
-	raw ProjectMembershipAPIModel,
-) diag.Diagnostics {
+func (self *ProjectMembershipModel) FromAPI(raw ProjectMembershipAPIModel) {
 	self.Email = types.StringValue(raw.Email)
 	self.Type = types.StringValue(raw.Type)
 	self.Role = types.StringValue(raw.Role)
-	return diag.Diagnostics{}
 }
 
-func (self ProjectMembershipModel) ToAPI(
-	ctx context.Context,
-) (ProjectMembershipAPIModel, diag.Diagnostics) {
+func (self ProjectMembershipModel) ToAPI() ProjectMembershipAPIModel {
 	return ProjectMembershipAPIModel{
 		Email: self.Email.ValueString(),
 		Type:  self.Type.ValueString(),
 		Role:  self.Role.ValueString(),
-	}, diag.Diagnostics{}
+	}
 }

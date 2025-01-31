@@ -50,9 +50,10 @@ func (self *CatalogSourceWorkflowModel) FromAPI(
 	self.Version = types.StringValue(raw.Version)
 
 	// Convert integration from raw and then to object
+	diags := diag.Diagnostics{}
 	var someDiags diag.Diagnostics
 	integration := IntegrationModel{}
-	diags := integration.FromAPI(ctx, raw.Integration)
+	integration.FromAPI(raw.Integration)
 	self.Integration, someDiags = types.ObjectValueFrom(
 		ctx, integration.AttributeTypes(), integration,
 	)
@@ -77,11 +78,9 @@ func (self CatalogSourceWorkflowModel) ToAPI(
 				self.String()))
 	} else {
 		// Convert integration from object to raw
-		var someDiags diag.Diagnostics
 		integration := IntegrationModel{}
 		diags.Append(self.Integration.As(ctx, &integration, basetypes.ObjectAsOptions{})...)
-		integrationRaw, someDiags = integration.ToAPI(ctx)
-		diags.Append(someDiags...)
+		integrationRaw = integration.ToAPI()
 	}
 
 	return CatalogSourceWorkflowAPIModel{

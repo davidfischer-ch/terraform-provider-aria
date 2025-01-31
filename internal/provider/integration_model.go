@@ -4,11 +4,9 @@
 package provider
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -49,24 +47,18 @@ func (self *IntegrationModel) String() string {
 		self.EndpointURI.ValueString())
 }
 
-func (self *IntegrationModel) FromAPI(
-	ctx context.Context,
-	raw IntegrationAPIModel,
-) diag.Diagnostics {
+func (self *IntegrationModel) FromAPI(raw IntegrationAPIModel) {
 	self.Name = types.StringValue(raw.Name)
 	self.EndpointConfigurationLink = types.StringValue(raw.EndpointConfigurationLink)
 	self.EndpointURI = types.StringValue(raw.EndpointURI)
-	return diag.Diagnostics{}
 }
 
-func (self *IntegrationModel) ToAPI(
-	ctx context.Context,
-) (IntegrationAPIModel, diag.Diagnostics) {
+func (self *IntegrationModel) ToAPI() IntegrationAPIModel {
 	return IntegrationAPIModel{
 		Name:                      self.Name.ValueString(),
 		EndpointConfigurationLink: self.EndpointConfigurationLink.ValueString(),
 		EndpointURI:               self.EndpointURI.ValueString(),
-	}, diag.Diagnostics{}
+	}
 }
 
 func (self IntegrationDataSourceModel) ReadPath() string {

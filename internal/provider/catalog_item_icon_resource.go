@@ -61,12 +61,7 @@ func (self *CatalogItemIconResource) Create(
 		return
 	}
 
-	itemIconRaw, diags := itemIcon.ToAPI(ctx)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
+	itemIconRaw := itemIcon.ToAPI()
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", CATALOG_API_VERSION).
 		SetBody(itemIconRaw).
@@ -81,7 +76,7 @@ func (self *CatalogItemIconResource) Create(
 	}
 
 	// Save item's icon into Terraform state
-	resp.Diagnostics.Append(itemIcon.FromAPI(ctx, itemIconRaw)...)
+	itemIcon.FromAPI(itemIconRaw)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &itemIcon)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", itemIcon.String()))
 }
@@ -108,7 +103,7 @@ func (self *CatalogItemIconResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated item's icon into Terraform state
-		resp.Diagnostics.Append(itemIcon.FromAPI(ctx, itemIconRaw)...)
+		itemIcon.FromAPI(itemIconRaw)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &itemIcon)...)
 	}
 }
@@ -125,12 +120,7 @@ func (self *CatalogItemIconResource) Update(
 		return
 	}
 
-	itemIconRaw, diags := itemIcon.ToAPI(ctx)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
+	itemIconRaw := itemIcon.ToAPI()
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", CATALOG_API_VERSION).
 		SetBody(itemIconRaw).
@@ -145,7 +135,7 @@ func (self *CatalogItemIconResource) Update(
 	}
 
 	// Save updated category into Terraform state
-	resp.Diagnostics.Append(itemIcon.FromAPI(ctx, itemIconRaw)...)
+	itemIcon.FromAPI(itemIconRaw)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &itemIcon)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", itemIcon.String()))
 }

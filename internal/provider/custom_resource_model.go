@@ -98,16 +98,16 @@ func (self *CustomResourceModel) FromAPI(
 	diags := self.Properties.FromAPI(ctx, raw.Properties.Properties)
 
 	self.Create = ResourceActionRunnableModel{}
-	diags.Append(self.Create.FromAPI(ctx, raw.MainActions["create"])...)
+	self.Create.FromAPI(raw.MainActions["create"])
 
 	self.Read = ResourceActionRunnableModel{}
-	diags.Append(self.Read.FromAPI(ctx, raw.MainActions["read"])...)
+	self.Read.FromAPI(raw.MainActions["read"])
 
 	self.Update = ResourceActionRunnableModel{}
-	diags.Append(self.Update.FromAPI(ctx, raw.MainActions["update"])...)
+	self.Update.FromAPI(raw.MainActions["update"])
 
 	self.Delete = ResourceActionRunnableModel{}
-	diags.Append(self.Delete.FromAPI(ctx, raw.MainActions["delete"])...)
+	self.Delete.FromAPI(raw.MainActions["delete"])
 
 	self.AdditionalActions = []ResourceActionModel{}
 	for _, actionRaw := range raw.AdditionalActions {
@@ -125,17 +125,10 @@ func (self CustomResourceModel) ToAPI(
 
 	propertiesRaw, diags := self.Properties.ToAPI(ctx)
 
-	createRaw, createDiags := self.Create.ToAPI(ctx)
-	diags.Append(createDiags...)
-
-	readRaw, readDiags := self.Read.ToAPI(ctx)
-	diags.Append(readDiags...)
-
-	updateRaw, updateDiags := self.Update.ToAPI(ctx)
-	diags.Append(updateDiags...)
-
-	deleteRaw, deleteDiags := self.Delete.ToAPI(ctx)
-	diags.Append(deleteDiags...)
+	createRaw := self.Create.ToAPI()
+	readRaw := self.Read.ToAPI()
+	updateRaw := self.Update.ToAPI()
+	deleteRaw := self.Delete.ToAPI()
 
 	var additionalActionsRaw []ResourceActionAPIModel
 	for _, action := range self.AdditionalActions {

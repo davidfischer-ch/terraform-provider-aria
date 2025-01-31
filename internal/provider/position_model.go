@@ -4,9 +4,6 @@
 package provider
 
 import (
-	"context"
-
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -22,20 +19,14 @@ type PositionAPIModel struct {
 	Y float64 `json:"y"`
 }
 
-func (self *PositionModel) FromAPI(
-	ctx context.Context,
-	raw PositionAPIModel,
-) diag.Diagnostics {
+func (self *PositionModel) FromAPI(raw PositionAPIModel) {
 	self.X = types.Float64Value(raw.X)
 	self.Y = types.Float64Value(raw.Y)
-	return diag.Diagnostics{}
 }
 
-func (self PositionModel) ToAPI(
-	ctx context.Context,
-) (PositionAPIModel, diag.Diagnostics) {
+func (self PositionModel) ToAPI() PositionAPIModel {
 	return PositionAPIModel{
 		X: self.X.ValueFloat64(),
 		Y: self.Y.ValueFloat64(),
-	}, diag.Diagnostics{}
+	}
 }

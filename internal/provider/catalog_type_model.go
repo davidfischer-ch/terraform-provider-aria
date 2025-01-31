@@ -4,9 +4,6 @@
 package provider
 
 import (
-	"context"
-
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -30,15 +27,11 @@ type CatalogTypeAPIModel struct {
 	IconId    string `json:"iconId"`
 }
 
-func (self *CatalogTypeModel) FromAPI(
-	ctx context.Context,
-	raw CatalogTypeAPIModel,
-) diag.Diagnostics {
+func (self *CatalogTypeModel) FromAPI(raw CatalogTypeAPIModel) {
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
 	self.BaseURI = types.StringValue(raw.BaseURI)
 	self.CreatedAt = types.StringValue(raw.CreatedAt)
 	self.CreatedBy = types.StringValue(raw.CreatedBy)
 	self.IconId = types.StringValue(raw.IconId)
-	return diag.Diagnostics{}
 }

@@ -74,6 +74,6 @@ func (self *CatalogTypeDataSource) Read(
 	}
 
 	// Save updated catalog type into Terraform state
-	resp.Diagnostics.Append(catalogType.FromAPI(ctx, catalogTypeRaw)...)
+	catalogType.FromAPI(catalogTypeRaw)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &catalogType)...)
 }

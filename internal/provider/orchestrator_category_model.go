@@ -4,10 +4,8 @@
 package provider
 
 import (
-	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -64,10 +62,7 @@ func (self OrchestratorCategoryModel) DeletePath() string {
 	return self.ReadPath()
 }
 
-func (self *OrchestratorCategoryModel) FromAPI(
-	ctx context.Context,
-	raw OrchestratorCategoryAPIModel,
-) diag.Diagnostics {
+func (self *OrchestratorCategoryModel) FromAPI(raw OrchestratorCategoryAPIModel) {
 	// Retrieve parent ID from PathIds
 	parentId := ""
 	parentIndex := len(raw.PathIds) - 2
@@ -79,16 +74,13 @@ func (self *OrchestratorCategoryModel) FromAPI(
 	self.Path = types.StringValue(raw.Path)
 	self.Type = types.StringValue(raw.Type)
 	self.ParentId = types.StringValue(parentId)
-	return diag.Diagnostics{}
 }
 
-func (self OrchestratorCategoryModel) ToAPI(
-	ctx context.Context,
-) (OrchestratorCategoryAPIModel, diag.Diagnostics) {
+func (self OrchestratorCategoryModel) ToAPI() OrchestratorCategoryAPIModel {
 	return OrchestratorCategoryAPIModel{
 		// ID and Path are computed by Aria
 		Name:     self.Name.ValueString(),
 		Type:     self.Type.ValueString(),
 		ParentId: self.ParentId.ValueString(),
-	}, diag.Diagnostics{}
+	}
 }
