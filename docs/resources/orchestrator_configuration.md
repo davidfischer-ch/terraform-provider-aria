@@ -48,6 +48,20 @@ resource "aria_orchestrator_configuration" "Dummy" {
         }
       }
     }
+    /*
+    This is not yet well handled (mutated by the platform), we have to find a pattern for this.
+    We cannot (?) expose 1-1 the API to make it declarative, we have to tackle this challenge.
+    {
+      name        = "someSecureString"
+      description = "Some secure string value"
+      type        = "SecureString"
+      value = {
+        secure_string = {
+          value         = "test" -> "A.....Z", changing everytime ...
+          is_plain_text = true -> false
+        }
+      }
+    }*/
   ]
 
   # If required...
@@ -82,7 +96,7 @@ Required:
 
 - `description` (String) Describe the resource in few sentences
 - `name` (String) Name
-- `type` (String) Type, one of boolean or string.
+- `type` (String) Type
 - `value` (Attributes) Value (see [below for nested schema](#nestedatt--attributes--value))
 
 <a id="nestedatt--attributes--value"></a>
@@ -91,6 +105,7 @@ Required:
 Optional:
 
 - `boolean` (Attributes) Boolean (see [below for nested schema](#nestedatt--attributes--value--boolean))
+- `secure_string` (Attributes) Secure String (see [below for nested schema](#nestedatt--attributes--value--secure_string))
 - `string` (Attributes) String (see [below for nested schema](#nestedatt--attributes--value--string))
 
 <a id="nestedatt--attributes--value--boolean"></a>
@@ -99,6 +114,15 @@ Optional:
 Required:
 
 - `value` (Boolean) Value
+
+
+<a id="nestedatt--attributes--value--secure_string"></a>
+### Nested Schema for `attributes.value.secure_string`
+
+Required:
+
+- `is_plain_text` (Boolean) Plain text?
+- `value` (String, Sensitive) Value
 
 
 <a id="nestedatt--attributes--value--string"></a>

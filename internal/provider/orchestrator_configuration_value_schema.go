@@ -13,8 +13,10 @@ func OrchestratorConfigurationValueSchema() schema.SingleNestedAttribute {
 		MarkdownDescription: "Value",
 		Required:            true,
 		Attributes: map[string]schema.Attribute{
-			"boolean": OrchestratorConfigurationBooleanSchema(),
-			"string":  OrchestratorConfigurationStringSchema(),
+			"boolean":       OrchestratorConfigurationBooleanSchema(),
+			"string":        OrchestratorConfigurationStringSchema(),
+			"secure_string": OrchestratorConfigurationSecureStringSchema(),
+		},
 		},
 	}
 }

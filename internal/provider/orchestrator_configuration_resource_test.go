@@ -85,6 +85,21 @@ resource "aria_orchestrator_configuration" "test" {
         }
       }
     }
+    /*
+		This is not yet well handled (mutated by the platform), we have to find a pattern for this.
+    We cannot (?) expose 1-1 the API to make it declarative, we have to tackle this challenge.
+    {
+      name        = "someSecureString"
+      description = "Some secure string value"
+      type        = "SecureString"
+      value = {
+        secure_string = {
+          value         = "test"
+          is_plain_text = true
+        }
+      }
+    }
+    */
   ]
 
   force_delete = true

@@ -4,9 +4,7 @@
 package provider
 
 import (
-	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
 // An Attribute declared inside a OrchestratorConfigurationSchema.
@@ -19,14 +17,8 @@ func OrchestratorConfigurationAttributeSchema() schema.NestedAttributeObject {
 			},
 			"description": RequiredDescriptionSchema(),
 			"type": schema.StringAttribute{
-				MarkdownDescription: "Type, one of boolean or string.",
+				MarkdownDescription: "Type",
 				Required:            true,
-				Validators: []validator.String{
-					stringvalidator.OneOf([]string{
-						"boolean",
-						"string",
-					}...),
-				},
 			},
 			"value": OrchestratorConfigurationValueSchema(),
 		},

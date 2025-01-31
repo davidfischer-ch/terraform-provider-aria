@@ -33,6 +33,20 @@ resource "aria_orchestrator_configuration" "Dummy" {
         }
       }
     }
+    /*
+    This is not yet well handled (mutated by the platform), we have to find a pattern for this.
+    We cannot (?) expose 1-1 the API to make it declarative, we have to tackle this challenge.
+    {
+      name        = "someSecureString"
+      description = "Some secure string value"
+      type        = "SecureString"
+      value = {
+        secure_string = {
+          value         = "test" -> "A.....Z", changing everytime ...
+          is_plain_text = true -> false
+        }
+      }
+    }*/
   ]
 
   # If required...

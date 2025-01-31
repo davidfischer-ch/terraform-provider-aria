@@ -14,14 +14,16 @@ import (
 
 // OrchestratorConfigurationValueModel describes the resource data model.
 type OrchestratorConfigurationValueModel struct {
-	Boolean types.Object `tfsdk:"boolean"` // Of type OrchestratorConfigurationBooleanModel
-	String  types.Object `tfsdk:"string"`  // Of type OrchestratorConfigurationStringModel
+	Boolean      types.Object `tfsdk:"boolean"`       // Of type OrchestratorConfigurationBooleanModel
+	String       types.Object `tfsdk:"string"`        // Of type OrchestratorConfigurationStringModel
+	SecureString types.Object `tfsdk:"secure_string"` // Of type ...SecureStringModel
 }
 
 // OrchestratorConfigurationValueAPIModel describes the resource API model.
 type OrchestratorConfigurationValueAPIModel struct {
-	Boolean *OrchestratorConfigurationBooleanAPIModel `json:"boolean,omitempty"`
-	String  *OrchestratorConfigurationStringAPIModel  `json:"string,omitempty"`
+	Boolean      *OrchestratorConfigurationBooleanAPIModel      `json:"boolean,omitempty"`
+	String       *OrchestratorConfigurationStringAPIModel       `json:"string,omitempty"`
+	SecureString *OrchestratorConfigurationSecureStringAPIModel `json:"secure-string,omitempty"`
 }
 
 func (self *OrchestratorConfigurationValueModel) FromAPI(
@@ -53,6 +55,19 @@ func (self *OrchestratorConfigurationValueModel) FromAPI(
 		diags.Append(someDiags...)
 	}
 
+	// Convert secure string from raw and then to object
+	secureVal := OrchestratorConfigurationSecureStringModel{}
+	if raw.SecureString == nil {
+		self.SecureString = types.ObjectNull(secureVal.AttributeTypes())
+	} else {
+		var someDiags diag.Diagnostics
+		secureVal.FromAPI(*raw.SecureString)
+		self.SecureString, someDiags = types.ObjectValueFrom(
+			ctx, secureVal.AttributeTypes(), secureVal,
+		)
+		diags.Append(someDiags...)
+	}
+
 	return diags
 }
 
@@ -81,6 +96,15 @@ func (self OrchestratorConfigurationValueModel) ToAPI(
 		raw.String = &stringRaw
 	}
 
+	if self.SecureString.IsNull() || self.SecureString.IsUnknown() {
+		raw.SecureString = nil
+	} else {
+		var secureVal OrchestratorConfigurationSecureStringModel
+		diags.Append(self.SecureString.As(ctx, &secureVal, basetypes.ObjectAsOptions{})...)
+		secureRaw := secureVal.ToAPI()
+		raw.SecureString = &secureRaw
+	}
+
 	return raw, diags
 }
 
@@ -94,6 +118,9 @@ func (self OrchestratorConfigurationValueModel) AttributeTypes() map[string]attr
 		},
 		"string": types.ObjectType{
 			AttrTypes: OrchestratorConfigurationStringModel{}.AttributeTypes(),
+		},
+		"secure_string": types.ObjectType{
+			AttrTypes: OrchestratorConfigurationSecureStringModel{}.AttributeTypes(),
 		},
 	}
 }
