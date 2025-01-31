@@ -4,6 +4,8 @@
 package provider
 
 import (
+	"fmt"
+
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -25,6 +27,17 @@ type CatalogTypeAPIModel struct {
 	CreatedAt string `json:"createdAt"`
 	CreatedBy string `json:"createdBy"`
 	IconId    string `json:"iconId"`
+}
+
+func (self CatalogTypeModel) String() string {
+	return fmt.Sprintf(
+		"Catalog Type %s (%s)",
+		self.Id.ValueString(),
+		self.Name.ValueString())
+}
+
+func (self CatalogTypeModel) ReadPath() string {
+	return "/catalog/api/types/" + self.Id.ValueString()
 }
 
 func (self *CatalogTypeModel) FromAPI(raw CatalogTypeAPIModel) {

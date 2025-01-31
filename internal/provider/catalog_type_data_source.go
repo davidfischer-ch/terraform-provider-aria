@@ -59,17 +59,16 @@ func (self *CatalogTypeDataSource) Read(
 	}
 
 	var catalogTypeRaw CatalogTypeAPIModel
-	catalogTypeId := catalogType.Id.ValueString()
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", CATALOG_API_VERSION).
 		SetResult(&catalogTypeRaw).
-		Get("/catalog/api/types/" + catalogTypeId)
+		Get(catalogType.ReadPath())
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read catalog type %s, got error: %s", catalogTypeId, err))
+			fmt.Sprintf("Unable to read %s, got error: %s", catalogType.String(), err))
 		return
 	}
 
