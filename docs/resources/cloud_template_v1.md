@@ -20,7 +20,7 @@ Cloud Template (v1 format) resource (WORK IN PROGRESS, DO NOT USE)
 - `description` (String) Describe the resource in few sentences
 - `inputs` (Attributes Map) Cloud Template's properties (see [below for nested schema](#nestedatt--inputs))
 - `name` (String) Name
-- `project_id` (String) Project identifier
+- `project_id` (String) Project identifier (force recreation on change)
 - `request_scope_org` (Boolean) Requestable from any project in organization?
 - `resources` (Attributes Map) Cloud Template's resources (see [below for nested schema](#nestedatt--resources))
 

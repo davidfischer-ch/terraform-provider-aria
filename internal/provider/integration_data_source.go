@@ -83,7 +83,7 @@ func (self *IntegrationDataSource) Read(
 	}
 
 	for _, contentsRaw := range responseRaw.Content {
-		resp.Diagnostics.Append(integration.FromAPI(ctx, contentsRaw.Integration)...)
+		integration.FromAPI(contentsRaw.Integration)
 		break // Make sure we don't set it multiple times for nothing
 	}
 

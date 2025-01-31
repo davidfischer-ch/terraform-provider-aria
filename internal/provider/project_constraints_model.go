@@ -3,12 +3,6 @@
 
 package provider
 
-import (
-	"context"
-
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-)
-
 // ProjectConstraintsModel describes the resource data model.
 type ProjectConstraintsModel struct {
 }
@@ -21,15 +15,9 @@ func (self ProjectConstraintsModel) String() string {
 	return "Project Constraints"
 }
 
-func (self *ProjectConstraintsModel) FromAPI(
-	ctx context.Context,
-	raw ProjectConstraintsAPIModel,
-) diag.Diagnostics {
-	return diag.Diagnostics{}
+func (self *ProjectConstraintsModel) FromAPI(raw ProjectConstraintsAPIModel) {
 }
 
-func (self ProjectConstraintsModel) ToAPI(
-	ctx context.Context,
-) (ProjectConstraintsAPIModel, diag.Diagnostics) {
-	return ProjectConstraintsAPIModel{}, diag.Diagnostics{}
+func (self ProjectConstraintsModel) ToAPI() ProjectConstraintsAPIModel {
+	return ProjectConstraintsAPIModel{}
 }

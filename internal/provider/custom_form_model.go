@@ -79,10 +79,7 @@ func (self *CustomFormModel) GenerateId() {
 	}
 }
 
-func (self *CustomFormModel) FromAPI(
-	ctx context.Context,
-	raw CustomFormAPIModel,
-) diag.Diagnostics {
+func (self *CustomFormModel) FromAPI(raw CustomFormAPIModel) {
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
 	self.Type = types.StringValue(raw.Type)
@@ -93,12 +90,9 @@ func (self *CustomFormModel) FromAPI(
 	self.SourceType = types.StringValue(raw.SourceType)
 	self.Tenant = types.StringValue(raw.Tenant)
 	self.Status = types.StringValue(raw.Status)
-	return diag.Diagnostics{}
 }
 
-func (self *CustomFormModel) ToAPI(
-	ctx context.Context,
-) (CustomFormAPIModel, diag.Diagnostics) {
+func (self *CustomFormModel) ToAPI() CustomFormAPIModel {
 	return CustomFormAPIModel{
 		Id:         self.Id.ValueString(),
 		Name:       self.Name.ValueString(),
@@ -110,7 +104,7 @@ func (self *CustomFormModel) ToAPI(
 		SourceType: self.SourceType.ValueString(),
 		Tenant:     self.Tenant.ValueString(),
 		Status:     self.Status.ValueString(),
-	}, diag.Diagnostics{}
+	}
 }
 
 // Utils -------------------------------------------------------------------------------------------
@@ -143,8 +137,7 @@ func CustomFormAPIModelFromObject(
 
 	formDefinition := CustomFormModel{}
 	diags := object.As(ctx, &formDefinition, basetypes.ObjectAsOptions{})
-	raw, someDiags := formDefinition.ToAPI(ctx)
-	diags.Append(someDiags...)
+	raw := formDefinition.ToAPI()
 	return &raw, diags
 }
 
@@ -154,8 +147,6 @@ func (self *CustomFormAPIModel) ToObject(ctx context.Context) (types.Object, dia
 	if self == nil {
 		return types.ObjectNull(form.AttributeTypes()), diag.Diagnostics{}
 	}
-	diags := form.FromAPI(ctx, *self)
-	object, someDiags := types.ObjectValueFrom(ctx, form.AttributeTypes(), form)
-	diags.Append(someDiags...)
-	return object, diags
+	form.FromAPI(*self)
+	return types.ObjectValueFrom(ctx, form.AttributeTypes(), form)
 }

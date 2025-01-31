@@ -115,8 +115,9 @@ func (self *ResourceActionModel) FromAPI(
 	self.OrgId = types.StringValue(raw.OrgId)
 
 	self.RunnableItem = ResourceActionRunnableModel{}
-	diags := self.RunnableItem.FromAPI(ctx, raw.RunnableItem)
+	self.RunnableItem.FromAPI(raw.RunnableItem)
 
+	diags := diag.Diagnostics{}
 	var someDiags diag.Diagnostics
 
 	self.Criteria, someDiags = JSONNormalizedFromAny(self.String(), raw.Criteria)
@@ -133,8 +134,7 @@ func (self ResourceActionModel) ToAPI(
 ) (ResourceActionAPIModel, diag.Diagnostics) {
 
 	formDefinitionRaw, diags := CustomFormAPIModelFromObject(ctx, self.FormDefinition)
-	runnableItemRaw, someDiags := self.RunnableItem.ToAPI(ctx)
-	diags.Append(someDiags...)
+	runnableItemRaw := self.RunnableItem.ToAPI()
 
 	// Defining name is mandatory when passing other form attributes such as styles...
 	// Otherwise we trigger an Hibernate exception on Aria. Fortunately We known that

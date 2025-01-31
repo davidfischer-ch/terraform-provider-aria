@@ -37,7 +37,7 @@ func (self *OrchestratorConfigurationValueModel) FromAPI(
 		self.Boolean = types.ObjectNull(boolVal.AttributeTypes())
 	} else {
 		var someDiags diag.Diagnostics
-		diags := boolVal.FromAPI(ctx, *raw.Boolean)
+		boolVal.FromAPI(*raw.Boolean)
 		self.Boolean, someDiags = types.ObjectValueFrom(ctx, boolVal.AttributeTypes(), boolVal)
 		diags.Append(someDiags...)
 	}
@@ -48,7 +48,7 @@ func (self *OrchestratorConfigurationValueModel) FromAPI(
 		self.String = types.ObjectNull(stringVal.AttributeTypes())
 	} else {
 		var someDiags diag.Diagnostics
-		diags := stringVal.FromAPI(ctx, *raw.String)
+		stringVal.FromAPI(*raw.String)
 		self.String, someDiags = types.ObjectValueFrom(ctx, stringVal.AttributeTypes(), stringVal)
 		diags.Append(someDiags...)
 	}
@@ -68,9 +68,8 @@ func (self OrchestratorConfigurationValueModel) ToAPI(
 	} else {
 		var boolVal OrchestratorConfigurationBooleanModel
 		diags.Append(self.Boolean.As(ctx, &boolVal, basetypes.ObjectAsOptions{})...)
-		booleanRaw, someDiags := boolVal.ToAPI(ctx)
-		raw.Boolean = &booleanRaw
-		diags.Append(someDiags...)
+		boolRaw := boolVal.ToAPI()
+		raw.Boolean = &boolRaw
 	}
 
 	if self.String.IsNull() || self.String.IsUnknown() {
@@ -78,9 +77,8 @@ func (self OrchestratorConfigurationValueModel) ToAPI(
 	} else {
 		var stringVal OrchestratorConfigurationStringModel
 		diags.Append(self.String.As(ctx, &stringVal, basetypes.ObjectAsOptions{})...)
-		stringRaw, someDiags := stringVal.ToAPI(ctx)
+		stringRaw := stringVal.ToAPI()
 		raw.String = &stringRaw
-		diags.Append(someDiags...)
 	}
 
 	return raw, diags

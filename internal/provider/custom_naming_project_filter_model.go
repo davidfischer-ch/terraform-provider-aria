@@ -4,10 +4,8 @@
 package provider
 
 import (
-	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -39,22 +37,16 @@ func (self CustomNamingProjectFilterModel) String() string {
 		self.ProjectName.ValueString())
 }
 
-func (self *CustomNamingProjectFilterModel) FromAPI(
-	ctx context.Context,
-	raw CustomNamingProjectFilterAPIModel,
-) diag.Diagnostics {
+func (self *CustomNamingProjectFilterModel) FromAPI(raw CustomNamingProjectFilterAPIModel) {
 	self.Id = types.StringValue(raw.Id)
 	self.Active = types.BoolValue(raw.Active)
 	self.OrgDefault = types.BoolValue(raw.OrgDefault)
 	self.OrgId = types.StringValue(raw.OrgId)
 	self.ProjectId = types.StringValue(raw.ProjectId)
 	self.ProjectName = types.StringValue(raw.ProjectName)
-	return diag.Diagnostics{}
 }
 
-func (self CustomNamingProjectFilterModel) ToAPI(
-	ctx context.Context,
-) (CustomNamingProjectFilterAPIModel, diag.Diagnostics) {
+func (self CustomNamingProjectFilterModel) ToAPI() CustomNamingProjectFilterAPIModel {
 	return CustomNamingProjectFilterAPIModel{
 		Id:          self.Id.ValueString(),
 		Active:      self.Active.ValueBool(),
@@ -62,5 +54,5 @@ func (self CustomNamingProjectFilterModel) ToAPI(
 		OrgId:       self.OrgId.ValueString(),
 		ProjectId:   self.ProjectId.ValueString(),
 		ProjectName: self.ProjectName.ValueString(),
-	}, diag.Diagnostics{}
+	}
 }

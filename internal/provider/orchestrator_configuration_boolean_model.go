@@ -4,10 +4,7 @@
 package provider
 
 import (
-	"context"
-
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -22,19 +19,15 @@ type OrchestratorConfigurationBooleanAPIModel struct {
 }
 
 func (self *OrchestratorConfigurationBooleanModel) FromAPI(
-	ctx context.Context,
 	raw OrchestratorConfigurationBooleanAPIModel,
-) diag.Diagnostics {
+) {
 	self.Value = types.BoolValue(raw.Value)
-	return diag.Diagnostics{}
 }
 
-func (self OrchestratorConfigurationBooleanModel) ToAPI(
-	ctx context.Context,
-) (OrchestratorConfigurationBooleanAPIModel, diag.Diagnostics) {
+func (self OrchestratorConfigurationBooleanModel) ToAPI() OrchestratorConfigurationBooleanAPIModel {
 	return OrchestratorConfigurationBooleanAPIModel{
 		Value: self.Value.ValueBool(),
-	}, diag.Diagnostics{}
+	}
 }
 
 // Utils -------------------------------------------------------------------------------------------

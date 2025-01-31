@@ -6,59 +6,50 @@ package provider
 import (
 	"strings"
 
-	dataschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 )
 
-func IconSchema() schema.Schema {
+func TagSchema() schema.Schema {
 	return schema.Schema{
-		MarkdownDescription: "Icon resource",
+		MarkdownDescription: "Tag resource",
 		Attributes: map[string]schema.Attribute{
-			"id": ComputedIdentifierSchema("Identifier (Aria seem to compute it from content)"),
-			"path": schema.StringAttribute{
-				MarkdownDescription: "Path" + IMMUTABLE,
+			"id": ComputedIdentifierSchema(""),
+			"key": schema.StringAttribute{
+				MarkdownDescription: "Key" + IMMUTABLE,
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
-			"hash": schema.StringAttribute{
-				MarkdownDescription: "Content SHA-256" + IMMUTABLE,
-				Optional:            true,
+			"value": schema.StringAttribute{
+				MarkdownDescription: "Value" + IMMUTABLE,
 				Computed:            true,
+				Optional:            true,
+				Default:             stringdefault.StaticString(""),
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
+			"force_delete": schema.BoolAttribute{
+				MarkdownDescription: "Force destroying the tag (bypass references check).",
+				Computed:            true,
+				Optional:            true,
+				Default:             booldefault.StaticBool(false),
+			},
 			"keep_on_destroy": schema.BoolAttribute{
 				MarkdownDescription: strings.Join([]string{
-					"Keep the icon on destroy?",
-					"This can help preventing issues if sharing the same icon " +
-						"for multiple catalog items.",
+					"Keep the tag on destroy?",
+					"This can help preventing issues if this tag " +
+						"should never be destroyed for good reasons.",
 					"Default value is false.",
 				}, "\n"),
 				Optional: true,
 				Computed: true,
 				Default:  booldefault.StaticBool(false),
-			},
-		},
-	}
-}
-
-func IconDataSourceSchema() dataschema.Schema {
-	return dataschema.Schema{
-		MarkdownDescription: "Icon data source",
-		Attributes: map[string]dataschema.Attribute{
-			"id": dataschema.StringAttribute{
-				MarkdownDescription: "Icon identifier",
-				Required:            true,
-			},
-			"content": dataschema.StringAttribute{
-				MarkdownDescription: "Icon content",
-				Computed:            true,
 			},
 		},
 	}

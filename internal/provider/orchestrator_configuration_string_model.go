@@ -4,10 +4,7 @@
 package provider
 
 import (
-	"context"
-
 	"github.com/hashicorp/terraform-plugin-framework/attr"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -22,19 +19,15 @@ type OrchestratorConfigurationStringAPIModel struct {
 }
 
 func (self *OrchestratorConfigurationStringModel) FromAPI(
-	ctx context.Context,
 	raw OrchestratorConfigurationStringAPIModel,
-) diag.Diagnostics {
+) {
 	self.Value = types.StringValue(raw.Value)
-	return diag.Diagnostics{}
 }
 
-func (self OrchestratorConfigurationStringModel) ToAPI(
-	ctx context.Context,
-) (OrchestratorConfigurationStringAPIModel, diag.Diagnostics) {
+func (self OrchestratorConfigurationStringModel) ToAPI() OrchestratorConfigurationStringAPIModel {
 	return OrchestratorConfigurationStringAPIModel{
 		Value: self.Value.ValueString(),
-	}, diag.Diagnostics{}
+	}
 }
 
 // Utils -------------------------------------------------------------------------------------------

@@ -4,10 +4,8 @@
 package provider
 
 import (
-	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -39,12 +37,7 @@ func (self *ResourceActionRunnableModel) String() string {
 		self.ProjectId.ValueString())
 }
 
-func (self *ResourceActionRunnableModel) FromAPI(
-	ctx context.Context,
-	raw ResourceActionRunnableAPIModel,
-) diag.Diagnostics {
-
-	diags := diag.Diagnostics{}
+func (self *ResourceActionRunnableModel) FromAPI(raw ResourceActionRunnableAPIModel) {
 
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
@@ -54,38 +47,28 @@ func (self *ResourceActionRunnableModel) FromAPI(
 	self.InputParameters = []ParameterModel{}
 	for _, parameterItem := range raw.InputParameters {
 		parameter := ParameterModel{}
-		diags.Append(parameter.FromAPI(ctx, parameterItem)...)
+		parameter.FromAPI(parameterItem)
 		self.InputParameters = append(self.InputParameters, parameter)
 	}
 
 	self.OutputParameters = []ParameterModel{}
 	for _, parameterItem := range raw.OutputParameters {
 		parameter := ParameterModel{}
-		diags.Append(parameter.FromAPI(ctx, parameterItem)...)
+		parameter.FromAPI(parameterItem)
 		self.OutputParameters = append(self.OutputParameters, parameter)
 	}
-
-	return diags
 }
 
-func (self ResourceActionRunnableModel) ToAPI(
-	ctx context.Context,
-) (ResourceActionRunnableAPIModel, diag.Diagnostics) {
-
-	diags := diag.Diagnostics{}
+func (self ResourceActionRunnableModel) ToAPI() ResourceActionRunnableAPIModel {
 
 	inputParametersRaw := []ParameterAPIModel{}
 	for _, parameter := range self.InputParameters {
-		parameterRaw, parameterDiags := parameter.ToAPI(ctx)
-		inputParametersRaw = append(inputParametersRaw, parameterRaw)
-		diags.Append(parameterDiags...)
+		inputParametersRaw = append(inputParametersRaw, parameter.ToAPI())
 	}
 
 	outputParametersRaw := []ParameterAPIModel{}
 	for _, parameter := range self.InputParameters {
-		parameterRaw, parameterDiags := parameter.ToAPI(ctx)
-		outputParametersRaw = append(outputParametersRaw, parameterRaw)
-		diags.Append(parameterDiags...)
+		outputParametersRaw = append(outputParametersRaw, parameter.ToAPI())
 	}
 
 	return ResourceActionRunnableAPIModel{
@@ -95,5 +78,5 @@ func (self ResourceActionRunnableModel) ToAPI(
 		ProjectId:        self.ProjectId.ValueString(),
 		InputParameters:  inputParametersRaw,
 		OutputParameters: outputParametersRaw,
-	}, diag.Diagnostics{}
+	}
 }

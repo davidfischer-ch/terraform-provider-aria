@@ -79,11 +79,10 @@ func (self *ProjectModel) FromAPI(
 	self.SharedResources = types.BoolValue(raw.SharedResources)
 	self.OrgId = types.StringValue(raw.OrgId)
 
-	diags := self.Constraints.FromAPI(ctx, raw.Constraints)
+	self.Constraints.FromAPI(raw.Constraints)
 
-	properties, propertiesDiags := types.MapValueFrom(ctx, types.StringType, raw.Properties)
-	self.Properties = properties
-	diags.Append(propertiesDiags...)
+	var diags diag.Diagnostics
+	self.Properties, diags = types.MapValueFrom(ctx, types.StringType, raw.Properties)
 
 	return diags
 }
@@ -92,10 +91,9 @@ func (self ProjectModel) ToAPI(
 	ctx context.Context,
 ) (ProjectAPIModel, diag.Diagnostics) {
 
-	constraintsRaw, diags := self.Constraints.ToAPI(ctx)
-
+	constraintsRaw := self.Constraints.ToAPI()
 	propertiesRaw := make(map[string]string, len(self.Properties.Elements()))
-	diags.Append(self.Properties.ElementsAs(ctx, &propertiesRaw, false)...)
+	diags := self.Properties.ElementsAs(ctx, &propertiesRaw, false)
 
 	return ProjectAPIModel{
 		Id:               self.Id.ValueString(),

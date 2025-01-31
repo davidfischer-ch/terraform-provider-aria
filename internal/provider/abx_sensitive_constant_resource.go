@@ -75,7 +75,7 @@ func (self *ABXSensitiveConstantResource) Create(
 	}
 
 	// Save sensitive constant into Terraform state
-	resp.Diagnostics.Append(constant.FromAPI(ctx, constantRaw)...)
+	constant.FromAPI(constantRaw)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", constant.String()))
 }
@@ -102,7 +102,7 @@ func (self *ABXSensitiveConstantResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated secret into Terraform state
-		resp.Diagnostics.Append(constant.FromAPI(ctx, constantRaw)...)
+		constant.FromAPI(constantRaw)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
 	}
 }
@@ -135,7 +135,7 @@ func (self *ABXSensitiveConstantResource) Update(
 	}
 
 	// Save sensitive constant into Terraform state
-	resp.Diagnostics.Append(constant.FromAPI(ctx, constantRaw)...)
+	constant.FromAPI(constantRaw)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", constant.String()))
 }

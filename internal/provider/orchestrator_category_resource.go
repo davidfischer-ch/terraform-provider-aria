@@ -61,12 +61,7 @@ func (self *OrchestratorCategoryResource) Create(
 		return
 	}
 
-	categoryRaw, diags := category.ToAPI(ctx)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
+	categoryRaw := category.ToAPI()
 	response, err := self.client.Client.R().
 		// TODO SetQueryParam("apiVersion", ORCHESTRATOR_API_VERSION).
 		SetBody(categoryRaw).
@@ -81,7 +76,7 @@ func (self *OrchestratorCategoryResource) Create(
 	}
 
 	// Save category into Terraform state
-	resp.Diagnostics.Append(category.FromAPI(ctx, categoryRaw)...)
+	category.FromAPI(categoryRaw)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &category)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", category.String()))
 }
@@ -108,7 +103,7 @@ func (self *OrchestratorCategoryResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated category into Terraform state
-		resp.Diagnostics.Append(category.FromAPI(ctx, categoryRaw)...)
+		category.FromAPI(categoryRaw)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &category)...)
 	}
 }
@@ -125,12 +120,7 @@ func (self *OrchestratorCategoryResource) Update(
 		return
 	}
 
-	categoryRaw, diags := category.ToAPI(ctx)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
+	categoryRaw := category.ToAPI()
 	response, err := self.client.Client.R().
 		// TODO SetQueryParam("apiVersion", ORCHESTRATOR_API_VERSION).
 		SetBody(categoryRaw).
@@ -159,7 +149,7 @@ func (self *OrchestratorCategoryResource) Update(
 	}
 
 	// Save updated category into Terraform state
-	resp.Diagnostics.Append(category.FromAPI(ctx, categoryRaw)...)
+	category.FromAPI(categoryRaw)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &category)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", category.String()))
 }

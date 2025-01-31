@@ -31,23 +31,19 @@ func (self CloudTemplateV1ValidationMessageModel) String() string {
 }
 
 func (self *CloudTemplateV1ValidationMessageModel) FromAPI(
-	ctx context.Context,
 	raw CloudTemplateV1ValidationMessageAPIModel,
-) diag.Diagnostics {
+) {
 	self.ResourceName = types.StringValue(raw.ResourceName)
 	self.Path = types.StringValue(raw.Path)
 	self.Message = types.StringValue(raw.Message)
-	return diag.Diagnostics{}
 }
 
-func (self CloudTemplateV1ValidationMessageModel) ToAPI(
-	ctx context.Context,
-) (CloudTemplateV1ValidationMessageAPIModel, diag.Diagnostics) {
+func (self CloudTemplateV1ValidationMessageModel) ToAPI() CloudTemplateV1ValidationMessageAPIModel {
 	return CloudTemplateV1ValidationMessageAPIModel{
 		ResourceName: self.ResourceName.ValueString(),
 		Path:         self.Path.ValueString(),
 		Message:      self.Message.ValueString(),
-	}, diag.Diagnostics{}
+	}
 }
 
 // Convert an object to a CloudTemplateV1ValidationMessageAPIModel.
@@ -62,8 +58,7 @@ func CloudTemplateV1ValidationMessageAPIModelFromObject(
 
 	var message CloudTemplateV1ValidationMessageModel
 	diags := object.As(ctx, &message, basetypes.ObjectAsOptions{})
-	raw, messageDiags := message.ToAPI(ctx)
-	diags.Append(messageDiags...)
+	raw := message.ToAPI()
 	return &raw, diags
 }
 
@@ -75,10 +70,8 @@ func (self *CloudTemplateV1ValidationMessageAPIModel) ToObject(
 	if self == nil {
 		return types.ObjectNull(message.AttributeTypes()), diag.Diagnostics{}
 	}
-	diags := message.FromAPI(ctx, *self)
-	object, objectDiags := types.ObjectValueFrom(ctx, message.AttributeTypes(), message)
-	diags.Append(objectDiags...)
-	return object, diags
+	message.FromAPI(*self)
+	return types.ObjectValueFrom(ctx, message.AttributeTypes(), message)
 }
 
 // Used to convert structure to a types.Object.

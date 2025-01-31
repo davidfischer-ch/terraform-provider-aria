@@ -42,24 +42,18 @@ func (self ParameterModel) String() string {
 		self.Type.ValueString())
 }
 
-func (self *ParameterModel) FromAPI(
-	ctx context.Context,
-	raw ParameterAPIModel,
-) diag.Diagnostics {
+func (self *ParameterModel) FromAPI(raw ParameterAPIModel) {
 	self.Name = types.StringValue(raw.Name)
 	self.Description = types.StringValue(raw.Description)
 	self.Type = types.StringValue(raw.Type)
-	return diag.Diagnostics{}
 }
 
-func (self ParameterModel) ToAPI(
-	ctx context.Context,
-) (ParameterAPIModel, diag.Diagnostics) {
+func (self ParameterModel) ToAPI() ParameterAPIModel {
 	return ParameterAPIModel{
 		Name:        self.Name.ValueString(),
 		Description: CleanString(self.Description.ValueString()),
 		Type:        self.Type.ValueString(),
-	}, diag.Diagnostics{}
+	}
 }
 
 // Utils -------------------------------------------------------------------------------------------
@@ -69,20 +63,16 @@ func ParameterModelListFromAPI(
 	parametersRaw []ParameterAPIModel,
 ) (types.List, diag.Diagnostics) {
 	// Convert input parameters from raw
-	diags := diag.Diagnostics{}
 	parameters := []ParameterModel{}
 	for _, parameterRaw := range parametersRaw {
 		parameter := ParameterModel{}
-		diags.Append(parameter.FromAPI(ctx, parameterRaw)...)
+		parameter.FromAPI(parameterRaw)
 		parameters = append(parameters, parameter)
 	}
 
 	// Store inputs parameters to list value
 	parameterAttrs := types.ObjectType{AttrTypes: ParameterModel{}.AttributeTypes()}
-	parametersList, parametersDiags := types.ListValueFrom(ctx, parameterAttrs, parameters)
-	diags.Append(parametersDiags...)
-
-	return parametersList, diags
+	return types.ListValueFrom(ctx, parameterAttrs, parameters)
 }
 
 func ParameterModelListToAPI(
@@ -106,9 +96,7 @@ func ParameterModelListToAPI(
 	diags.Append(parametersList.ElementsAs(ctx, &parameters, false)...)
 	if !diags.HasError() {
 		for _, parameter := range parameters {
-			parameterRaw, parameterDiags := parameter.ToAPI(ctx)
-			parametersRaw = append(parametersRaw, parameterRaw)
-			diags.Append(parameterDiags...)
+			parametersRaw = append(parametersRaw, parameter.ToAPI())
 		}
 	}
 

@@ -134,14 +134,10 @@ func (self OrchestratorWorkflowModel) DeletePath() string {
 }
 
 // Save response from create API endpoint.
-func (self *OrchestratorWorkflowModel) FromCreateAPI(
-	ctx context.Context,
-	raw OrchestratorWorkflowCreateAPIModel,
-) diag.Diagnostics {
+func (self *OrchestratorWorkflowModel) FromCreateAPI(raw OrchestratorWorkflowCreateAPIModel) {
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
 	self.CategoryId = types.StringValue(raw.CategoryId)
-	return diag.Diagnostics{}
 }
 
 // Save response from content API endpoint.
@@ -164,8 +160,10 @@ func (self *OrchestratorWorkflowModel) FromContentAPI(
 	self.ApiVersion = types.StringValue(raw.ApiVersion)
 	self.EditorVersion = types.StringValue(raw.EditorVersion)
 
+	self.Position.FromAPI(raw.Position)
+
+	diags := diag.Diagnostics{}
 	var attributeDiags diag.Diagnostics
-	diags := self.Position.FromAPI(ctx, raw.Position)
 
 	self.Attrib, attributeDiags = JSONNormalizedFromAny(self.String(), raw.Attrib)
 	diags.Append(attributeDiags...)
@@ -196,33 +194,29 @@ func (self *OrchestratorWorkflowModel) FromFormAPI(ctx context.Context, raw any)
 
 // Save response from version API endpoint.
 func (self *OrchestratorWorkflowModel) FromVersionAPI(
-	ctx context.Context,
 	raw OrchestratorWorkflowVersionResponseAPIModel,
-) diag.Diagnostics {
+) {
 	self.VersionId = types.StringValue(raw.ObjectId)
-	return diag.Diagnostics{}
 }
 
 // Prepare data for calling the create API endpoint.
-func (self OrchestratorWorkflowModel) ToCreateAPI(
-	ctx context.Context,
-) (OrchestratorWorkflowCreateAPIModel, diag.Diagnostics) {
+func (self OrchestratorWorkflowModel) ToCreateAPI() OrchestratorWorkflowCreateAPIModel {
 	return OrchestratorWorkflowCreateAPIModel{
 		Id:         self.Id.ValueString(),
 		Name:       self.Name.ValueString(),
 		CategoryId: self.CategoryId.ValueString(),
-	}, diag.Diagnostics{}
+	}
 }
 
 // Prepare data for calling the content API endpoint.
 func (self OrchestratorWorkflowModel) ToContentAPI(
 	ctx context.Context,
 ) (OrchestratorWorkflowContentAPIModel, diag.Diagnostics) {
-	var attributeDiags diag.Diagnostics
-	positionRaw, diags := self.Position.ToAPI(ctx)
 
-	attribRaw, attributeDiags := JSONNormalizedToAny(self.Attrib)
-	diags.Append(attributeDiags...)
+	positionRaw := self.Position.ToAPI()
+
+	var attributeDiags diag.Diagnostics
+	attribRaw, diags := JSONNormalizedToAny(self.Attrib)
 
 	presentationRaw, attributeDiags := JSONNormalizedToAny(self.Presentation)
 	diags.Append(attributeDiags...)

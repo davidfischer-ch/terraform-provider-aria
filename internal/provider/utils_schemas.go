@@ -77,10 +77,12 @@ func ComputedOrganizationIdSchema() schema.StringAttribute {
 
 func OptionalImmutableProjectIdSchema() schema.StringAttribute {
 	return schema.StringAttribute{
-		MarkdownDescription: "Project identifier. Empty or unset means available for all projects.",
-		Computed:            true,
-		Optional:            true,
-		Default:             stringdefault.StaticString(""),
+		MarkdownDescription: "Project identifier. " +
+			"Empty or unset means available for all projects." +
+			IMMUTABLE,
+		Computed: true,
+		Optional: true,
+		Default:  stringdefault.StaticString(""),
 		PlanModifiers: []planmodifier.String{
 			stringplanmodifier.RequiresReplace(),
 			stringplanmodifier.UseStateForUnknown(),
@@ -90,7 +92,7 @@ func OptionalImmutableProjectIdSchema() schema.StringAttribute {
 
 func RequiredImmutableProjectIdSchema() schema.StringAttribute {
 	return schema.StringAttribute{
-		MarkdownDescription: "Project identifier",
+		MarkdownDescription: "Project identifier" + IMMUTABLE,
 		Required:            true,
 		PlanModifiers: []planmodifier.String{
 			stringplanmodifier.RequiresReplace(),

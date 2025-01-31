@@ -123,10 +123,10 @@ Inspired by https://discuss.hashicorp.com/t/terraform-framework-optional-inside-
 Required:
 
 - `active` (Boolean) TODO
-- `org_default` (Boolean) Default for the organization?
-- `org_id` (String) Organization identifier
-- `project_id` (String) Projects identifier pattern (e.g. *).
-- `project_name` (String) Projects name pattern (e.g. *).
+- `org_default` (Boolean) Default for the organization? (force recreation on change)
+- `org_id` (String) Organization identifier (force recreation on change)
+- `project_id` (String) Projects identifier pattern (e.g. *) (force recreation on change)
+- `project_name` (String) Projects name pattern (e.g. *) (force recreation on change)
 
 Read-Only:
 

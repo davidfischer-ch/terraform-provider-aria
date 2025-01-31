@@ -62,12 +62,7 @@ func (self *CustomFormResource) Create(
 	}
 
 	form.GenerateId()
-	formRaw, diags := form.ToAPI(ctx)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
+	formRaw := form.ToAPI()
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", FORM_API_VERSION).
 		SetBody(formRaw).
@@ -82,7 +77,7 @@ func (self *CustomFormResource) Create(
 	}
 
 	// Save custom form into Terraform state
-	resp.Diagnostics.Append(form.FromAPI(ctx, formRaw)...)
+	form.FromAPI(formRaw)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &form)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", form.String()))
 }
@@ -109,7 +104,7 @@ func (self *CustomFormResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated custom form into Terraform state
-		resp.Diagnostics.Append(form.FromAPI(ctx, formRaw)...)
+		form.FromAPI(formRaw)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &form)...)
 	}
 }
@@ -126,12 +121,7 @@ func (self *CustomFormResource) Update(
 		return
 	}
 
-	formRaw, diags := form.ToAPI(ctx)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
+	formRaw := form.ToAPI()
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", FORM_API_VERSION).
 		SetBody(formRaw).
@@ -146,7 +136,7 @@ func (self *CustomFormResource) Update(
 	}
 
 	// Save custom form into Terraform state
-	resp.Diagnostics.Append(form.FromAPI(ctx, formRaw)...)
+	form.FromAPI(formRaw)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &form)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", form.String()))
 }

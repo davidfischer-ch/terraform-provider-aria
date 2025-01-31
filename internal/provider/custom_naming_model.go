@@ -4,10 +4,8 @@
 package provider
 
 import (
-	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -61,12 +59,7 @@ func (self CustomNamingModel) DeletePath() string {
 	return self.ReadPath()
 }
 
-func (self *CustomNamingModel) FromAPI(
-	ctx context.Context,
-	raw CustomNamingAPIModel,
-) diag.Diagnostics {
-
-	diags := diag.Diagnostics{}
+func (self *CustomNamingModel) FromAPI(raw CustomNamingAPIModel) {
 
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
@@ -75,7 +68,7 @@ func (self *CustomNamingModel) FromAPI(
 	self.Projects = []CustomNamingProjectFilterModel{}
 	for _, projectRaw := range raw.Projects {
 		project := CustomNamingProjectFilterModel{}
-		diags.Append(project.FromAPI(ctx, projectRaw)...)
+		project.FromAPI(projectRaw)
 		self.Projects = append(self.Projects, project)
 	}
 
@@ -83,42 +76,29 @@ func (self *CustomNamingModel) FromAPI(
 	self.Templates = map[string]CustomNamingTemplateModel{}
 	for _, templateRaw := range raw.Templates {
 		template := CustomNamingTemplateModel{}
-		diags.Append(template.FromAPI(ctx, templateRaw)...)
+		template.FromAPI(templateRaw)
 		self.Templates[template.Key()] = template
 	}
-
-	return diags
 }
 
-func (self *CustomNamingModel) ToAPI(
-	ctx context.Context,
-	state CustomNamingModel,
-) (CustomNamingAPIModel, diag.Diagnostics) {
-
-	diags := diag.Diagnostics{}
+func (self *CustomNamingModel) ToAPI(state CustomNamingModel) CustomNamingAPIModel {
 
 	projectsRaw := []CustomNamingProjectFilterAPIModel{}
 	for _, project := range self.Projects {
-		projectRaw, projectDiags := project.ToAPI(ctx)
-		projectsRaw = append(projectsRaw, projectRaw)
-		diags.Append(projectDiags...)
+		projectsRaw = append(projectsRaw, project.ToAPI())
 	}
 
 	templatesRaw := []CustomNamingTemplateAPIModel{}
 	for key, template := range self.Templates {
 		templateState := state.Templates[key]
-		templateRaw, templateDiags := template.ToAPI(ctx, templateState)
-		templatesRaw = append(templatesRaw, templateRaw)
-		diags.Append(templateDiags...)
+		templatesRaw = append(templatesRaw, template.ToAPI(templateState))
 	}
 
-	raw := CustomNamingAPIModel{
+	return CustomNamingAPIModel{
 		Id:          self.Id.ValueString(),
 		Name:        self.Name.ValueString(),
 		Description: CleanString(self.Description.ValueString()),
 		Projects:    projectsRaw,
 		Templates:   templatesRaw,
 	}
-
-	return raw, diags
 }

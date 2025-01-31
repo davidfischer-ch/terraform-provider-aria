@@ -27,7 +27,7 @@ func ProjectMembershipSchema() schema.NestedAttributeObject {
 					"* name (and group has domain) - email should be written as name@domain",
 					"* name (and group doesn't have domain) - email should be written as name@",
 					"",
-					"to ensure proper functioning.",
+					"to ensure proper functioning." + IMMUTABLE,
 				}),
 				Required:            true,
 				PlanModifiers: []planmodifier.String{

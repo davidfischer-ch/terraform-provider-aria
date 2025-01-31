@@ -137,5 +137,5 @@ func (self OrchestratorConfigurationModel) ToAPI(
 		Description: self.Description.ValueString(),
 		Version:     self.Version.ValueString(),
 		Attributes:  attributesRaw,
-	}, diag.Diagnostics{}
+	}, diags
 }

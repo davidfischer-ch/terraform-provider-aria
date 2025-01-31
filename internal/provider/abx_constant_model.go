@@ -4,10 +4,8 @@
 package provider
 
 import (
-	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -60,16 +58,12 @@ func (self ABXConstantModel) DeletePath() string {
 	return self.ReadPath()
 }
 
-func (self *ABXConstantModel) FromAPI(
-	ctx context.Context,
-	raw ABXConstantAPIModel,
-) diag.Diagnostics {
+func (self *ABXConstantModel) FromAPI(raw ABXConstantAPIModel) {
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
 	self.Value = types.StringValue(raw.Value)
 	self.Encrypted = types.BoolValue(raw.Encrypted)
 	self.OrgId = types.StringValue(raw.OrgId)
-	return diag.Diagnostics{}
 }
 
 func (self ABXConstantModel) ToAPI() ABXConstantAPIModel {

@@ -4,10 +4,8 @@
 package provider
 
 import (
-	"context"
 	"fmt"
 
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -53,20 +51,14 @@ func (self CatalogItemIconModel) DeletePath() string {
 	return self.ReadPath() // Even if not possible ...
 }
 
-func (self *CatalogItemIconModel) FromAPI(
-	ctx context.Context,
-	raw CatalogItemIconAPIModel,
-) diag.Diagnostics {
+func (self *CatalogItemIconModel) FromAPI(raw CatalogItemIconAPIModel) {
 	self.Id = types.StringValue(raw.Id)
 	self.IconId = types.StringValue(raw.IconId)
-	return diag.Diagnostics{}
 }
 
-func (self CatalogItemIconModel) ToAPI(
-	ctx context.Context,
-) (CatalogItemIconAPIModel, diag.Diagnostics) {
+func (self CatalogItemIconModel) ToAPI() CatalogItemIconAPIModel {
 	return CatalogItemIconAPIModel{
 		Id:     self.Id.ValueString(),
 		IconId: self.IconId.ValueString(),
-	}, diag.Diagnostics{}
+	}
 }
