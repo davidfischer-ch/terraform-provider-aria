@@ -160,16 +160,16 @@ func (self *IconResource) Update(
 	req resource.UpdateRequest,
 	resp *resource.UpdateResponse,
 ) {
-	// Read Terraform prior state data into the model
+	// Read Terraform plan data into the model
 	var icon IconModel
-	resp.Diagnostics.Append(req.State.Get(ctx, &icon)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &icon)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	resp.Diagnostics.AddError(
-		"Client error",
-		fmt.Sprintf("Cannot update %s, this type of resource is immutable.", icon.String()))
+	// Save updated icon into Terraform state
+	resp.Diagnostics.Append(resp.State.Set(ctx, &icon)...)
+	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", icon.String()))
 }
 
 func (self *IconResource) Delete(
