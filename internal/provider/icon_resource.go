@@ -169,7 +169,7 @@ func (self *IconResource) Update(
 
 	resp.Diagnostics.AddError(
 		"Client error",
-		fmt.Sprintf("Unable to update %s, method is not implement.", icon.String()))
+		fmt.Sprintf("Cannot update %s, this type of resource is immutable.", icon.String()))
 }
 
 func (self *IconResource) Delete(

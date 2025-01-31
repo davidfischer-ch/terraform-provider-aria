@@ -43,7 +43,7 @@ func (self IconModel) ReadPath() string {
 }
 
 func (self IconModel) UpdatePath() string {
-	return self.ReadPath() // Even if not possible ...
+	panic(fmt.Sprintf("Cannot update %s, this type of resource is immutable.", self.String()))
 }
 
 func (self IconModel) DeletePath() string {
