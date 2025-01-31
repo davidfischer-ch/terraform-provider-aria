@@ -17,7 +17,7 @@ Project resource (WORK IN PROGRESS, DO NOT USE)
 
 ### Required
 
-- `name` (String) Project name
+- `name` (String) Project name (force recreation on change)
 - `operation_timeout` (Number) Timeout (in seconds) that should be used for Cloud Template operations and Provisioning tasks
 - `properties` (Map of String) Custom properties to attach to project's resources
 - `shared_resources` (Boolean) Specifies whetever the resources are shared between project's members or not

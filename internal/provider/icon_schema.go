@@ -19,14 +19,14 @@ func IconSchema() schema.Schema {
 		Attributes: map[string]schema.Attribute{
 			"id": ComputedIdentifierSchema("Identifier (Aria seem to compute it from content)"),
 			"path": schema.StringAttribute{
-				MarkdownDescription: "Path (force recreation on change)",
+				MarkdownDescription: "Path" + IMMUTABLE,
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"hash": schema.StringAttribute{
-				MarkdownDescription: "Content SHA-256 (force recreation on change)",
+				MarkdownDescription: "Content SHA-256" + IMMUTABLE,
 				Optional:            true,
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
@@ -36,7 +36,8 @@ func IconSchema() schema.Schema {
 			"keep_on_destroy": schema.BoolAttribute{
 				MarkdownDescription: strings.Join([]string{
 					"Keep the icon on destroy?",
-					"This can help preventing issues if sharing the same icon for multiple catalog items.",
+					"This can help preventing issues if sharing the same icon " +
+						"for multiple catalog items.",
 					"Default value is false.",
 				}, "\n"),
 				Optional: true,

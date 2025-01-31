@@ -86,7 +86,7 @@ EOT
 - `cpu_shares` (Number) Runtime CPU shares
 - `deployment_timeout_seconds` (Number) How long ??
 - `faas_provider` (String) FaaS provider used for code execution, one of auto (default), on-prem, aws and azure (automatically set by the platform if unset)
-- `project_id` (String) Project identifier. Empty or unset means available for all projects.
+- `project_id` (String) Project identifier. Empty or unset means available for all projects. (force recreation on change)
 - `runtime_version` (String) Runtime version (3.10, ...)
 - `shared` (Boolean) Flag indicating if the action can be shared across projects
 - `timeout_seconds` (Number) How long an action can run (default to 600)

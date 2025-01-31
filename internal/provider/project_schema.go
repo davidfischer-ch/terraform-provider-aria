@@ -18,7 +18,7 @@ func ProjectSchema() schema.Schema {
 		Attributes: map[string]schema.Attribute{
 			"id": ComputedIdentifierSchema(""),
 			"name": schema.StringAttribute{
-				MarkdownDescription: "Project name",
+				MarkdownDescription: "Project name" + IMMUTABLE,
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),

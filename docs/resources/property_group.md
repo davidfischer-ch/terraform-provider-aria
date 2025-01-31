@@ -103,13 +103,13 @@ resource "aria_property_group" "vm_common" {
 ### Required
 
 - `description` (String) Describe the resource in few sentences
-- `name` (String) Name
+- `name` (String) Name (force recreation on change)
 - `properties` (Attributes Map) Property Group's properties (see [below for nested schema](#nestedatt--properties))
-- `type` (String) Type, either INPUT or CONSTANT
+- `type` (String) Type, either INPUT or CONSTANT (force recreation on change)
 
 ### Optional
 
-- `project_id` (String) Project identifier. Empty or unset means available for all projects.
+- `project_id` (String) Project identifier. Empty or unset means available for all projects. (force recreation on change)
 
 ### Read-Only
 

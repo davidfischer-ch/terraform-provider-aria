@@ -20,7 +20,7 @@ func CustomNamingProjectFilterSchema() schema.NestedAttributeObject {
 				Required:            true,
 			},
 			"org_default": schema.BoolAttribute{
-				MarkdownDescription: "Default for the organization?",
+				MarkdownDescription: "Default for the organization?" + IMMUTABLE,
 				Required:            true,
 				PlanModifiers: []planmodifier.Bool{
 					boolplanmodifier.RequiresReplace(),
@@ -28,7 +28,7 @@ func CustomNamingProjectFilterSchema() schema.NestedAttributeObject {
 				},
 			},
 			"org_id": schema.StringAttribute{
-				MarkdownDescription: "Organization identifier",
+				MarkdownDescription: "Organization identifier" + IMMUTABLE,
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
@@ -36,7 +36,7 @@ func CustomNamingProjectFilterSchema() schema.NestedAttributeObject {
 				},
 			},
 			"project_id": schema.StringAttribute{
-				MarkdownDescription: "Projects identifier pattern (e.g. *).",
+				MarkdownDescription: "Projects identifier pattern (e.g. *)" + IMMUTABLE,
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
@@ -44,7 +44,7 @@ func CustomNamingProjectFilterSchema() schema.NestedAttributeObject {
 				},
 			},
 			"project_name": schema.StringAttribute{
-				MarkdownDescription: "Projects name pattern (e.g. *).",
+				MarkdownDescription: "Projects name pattern (e.g. *)" + IMMUTABLE,
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),

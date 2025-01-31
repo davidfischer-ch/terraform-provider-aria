@@ -138,8 +138,8 @@ EOT
 
 - `description` (String) Describe the resource in few sentences
 - `display_name` (String) Action display name
-- `name` (String) Action name
-- `resource_type` (String) Resource type
+- `name` (String) Action name (force recreation on change)
+- `resource_type` (String) Resource type (force recreation on change)
 - `runnable_item` (Attributes) Action's runnable (see [below for nested schema](#nestedatt--runnable_item))
 
 ### Optional
@@ -150,9 +150,9 @@ We should have implemented this attribute as a dynamic type (and not JSON).
 Unfortunately Terraform SDK returns this issue:
 Dynamic types inside of collections are not currently supported in terraform-plugin-framework.
 - `form_definition` (Attributes) Form definition (see [below for nested schema](#nestedatt--form_definition))
-- `project_id` (String) Project identifier. Empty or unset means available for all projects.
+- `project_id` (String) Project identifier. Empty or unset means available for all projects. (force recreation on change)
 - `provider_name` (String) Provider name, one of xaas (and that's all, maybe)
-- `resource_id` (String) Resource identifier (required if its a custom resource)
+- `resource_id` (String) Resource identifier (required if its a custom resource) (force recreation on change)
 - `status` (String) Action status, either DRAFT or RELEASED
 
 ### Read-Only

@@ -19,7 +19,7 @@ func ResourceActionSchema() schema.Schema {
 		Attributes: map[string]schema.Attribute{
 			"id": ComputedIdentifierSchema(""),
 			"name": schema.StringAttribute{
-				MarkdownDescription: "Action name",
+				MarkdownDescription: "Action name" + IMMUTABLE,
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
@@ -40,14 +40,16 @@ func ResourceActionSchema() schema.Schema {
 				},
 			},
 			"resource_id": schema.StringAttribute{
-				MarkdownDescription: "Resource identifier (required if its a custom resource)",
-				Optional:            true,
+				MarkdownDescription: "Resource identifier " +
+					"(required if its a custom resource)" +
+					IMMUTABLE,
+				Optional: true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"resource_type": schema.StringAttribute{
-				MarkdownDescription: "Resource type",
+				MarkdownDescription: "Resource type" + IMMUTABLE,
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),

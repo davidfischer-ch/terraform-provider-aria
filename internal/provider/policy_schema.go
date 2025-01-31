@@ -24,7 +24,7 @@ func PolicySchema() schema.Schema {
 			},
 			"description": RequiredDescriptionSchema(),
 			"enforcement_type": schema.StringAttribute{
-				MarkdownDescription: "Enforcement type, either SOFT or HARD",
+				MarkdownDescription: "Enforcement type, either SOFT or HARD" + IMMUTABLE,
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
@@ -34,7 +34,7 @@ func PolicySchema() schema.Schema {
 				},
 			},
 			"type_id": schema.StringAttribute{
-				MarkdownDescription: "Policy type, one of " +
+				MarkdownDescription: "Policy type" + IMMUTABLE + ", one of " +
 					"com.vmware.policy.approval, " +
 					"com.vmware.policy.catalog.entitlement, " +
 					"com.vmware.policy.deployment.action, " +
@@ -64,9 +64,14 @@ func PolicySchema() schema.Schema {
 			},
 			// Only when its com.vmware.policy.approval?
 			"scope_criteria": schema.StringAttribute{
-				MarkdownDescription: "Scoping criteria" + JSON_INSTEAD_OF_DYNAMIC_DISCLAIMER,
-				CustomType:          jsontypes.NormalizedType{},
-				Optional:            true,
+				MarkdownDescription: "Scoping criteria" +
+					IMMUTABLE +
+					JSON_INSTEAD_OF_DYNAMIC_DISCLAIMER,
+				CustomType: jsontypes.NormalizedType{},
+				Optional:   true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"definition": schema.StringAttribute{
 				MarkdownDescription: "Definition" + JSON_INSTEAD_OF_DYNAMIC_DISCLAIMER,

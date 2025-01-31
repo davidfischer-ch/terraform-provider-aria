@@ -276,12 +276,12 @@ resource "aria_resource_action" "redis_restore" {
 - `display_name` (String) A friendly name
 - `properties` (Attributes Map) Resource's properties (see [below for nested schema](#nestedatt--properties))
 - `read` (Attributes) Read action (see [below for nested schema](#nestedatt--read))
-- `resource_type` (String) Define the type (must be unique, e.g. Custom.DB.PostgreSQL)
+- `resource_type` (String) Define the type (must be unique, e.g. Custom.DB.PostgreSQL) (force recreation on change)
 - `update` (Attributes) Update action (see [below for nested schema](#nestedatt--update))
 
 ### Optional
 
-- `project_id` (String) Project identifier. Empty or unset means available for all projects.
+- `project_id` (String) Project identifier. Empty or unset means available for all projects. (force recreation on change)
 - `schema_type` (String) Type of resource, one of ABX_USER_DEFINED (and that's all, maybe)
 - `status` (String) Resource status, one of DRAFT, ON, or RELEASED
 

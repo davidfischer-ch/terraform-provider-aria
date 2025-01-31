@@ -17,7 +17,7 @@ func PropertyGroupSchema() schema.Schema {
 		Attributes: map[string]schema.Attribute{
 			"id": ComputedIdentifierSchema(""),
 			"name": schema.StringAttribute{
-				MarkdownDescription: "Name",
+				MarkdownDescription: "Name" + IMMUTABLE,
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
@@ -25,7 +25,7 @@ func PropertyGroupSchema() schema.Schema {
 			},
 			"description": RequiredDescriptionSchema(),
 			"type": schema.StringAttribute{
-				MarkdownDescription: "Type, either INPUT or CONSTANT",
+				MarkdownDescription: "Type, either INPUT or CONSTANT" + IMMUTABLE,
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
