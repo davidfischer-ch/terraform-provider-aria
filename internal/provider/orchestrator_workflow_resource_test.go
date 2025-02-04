@@ -55,6 +55,8 @@ resource "aria_orchestrator_workflow" "test" {
 
   input_forms = jsonencode(local.input_forms)
 
+  wait_on_catalog = false # Make tests faster
+
   lifecycle {
     postcondition {
       condition     = jsondecode(self.input_forms) == local.input_forms
@@ -81,6 +83,7 @@ resource "aria_orchestrator_workflow" "test" {
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "api_version", "6.0.0"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "editor_version", "2.0"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "force_delete", "false"),
+					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "wait_on_catalog", "false"),
 					resource.TestCheckResourceAttrPair(
 						"aria_orchestrator_workflow.test", "category_id",
 						"aria_orchestrator_category.root", "id",
@@ -128,7 +131,8 @@ resource "aria_orchestrator_workflow" "test" {
   input_parameters  = []
   output_parameters = []
 
-  force_delete = true
+  force_delete    = true
+  wait_on_catalog = false # Make tests faster
 
   input_forms = jsonencode(local.input_forms)
 
@@ -158,6 +162,7 @@ resource "aria_orchestrator_workflow" "test" {
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "api_version", "6.0.0"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "editor_version", "2.0"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "force_delete", "true"),
+					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "wait_on_catalog", "false"),
 					resource.TestCheckResourceAttrPair(
 						"aria_orchestrator_workflow.test", "category_id",
 						"aria_orchestrator_category.root", "id",
@@ -213,7 +218,8 @@ resource "aria_orchestrator_workflow" "test" {
 
   input_forms = jsonencode(local.input_forms)
 
-  force_delete = true
+  force_delete    = true
+  wait_on_catalog = false # Make tests faster
 
   lifecycle {
     postcondition {
@@ -241,6 +247,7 @@ resource "aria_orchestrator_workflow" "test" {
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "api_version", "6.0.0"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "editor_version", "2.0"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "force_delete", "true"),
+					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "wait_on_catalog", "false"),
 					resource.TestCheckResourceAttrPair(
 						"aria_orchestrator_workflow.test", "category_id",
 						"aria_orchestrator_category.test", "id",
@@ -324,7 +331,8 @@ resource "aria_orchestrator_workflow" "test" {
 
   input_forms = jsonencode(local.input_forms)
 
-  force_delete = true
+  force_delete    = true
+  wait_on_catalog = false # Make tests faster
 
   lifecycle {
     postcondition {
@@ -387,6 +395,7 @@ resource "aria_orchestrator_workflow" "test" {
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "api_version", "6.0.0"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "editor_version", "2.0"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "force_delete", "true"),
+					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "wait_on_catalog", "false"),
 					resource.TestCheckResourceAttrPair(
 						"aria_orchestrator_workflow.test", "category_id",
 						"aria_orchestrator_category.test", "id",
@@ -879,7 +888,8 @@ resource "aria_orchestrator_workflow" "test" {
   api_version             = local.workflow_data["workflowSchema"]["api-version"]
   editor_version          = local.workflow_data["workflowSchema"]["editor-version"]
 
-  force_delete = true
+  force_delete    = true
+  wait_on_catalog = false # Make tests faster
 
   lifecycle {
     postcondition {
@@ -913,6 +923,7 @@ resource "aria_orchestrator_workflow" "test" {
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "api_version", "6.0.0"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "editor_version", "2.0"),
 					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "force_delete", "true"),
+					resource.TestCheckResourceAttr("aria_orchestrator_workflow.test", "wait_on_catalog", "false"),
 					resource.TestCheckResourceAttrPair(
 						"aria_orchestrator_workflow.test", "category_id",
 						"aria_orchestrator_category.root", "id",

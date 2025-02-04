@@ -42,6 +42,8 @@ type OrchestratorWorkflowModel struct {
 	EditorVersion types.String `tfsdk:"editor_version"`
 
 	ForceDelete types.Bool `tfsdk:"force_delete"`
+
+	WaitOnCatalog types.Bool `tfsdk:"wait_on_catalog"`
 }
 
 // OrchestratorWorkflowCreateAPIModel describes the resource create API model.
@@ -110,6 +112,10 @@ func (self OrchestratorWorkflowModel) CreatePath() string {
 
 func (self OrchestratorWorkflowModel) ReadPath() string {
 	return self.ReadContentPath()
+}
+
+func (self OrchestratorWorkflowModel) ReadCatalogPath() string {
+	return "catalog/api/typescom.vmw.vro.workflow/data/workflows/" + self.Id.ValueString()
 }
 
 func (self OrchestratorWorkflowModel) ReadContentPath() string {

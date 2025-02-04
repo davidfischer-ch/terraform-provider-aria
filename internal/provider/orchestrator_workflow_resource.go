@@ -6,7 +6,9 @@ package provider
 import (
 	"context"
 	"fmt"
+	"time"
 
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -130,6 +132,9 @@ func (self *OrchestratorWorkflowResource) Create(
 		resp.Diagnostics.Append(workflow.FromFormAPI(ctx, formsRaw)...)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &workflow)...)
 	}
+
+	// Optionally wait available on catalog
+	resp.Diagnostics.Append(self.WaitOnCatalog(ctx, &workflow)...)
 }
 
 func (self *OrchestratorWorkflowResource) Read(
@@ -203,6 +208,9 @@ func (self *OrchestratorWorkflowResource) Update(
 	workflow.FromVersionAPI(workflowVersionResponsRaw)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &workflow)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", workflow.String()))
+
+	// Optionally wait available on catalog
+	resp.Diagnostics.Append(self.WaitOnCatalog(ctx, &workflow)...)
 }
 
 func (self *OrchestratorWorkflowResource) Delete(
@@ -225,4 +233,56 @@ func (self *OrchestratorWorkflowResource) ImportState(
 ) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("force_delete"), false)...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("wait_on_catalog"), true)...)
+}
+
+// -------------------------------------------------------------------------------------------------
+
+func (self *OrchestratorWorkflowResource) WaitOnCatalog(
+	ctx context.Context,
+	workflow *OrchestratorWorkflowModel,
+) diag.Diagnostics {
+
+	diags := diag.Diagnostics{}
+
+	if !workflow.WaitOnCatalog.ValueBool() {
+		return diags
+	}
+
+	name := workflow.String()
+	path := workflow.ReadCatalogPath()
+	tflog.Debug(ctx, fmt.Sprintf("Wait %s to be available on catalog...", name))
+
+	// Poll for matching catalog item to be available up to 10 minutes (60 x 10 seconds)
+	maxAttempts := 60
+	for attempt := 0; attempt < maxAttempts; attempt++ {
+		// Poll resource until imported
+		time.Sleep(time.Duration(10) * time.Second)
+		tflog.Debug(
+			ctx,
+			fmt.Sprintf("Poll %d of %d - Check %s is imported...", attempt+1, maxAttempts, name))
+
+		response, err := self.client.Client.R().
+			SetQueryParam("apiVersion", GetVersionFromPath(path)).
+			Get(path)
+
+		if response.StatusCode() == 404 {
+			tflog.Debug(ctx, fmt.Sprintf("%s not found", name))
+			continue
+		}
+
+		err = handleAPIResponse(ctx, response, err, []int{200})
+		if err != nil {
+			diags.AddError(
+				"Client error",
+				fmt.Sprintf("Unable to read %s, got error: %s", name, err))
+		}
+
+		// Found
+		return diags
+	}
+
+	diags.AddError(
+		"Client error", fmt.Sprintf("Timeout while waiting for %s to be imported.", name))
+	return diags
 }

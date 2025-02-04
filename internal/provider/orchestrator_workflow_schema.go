@@ -125,6 +125,13 @@ func OrchestratorWorkflowSchema() schema.Schema {
 				Optional:            true,
 				Default:             booldefault.StaticBool(false),
 			},
+			"wait_on_catalog": schema.BoolAttribute{
+				MarkdownDescription: "Wait for workflow to be available in catalog " +
+					"(up to 10 minutes, checked every 10 seconds)",
+				Optional: true,
+				Computed: true,
+				Default:  booldefault.StaticBool(true),
+			},
 		},
 	}
 }
