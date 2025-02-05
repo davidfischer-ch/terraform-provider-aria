@@ -6,6 +6,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -141,7 +142,7 @@ func (self *CatalogSourceResource) Update(
 		SetBody(sourceRaw).
 		SetResult(&sourceRaw).
 		Post(source.UpdatePath())
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -193,11 +194,11 @@ func (self *CatalogSourceResource) WaitImported(
 	name := source.String()
 	tflog.Debug(ctx, fmt.Sprintf("Wait %s to be imported...", name))
 
-	// Poll for catalog items to be imported up to 10 minutes (60 x 10 seconds)
-	maxAttempts := 60
+	// Poll for catalog items to be imported up to 15 minutes (30 x 30 seconds)
+	maxAttempts := 30
 	for attempt := 0; attempt < maxAttempts; attempt++ {
 		// Poll resource until imported
-		time.Sleep(time.Duration(10) * time.Second)
+		time.Sleep(time.Duration(30) * time.Second)
 		tflog.Debug(
 			ctx,
 			fmt.Sprintf("Poll %d of %d - Check %s is imported...", attempt+1, maxAttempts, name))
@@ -207,18 +208,60 @@ func (self *CatalogSourceResource) WaitImported(
 		if !found {
 			diags.AddError(
 				"Client error",
-				fmt.Sprintf("Resource %s has vanished while waiting to be imported.", name))
+				fmt.Sprintf("%s has vanished while waiting to be imported.", name))
 			return diags
 		}
 
+		// Update source from API
 		diags.Append(source.FromAPI(ctx, sourceRaw)...)
-		if diags.HasError() || !source.IsImporting(ctx) {
+		if diags.HasError() {
 			return diags
 		}
+
+		if source.IsImporting(ctx) {
+			continue // Continue polling
+		}
+
+		waitAndSee, errors, someDiags := source.QualifyErrors(ctx)
+		diags.Append(someDiags...)
+
+		if waitAndSee {
+			// Trigger import of catalog source again and crossing fingers...
+			response, err := self.client.Client.R().
+				SetQueryParam("apiVersion", CATALOG_API_VERSION).
+				SetBody(sourceRaw).
+				Post(source.UpdatePath())
+			err = handleAPIResponse(ctx, response, err, []int{201})
+			if err == nil {
+				continue // Continue polling
+			}
+
+			// Will end with errors...
+			diags.AddError(
+				"Client error",
+				fmt.Sprintf("%s unable to trigger reimport, got error: %s", name, err))
+		}
+
+		// May have some import errors too...
+		numErrors := len(errors)
+		if numErrors > 0 {
+			// Python f-string and ternary make it so easier to generate text from data...
+			errorsString := strings.Join(errors, "\n- ")
+			numErrorsString := fmt.Sprintf("%d import error", numErrors)
+			if numErrors > 1 {
+				numErrorsString = numErrorsString + "s"
+			}
+			diags.AddError(
+				"Client error",
+				fmt.Sprintf("%s has %s: \n- %s", name, numErrorsString, errorsString))
+		}
+
+		// Either successful or failing, its the end...
+		return diags
 	}
 
 	diags.AddError(
 		"Client error",
-		fmt.Sprintf("Timeout while waiting for %s to be imported.", name))
+		fmt.Sprintf("Timeout while waiting for %s to be imported without errors.", name))
 	return diags
 }

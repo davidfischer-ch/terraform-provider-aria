@@ -75,6 +75,13 @@ resource "aria_catalog_source" "test" {
       }
     ]
   }
+
+  lifecycle {
+    postcondition {
+      condition     = self.config.workflows[0].id == aria_orchestrator_workflow.test.id
+      error_message = "Oups workflow is missing or not the good one..."
+    }
+  }
 }
 `,
 				Check: resource.ComposeAggregateTestCheckFunc(
@@ -93,28 +100,19 @@ resource "aria_catalog_source" "test" {
 					resource.TestCheckResourceAttr("aria_catalog_source.test", "items_imported", "1"),
 					resource.TestCheckResourceAttr("aria_catalog_source.test", "wait_imported", "true"),
 					resource.TestCheckResourceAttr("aria_catalog_source.test", "config.source_project_id", ""),
-					resource.TestCheckResourceAttrPair(
-						"aria_catalog_source.test", "config.workflows[0].id",
-						"aria_orchestrator_workflow.test", "id",
-					),
-					resource.TestCheckResourceAttrPair(
-						"aria_catalog_source.test", "config.workflows[0].name",
-						"aria_orchestrator_workflow.test", "name",
-					),
-					resource.TestCheckResourceAttrPair(
-						"aria_catalog_source.test", "config.workflows[0].version",
-						"aria_orchestrator_workflow.test", "version",
-					),
 				),
 			},
 
 			// ImportState testing
 			/* TODO https://github.com/davidfischer-ch/terraform-provider-aria/issues/111
-			   {
-			     ResourceName:      "aria_catalog_source.test",
-			     ImportState:       true,
-			     ImportStateVerify: true,
-			   }, */
+			    {
+			      ResourceName:      "aria_catalog_source.test",
+			      ImportState:       true,
+			      ImportStateVerify: true,
+						// Prevent diff on force_delete field
+						ImportStateVerifyIgnore: []string{"wait_imported"},
+					},
+			    }, */
 			// Delete testing automatically occurs in TestCase
 			// TODO Check https://developer.hashicorp.com/terraform/plugin/sdkv2/testing/acceptance-tests/testcase#checkdestroy
 		},

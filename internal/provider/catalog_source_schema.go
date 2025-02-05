@@ -79,10 +79,11 @@ func CatalogSourceSchema() schema.Schema {
 				Computed:            true,
 			},
 			"wait_imported": schema.BoolAttribute{
-				MarkdownDescription: "Wait for import to be completed (up to 10 minutes, checked every 10 seconds)",
-				Optional:            true,
-				Computed:            true,
-				Default:             booldefault.StaticBool(true),
+				MarkdownDescription: "Wait for import to be completed " +
+					"(up to 10 minutes, checked every 10 seconds)",
+				Optional: true,
+				Computed: true,
+				Default:  booldefault.StaticBool(true),
 			},
 		},
 	}
