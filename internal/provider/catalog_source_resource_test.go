@@ -105,14 +105,14 @@ resource "aria_catalog_source" "test" {
 
 			// ImportState testing
 			/* TODO https://github.com/davidfischer-ch/terraform-provider-aria/issues/111
-	    {
-	      ResourceName:      "aria_catalog_source.test",
-	      ImportState:       true,
-	      ImportStateVerify: true,
-				// Prevent diff on force_delete field
-				ImportStateVerifyIgnore: []string{"wait_imported"},
-			},
-	    }, */
+			    {
+			      ResourceName:      "aria_catalog_source.test",
+			      ImportState:       true,
+			      ImportStateVerify: true,
+						// Prevent diff on force_delete field
+						ImportStateVerifyIgnore: []string{"wait_imported"},
+					},
+			    }, */
 			// Delete testing automatically occurs in TestCase
 			// TODO Check https://developer.hashicorp.com/terraform/plugin/sdkv2/testing/acceptance-tests/testcase#checkdestroy
 		},
