@@ -400,8 +400,8 @@ resource "aria_orchestrator_workflow" "test" {
 				ImportState:       true,
 				ImportStateVerify: true,
 
-				// Prevent diff on force_delete & wait_on_catalog fields
-				ImportStateVerifyIgnore: []string{"force_delete", "wait_on_catalog"},
+				// Prevent diff on force_delete field
+				ImportStateVerifyIgnore: []string{"force_delete"},
 			},*/
 			// Delete testing automatically occurs in TestCase
 		},
