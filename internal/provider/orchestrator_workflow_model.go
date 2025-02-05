@@ -115,7 +115,7 @@ func (self OrchestratorWorkflowModel) ReadPath() string {
 }
 
 func (self OrchestratorWorkflowModel) ReadCatalogPath() string {
-	return "catalog/api/typescom.vmw.vro.workflow/data/workflows/" + self.Id.ValueString()
+	return "catalog/api/types/com.vmw.vro.workflow/data/workflows/" + self.Id.ValueString()
 }
 
 func (self OrchestratorWorkflowModel) ReadContentPath() string {
