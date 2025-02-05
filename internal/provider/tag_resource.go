@@ -96,12 +96,13 @@ func (self *TagResource) Read(
 
 	// TODO Read by filtering tag list by ID
 	var listRaw TagListAPIModel
+	listPath := tag.ListPath()
 	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", IAAS_API_VERSION).
+		SetQueryParam("apiVersion", GetVersionFromPath(listPath)).
 		SetQueryParam("$filter", fmt.Sprintf("id eq %s", tag.Id.ValueString())).
 		SetQueryParam("$top", "2"). // Make it possible to know if filter works properly
 		SetResult(&listRaw).
-		Get(tag.ListPath())
+		Get(listPath)
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(

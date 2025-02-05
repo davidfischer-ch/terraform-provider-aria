@@ -6,6 +6,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -120,7 +121,9 @@ func (self *CatalogSourceModel) FromAPI(
 		diags.Append(someDiags...)
 	}
 
-	self.LastImportErrors, someDiags = types.ListValueFrom(ctx, types.StringType, raw.LastImportErrors)
+	self.LastImportErrors, someDiags = types.ListValueFrom(
+		ctx, types.StringType, raw.LastImportErrors,
+	)
 	diags.Append(someDiags...)
 
 	return diags
@@ -160,4 +163,34 @@ func (self CatalogSourceModel) IsImporting(ctx context.Context) bool {
 	}
 
 	return startedAt.After(completedAt)
+}
+
+// Return a tuple with waitAndSee, errors and diagnostics.
+// If some errors may be fixed by the next integration's refresh process then waitAndSee is true.
+func (self CatalogSourceModel) QualifyErrors(
+	ctx context.Context,
+) (bool, []string, diag.Diagnostics) {
+
+	diags := diag.Diagnostics{}
+	errors := make([]string, 0, len(self.LastImportErrors.Elements()))
+
+	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/list
+	if self.LastImportErrors.IsNull() || self.LastImportErrors.IsUnknown() {
+		diags.AddError(
+			"Configuration error",
+			fmt.Sprintf(
+				"Unable to qualify %s errors, last_import_errors is either null or unknown",
+				self.String()))
+		return false, errors, diags
+	}
+
+	diags.Append(self.LastImportErrors.ElementsAs(ctx, &errors, false)...)
+
+	for _, error := range errors {
+		// Next integration's refresh process may fix this issue
+		if strings.Contains(error, "Error downloading catalog item") {
+			return true, errors, diags
+		}
+	}
+	return false, errors, diags
 }

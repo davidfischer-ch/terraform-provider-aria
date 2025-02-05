@@ -526,7 +526,6 @@ Disabled (2) - If a workflow run fails, it cannot be resumed.
 - `force_delete` (Boolean) Force destroying the workflow (bypass references check).
 - `object_name` (String) TODO
 - `root_name` (String) TODO
-- `wait_on_catalog` (Boolean) Wait for workflow to be available in catalog (up to 10 minutes, checked every 10 seconds)
 
 ### Read-Only
 
