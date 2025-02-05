@@ -4,6 +4,7 @@
 package provider
 
 import (
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -28,5 +29,15 @@ func (self PositionModel) ToAPI() PositionAPIModel {
 	return PositionAPIModel{
 		X: self.X.ValueFloat64(),
 		Y: self.Y.ValueFloat64(),
+	}
+}
+
+// Utils -------------------------------------------------------------------------------------------
+
+// Used to convert structure to a types.Object.
+func (self PositionModel) AttributeTypes() map[string]attr.Type {
+	return map[string]attr.Type{
+		"x": types.Float64Type,
+		"y": types.Float64Type,
 	}
 }

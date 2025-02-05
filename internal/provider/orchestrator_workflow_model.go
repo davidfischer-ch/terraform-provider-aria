@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
 
 // OrchestratorWorkflowModel describes the resource data model.
@@ -25,7 +26,7 @@ type OrchestratorWorkflowModel struct {
 	AllowedOperations    types.String         `tfsdk:"allowed_operations"`
 	Attrib               jsontypes.Normalized `tfsdk:"attrib"`
 	ObjectName           types.String         `tfsdk:"object_name"`
-	Position             PositionModel        `tfsdk:"position"` // TODO types.Object
+	Position             types.Object         `tfsdk:"position"` // Of type PositionModel
 	Presentation         jsontypes.Normalized `tfsdk:"presentation"`
 	RestartMode          types.Int32          `tfsdk:"restart_mode"`
 	ResumeFromFailedMode types.Int32          `tfsdk:"resume_from_failed_mode"`
@@ -41,8 +42,7 @@ type OrchestratorWorkflowModel struct {
 	ApiVersion    types.String `tfsdk:"api_version"`
 	EditorVersion types.String `tfsdk:"editor_version"`
 
-	ForceDelete types.Bool `tfsdk:"force_delete"`
-
+	ForceDelete   types.Bool `tfsdk:"force_delete"`
 	WaitOnCatalog types.Bool `tfsdk:"wait_on_catalog"`
 }
 
@@ -155,7 +155,10 @@ func (self *OrchestratorWorkflowModel) FromContentAPI(
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
 	self.Description = types.StringValue(raw.Description)
+
+	// FIXME https://github.com/davidfischer-ch/terraform-provider-aria/issues/122
 	// FIXME How to retrieve CategoryId ? Yet another API endpoint to call?
+
 	self.Version = types.StringValue(raw.Version)
 	self.VersionId = types.StringValue(response.Header().Get("x-vro-changeset-sha"))
 	self.AllowedOperations = types.StringValue(raw.AllowedOperations)
@@ -166,27 +169,33 @@ func (self *OrchestratorWorkflowModel) FromContentAPI(
 	self.ApiVersion = types.StringValue(raw.ApiVersion)
 	self.EditorVersion = types.StringValue(raw.EditorVersion)
 
-	self.Position.FromAPI(raw.Position)
-
 	diags := diag.Diagnostics{}
-	var attributeDiags diag.Diagnostics
+	var someDiags diag.Diagnostics
 
-	self.Attrib, attributeDiags = JSONNormalizedFromAny(self.String(), raw.Attrib)
-	diags.Append(attributeDiags...)
+	// Convert position from raw and then to object
+	position := PositionModel{}
+	position.FromAPI(raw.Position)
+	self.Position, someDiags = types.ObjectValueFrom(ctx, position.AttributeTypes(), position)
+	diags.Append(someDiags...)
 
-	self.Presentation, attributeDiags = JSONNormalizedFromAny(self.String(), raw.Presentation)
-	diags.Append(attributeDiags...)
+	self.Attrib, someDiags = JSONNormalizedFromAny(self.String(), raw.Attrib)
+	diags.Append(someDiags...)
 
-	if raw.WorkflowItem != nil {
-		self.WorkflowItem, attributeDiags = JSONNormalizedFromAny(self.String(), raw.WorkflowItem)
-		diags.Append(attributeDiags...)
+	self.Presentation, someDiags = JSONNormalizedFromAny(self.String(), raw.Presentation)
+	diags.Append(someDiags...)
+
+	workflowItemRaw := raw.WorkflowItem
+	if workflowItemRaw == nil {
+		workflowItemRaw = []string{}
 	}
+	self.WorkflowItem, someDiags = JSONNormalizedFromAny(self.String(), workflowItemRaw)
+	diags.Append(someDiags...)
 
-	self.InputParameters, attributeDiags = ParameterModelListFromAPI(ctx, raw.Input.Param)
-	diags.Append(attributeDiags...)
+	self.InputParameters, someDiags = ParameterModelListFromAPI(ctx, raw.Input.Param)
+	diags.Append(someDiags...)
 
-	self.OutputParameters, attributeDiags = ParameterModelListFromAPI(ctx, raw.Output.Param)
-	diags.Append(attributeDiags...)
+	self.OutputParameters, someDiags = ParameterModelListFromAPI(ctx, raw.Output.Param)
+	diags.Append(someDiags...)
 
 	return diags
 }
@@ -219,30 +228,45 @@ func (self OrchestratorWorkflowModel) ToContentAPI(
 	ctx context.Context,
 ) (OrchestratorWorkflowContentAPIModel, diag.Diagnostics) {
 
-	positionRaw := self.Position.ToAPI()
+	diags := diag.Diagnostics{}
+	positionRaw := PositionAPIModel{}
 
-	var attributeDiags diag.Diagnostics
-	attribRaw, diags := JSONNormalizedToAny(self.Attrib)
+	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/object
+	if self.Position.IsNull() || self.Position.IsUnknown() {
+		diags.AddError(
+			"Configuration error",
+			fmt.Sprintf("Unable to manage %s, position is either null or unknown", self.String()))
+	} else {
+		// Convert position from object to raw
+		position := PositionModel{}
+		diags.Append(self.Position.As(ctx, &position, basetypes.ObjectAsOptions{})...)
+		positionRaw = position.ToAPI()
+	}
 
-	presentationRaw, attributeDiags := JSONNormalizedToAny(self.Presentation)
-	diags.Append(attributeDiags...)
+	var someDiags diag.Diagnostics
 
-	workflowItemRaw, attributeDiags := JSONNormalizedToAny(self.WorkflowItem)
-	diags.Append(attributeDiags...)
+	attribRaw, someDiags := JSONNormalizedToAny(self.Attrib)
+	diags.Append(someDiags...)
 
-	inputRaw, attributeDiags := ParameterModelListToAPI(
+	presentationRaw, someDiags := JSONNormalizedToAny(self.Presentation)
+	diags.Append(someDiags...)
+
+	workflowItemRaw, someDiags := JSONNormalizedToAny(self.WorkflowItem)
+	diags.Append(someDiags...)
+
+	inputRaw, someDiags := ParameterModelListToAPI(
 		ctx,
 		self.InputParameters,
 		fmt.Sprintf("%s, %s", self.String(), "input_parameters"),
 	)
-	diags.Append(attributeDiags...)
+	diags.Append(someDiags...)
 
-	outputRaw, attributeDiags := ParameterModelListToAPI(
+	outputRaw, someDiags := ParameterModelListToAPI(
 		ctx,
 		self.OutputParameters,
 		fmt.Sprintf("%s, %s", self.String(), "output_parameters"),
 	)
-	diags.Append(attributeDiags...)
+	diags.Append(someDiags...)
 
 	return OrchestratorWorkflowContentAPIModel{
 		Id:                   self.Id.ValueString(),
