@@ -89,7 +89,7 @@ resource "aria_catalog_source" "dummy" {
 
 ### Optional
 
-- `wait_imported` (Boolean) Wait for import to be completed (up to 10 minutes, checked every 10 seconds)
+- `wait_imported` (Boolean) Wait for import to be completed (up to 15 minutes, checked every 30 seconds)
 
 ### Read-Only
 
