@@ -1,5 +1,16 @@
 # Changelog
 
+## Release v0.6.5 (2025-02-06)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.4...v0.6.5
+
+### Features
+
+* Add resource `aria_orchestrator_task`
+* Resource `aria_catalog_source`, if `wait_imported = true` then the polling function will (up to 15 minutes) :
+  * Proactively wait for catalog items to be available (by doing the equivalent of save & import multiple times)
+  * Immediately return an error if there are any *hard* errors (not related to catalog item's availability)
+
 ## Release v0.6.4 (2025-01-31)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.3...v0.6.4
