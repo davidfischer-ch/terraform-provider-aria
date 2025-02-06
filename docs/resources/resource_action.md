@@ -151,9 +151,9 @@ Unfortunately Terraform SDK returns this issue:
 Dynamic types inside of collections are not currently supported in terraform-plugin-framework.
 - `form_definition` (Attributes) Form definition (see [below for nested schema](#nestedatt--form_definition))
 - `project_id` (String) Project identifier. Empty or unset means available for all projects. (force recreation on change)
-- `provider_name` (String) Provider name, one of xaas (and that's all, maybe)
+- `provider_name` (String) Provider name, one of `xaas` (and that's all, maybe)
 - `resource_id` (String) Resource identifier (required if its a custom resource) (force recreation on change)
-- `status` (String) Action status, either DRAFT or RELEASED
+- `status` (String) Action status, either `DRAFT` or `RELEASED`
 
 ### Read-Only
 

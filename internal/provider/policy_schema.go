@@ -24,7 +24,7 @@ func PolicySchema() schema.Schema {
 			},
 			"description": RequiredDescriptionSchema(),
 			"enforcement_type": schema.StringAttribute{
-				MarkdownDescription: "Enforcement type, either SOFT or HARD" + IMMUTABLE,
+				MarkdownDescription: "Enforcement type, either `SOFT` or `HARD`" + IMMUTABLE,
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
@@ -35,12 +35,12 @@ func PolicySchema() schema.Schema {
 			},
 			"type_id": schema.StringAttribute{
 				MarkdownDescription: "Policy type" + IMMUTABLE + ", one of " +
-					"com.vmware.policy.approval, " +
-					"com.vmware.policy.catalog.entitlement, " +
-					"com.vmware.policy.deployment.action, " +
-					"com.vmware.policy.deployment.lease, " +
-					"com.vmware.policy.deployment.limit, " +
-					"com.vmware.policy.resource.quota",
+					"`com.vmware.policy.approval`, " +
+					"`com.vmware.policy.catalog.entitlement`, " +
+					"`com.vmware.policy.deployment.action`, " +
+					"`com.vmware.policy.deployment.lease`, " +
+					"`com.vmware.policy.deployment.limit` or " +
+					"`com.vmware.policy.resource.quota`",
 				Required: true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),

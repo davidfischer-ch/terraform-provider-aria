@@ -25,7 +25,7 @@ func PropertyGroupSchema() schema.Schema {
 			},
 			"description": RequiredDescriptionSchema(),
 			"type": schema.StringAttribute{
-				MarkdownDescription: "Type, either INPUT or CONSTANT" + IMMUTABLE,
+				MarkdownDescription: "Type, either `INPUT` or `CONSTANT`" + IMMUTABLE,
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),

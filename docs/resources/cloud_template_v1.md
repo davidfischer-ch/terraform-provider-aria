@@ -43,7 +43,7 @@ Required:
 - `read_only` (Boolean) Make the field read-only (in the form)
 - `recreate_on_update` (Boolean) Mark this field as writable once (resource will be recreated on change)
 - `title` (String) Title
-- `type` (String) Type, one of array, boolean, integer, object, number or string.
+- `type` (String) Type, one of `array`, `boolean`, `integer`, `object`, `number` or `string`.
 
 Optional:
 

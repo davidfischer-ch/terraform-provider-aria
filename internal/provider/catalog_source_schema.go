@@ -23,7 +23,7 @@ func CatalogSourceSchema() schema.Schema {
 				Required:            true,
 			},
 			"type_id": schema.StringAttribute{
-				MarkdownDescription: "Source type (e.g. com.vmw.vro.workflow)",
+				MarkdownDescription: "Source type (e.g. `com.vmw.vro.workflow`)",
 				Required:            true,
 			},
 			"global": schema.BoolAttribute{

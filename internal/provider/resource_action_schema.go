@@ -31,7 +31,7 @@ func ResourceActionSchema() schema.Schema {
 			},
 			"description": RequiredDescriptionSchema(),
 			"provider_name": schema.StringAttribute{
-				MarkdownDescription: "Provider name, one of xaas (and that's all, maybe)",
+				MarkdownDescription: "Provider name, one of `xaas` (and that's all, maybe)",
 				Computed:            true,
 				Optional:            true,
 				Default:             stringdefault.StaticString("xaas"),
@@ -63,7 +63,7 @@ func ResourceActionSchema() schema.Schema {
 			},
 			"form_definition": NestedCustomFormSchema(),
 			"status": schema.StringAttribute{
-				MarkdownDescription: "Action status, either DRAFT or RELEASED",
+				MarkdownDescription: "Action status, either `DRAFT` or `RELEASED`",
 				Computed:            true,
 				Optional:            true,
 				Default:             stringdefault.StaticString("RELEASED"),

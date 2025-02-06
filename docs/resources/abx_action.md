@@ -77,7 +77,7 @@ EOT
 - `entrypoint` (String) Main function's name
 - `memory_in_mb` (Number) Runtime memory constraint in MB
 - `name` (String) A name (must be unique)
-- `runtime_name` (String) Runtime name (python, nodejs, ...)
+- `runtime_name` (String) Runtime name (`python`, `nodejs`, ...)
 - `secrets` (Set of String) Secrets to expose to the action
 - `source` (String) Action source code
 
@@ -85,12 +85,12 @@ EOT
 
 - `cpu_shares` (Number) Runtime CPU shares
 - `deployment_timeout_seconds` (Number) How long ??
-- `faas_provider` (String) FaaS provider used for code execution, one of auto (default), on-prem, aws and azure (automatically set by the platform if unset)
+- `faas_provider` (String) FaaS provider used for code execution, one of `auto` (default), `on-prem`, `aws` or `azure` (automatically set by the platform if unset)
 - `project_id` (String) Project identifier. Empty or unset means available for all projects. (force recreation on change)
 - `runtime_version` (String) Runtime version (3.10, ...)
 - `shared` (Boolean) Flag indicating if the action can be shared across projects
 - `timeout_seconds` (Number) How long an action can run (default to 600)
-- `type` (String) Type of action, one of SCRIPT (default), REST_CALL, REST_POLL, FLOW, VAULT and CYBERARK
+- `type` (String) Type of action, one of `SCRIPT` (default), `REST_CALL`, `REST_POLL`, `FLOW`, `VAULT` or `CYBERARK`
 
 ### Read-Only
 

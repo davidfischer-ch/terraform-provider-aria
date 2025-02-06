@@ -24,8 +24,8 @@ func PropertySchema() schema.NestedAttributeObject {
 			},
 			"description": RequiredDescriptionSchema(),
 			"type": schema.StringAttribute{
-				MarkdownDescription: "Type, one of array, boolean, integer, object, number or " +
-					"string.",
+				MarkdownDescription: "Type, one of `array`, `boolean`, `integer`, `object`, " +
+					"`number` or `string`.",
 				Required: true,
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{

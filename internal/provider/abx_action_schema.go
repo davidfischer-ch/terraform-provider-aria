@@ -26,25 +26,35 @@ func ABXActionSchema() schema.Schema {
 			},
 			"description": RequiredDescriptionSchema(),
 			"faas_provider": schema.StringAttribute{
-				MarkdownDescription: "FaaS provider used for code execution, one of auto (default), on-prem, aws and azure (automatically set by the platform if unset)",
-				Computed:            true,
-				Optional:            true,
-				Default:             stringdefault.StaticString("auto"),
+				MarkdownDescription: "FaaS provider used for code execution, one of `auto` " +
+					"(default), `on-prem`, `aws` or `azure` " +
+					"(automatically set by the platform if unset)",
+				Computed: true,
+				Optional: true,
+				Default:  stringdefault.StaticString("auto"),
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{"auto", "on-prem", "aws", "azure"}...),
 				},
 			},
 			"type": schema.StringAttribute{
-				MarkdownDescription: "Type of action, one of SCRIPT (default), REST_CALL, REST_POLL, FLOW, VAULT and CYBERARK",
-				Computed:            true,
-				Optional:            true,
-				Default:             stringdefault.StaticString("SCRIPT"),
+				MarkdownDescription: "Type of action, one of `SCRIPT` (default), `REST_CALL`, " +
+					"`REST_POLL`, `FLOW`, `VAULT` or `CYBERARK`",
+				Computed: true,
+				Optional: true,
+				Default:  stringdefault.StaticString("SCRIPT"),
 				Validators: []validator.String{
-					stringvalidator.OneOf([]string{"SCRIPT", "REST_CALL", "REST_POLL", "FLOW", "VAULT", "CYBERARK"}...),
+					stringvalidator.OneOf([]string{
+						"SCRIPT",
+						"REST_CALL",
+						"REST_POLL",
+						"FLOW",
+						"VAULT",
+						"CYBERARK",
+					}...),
 				},
 			},
 			"runtime_name": schema.StringAttribute{
-				MarkdownDescription: "Runtime name (python, nodejs, ...)",
+				MarkdownDescription: "Runtime name (`python`, `nodejs`, ...)",
 				Required:            true,
 			},
 			"runtime_version": schema.StringAttribute{

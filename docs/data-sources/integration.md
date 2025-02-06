@@ -35,7 +35,7 @@ output "vro_workflows_integration" {
 
 ### Required
 
-- `type_id` (String) Source type (com.vmw.vro.workflow, and that's all for now)
+- `type_id` (String) Source type (`com.vmw.vro.workflow`, and that's all for now)
 
 ### Read-Only
 

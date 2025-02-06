@@ -77,16 +77,16 @@ resource "aria_subscription" "hello_world" {
 - `priority` (Number) TODO
 - `project_ids` (Set of String) Restrict to given projects (an empty list means all)
 - `runnable_id` (String) Runnable identifier
-- `runnable_type` (String) Runnable type, either extensibility.abx or extensibility.vro
+- `runnable_type` (String) Runnable type, either `extensibility.abx` or `extensibility.vro`
 - `timeout` (Number) TODO
-- `type` (String) Subscription type, either RUNNABLE or SUBSCRIBABLE
+- `type` (String) Subscription type, either `RUNNABLE` or `SUBSCRIBABLE`
 
 ### Optional
 
 - `criteria` (String) TODO
 - `disabled` (Boolean) TODO
 - `recover_runnable_id` (String) Recovery runnable identifier
-- `recover_runnable_type` (String) Recovery runnable type, either extensibility.abx or extensibility.vro
+- `recover_runnable_type` (String) Recovery runnable type, either `extensibility.abx` or `extensibility.vro`
 
 ### Read-Only
 

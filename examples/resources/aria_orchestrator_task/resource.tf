@@ -37,7 +37,7 @@ resource "aria_orchestrator_workflow" "dummy" {
 
 # Schedule the workflow we manage
 resource "aria_orchestrator_task" "dummy_monthly" {
-  name        = "ARIA_PROVIDER_TEST_ORCHESTRATOR_TASK_RENAMED"
+  name        = "Monthly execution of ${aria_orchestrator_workflow.dummy.name}"
   description = "Task doing nothing particular, on a monthly basis the 1st and 12th at midnight."
 
   recurrence_cycle      = "every-months"

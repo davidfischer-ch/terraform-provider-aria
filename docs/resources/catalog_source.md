@@ -85,7 +85,7 @@ resource "aria_catalog_source" "dummy" {
 
 - `config` (Attributes) Configuration (see [below for nested schema](#nestedatt--config))
 - `name` (String) Source name (e.g. getVRAHost)
-- `type_id` (String) Source type (e.g. com.vmw.vro.workflow)
+- `type_id` (String) Source type (e.g. `com.vmw.vro.workflow`)
 
 ### Optional
 

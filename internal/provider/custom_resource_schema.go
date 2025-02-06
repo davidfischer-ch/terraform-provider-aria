@@ -23,8 +23,8 @@ func CustomResourceSchema() schema.Schema {
 			},
 			"description": RequiredDescriptionSchema(),
 			"resource_type": schema.StringAttribute{
-				MarkdownDescription: "Define the type (must be unique, e.g. Custom.DB.PostgreSQL)" +
-					IMMUTABLE,
+				MarkdownDescription: "Define the type (must be unique, e.g. " +
+					"`Custom.DB.PostgreSQL`)" + IMMUTABLE,
 				Required: true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
@@ -33,7 +33,7 @@ func CustomResourceSchema() schema.Schema {
 			},
 			"schema_type": schema.StringAttribute{
 				MarkdownDescription: "Type of resource, " +
-					"one of ABX_USER_DEFINED (and that's all, maybe)",
+					"one of `ABX_USER_DEFINED` (and that's all, maybe)",
 				Computed: true,
 				Optional: true,
 				Default:  stringdefault.StaticString("ABX_USER_DEFINED"),
@@ -42,7 +42,7 @@ func CustomResourceSchema() schema.Schema {
 				},
 			},
 			"status": schema.StringAttribute{
-				MarkdownDescription: "Resource status, one of DRAFT, ON, or RELEASED",
+				MarkdownDescription: "Resource status, one of `DRAFT`, `ON`, or `RELEASED`",
 				Computed:            true,
 				Optional:            true,
 				Default:             stringdefault.StaticString("RELEASED"),

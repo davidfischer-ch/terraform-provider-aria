@@ -27,7 +27,7 @@ func CustomFormSchema() schema.Schema {
 				},
 			},
 			"type": schema.StringAttribute{
-				MarkdownDescription: "Form type, requestForm",
+				MarkdownDescription: "Form type, `requestForm`",
 				Computed:            true,
 				Optional:            true,
 				Default:             stringdefault.StaticString("requestForm"),
@@ -44,7 +44,7 @@ func CustomFormSchema() schema.Schema {
 				Required:            true,
 			},
 			"form_format": schema.StringAttribute{
-				MarkdownDescription: "Form format either JSON or YAML, " +
+				MarkdownDescription: "Form format either `JSON` or `YAML`, " +
 					"will be forced to JSON by Aria so you have no choice...",
 				Computed: true,
 				Default:  stringdefault.StaticString("JSON"),
@@ -70,7 +70,7 @@ func CustomFormSchema() schema.Schema {
 				Required:            true,
 			},
 			"status": schema.StringAttribute{
-				MarkdownDescription: "Resource status, one of DRAFT, ON, or RELEASED",
+				MarkdownDescription: "Resource status, one of `DRAFT`, `ON`, or `RELEASED`",
 				Computed:            true,
 				Default:             stringdefault.StaticString("ON"),
 				PlanModifiers: []planmodifier.String{

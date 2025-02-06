@@ -52,7 +52,7 @@ resource "aria_orchestrator_workflow" "dummy" {
 
 # Schedule the workflow we manage
 resource "aria_orchestrator_task" "dummy_monthly" {
-  name        = "ARIA_PROVIDER_TEST_ORCHESTRATOR_TASK_RENAMED"
+  name        = "Monthly execution of ${aria_orchestrator_workflow.dummy.name}"
   description = "Task doing nothing particular, on a monthly basis the 1st and 12th at midnight."
 
   recurrence_cycle      = "every-months"
@@ -81,22 +81,22 @@ resource "aria_orchestrator_task" "dummy_monthly" {
 
 - `description` (String) Describe the resource in few sentences
 - `name` (String) Name
-- `recurrence_cycle` (String) Recurrence cycle, one of one-time, every-minutes, every-hours, every-days, every-weeks or every-months
+- `recurrence_cycle` (String) Recurrence cycle, one of `one-time`, `every-minutes`, `every-hours`, `every-days`, `every-weeks` or `every-months`
 - `recurrence_pattern` (String) Recurrence pattern, examples:
-* one-time -> "(Europe/Zurich) "
-* every-minutes -> "(Europe/Zurich) 30,"
-* every-hours -> "(Europe/Zurich) 10:00,"
-* every-days -> "(Europe/Zurich) 01:00:00,19:30:00,"
-* every-weeks -> "(Europe/Zurich) Monday 02:00:00,Friday 22:00:00,"
-* every-months -> "(Europe/Zurich) 01 00:00:00,12 00:00:00,"
+	* `one-time` -> "(Europe/Zurich) "
+	* `every-minutes` -> "(Europe/Zurich) 30,"
+	* `every-hours` -> "(Europe/Zurich) 10:00,"
+	* every-days` -> "(Europe/Zurich) 01:00:00,19:30:00,"
+	* `every-weeks` -> "(Europe/Zurich) Monday 02:00:00,Friday 22:00:00,"
+	* `every-months` -> "(Europe/Zurich) 01 00:00:00,12 00:00:00,"
 - `recurrence_start_date` (String) Recurrence start timestamp (RFC3339)
-- `start_mode` (String) Start mode, either normal or start-in-the-past
+- `start_mode` (String) Start mode, either `normal` or `start-in-the-past`
 - `workflow` (Attributes) Configuration (see [below for nested schema](#nestedatt--workflow))
 
 ### Optional
 
 - `recurrence_end_date` (String) Recurrence end timestamp (RFC3339)
-- `state` (String) State
+- `state` (String) State, either `pending` or `suspended`
 - `user` (String) User
 
 ### Read-Only

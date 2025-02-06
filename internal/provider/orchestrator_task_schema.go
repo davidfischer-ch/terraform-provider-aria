@@ -27,19 +27,19 @@ func OrchestratorTaskSchema() schema.Schema {
 				Computed:            true,
 			},
 			"recurrence_cycle": schema.StringAttribute{
-				MarkdownDescription: "Recurrence cycle, one of one-time, every-minutes, " +
-					"every-hours, every-days, every-weeks or every-months",
+				MarkdownDescription: "Recurrence cycle, one of `one-time`, `every-minutes`, " +
+					"`every-hours`, `every-days`, `every-weeks` or `every-months`",
 				Required: true,
 			},
 			"recurrence_pattern": schema.StringAttribute{
 				MarkdownDescription: strings.Join([]string{
 					"Recurrence pattern, examples:",
-					"* one-time -> \"(Europe/Zurich) \"",
-					"* every-minutes -> \"(Europe/Zurich) 30,\"",
-					"* every-hours -> \"(Europe/Zurich) 10:00,\"",
-					"* every-days -> \"(Europe/Zurich) 01:00:00,19:30:00,\"",
-					"* every-weeks -> \"(Europe/Zurich) Monday 02:00:00,Friday 22:00:00,\"",
-					"* every-months -> \"(Europe/Zurich) 01 00:00:00,12 00:00:00,\"",
+					"\t* `one-time` -> \"(Europe/Zurich) \"",
+					"\t* `every-minutes` -> \"(Europe/Zurich) 30,\"",
+					"\t* `every-hours` -> \"(Europe/Zurich) 10:00,\"",
+					"\t* every-days` -> \"(Europe/Zurich) 01:00:00,19:30:00,\"",
+					"\t* `every-weeks` -> \"(Europe/Zurich) Monday 02:00:00,Friday 22:00:00,\"",
+					"\t* `every-months` -> \"(Europe/Zurich) 01 00:00:00,12 00:00:00,\"",
 				}, "\n"),
 				Required: true,
 			},
@@ -59,14 +59,14 @@ func OrchestratorTaskSchema() schema.Schema {
 				Computed:            true,
 			},
 			"start_mode": schema.StringAttribute{
-				MarkdownDescription: "Start mode, either normal or start-in-the-past",
+				MarkdownDescription: "Start mode, either `normal` or `start-in-the-past`",
 				Required:            true,
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{"normal", "start-in-the-past"}...),
 				},
 			},
 			"state": schema.StringAttribute{
-				MarkdownDescription: "State",
+				MarkdownDescription: "State, either `pending` or `suspended`",
 				Computed:            true,
 				Optional:            true,
 				Validators: []validator.String{

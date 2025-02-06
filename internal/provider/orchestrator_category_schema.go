@@ -24,10 +24,10 @@ func OrchestratorCategorySchema() schema.Schema {
 			},
 			"type": schema.StringAttribute{
 				MarkdownDescription: "Category's type, " +
-					"ConfigurationElementCategory, " +
-					"PolicyTemplateCategory, " +
-					"ResourceElementCategory or " +
-					"WorkflowCategory",
+					"`ConfigurationElementCategory`, " +
+					"`PolicyTemplateCategory`, " +
+					"`ResourceElementCategory` or " +
+					"`WorkflowCategory`",
 				Required: true,
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{

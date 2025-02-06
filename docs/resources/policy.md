@@ -126,9 +126,9 @@ We should have implemented this attribute as a dynamic type (and not JSON).
 Unfortunately Terraform SDK returns this issue:
 Dynamic types inside of collections are not currently supported in terraform-plugin-framework.
 - `description` (String) Describe the resource in few sentences
-- `enforcement_type` (String) Enforcement type, either SOFT or HARD (force recreation on change)
+- `enforcement_type` (String) Enforcement type, either `SOFT` or `HARD` (force recreation on change)
 - `name` (String) Policy name
-- `type_id` (String) Policy type (force recreation on change), one of com.vmware.policy.approval, com.vmware.policy.catalog.entitlement, com.vmware.policy.deployment.action, com.vmware.policy.deployment.lease, com.vmware.policy.deployment.limit, com.vmware.policy.resource.quota
+- `type_id` (String) Policy type (force recreation on change), one of `com.vmware.policy.approval`, `com.vmware.policy.catalog.entitlement`, `com.vmware.policy.deployment.action`, `com.vmware.policy.deployment.lease`, `com.vmware.policy.deployment.limit` or `com.vmware.policy.resource.quota`
 
 ### Optional
 

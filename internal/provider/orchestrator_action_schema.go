@@ -22,8 +22,9 @@ func OrchestratorActionSchema() schema.Schema {
 				Required:            true,
 			},
 			"fqn": schema.StringAttribute{
-				MarkdownDescription: "Action fully qualified name (aka FQN, e.g. ch.ocsin.core/getVRAHost)",
-				Required:            true,
+				MarkdownDescription: "Action fully qualified name " +
+					"(aka FQN, e.g. ch.ocsin.core/getVRAHost)",
+				Required: true,
 			},
 			"description": RequiredDescriptionSchema(),
 			"version": schema.StringAttribute{
@@ -39,8 +40,9 @@ func OrchestratorActionSchema() schema.Schema {
 				Required:            true,
 			},
 			"runtime_timeout": schema.Int32Attribute{
-				MarkdownDescription: "How long an action can run (in seconds) (can be 0 for unlimited)",
-				Required:            true,
+				MarkdownDescription: "How long an action can run (in seconds) " +
+					"(can be 0 for unlimited)",
+				Required: true,
 			},
 			"script": schema.StringAttribute{
 				MarkdownDescription: "Action source code",

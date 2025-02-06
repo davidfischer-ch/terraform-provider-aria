@@ -28,15 +28,16 @@ func SubscriptionSchema() schema.Schema {
 			},
 			"description": RequiredDescriptionSchema(),
 			"type": schema.StringAttribute{
-				MarkdownDescription: "Subscription type, either RUNNABLE or SUBSCRIBABLE",
+				MarkdownDescription: "Subscription type, either `RUNNABLE` or `SUBSCRIBABLE`",
 				Required:            true,
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{"RUNNABLE", "SUBSCRIBABLE"}...),
 				},
 			},
 			"runnable_type": schema.StringAttribute{
-				MarkdownDescription: "Runnable type, either extensibility.abx or extensibility.vro",
-				Required:            true,
+				MarkdownDescription: "Runnable type, either `extensibility.abx` or " +
+					"`extensibility.vro`",
+				Required: true,
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{"extensibility.abx", "extensibility.vro"}...),
 				},
@@ -46,8 +47,8 @@ func SubscriptionSchema() schema.Schema {
 				Required:            true,
 			},
 			"recover_runnable_type": schema.StringAttribute{
-				MarkdownDescription: "Recovery runnable type, either extensibility.abx or " +
-					"extensibility.vro",
+				MarkdownDescription: "Recovery runnable type, either `extensibility.abx` or " +
+					"`extensibility.vro`",
 				Optional: true,
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{"extensibility.abx", "extensibility.vro"}...),

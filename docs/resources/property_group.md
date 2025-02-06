@@ -105,7 +105,7 @@ resource "aria_property_group" "vm_common" {
 - `description` (String) Describe the resource in few sentences
 - `name` (String) Name (force recreation on change)
 - `properties` (Attributes Map) Property Group's properties (see [below for nested schema](#nestedatt--properties))
-- `type` (String) Type, either INPUT or CONSTANT (force recreation on change)
+- `type` (String) Type, either `INPUT` or `CONSTANT` (force recreation on change)
 
 ### Optional
 
@@ -127,7 +127,7 @@ Required:
 - `read_only` (Boolean) Make the field read-only (in the form)
 - `recreate_on_update` (Boolean) Mark this field as writable once (resource will be recreated on change)
 - `title` (String) Title
-- `type` (String) Type, one of array, boolean, integer, object, number or string.
+- `type` (String) Type, one of `array`, `boolean`, `integer`, `object`, `number` or `string`.
 
 Optional:
 
