@@ -45,6 +45,19 @@ func RequiredIdentifierSchema(description string) schema.StringAttribute {
 	}
 }
 
+func RequiredImmutableIdentifierSchema(description string) schema.StringAttribute {
+	if len(description) == 0 {
+		description = "Identifier"
+	}
+	return schema.StringAttribute{
+		MarkdownDescription: description,
+		Required:            true,
+		PlanModifiers: []planmodifier.String{
+			stringplanmodifier.RequiresReplace(),
+		},
+	}
+}
+
 // Description
 
 func ComputedDescriptionSchema() schema.StringAttribute {
