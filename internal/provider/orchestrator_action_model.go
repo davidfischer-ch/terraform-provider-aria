@@ -73,7 +73,7 @@ func (self OrchestratorActionModel) CreatePath() string {
 }
 
 func (self OrchestratorActionModel) ReadPath() string {
-	return fmt.Sprintf("vco/api/actions/%s", self.Id.ValueString())
+	return "vco/api/actions/" + self.Id.ValueString()
 }
 
 func (self OrchestratorActionModel) UpdatePath() string {

@@ -61,12 +61,13 @@ func (self *OrchestratorWorkflowResource) Create(
 		return
 	}
 
+	path := workflow.CreatePath()
 	workflowCreateRaw := workflow.ToCreateAPI()
 	response, err := self.client.Client.R().
-		// TODO SetQueryParam("apiVersion", ORCHESTRATOR_API_VERSION).
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
 		SetBody(workflowCreateRaw).
 		SetResult(&workflowCreateRaw).
-		Post(workflow.CreatePath())
+		Post(path)
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -89,11 +90,12 @@ func (self *OrchestratorWorkflowResource) Create(
 	}
 
 	var workflowVersionResponsRaw OrchestratorWorkflowVersionResponseAPIModel
+	path = workflow.UpdatePath()
 	response, err = self.client.Client.R().
-		// TODO SetQueryParam("apiVersion", ORCHESTRATOR_API_VERSION).
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
 		SetBody(workflowVersionRaw).
 		SetResult(&workflowVersionResponsRaw).
-		Post(workflow.UpdatePath())
+		Post(path)
 
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
@@ -185,11 +187,12 @@ func (self *OrchestratorWorkflowResource) Update(
 	}
 
 	var workflowVersionResponsRaw OrchestratorWorkflowVersionResponseAPIModel
+	path := workflow.UpdatePath()
 	response, err := self.client.Client.R().
-		// TODO SetQueryParam("apiVersion", ORCHESTRATOR_API_VERSION).
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
 		SetBody(workflowVersionRaw).
 		SetResult(&workflowVersionResponsRaw).
-		Post(workflow.UpdatePath())
+		Post(path)
 
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {

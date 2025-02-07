@@ -67,11 +67,12 @@ func (self *OrchestratorConfigurationResource) Create(
 		return
 	}
 
+	path := configuration.CreatePath()
 	response, err := self.client.Client.R().
-		// TODO SetQueryParam("apiVersion", ORCHESTRATOR_API_VERSION).
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
 		SetBody(configurationRaw).
 		SetResult(&configurationRaw).
-		Post(configuration.CreatePath())
+		Post(path)
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -139,11 +140,12 @@ func (self *OrchestratorConfigurationResource) Update(
 	}
 
 	// No response body from API, only the changeset (version) available in response headers
+	path := configuration.UpdatePath()
 	response, err := self.client.Client.R().
-		// TODO SetQueryParam("apiVersion", ORCHESTRATOR_API_VERSION).
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
 		SetHeader("x-vro-changeset-sha", configurationFromState.VersionId.ValueString()).
 		SetBody(configurationRaw).
-		Put(configuration.UpdatePath())
+		Put(path)
 
 	err = handleAPIResponse(ctx, response, err, []int{204})
 	if err != nil {

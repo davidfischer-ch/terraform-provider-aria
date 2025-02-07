@@ -47,11 +47,11 @@ func (self OrchestratorCategoryModel) CreatePath() string {
 	if len(self.ParentId.ValueString()) == 0 {
 		return "vco/api/categories"
 	}
-	return fmt.Sprintf("vco/api/categories/%s", self.ParentId.ValueString())
+	return "vco/api/categories/" + self.ParentId.ValueString()
 }
 
 func (self OrchestratorCategoryModel) ReadPath() string {
-	return fmt.Sprintf("vco/api/categories/%s", self.Id.ValueString())
+	return "vco/api/categories/" + self.Id.ValueString()
 }
 
 func (self OrchestratorCategoryModel) UpdatePath() string {

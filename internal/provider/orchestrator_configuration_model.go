@@ -61,7 +61,7 @@ func (self OrchestratorConfigurationModel) CreatePath() string {
 }
 
 func (self OrchestratorConfigurationDataSourceModel) ReadPath() string {
-	return fmt.Sprintf("vco/api/configurations/%s", self.Id.ValueString())
+	return "vco/api/configurations/" + self.Id.ValueString()
 }
 
 func (self OrchestratorConfigurationModel) UpdatePath() string {
