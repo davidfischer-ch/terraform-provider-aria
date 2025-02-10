@@ -1,5 +1,14 @@
 # Changelog
 
+## Release v0.6.6 (2025-02-10)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.5...v0.6.6
+
+### Features
+
+* Add resource `aria_orchestrator_environment`
+* Add resource `aria_orchestrator_environment_repository`
+
 ## Release v0.6.5 (2025-02-06)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.4...v0.6.5
