@@ -31,18 +31,23 @@ func (self *CatalogSourceConfigModel) FromAPI(
 
 	diags := diag.Diagnostics{}
 
-	// Convert workflows from raw
-	workflows := []CatalogSourceWorkflowModel{}
-	for _, workflowRaw := range raw.Workflows {
-		workflow := CatalogSourceWorkflowModel{}
-		diags.Append(workflow.FromAPI(ctx, workflowRaw)...)
-		workflows = append(workflows, workflow)
-	}
+	// Convert workflows from raw to list
+	if raw.Workflows == nil {
+		self.Workflows = types.ListNull(self.Workflows.ElementType(ctx))
+	} else {
+		workflows := []CatalogSourceWorkflowModel{}
+		for _, workflowRaw := range raw.Workflows {
+			workflow := CatalogSourceWorkflowModel{}
+			diags.Append(workflow.FromAPI(ctx, workflowRaw)...)
+			workflows = append(workflows, workflow)
+		}
 
-	// Store workflows to list value
-	var someDiags diag.Diagnostics
-	self.Workflows, someDiags = types.ListValueFrom(ctx, self.Workflows.ElementType(ctx), workflows)
-	diags.Append(someDiags...)
+		var someDiags diag.Diagnostics
+		self.Workflows, someDiags = types.ListValueFrom(
+			ctx, self.Workflows.ElementType(ctx), workflows,
+		)
+		diags.Append(someDiags...)
+	}
 
 	return diags
 }
@@ -53,13 +58,15 @@ func (self CatalogSourceConfigModel) ToAPI(
 ) (CatalogSourceConfigAPIModel, diag.Diagnostics) {
 
 	diags := diag.Diagnostics{}
-	workflowsRaw := []CatalogSourceWorkflowAPIModel{}
 
 	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/list
-	if self.Workflows.IsNull() || self.Workflows.IsUnknown() {
+	var workflowsRaw []CatalogSourceWorkflowAPIModel
+	if self.Workflows.IsUnknown() {
 		diags.AddError(
 			"Configuration error",
-			fmt.Sprintf("Unable to manage %s, workflows is either null or unknown", name))
+			fmt.Sprintf("Unable to manage %s, workflows is unknown", name))
+	} else if self.Workflows.IsNull() {
+		workflowsRaw = nil
 	} else {
 		// Extract workflows from list value and then convert to raw
 		workflows := make([]CatalogSourceWorkflowModel, 0, len(self.Workflows.Elements()))

@@ -1,3 +1,27 @@
+# Publish the Cloud Templates of a Project Libray using a Catalog Source ---------------------------
+
+# variables.tf
+
+variable "library_project_id" {
+  description = "Identifier of the project containing Cloud templates to publish."
+  type        = string
+}
+
+# main.tf
+
+resource "aria_catalog_source" "library_project_cloud_templates" {
+  name        = "Cloud Templates Catalog Source"
+  description = "Publish some Cloud templates from a library project."
+  project_id  = var.library_project_id
+  type_id     = "com.vmw.abx.actions"
+
+  config = {
+    source_project_id = var.library_project_id
+  }
+}
+
+# Create a Workflow and make it available using a Catalog Source -----------------------------------
+
 # data.tf
 
 data "aria_integration" "workflows" {
@@ -42,8 +66,9 @@ resource "aria_orchestrator_workflow" "dummy" {
 }
 
 resource "aria_catalog_source" "dummy" {
-  name    = "Dummy Workflow Catalog Source"
-  type_id = data.aria_integration.workflows.type_id
+  name        = "Dummy Workflow Catalog Source"
+  description = "Publish the dummy workflow."
+  type_id     = data.aria_integration.workflows.type_id
 
   config = {
     workflows = [
