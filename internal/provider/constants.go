@@ -30,8 +30,8 @@ const PLATFORM_API_VERSION = ""
 
 const IMMUTABLE = " (force recreation on change)"
 
-const JSON_INSTEAD_OF_DYNAMIC_DISCLAIMER = "" +
-	" (JSON encoded)\n" +
+const JSON_INSTEAD_OF_DYNAMIC_DISCLAIMER = " " +
+	"(JSON encoded)\n" +
 	"\n" +
 	"We should have implemented this attribute as a dynamic type (and not JSON).\n" +
 	"Unfortunately Terraform SDK returns this issue:\n" +

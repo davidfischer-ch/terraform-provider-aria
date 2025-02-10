@@ -131,7 +131,7 @@ func (self OrchestratorWorkflowModel) DeletePath() string {
 	if self.ForceDelete.ValueBool() {
 		return fmt.Sprintf("vco/api/workflows/%s?force=true", self.Id.ValueString())
 	}
-	return fmt.Sprintf("vco/api/workflows/%s", self.Id.ValueString())
+	return "vco/api/workflows/" + self.Id.ValueString()
 }
 
 // Save response from create API endpoint.
