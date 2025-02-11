@@ -13,6 +13,30 @@ Catalog source resource. Please be aware of this: https://github.com/davidfische
 ## Example Usage
 
 ```terraform
+# Publish the Cloud Templates of a Project Libray using a Catalog Source ---------------------------
+
+# variables.tf
+
+variable "library_project_id" {
+  description = "Identifier of the project containing Cloud templates to publish."
+  type        = string
+}
+
+# main.tf
+
+resource "aria_catalog_source" "library_project_cloud_templates" {
+  name        = "Cloud Templates Catalog Source"
+  description = "Publish some Cloud templates from a library project."
+  project_id  = var.library_project_id
+  type_id     = "com.vmw.abx.actions"
+
+  config = {
+    source_project_id = var.library_project_id
+  }
+}
+
+# Create a Workflow and make it available using a Catalog Source -----------------------------------
+
 # data.tf
 
 data "aria_integration" "workflows" {
@@ -57,8 +81,9 @@ resource "aria_orchestrator_workflow" "dummy" {
 }
 
 resource "aria_catalog_source" "dummy" {
-  name    = "Dummy Workflow Catalog Source"
-  type_id = data.aria_integration.workflows.type_id
+  name        = "Dummy Workflow Catalog Source"
+  description = "Publish the dummy workflow."
+  type_id     = data.aria_integration.workflows.type_id
 
   config = {
     workflows = [
@@ -84,11 +109,13 @@ resource "aria_catalog_source" "dummy" {
 ### Required
 
 - `config` (Attributes) Configuration (see [below for nested schema](#nestedatt--config))
+- `description` (String) Describe the resource in few sentences
 - `name` (String) Source name (e.g. getVRAHost)
 - `type_id` (String) Source type (e.g. `com.vmw.vro.workflow`)
 
 ### Optional
 
+- `project_id` (String) Project identifier. Empty or unset means available for all projects. (force recreation on change)
 - `wait_imported` (Boolean) Wait for import to be completed (up to 15 minutes, checked every 30 seconds)
 
 ### Read-Only

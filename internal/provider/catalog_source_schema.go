@@ -22,6 +22,7 @@ func CatalogSourceSchema() schema.Schema {
 				MarkdownDescription: "Source name (e.g. getVRAHost)",
 				Required:            true,
 			},
+			"description": RequiredDescriptionSchema(),
 			"type_id": schema.StringAttribute{
 				MarkdownDescription: "Source type (e.g. `com.vmw.vro.workflow`)",
 				Required:            true,
@@ -30,7 +31,8 @@ func CatalogSourceSchema() schema.Schema {
 				MarkdownDescription: "Is it globally shared?",
 				Computed:            true,
 			},
-			"config": CatalogSourceConfigSchema(),
+			"project_id": OptionalImmutableProjectIdSchema(),
+			"config":     CatalogSourceConfigSchema(),
 			"created_at": schema.StringAttribute{
 				MarkdownDescription: "Creation timestamp (RFC3339)",
 				CustomType:          timetypes.RFC3339Type{},

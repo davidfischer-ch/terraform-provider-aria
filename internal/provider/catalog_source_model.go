@@ -16,10 +16,11 @@ import (
 
 // CatalogSourceModel describes the resource data model.
 type CatalogSourceModel struct {
-	Id     types.String `tfsdk:"id"`
-	Name   types.String `tfsdk:"name"`
-	TypeId types.String `tfsdk:"type_id"`
-	Global types.Bool   `tfsdk:"global"`
+	Id          types.String `tfsdk:"id"`
+	Name        types.String `tfsdk:"name"`
+	Description types.String `tfsdk:"description"`
+	TypeId      types.String `tfsdk:"type_id"`
+	Global      types.Bool   `tfsdk:"global"`
 
 	Config CatalogSourceConfigModel `tfsdk:"config"`
 
@@ -34,15 +35,18 @@ type CatalogSourceModel struct {
 	ItemsImported types.Int32 `tfsdk:"items_imported"`
 	ItemsFound    types.Int32 `tfsdk:"items_found"`
 
+	ProjectId types.String `tfsdk:"project_id"`
+
 	WaitImported types.Bool `tfsdk:"wait_imported"`
 }
 
 // CatalogSourceAPIModel describes the resource API model.
 type CatalogSourceAPIModel struct {
-	Id     string `json:"id,omitempty"`
-	Name   string `json:"name"`
-	TypeId string `json:"typeId"`
-	Global bool   `json:"global,omitempty"`
+	Id          string `json:"id,omitempty"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	TypeId      string `json:"typeId"`
+	Global      bool   `json:"global,omitempty"`
 
 	Config CatalogSourceConfigAPIModel `json:"config"`
 
@@ -56,6 +60,8 @@ type CatalogSourceAPIModel struct {
 
 	ItemsImported int32 `json:"itemsImported,omitempty"`
 	ItemsFound    int32 `json:"itemsFound,omitempty"`
+
+	ProjectId string `json:"projectId"`
 }
 
 func (self CatalogSourceModel) String() string {
@@ -94,12 +100,14 @@ func (self *CatalogSourceModel) FromAPI(
 ) diag.Diagnostics {
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
+	self.Description = types.StringValue(raw.Description)
 	self.TypeId = types.StringValue(raw.TypeId)
 	self.Global = types.BoolValue(raw.Global)
 	self.CreatedBy = types.StringValue(raw.CreatedBy)
 	self.LastUpdatedBy = types.StringValue(raw.LastUpdatedBy)
 	self.ItemsImported = types.Int32Value(raw.ItemsImported)
 	self.ItemsFound = types.Int32Value(raw.ItemsFound)
+	self.ProjectId = types.StringValue(raw.ProjectId)
 
 	diags := self.Config.FromAPI(ctx, raw.Config)
 
@@ -134,10 +142,12 @@ func (self CatalogSourceModel) ToAPI(
 ) (CatalogSourceAPIModel, diag.Diagnostics) {
 	configRaw, diags := self.Config.ToAPI(ctx, self.String())
 	return CatalogSourceAPIModel{
-		Id:     self.Id.ValueString(),
-		Name:   self.Name.ValueString(),
-		TypeId: self.TypeId.ValueString(),
-		Config: configRaw,
+		Id:          self.Id.ValueString(),
+		Name:        self.Name.ValueString(),
+		Description: self.Description.ValueString(),
+		TypeId:      self.TypeId.ValueString(),
+		ProjectId:   self.ProjectId.ValueString(),
+		Config:      configRaw,
 	}, diags
 }
 
