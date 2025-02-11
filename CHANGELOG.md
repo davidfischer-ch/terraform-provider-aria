@@ -1,5 +1,13 @@
 # Changelog
 
+## Release v0.6.7 (2025-02-11)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.6...v0.6.7
+
+### Features
+
+* Resource `aria_catalog_source` implement Cloud Templates & ABX Actions use-cases
+
 ## Release v0.6.6 (2025-02-10)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.5...v0.6.6
