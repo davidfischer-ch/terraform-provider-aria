@@ -14,8 +14,7 @@ import (
 
 func CatalogSourceSchema() schema.Schema {
 	return schema.Schema{
-		MarkdownDescription: "Catalog source resource. Please be aware of this: " +
-			"https://github.com/davidfischer-ch/terraform-provider-aria/issues/114",
+		MarkdownDescription: "Catalog source resource",
 		Attributes: map[string]schema.Attribute{
 			"id": ComputedIdentifierSchema(""),
 			"name": schema.StringAttribute{

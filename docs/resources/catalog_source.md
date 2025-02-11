@@ -3,12 +3,12 @@
 page_title: "aria_catalog_source Resource - aria"
 subcategory: ""
 description: |-
-  Catalog source resource. Please be aware of this: https://github.com/davidfischer-ch/terraform-provider-aria/issues/114
+  Catalog source resource
 ---
 
 # aria_catalog_source (Resource)
 
-Catalog source resource. Please be aware of this: https://github.com/davidfischer-ch/terraform-provider-aria/issues/114
+Catalog source resource
 
 ## Example Usage
 
