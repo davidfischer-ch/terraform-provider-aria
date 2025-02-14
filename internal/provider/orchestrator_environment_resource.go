@@ -69,8 +69,8 @@ func (self *OrchestratorEnvironmentResource) Create(
 		return
 	}
 
-	path := environment.CreatePath()
 	var environmentFromAPI OrchestratorEnvironmentAPIModel
+	path := environment.CreatePath()
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", GetVersionFromPath(path)).
 		SetBody(environmentToAPI).
@@ -147,8 +147,8 @@ func (self *OrchestratorEnvironmentResource) Update(
 		return
 	}
 
-	path := environment.UpdatePath()
 	var environmentFromAPI OrchestratorEnvironmentAPIModel
+	path := environment.UpdatePath()
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", GetVersionFromPath(path)).
 		SetHeader("x-vro-changeset-sha", environmentFromState.VersionId.ValueString()).
@@ -214,7 +214,6 @@ func (self *OrchestratorEnvironmentResource) WaitUpToDate(
 	tflog.Debug(ctx, fmt.Sprintf("Wait %s to be up-to-date...", name))
 
 	// Poll for environment to be up-to-date to 10 minutes (60 x 10 seconds)
-	var environmentFromAPI OrchestratorEnvironmentAPIModel
 	maxAttempts := 60
 	for attempt := 0; attempt < maxAttempts; attempt++ {
 		// Poll resource until up-to-date
@@ -223,6 +222,7 @@ func (self *OrchestratorEnvironmentResource) WaitUpToDate(
 			ctx,
 			fmt.Sprintf("Poll %d of %d - Check %s is up-to-date...", attempt+1, maxAttempts, name))
 
+		var environmentFromAPI OrchestratorEnvironmentAPIModel
 		found, response, someDiags := self.client.ReadIt(ctx, environment, &environmentFromAPI)
 		diags.Append(someDiags...)
 		if !found {

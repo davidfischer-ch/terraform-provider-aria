@@ -68,10 +68,11 @@ func (self *SubscriptionResource) Create(
 		return
 	}
 
+	path := subscription.CreatePath()
 	response, err := self.client.Client.R().
-		// TODO SetQueryParam("apiVersion", EVENT_BROKER_API_VERSION).
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
 		SetBody(subscriptionToAPI).
-		Post(subscription.CreatePath())
+		Post(path)
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -82,10 +83,11 @@ func (self *SubscriptionResource) Create(
 
 	// Read (using API) to retrieve the subscription content (and not empty stuff)
 	var subscriptionFromAPI SubscriptionAPIModel
+	path = subscription.ReadPath()
 	response, err = self.client.Client.R().
-		// TODO SetQueryParam("apiVersion", EVENT_BROKER_API_VERSION).
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
 		SetResult(&subscriptionFromAPI).
-		Get(subscription.ReadPath())
+		Get(path)
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
@@ -146,10 +148,11 @@ func (self *SubscriptionResource) Update(
 		return
 	}
 
+	path := subscription.UpdatePath()
 	response, err := self.client.Client.R().
-		// TODO SetQueryParam("apiVersion", EVENT_BROKER_API_VERSION).
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
 		SetBody(subscriptionToAPI).
-		Post(subscription.UpdatePath())
+		Post(path)
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -160,9 +163,11 @@ func (self *SubscriptionResource) Update(
 
 	// Read (using API) to retrieve the subscription content (and not empty stuff)
 	var subscriptionFromAPI SubscriptionAPIModel
+	path = subscription.ReadPath()
 	response, err = self.client.Client.R().
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
 		SetResult(&subscriptionFromAPI).
-		Get(subscription.ReadPath())
+		Get(path)
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {

@@ -194,7 +194,6 @@ func (self *CatalogSourceResource) WaitImported(
 	tflog.Debug(ctx, fmt.Sprintf("Wait %s to be imported...", name))
 
 	// Poll for catalog items to be imported up to 15 minutes (30 x 30 seconds)
-	var sourceFromAPI CatalogSourceAPIModel
 	maxAttempts := 30
 	for attempt := 0; attempt < maxAttempts; attempt++ {
 		// Poll resource until imported
@@ -203,6 +202,7 @@ func (self *CatalogSourceResource) WaitImported(
 			ctx,
 			fmt.Sprintf("Poll %d of %d - Check %s is imported...", attempt+1, maxAttempts, name))
 
+		var sourceFromAPI CatalogSourceAPIModel
 		found, _, someDiags := self.client.ReadIt(ctx, source, &sourceFromAPI)
 		diags.Append(someDiags...)
 		if !found {

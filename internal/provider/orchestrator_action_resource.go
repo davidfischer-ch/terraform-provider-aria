@@ -133,12 +133,10 @@ func (self *OrchestratorActionResource) Update(
 		return
 	}
 
-	var actionFromAPI OrchestratorActionAPIModel
 	path := action.UpdatePath()
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", GetVersionFromPath(path)).
 		SetBody(actionToAPI).
-		SetResult(&actionFromAPI).
 		Put(path)
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
@@ -146,6 +144,22 @@ func (self *OrchestratorActionResource) Update(
 		resp.Diagnostics.AddError(
 			"Client error",
 			fmt.Sprintf("Unable to update %s, got error: %s", action.String(), err))
+		return
+	}
+
+	// Read (using API) to retrieve the action content (and not empty stuff)
+	var actionFromAPI OrchestratorActionAPIModel
+	path = action.ReadPath()
+	response, err = self.client.Client.R().
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+		SetResult(&actionFromAPI).
+		Get(path)
+
+	err = handleAPIResponse(ctx, response, err, []int{200})
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to read %s, got error: %s", action.String(), err))
 		return
 	}
 

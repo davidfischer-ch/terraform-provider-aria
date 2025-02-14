@@ -159,6 +159,8 @@ func (self *CustomResourceResource) Update(
 	// Ensure additional actions are left untouched
 	resourceToAPI.AdditionalActions = resourceFromAPI.AdditionalActions
 
+	// Reset to prevent muxing of old/new data
+	resourceFromAPI = CustomResourceAPIModel{}
 	path := resource.UpdatePath()
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", GetVersionFromPath(path)).

@@ -61,18 +61,33 @@ func (self *CatalogItemIconResource) Create(
 		return
 	}
 
-	var itemIconFromAPI CatalogItemIconAPIModel
 	path := itemIcon.CreatePath()
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", GetVersionFromPath(path)).
 		SetBody(itemIcon.ToAPI()).
-		SetResult(&itemIconFromAPI).
 		Patch(path)
+
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
 			fmt.Sprintf("Unable to create %s, got error: %s", itemIcon.String(), err))
+		return
+	}
+
+	// Read (using API) to retrieve the item content (and not empty stuff)
+	var itemIconFromAPI CatalogItemIconAPIModel
+	path = itemIcon.ReadPath()
+	response, err = self.client.Client.R().
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+		SetResult(&itemIconFromAPI).
+		Get(path)
+
+	err = handleAPIResponse(ctx, response, err, []int{200})
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to read %s, got error: %s", itemIcon.String(), err))
 		return
 	}
 
@@ -121,12 +136,10 @@ func (self *CatalogItemIconResource) Update(
 		return
 	}
 
-	var itemIconFromAPI CatalogItemIconAPIModel
 	path := itemIcon.UpdatePath()
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", GetVersionFromPath(path)).
 		SetBody(itemIcon.ToAPI()).
-		SetResult(&itemIconFromAPI).
 		Patch(path)
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
@@ -134,6 +147,22 @@ func (self *CatalogItemIconResource) Update(
 		resp.Diagnostics.AddError(
 			"Client error",
 			fmt.Sprintf("Unable to update %s, got error: %s", itemIcon.String(), err))
+		return
+	}
+
+	// Read (using API) to retrieve the item content (and not empty stuff)
+	var itemIconFromAPI CatalogItemIconAPIModel
+	path = itemIcon.ReadPath()
+	response, err = self.client.Client.R().
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+		SetResult(&itemIconFromAPI).
+		Get(path)
+
+	err = handleAPIResponse(ctx, response, err, []int{200})
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to read %s, got error: %s", itemIcon.String(), err))
 		return
 	}
 
