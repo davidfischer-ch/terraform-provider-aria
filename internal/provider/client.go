@@ -274,12 +274,22 @@ func logAPIResponseInfo(
 		requestBody = []byte("<body>")
 	}
 
+	var responseData any
+	responseBody := response.Body()
+	if json.Unmarshal(responseBody, &responseData) == nil {
+		body, bodyErr := json.MarshalIndent(responseData, "", "\t")
+		if bodyErr == nil {
+			responseBody = body
+		}
+	}
+
 	method := tflog.Trace
 	if err != nil {
 		method = tflog.Debug
 	}
 
 	method(ctx, strings.Join([]string{
+		"",
 		"Request Info:",
 		fmt.Sprintf("  URL         : %s", request.URL),
 		fmt.Sprintf("  Method      : %s", request.Method),
@@ -292,7 +302,7 @@ func logAPIResponseInfo(
 		fmt.Sprintf("  Proto       : %s", response.Proto()),
 		fmt.Sprintf("  Time        : %s", response.Time()),
 		fmt.Sprintf("  Received At : %s", response.ReceivedAt()),
-		fmt.Sprintf("  Body        : %s", response.String()),
+		fmt.Sprintf("  Body        : %s", responseBody),
 	}, "\n"))
 }
 
