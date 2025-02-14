@@ -283,12 +283,7 @@ func logAPIResponseInfo(
 		}
 	}
 
-	method := tflog.Trace
-	if err != nil {
-		method = tflog.Debug
-	}
-
-	method(ctx, strings.Join([]string{
+	tflog.Debug(ctx, strings.Join([]string{
 		"",
 		"Request Info:",
 		fmt.Sprintf("  URL         : %s", request.URL),
