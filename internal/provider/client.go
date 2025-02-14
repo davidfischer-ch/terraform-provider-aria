@@ -274,16 +274,26 @@ func logAPIResponseInfo(
 		requestBody = []byte("<body>")
 	}
 
-	var responseData any
-	responseBody := response.Body()
-	if json.Unmarshal(responseBody, &responseData) == nil {
-		body, bodyErr := json.MarshalIndent(responseData, "", "\t")
-		if bodyErr == nil {
-			responseBody = body
+	var responseBody []byte
+	if strings.Contains(request.URL, "icon/api/icons") && request.Method == "GET" {
+		responseBody = []byte("<THE ICON>")
+	} else {
+		var responseData any
+		responseBody = response.Body()
+		if json.Unmarshal(responseBody, &responseData) == nil {
+			body, bodyErr := json.MarshalIndent(responseData, "", "\t")
+			if bodyErr == nil {
+				responseBody = body
+			}
 		}
 	}
 
-	tflog.Debug(ctx, strings.Join([]string{
+	method := tflog.Trace
+	if err != nil {
+		method = tflog.Debug
+	}
+
+	method(ctx, strings.Join([]string{
 		"",
 		"Request Info:",
 		fmt.Sprintf("  URL         : %s", request.URL),
