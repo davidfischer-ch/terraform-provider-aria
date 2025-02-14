@@ -13,7 +13,7 @@ import (
 func CustomNamingTemplateCounterSchema() schema.NestedAttributeObject {
 	return schema.NestedAttributeObject{
 		Attributes: map[string]schema.Attribute{
-			"id": ComputedMutableIdentifierSchema(""),
+			"id":            ComputedMutableIdentifierSchema(""),
 			"resource_type": ComputedCustomNamingResourceTypeSchema(),
 			"current_counter": schema.Int32Attribute{
 				MarkdownDescription: "Current counter value",

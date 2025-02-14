@@ -205,8 +205,9 @@ func (self *OrchestratorEnvironmentResource) WaitUpToDate(
 	environment *OrchestratorEnvironmentModel,
 ) diag.Diagnostics {
 
+	diags := diag.Diagnostics{}
 	if !environment.WaitUpToDate.ValueBool() {
-		return diag.Diagnostics{}
+		return diags
 	}
 
 	name := environment.String()

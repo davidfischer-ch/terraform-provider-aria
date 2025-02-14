@@ -86,7 +86,7 @@ resource "aria_orchestrator_task" "dummy_monthly" {
 	* `one-time` -> "(Europe/Zurich) "
 	* `every-minutes` -> "(Europe/Zurich) 30,"
 	* `every-hours` -> "(Europe/Zurich) 10:00,"
-	* every-days` -> "(Europe/Zurich) 01:00:00,19:30:00,"
+	* `every-days` -> "(Europe/Zurich) 01:00:00,19:30:00,"
 	* `every-weeks` -> "(Europe/Zurich) Monday 02:00:00,Friday 22:00:00,"
 	* `every-months` -> "(Europe/Zurich) 01 00:00:00,12 00:00:00,"
 - `recurrence_start_date` (String) Recurrence start timestamp (RFC3339)

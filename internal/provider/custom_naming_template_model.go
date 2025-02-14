@@ -160,7 +160,7 @@ func (self CustomNamingTemplateModel) ToAPI(
 		// Keep last known identifier and counters
 		raw.Id = stateRaw.Id
 		raw.Counters = stateRaw.Counters
-		tflog.Debug(ctx,fmt.Sprintf("Keep last known %s ID and counters", self.String()))
+		tflog.Debug(ctx, fmt.Sprintf("Keep last known %s ID and counters", self.String()))
 	} else {
 		// Wipe identifier and counters
 		raw.Id = ""

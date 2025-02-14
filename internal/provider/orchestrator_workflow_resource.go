@@ -61,7 +61,7 @@ func (self *OrchestratorWorkflowResource) Create(
 		return
 	}
 
-	var workflowFromCreateAPI OrchestratorWorkflowAPIModel
+	var workflowFromCreateAPI OrchestratorWorkflowCreateAPIModel
 	path := workflow.CreatePath()
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", GetVersionFromPath(path)).
@@ -89,8 +89,8 @@ func (self *OrchestratorWorkflowResource) Create(
 		return
 	}
 
-	path = workflow.UpdatePath()
 	var workflowFromVersionAPI OrchestratorWorkflowVersionResponseAPIModel
+	path = workflow.UpdatePath()
 	response, err = self.client.Client.R().
 		SetQueryParam("apiVersion", GetVersionFromPath(path)).
 		SetBody(workflowToVersionAPI).
@@ -122,14 +122,14 @@ func (self *OrchestratorWorkflowResource) Create(
 	}
 
 	// Read forms
-	var formsRaw any
-	_, _, readDiags = self.client.ReadIt(ctx, &workflow, &formsRaw, workflow.ReadFormPath())
+	var fromsFromAPI any
+	_, _, readDiags = self.client.ReadIt(ctx, &workflow, &fromsFromAPI, workflow.ReadFormPath())
 	resp.Diagnostics.Append(readDiags...)
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated workflow into Terraform state
 		resp.Diagnostics.Append(workflow.FromContentAPI(ctx, workflowFromContentAPI, response)...)
-		resp.Diagnostics.Append(workflow.FromFormAPI(ctx, formsRaw)...)
+		resp.Diagnostics.Append(workflow.FromFormAPI(ctx, fromsFromAPI)...)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &workflow)...)
 	}
 }

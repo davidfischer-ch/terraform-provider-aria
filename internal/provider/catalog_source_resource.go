@@ -229,24 +229,25 @@ func (self *CatalogSourceResource) WaitImported(
 			// Trigger import of catalog source again and crossing fingers...
 
 			sourceToAPI, someDiags := source.ToAPI(ctx)
-			if diags.HasError() {
-				break // Unexpected error, cannot continue polling
-			}
+			diags.Append(someDiags...)
 
-			path := source.UpdatePath()
-			response, err := self.client.Client.R().
-				SetQueryParam("apiVersion", GetVersionFromPath(path)).
-				SetBody(sourceToAPI).
-				Post(path)
-			err = handleAPIResponse(ctx, response, err, []int{201})
-			if err == nil {
-				continue // Continue polling
-			}
+			// Refresh and continue polling but only if there is no error (conversion, ...)
+			if !diags.HasError() {
+				path := source.UpdatePath()
+				response, err := self.client.Client.R().
+					SetQueryParam("apiVersion", GetVersionFromPath(path)).
+					SetBody(sourceToAPI).
+					Post(path)
+				err = handleAPIResponse(ctx, response, err, []int{201})
+				if err == nil {
+					continue // Continue polling
+				}
 
-			// Will end with errors...
-			diags.AddError(
-				"Client error",
-				fmt.Sprintf("%s unable to trigger reimport, got error: %s", name, err))
+				// Will end with errors...
+				diags.AddError(
+					"Client error",
+					fmt.Sprintf("%s unable to trigger reimport, got error: %s", name, err))
+			}
 		}
 
 		// May have some import errors too...
