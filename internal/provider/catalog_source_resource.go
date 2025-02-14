@@ -62,17 +62,19 @@ func (self *CatalogSourceResource) Create(
 		return
 	}
 
-	sourceRaw, someDiags := source.ToAPI(ctx)
+	sourceToAPI, someDiags := source.ToAPI(ctx)
 	resp.Diagnostics.Append(someDiags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	var sourceFromAPI CatalogSourceAPIModel
+	path := source.CreatePath()
 	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", CATALOG_API_VERSION).
-		SetBody(sourceRaw).
-		SetResult(&sourceRaw).
-		Post(source.CreatePath())
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+		SetBody(sourceToAPI).
+		SetResult(&sourceFromAPI).
+		Post(path)
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -82,7 +84,7 @@ func (self *CatalogSourceResource) Create(
 	}
 
 	// Save catalog source into Terraform state
-	resp.Diagnostics.Append(source.FromAPI(ctx, sourceRaw)...)
+	resp.Diagnostics.Append(source.FromAPI(ctx, sourceFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &source)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", source.String()))
 
@@ -104,8 +106,8 @@ func (self *CatalogSourceResource) Read(
 		return
 	}
 
-	var sourceRaw CatalogSourceAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &source, &sourceRaw)
+	var sourceFromAPI CatalogSourceAPIModel
+	found, _, readDiags := self.client.ReadIt(ctx, &source, &sourceFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -114,7 +116,7 @@ func (self *CatalogSourceResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated catalog source into Terraform state
-		resp.Diagnostics.Append(source.FromAPI(ctx, sourceRaw)...)
+		resp.Diagnostics.Append(source.FromAPI(ctx, sourceFromAPI)...)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &source)...)
 	}
 }
@@ -131,17 +133,19 @@ func (self *CatalogSourceResource) Update(
 		return
 	}
 
-	sourceRaw, someDiags := source.ToAPI(ctx)
+	sourceToAPI, someDiags := source.ToAPI(ctx)
 	resp.Diagnostics.Append(someDiags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	var sourceFromAPI CatalogSourceAPIModel
+	path := source.UpdatePath()
 	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", CATALOG_API_VERSION).
-		SetBody(sourceRaw).
-		SetResult(&sourceRaw).
-		Post(source.UpdatePath())
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+		SetBody(sourceToAPI).
+		SetResult(&sourceFromAPI).
+		Post(path)
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -151,7 +155,7 @@ func (self *CatalogSourceResource) Update(
 	}
 
 	// Save catalog source into Terraform state
-	resp.Diagnostics.Append(source.FromAPI(ctx, sourceRaw)...)
+	resp.Diagnostics.Append(source.FromAPI(ctx, sourceFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &source)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", source.String()))
 
@@ -166,9 +170,8 @@ func (self *CatalogSourceResource) Delete(
 	req resource.DeleteRequest,
 	resp *resource.DeleteResponse,
 ) {
-	var source CatalogSourceModel
-
 	// Read Terraform prior state data into the model
+	var source CatalogSourceModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &source)...)
 	if !resp.Diagnostics.HasError() {
 		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &source)...)
@@ -182,12 +185,8 @@ func (self *CatalogSourceResource) WaitImported(
 	source *CatalogSourceModel,
 ) diag.Diagnostics {
 
+	diags := diag.Diagnostics{}
 	if !source.WaitImported.ValueBool() {
-		return diag.Diagnostics{}
-	}
-
-	sourceRaw, diags := source.ToAPI(ctx)
-	if diags.HasError() {
 		return diags
 	}
 
@@ -195,6 +194,7 @@ func (self *CatalogSourceResource) WaitImported(
 	tflog.Debug(ctx, fmt.Sprintf("Wait %s to be imported...", name))
 
 	// Poll for catalog items to be imported up to 15 minutes (30 x 30 seconds)
+	var sourceFromAPI CatalogSourceAPIModel
 	maxAttempts := 30
 	for attempt := 0; attempt < maxAttempts; attempt++ {
 		// Poll resource until imported
@@ -203,7 +203,7 @@ func (self *CatalogSourceResource) WaitImported(
 			ctx,
 			fmt.Sprintf("Poll %d of %d - Check %s is imported...", attempt+1, maxAttempts, name))
 
-		found, _, someDiags := self.client.ReadIt(ctx, source, &sourceRaw)
+		found, _, someDiags := self.client.ReadIt(ctx, source, &sourceFromAPI)
 		diags.Append(someDiags...)
 		if !found {
 			diags.AddError(
@@ -213,7 +213,7 @@ func (self *CatalogSourceResource) WaitImported(
 		}
 
 		// Update source from API
-		diags.Append(source.FromAPI(ctx, sourceRaw)...)
+		diags.Append(source.FromAPI(ctx, sourceFromAPI)...)
 		if diags.HasError() {
 			return diags
 		}
@@ -227,10 +227,17 @@ func (self *CatalogSourceResource) WaitImported(
 
 		if waitAndSee {
 			// Trigger import of catalog source again and crossing fingers...
+
+			sourceToAPI, someDiags := source.ToAPI(ctx)
+			if diags.HasError() {
+				break // Unexpected error, cannot continue polling
+			}
+
+			path := source.UpdatePath()
 			response, err := self.client.Client.R().
-				SetQueryParam("apiVersion", CATALOG_API_VERSION).
-				SetBody(sourceRaw).
-				Post(source.UpdatePath())
+				SetQueryParam("apiVersion", GetVersionFromPath(path)).
+				SetBody(sourceToAPI).
+				Post(path)
 			err = handleAPIResponse(ctx, response, err, []int{201})
 			if err == nil {
 				continue // Continue polling

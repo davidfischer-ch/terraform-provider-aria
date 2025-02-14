@@ -61,12 +61,13 @@ func (self *TagResource) Create(
 		return
 	}
 
-	var tagRaw TagAPIModel
+	var tagFromAPI TagAPIModel
+	path := tag.CreatePath()
 	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", IAAS_API_VERSION).
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
 		SetBody(tag.ToAPI()).
-		SetResult(&tagRaw).
-		Post(tag.CreatePath())
+		SetResult(&tagFromAPI).
+		Post(path)
 
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
@@ -77,7 +78,7 @@ func (self *TagResource) Create(
 	}
 
 	// Save tag into Terraform state
-	tag.FromAPI(tagRaw)
+	tag.FromAPI(tagFromAPI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &tag)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", tag.String()))
 }
@@ -95,13 +96,13 @@ func (self *TagResource) Read(
 	}
 
 	// TODO Read by filtering tag list by ID
-	var listRaw TagListAPIModel
+	var listFromAPI TagListAPIModel
 	listPath := tag.ListPath()
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", GetVersionFromPath(listPath)).
 		SetQueryParam("$filter", fmt.Sprintf("id eq %s", tag.Id.ValueString())).
 		SetQueryParam("$top", "2"). // Make it possible to know if filter works properly
-		SetResult(&listRaw).
+		SetResult(&listFromAPI).
 		Get(listPath)
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
@@ -112,25 +113,25 @@ func (self *TagResource) Read(
 	}
 
 	// Do not rely on NumberOfElements
-	if len(listRaw.Content) == 0 {
+	if len(listFromAPI.Content) == 0 {
 		resp.State.RemoveResource(ctx)
 		return
 	}
 
 	// Neither TotalElements
-	if len(listRaw.Content) > 1 {
+	if len(listFromAPI.Content) > 1 {
 		resp.Diagnostics.AddError(
 			"Client error",
 			fmt.Sprintf(
 				"Expected one and only one tag matching %s ID, found: %d",
-				tag.String(), listRaw.TotalElements,
+				tag.String(), listFromAPI.TotalElements,
 			),
 		)
 		return
 	}
 
 	// Save updated tag into Terraform state
-	tag.FromAPI(listRaw.Content[0])
+	tag.FromAPI(listFromAPI.Content[0])
 	resp.Diagnostics.Append(resp.State.Set(ctx, &tag)...)
 }
 

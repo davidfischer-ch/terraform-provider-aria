@@ -61,17 +61,19 @@ func (self *CloudTemplateV1Resource) Create(
 		return
 	}
 
-	templateRaw, diags := template.ToAPI(ctx)
+	templateToAPI, diags := template.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	var templateFromAPI CloudTemplateV1APIModel
+	path := template.CreatePath()
 	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", BLUEPRINT_API_VERSION).
-		SetBody(templateRaw).
-		SetResult(&templateRaw).
-		Post(template.CreatePath())
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+		SetBody(templateToAPI).
+		SetResult(&templateFromAPI).
+		Post(path)
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -81,7 +83,7 @@ func (self *CloudTemplateV1Resource) Create(
 	}
 
 	// Save cloud template into Terraform state
-	resp.Diagnostics.Append(template.FromAPI(ctx, templateRaw)...)
+	resp.Diagnostics.Append(template.FromAPI(ctx, templateFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &template)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", template.String()))
 }
@@ -125,17 +127,19 @@ func (self *CloudTemplateV1Resource) Update(
 		return
 	}
 
-	templateRaw, diags := template.ToAPI(ctx)
+	templateToAPI, diags := template.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	var templateFromAPI CloudTemplateV1APIModel
+	path := template.UpdatePath()
 	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", BLUEPRINT_API_VERSION).
-		SetBody(templateRaw).
-		SetResult(&templateRaw).
-		Put(template.UpdatePath())
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+		SetBody(templateToAPI).
+		SetResult(&templateFromAPI).
+		Put(path)
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
@@ -146,7 +150,7 @@ func (self *CloudTemplateV1Resource) Update(
 	}
 
 	// Save updated cloud template into Terraform state
-	resp.Diagnostics.Append(template.FromAPI(ctx, templateRaw)...)
+	resp.Diagnostics.Append(template.FromAPI(ctx, templateFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &template)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", template.String()))
 }

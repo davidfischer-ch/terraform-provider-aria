@@ -62,7 +62,7 @@ func (self *SubscriptionResource) Create(
 	}
 
 	subscription.GenerateId()
-	subscriptionRaw, diags := subscription.ToAPI(ctx)
+	subscriptionToAPI, diags := subscription.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -70,7 +70,7 @@ func (self *SubscriptionResource) Create(
 
 	response, err := self.client.Client.R().
 		// TODO SetQueryParam("apiVersion", EVENT_BROKER_API_VERSION).
-		SetBody(subscriptionRaw).
+		SetBody(subscriptionToAPI).
 		Post(subscription.CreatePath())
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
@@ -81,9 +81,10 @@ func (self *SubscriptionResource) Create(
 	}
 
 	// Read (using API) to retrieve the subscription content (and not empty stuff)
+	var subscriptionFromAPI SubscriptionAPIModel
 	response, err = self.client.Client.R().
 		// TODO SetQueryParam("apiVersion", EVENT_BROKER_API_VERSION).
-		SetResult(&subscriptionRaw).
+		SetResult(&subscriptionFromAPI).
 		Get(subscription.ReadPath())
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
@@ -95,7 +96,7 @@ func (self *SubscriptionResource) Create(
 	}
 
 	// Save subscription into Terraform state
-	resp.Diagnostics.Append(subscription.FromAPI(ctx, subscriptionRaw)...)
+	resp.Diagnostics.Append(subscription.FromAPI(ctx, subscriptionFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &subscription)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", subscription.String()))
 }
@@ -112,8 +113,8 @@ func (self *SubscriptionResource) Read(
 		return
 	}
 
-	var subscriptionRaw SubscriptionAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &subscription, &subscriptionRaw)
+	var subscriptionFromAPI SubscriptionAPIModel
+	found, _, readDiags := self.client.ReadIt(ctx, &subscription, &subscriptionFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -122,7 +123,7 @@ func (self *SubscriptionResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated subscription into Terraform state
-		resp.Diagnostics.Append(subscription.FromAPI(ctx, subscriptionRaw)...)
+		resp.Diagnostics.Append(subscription.FromAPI(ctx, subscriptionFromAPI)...)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &subscription)...)
 	}
 }
@@ -139,7 +140,7 @@ func (self *SubscriptionResource) Update(
 		return
 	}
 
-	subscriptionRaw, diags := subscription.ToAPI(ctx)
+	subscriptionToAPI, diags := subscription.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -147,7 +148,7 @@ func (self *SubscriptionResource) Update(
 
 	response, err := self.client.Client.R().
 		// TODO SetQueryParam("apiVersion", EVENT_BROKER_API_VERSION).
-		SetBody(subscriptionRaw).
+		SetBody(subscriptionToAPI).
 		Post(subscription.UpdatePath())
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
@@ -158,8 +159,9 @@ func (self *SubscriptionResource) Update(
 	}
 
 	// Read (using API) to retrieve the subscription content (and not empty stuff)
+	var subscriptionFromAPI SubscriptionAPIModel
 	response, err = self.client.Client.R().
-		SetResult(&subscriptionRaw).
+		SetResult(&subscriptionFromAPI).
 		Get(subscription.ReadPath())
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
@@ -171,7 +173,7 @@ func (self *SubscriptionResource) Update(
 	}
 
 	// Save subscription into Terraform state
-	resp.Diagnostics.Append(subscription.FromAPI(ctx, subscriptionRaw)...)
+	resp.Diagnostics.Append(subscription.FromAPI(ctx, subscriptionFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &subscription)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", subscription.String()))
 }
@@ -181,9 +183,8 @@ func (self *SubscriptionResource) Delete(
 	req resource.DeleteRequest,
 	resp *resource.DeleteResponse,
 ) {
-	var subscription SubscriptionModel
-
 	// Read Terraform prior state data into the model
+	var subscription SubscriptionModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &subscription)...)
 	if !resp.Diagnostics.HasError() {
 		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &subscription)...)

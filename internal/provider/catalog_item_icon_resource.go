@@ -61,12 +61,13 @@ func (self *CatalogItemIconResource) Create(
 		return
 	}
 
-	itemIconRaw := itemIcon.ToAPI()
+	var itemIconFromAPI CatalogItemIconAPIModel
+	path := itemIcon.CreatePath()
 	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", CATALOG_API_VERSION).
-		SetBody(itemIconRaw).
-		SetResult(&itemIconRaw).
-		Patch(itemIcon.CreatePath())
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+		SetBody(itemIcon.ToAPI()).
+		SetResult(&itemIconFromAPI).
+		Patch(path)
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -76,7 +77,7 @@ func (self *CatalogItemIconResource) Create(
 	}
 
 	// Save item's icon into Terraform state
-	itemIcon.FromAPI(itemIconRaw)
+	itemIcon.FromAPI(itemIconFromAPI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &itemIcon)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", itemIcon.String()))
 }
@@ -93,8 +94,8 @@ func (self *CatalogItemIconResource) Read(
 		return
 	}
 
-	var itemIconRaw CatalogItemIconAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &itemIcon, &itemIconRaw)
+	var itemIconFromAPI CatalogItemIconAPIModel
+	found, _, readDiags := self.client.ReadIt(ctx, &itemIcon, &itemIconFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -103,7 +104,7 @@ func (self *CatalogItemIconResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated item's icon into Terraform state
-		itemIcon.FromAPI(itemIconRaw)
+		itemIcon.FromAPI(itemIconFromAPI)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &itemIcon)...)
 	}
 }
@@ -120,11 +121,13 @@ func (self *CatalogItemIconResource) Update(
 		return
 	}
 
-	itemIconRaw := itemIcon.ToAPI()
+	var itemIconFromAPI CatalogItemIconAPIModel
+	path := itemIcon.UpdatePath()
 	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", CATALOG_API_VERSION).
-		SetBody(itemIconRaw).
-		Patch(itemIcon.UpdatePath())
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+		SetBody(itemIcon.ToAPI()).
+		SetResult(&itemIconFromAPI).
+		Patch(path)
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
@@ -134,8 +137,8 @@ func (self *CatalogItemIconResource) Update(
 		return
 	}
 
-	// Save updated category into Terraform state
-	itemIcon.FromAPI(itemIconRaw)
+	// Save updated item's icon into Terraform state
+	itemIcon.FromAPI(itemIconFromAPI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &itemIcon)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", itemIcon.String()))
 }

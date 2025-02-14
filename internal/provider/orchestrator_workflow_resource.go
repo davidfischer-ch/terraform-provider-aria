@@ -61,12 +61,12 @@ func (self *OrchestratorWorkflowResource) Create(
 		return
 	}
 
+	var workflowFromCreateAPI OrchestratorWorkflowAPIModel
 	path := workflow.CreatePath()
-	workflowCreateRaw := workflow.ToCreateAPI()
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(workflowCreateRaw).
-		SetResult(&workflowCreateRaw).
+		SetBody(workflow.ToCreateAPI()).
+		SetResult(&workflowFromCreateAPI).
 		Post(path)
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
@@ -77,24 +77,24 @@ func (self *OrchestratorWorkflowResource) Create(
 	}
 
 	// Save workflow into Terraform state
-	workflow.FromCreateAPI(workflowCreateRaw)
+	workflow.FromCreateAPI(workflowFromCreateAPI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &workflow)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully, now updating", workflow.String()))
 
 	// Update ... TODO deduplicate with Update()
 
-	workflowVersionRaw, diags := workflow.ToVersionAPI(ctx)
+	workflowToVersionAPI, diags := workflow.ToVersionAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	var workflowVersionResponsRaw OrchestratorWorkflowVersionResponseAPIModel
 	path = workflow.UpdatePath()
+	var workflowFromVersionAPI OrchestratorWorkflowVersionResponseAPIModel
 	response, err = self.client.Client.R().
 		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(workflowVersionRaw).
-		SetResult(&workflowVersionResponsRaw).
+		SetBody(workflowToVersionAPI).
+		SetResult(&workflowFromVersionAPI).
 		Post(path)
 
 	err = handleAPIResponse(ctx, response, err, []int{201})
@@ -106,15 +106,15 @@ func (self *OrchestratorWorkflowResource) Create(
 	}
 
 	// Save updated workflow into Terraform state
-	workflow.FromVersionAPI(workflowVersionResponsRaw)
+	workflow.FromVersionAPI(workflowFromVersionAPI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &workflow)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", workflow.String()))
 
 	// Read ... TODO deduplicate with Read()
 
 	// Read content
-	var workflowContentRaw OrchestratorWorkflowContentAPIModel
-	found, response, readDiags := self.client.ReadIt(ctx, &workflow, &workflowContentRaw)
+	var workflowFromContentAPI OrchestratorWorkflowContentAPIModel
+	found, response, readDiags := self.client.ReadIt(ctx, &workflow, &workflowFromContentAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -128,7 +128,7 @@ func (self *OrchestratorWorkflowResource) Create(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated workflow into Terraform state
-		resp.Diagnostics.Append(workflow.FromContentAPI(ctx, workflowContentRaw, response)...)
+		resp.Diagnostics.Append(workflow.FromContentAPI(ctx, workflowFromContentAPI, response)...)
 		resp.Diagnostics.Append(workflow.FromFormAPI(ctx, formsRaw)...)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &workflow)...)
 	}
@@ -147,8 +147,8 @@ func (self *OrchestratorWorkflowResource) Read(
 	}
 
 	// Read content
-	var workflowContentRaw OrchestratorWorkflowContentAPIModel
-	found, response, readDiags := self.client.ReadIt(ctx, &workflow, &workflowContentRaw)
+	var workflowFromContentAPI OrchestratorWorkflowContentAPIModel
+	found, response, readDiags := self.client.ReadIt(ctx, &workflow, &workflowFromContentAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -156,14 +156,14 @@ func (self *OrchestratorWorkflowResource) Read(
 	}
 
 	// Read forms
-	var formsRaw any
-	_, _, readDiags = self.client.ReadIt(ctx, &workflow, &formsRaw, workflow.ReadFormPath())
+	var formsFromAPI any
+	_, _, readDiags = self.client.ReadIt(ctx, &workflow, &formsFromAPI, workflow.ReadFormPath())
 	resp.Diagnostics.Append(readDiags...)
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated workflow into Terraform state
-		resp.Diagnostics.Append(workflow.FromContentAPI(ctx, workflowContentRaw, response)...)
-		resp.Diagnostics.Append(workflow.FromFormAPI(ctx, formsRaw)...)
+		resp.Diagnostics.Append(workflow.FromContentAPI(ctx, workflowFromContentAPI, response)...)
+		resp.Diagnostics.Append(workflow.FromFormAPI(ctx, formsFromAPI)...)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &workflow)...)
 	}
 }
@@ -180,18 +180,18 @@ func (self *OrchestratorWorkflowResource) Update(
 		return
 	}
 
-	workflowVersionRaw, diags := workflow.ToVersionAPI(ctx)
+	workflowToVersionAPI, diags := workflow.ToVersionAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	var workflowVersionResponsRaw OrchestratorWorkflowVersionResponseAPIModel
+	var workflowFromVersionAPI OrchestratorWorkflowVersionResponseAPIModel
 	path := workflow.UpdatePath()
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(workflowVersionRaw).
-		SetResult(&workflowVersionResponsRaw).
+		SetBody(workflowToVersionAPI).
+		SetResult(&workflowFromVersionAPI).
 		Post(path)
 
 	err = handleAPIResponse(ctx, response, err, []int{201})
@@ -203,7 +203,7 @@ func (self *OrchestratorWorkflowResource) Update(
 	}
 
 	// Save updated workflow into Terraform state
-	workflow.FromVersionAPI(workflowVersionResponsRaw)
+	workflow.FromVersionAPI(workflowFromVersionAPI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &workflow)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", workflow.String()))
 }

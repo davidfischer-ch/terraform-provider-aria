@@ -61,17 +61,19 @@ func (self *PropertyGroupResource) Create(
 		return
 	}
 
-	propertyGroupRaw, diags := propertyGroup.ToAPI(ctx)
+	propertyGroupToAPI, diags := propertyGroup.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	var propertyGroupFromAPI PropertyGroupAPIModel
+	path := propertyGroup.CreatePath()
 	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", BLUEPRINT_API_VERSION).
-		SetBody(propertyGroupRaw).
-		SetResult(&propertyGroupRaw).
-		Post(propertyGroup.CreatePath())
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+		SetBody(propertyGroupToAPI).
+		SetResult(&propertyGroupFromAPI).
+		Post(path)
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -81,7 +83,7 @@ func (self *PropertyGroupResource) Create(
 	}
 
 	// Save property group into Terraform state
-	resp.Diagnostics.Append(propertyGroup.FromAPI(ctx, propertyGroupRaw)...)
+	resp.Diagnostics.Append(propertyGroup.FromAPI(ctx, propertyGroupFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &propertyGroup)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", propertyGroup.String()))
 }
@@ -98,8 +100,8 @@ func (self *PropertyGroupResource) Read(
 		return
 	}
 
-	var propertyGroupRaw PropertyGroupAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &propertyGroup, &propertyGroupRaw)
+	var propertyGroupFromAPI PropertyGroupAPIModel
+	found, _, readDiags := self.client.ReadIt(ctx, &propertyGroup, &propertyGroupFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -108,7 +110,7 @@ func (self *PropertyGroupResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated property group into Terraform state
-		resp.Diagnostics.Append(propertyGroup.FromAPI(ctx, propertyGroupRaw)...)
+		resp.Diagnostics.Append(propertyGroup.FromAPI(ctx, propertyGroupFromAPI)...)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &propertyGroup)...)
 	}
 }
@@ -125,17 +127,19 @@ func (self *PropertyGroupResource) Update(
 		return
 	}
 
-	propertyGroupRaw, diags := propertyGroup.ToAPI(ctx)
+	propertyGroupToAPI, diags := propertyGroup.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	var propertyGroupFromAPI PropertyGroupAPIModel
+	path := propertyGroup.UpdatePath()
 	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", BLUEPRINT_API_VERSION).
-		SetBody(propertyGroupRaw).
-		SetResult(&propertyGroupRaw).
-		Put(propertyGroup.UpdatePath())
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+		SetBody(propertyGroupToAPI).
+		SetResult(&propertyGroupFromAPI).
+		Put(path)
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
@@ -146,7 +150,7 @@ func (self *PropertyGroupResource) Update(
 	}
 
 	// Save updated property group into Terraform state
-	resp.Diagnostics.Append(propertyGroup.FromAPI(ctx, propertyGroupRaw)...)
+	resp.Diagnostics.Append(propertyGroup.FromAPI(ctx, propertyGroupFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &propertyGroup)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", propertyGroup.String()))
 }

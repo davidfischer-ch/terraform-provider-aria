@@ -61,12 +61,12 @@ func (self *OrchestratorEnvironmentRepositoryResource) Create(
 		return
 	}
 
+	var repositoryFromAPI OrchestratorEnvironmentRepositoryAPIModel
 	path := repository.CreatePath()
-	repositoryRaw := repository.ToAPI()
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(repositoryRaw).
-		SetResult(&repositoryRaw).
+		SetBody(repository.ToAPI()).
+		SetResult(&repositoryFromAPI).
 		Post(path)
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
@@ -77,7 +77,7 @@ func (self *OrchestratorEnvironmentRepositoryResource) Create(
 	}
 
 	// Save repository into Terraform state
-	repository.FromAPI(repositoryRaw)
+	repository.FromAPI(repositoryFromAPI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &repository)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", repository.String()))
 }
@@ -94,8 +94,8 @@ func (self *OrchestratorEnvironmentRepositoryResource) Read(
 		return
 	}
 
-	var repositoryRaw OrchestratorEnvironmentRepositoryAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &repository, &repositoryRaw)
+	var repositoryFromAPI OrchestratorEnvironmentRepositoryAPIModel
+	found, _, readDiags := self.client.ReadIt(ctx, &repository, &repositoryFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -104,7 +104,7 @@ func (self *OrchestratorEnvironmentRepositoryResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated repository into Terraform state
-		repository.FromAPI(repositoryRaw)
+		repository.FromAPI(repositoryFromAPI)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &repository)...)
 	}
 }
@@ -121,12 +121,12 @@ func (self *OrchestratorEnvironmentRepositoryResource) Update(
 		return
 	}
 
+	var repositoryFromAPI OrchestratorEnvironmentRepositoryAPIModel
 	path := repository.UpdatePath()
-	repositoryRaw := repository.ToAPI()
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(repositoryRaw).
-		SetResult(&repositoryRaw).
+		SetBody(repository.ToAPI()).
+		SetResult(&repositoryFromAPI).
 		Put(path)
 
 	err = handleAPIResponse(ctx, response, err, []int{202})
@@ -138,7 +138,7 @@ func (self *OrchestratorEnvironmentRepositoryResource) Update(
 	}
 
 	// Save updated repository into Terraform state
-	repository.FromAPI(repositoryRaw)
+	repository.FromAPI(repositoryFromAPI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &repository)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", repository.String()))
 }

@@ -61,12 +61,13 @@ func (self *ABXConstantResource) Create(
 		return
 	}
 
-	var constantRaw ABXConstantAPIModel
+	var constantFromAPI ABXConstantAPIModel
+	path := constant.CreatePath()
 	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", ABX_API_VERSION).
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
 		SetBody(constant.ToAPI()).
-		SetResult(&constantRaw).
-		Post(constant.CreatePath())
+		SetResult(&constantFromAPI).
+		Post(path)
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
@@ -77,7 +78,7 @@ func (self *ABXConstantResource) Create(
 	}
 
 	// Save constant into Terraform state
-	constant.FromAPI(constantRaw)
+	constant.FromAPI(constantFromAPI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", constant.String()))
 }
@@ -94,8 +95,8 @@ func (self *ABXConstantResource) Read(
 		return
 	}
 
-	var constantRaw ABXConstantAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &constant, &constantRaw)
+	var constantFromAPI ABXConstantAPIModel
+	found, _, readDiags := self.client.ReadIt(ctx, &constant, &constantFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -104,7 +105,7 @@ func (self *ABXConstantResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated constant into Terraform state
-		constant.FromAPI(constantRaw)
+		constant.FromAPI(constantFromAPI)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
 	}
 }
@@ -121,12 +122,13 @@ func (self *ABXConstantResource) Update(
 		return
 	}
 
-	var constantRaw ABXConstantAPIModel
+	var contantFromAPI ABXConstantAPIModel
+	path := constant.UpdatePath()
 	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", ABX_API_VERSION).
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
 		SetBody(constant.ToAPI()).
-		SetResult(&constantRaw).
-		Put(constant.UpdatePath())
+		SetResult(&contantFromAPI).
+		Put(path)
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
@@ -137,7 +139,7 @@ func (self *ABXConstantResource) Update(
 	}
 
 	// Save constant into Terraform state
-	constant.FromAPI(constantRaw)
+	constant.FromAPI(contantFromAPI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", constant.String()))
 }

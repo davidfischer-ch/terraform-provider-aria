@@ -61,13 +61,14 @@ func (self *CustomFormResource) Create(
 		return
 	}
 
+	var fromFromAPI CustomFormAPIModel
 	form.GenerateId()
-	formRaw := form.ToAPI()
+	path := form.CreatePath()
 	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", FORM_API_VERSION).
-		SetBody(formRaw).
-		SetResult(&formRaw).
-		Post(form.CreatePath())
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+		SetBody(form.ToAPI()).
+		SetResult(&fromFromAPI).
+		Post(path)
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -77,7 +78,7 @@ func (self *CustomFormResource) Create(
 	}
 
 	// Save custom form into Terraform state
-	form.FromAPI(formRaw)
+	form.FromAPI(fromFromAPI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &form)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", form.String()))
 }
@@ -94,8 +95,8 @@ func (self *CustomFormResource) Read(
 		return
 	}
 
-	var formRaw CustomFormAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &form, &formRaw)
+	var formFromAPI CustomFormAPIModel
+	found, _, readDiags := self.client.ReadIt(ctx, &form, &formFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -104,7 +105,7 @@ func (self *CustomFormResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated custom form into Terraform state
-		form.FromAPI(formRaw)
+		form.FromAPI(formFromAPI)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &form)...)
 	}
 }
@@ -121,12 +122,13 @@ func (self *CustomFormResource) Update(
 		return
 	}
 
-	formRaw := form.ToAPI()
+	var formFromAPI CustomFormAPIModel
+	path := form.UpdatePath()
 	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", FORM_API_VERSION).
-		SetBody(formRaw).
-		SetResult(&formRaw).
-		Post(form.UpdatePath())
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+		SetBody(form.ToAPI()).
+		SetResult(&formFromAPI).
+		Post(path)
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -136,7 +138,7 @@ func (self *CustomFormResource) Update(
 	}
 
 	// Save custom form into Terraform state
-	form.FromAPI(formRaw)
+	form.FromAPI(formFromAPI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &form)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", form.String()))
 }

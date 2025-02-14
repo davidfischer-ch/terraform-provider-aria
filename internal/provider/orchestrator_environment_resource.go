@@ -63,17 +63,18 @@ func (self *OrchestratorEnvironmentResource) Create(
 		return
 	}
 
-	environmentRaw, diags := environment.ToAPI(ctx)
+	environmentToAPI, diags := environment.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	path := environment.CreatePath()
+	var environmentFromAPI OrchestratorEnvironmentAPIModel
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(environmentRaw).
-		SetResult(&environmentRaw).
+		SetBody(environmentToAPI).
+		SetResult(&environmentFromAPI).
 		Post(path)
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
@@ -84,7 +85,7 @@ func (self *OrchestratorEnvironmentResource) Create(
 	}
 
 	// Save environment into Terraform state
-	resp.Diagnostics.Append(environment.FromAPI(ctx, environmentRaw, response)...)
+	resp.Diagnostics.Append(environment.FromAPI(ctx, environmentFromAPI, response)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &environment)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", environment.String()))
 
@@ -106,8 +107,8 @@ func (self *OrchestratorEnvironmentResource) Read(
 		return
 	}
 
-	var environmentRaw OrchestratorEnvironmentAPIModel
-	found, response, someDiags := self.client.ReadIt(ctx, &environment, &environmentRaw)
+	var environmentFromAPI OrchestratorEnvironmentAPIModel
+	found, response, someDiags := self.client.ReadIt(ctx, &environment, &environmentFromAPI)
 	resp.Diagnostics.Append(someDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -116,7 +117,7 @@ func (self *OrchestratorEnvironmentResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated environment into Terraform state
-		resp.Diagnostics.Append(environment.FromAPI(ctx, environmentRaw, response)...)
+		resp.Diagnostics.Append(environment.FromAPI(ctx, environmentFromAPI, response)...)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &environment)...)
 	}
 }
@@ -140,18 +141,19 @@ func (self *OrchestratorEnvironmentResource) Update(
 		return
 	}
 
-	environmentRaw, diags := environment.ToAPI(ctx)
+	environmentToAPI, diags := environment.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	path := environment.UpdatePath()
+	var environmentFromAPI OrchestratorEnvironmentAPIModel
 	response, err := self.client.Client.R().
 		SetQueryParam("apiVersion", GetVersionFromPath(path)).
 		SetHeader("x-vro-changeset-sha", environmentFromState.VersionId.ValueString()).
-		SetBody(environmentRaw).
-		SetResult(&environmentRaw).
+		SetBody(environmentToAPI).
+		SetResult(&environmentFromAPI).
 		Put(path)
 
 	err = handleAPIResponse(ctx, response, err, []int{202})
@@ -164,7 +166,7 @@ func (self *OrchestratorEnvironmentResource) Update(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated environment into Terraform state
-		resp.Diagnostics.Append(environment.FromAPI(ctx, environmentRaw, response)...)
+		resp.Diagnostics.Append(environment.FromAPI(ctx, environmentFromAPI, response)...)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &environment)...)
 	}
 
@@ -207,15 +209,11 @@ func (self *OrchestratorEnvironmentResource) WaitUpToDate(
 		return diag.Diagnostics{}
 	}
 
-	environmentRaw, diags := environment.ToAPI(ctx)
-	if diags.HasError() {
-		return diags
-	}
-
 	name := environment.String()
 	tflog.Debug(ctx, fmt.Sprintf("Wait %s to be up-to-date...", name))
 
 	// Poll for environment to be up-to-date to 10 minutes (60 x 10 seconds)
+	var environmentFromAPI OrchestratorEnvironmentAPIModel
 	maxAttempts := 60
 	for attempt := 0; attempt < maxAttempts; attempt++ {
 		// Poll resource until up-to-date
@@ -224,7 +222,7 @@ func (self *OrchestratorEnvironmentResource) WaitUpToDate(
 			ctx,
 			fmt.Sprintf("Poll %d of %d - Check %s is up-to-date...", attempt+1, maxAttempts, name))
 
-		found, response, someDiags := self.client.ReadIt(ctx, environment, &environmentRaw)
+		found, response, someDiags := self.client.ReadIt(ctx, environment, &environmentFromAPI)
 		diags.Append(someDiags...)
 		if !found {
 			diags.AddError(
@@ -234,7 +232,7 @@ func (self *OrchestratorEnvironmentResource) WaitUpToDate(
 		}
 
 		// Update environment from API
-		diags.Append(environment.FromAPI(ctx, environmentRaw, response)...)
+		diags.Append(environment.FromAPI(ctx, environmentFromAPI, response)...)
 		if diags.HasError() || environment.IsUpToDate() {
 			return diags
 		}

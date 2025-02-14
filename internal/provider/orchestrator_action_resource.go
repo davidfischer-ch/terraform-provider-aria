@@ -61,17 +61,19 @@ func (self *OrchestratorActionResource) Create(
 		return
 	}
 
-	actionRaw, diags := action.ToAPI(ctx)
+	actionToAPI, diags := action.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	var actionFromAPI OrchestratorActionAPIModel
+	path := action.CreatePath()
 	response, err := self.client.Client.R().
-		// TODO SetQueryParam("apiVersion", ORCHESTRATOR_API_VERSION).
-		SetBody(actionRaw).
-		SetResult(&actionRaw).
-		Post(action.CreatePath())
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+		SetBody(actionToAPI).
+		SetResult(&actionFromAPI).
+		Post(path)
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -81,7 +83,7 @@ func (self *OrchestratorActionResource) Create(
 	}
 
 	// Save action into Terraform state
-	resp.Diagnostics.Append(action.FromAPI(ctx, actionRaw)...)
+	resp.Diagnostics.Append(action.FromAPI(ctx, actionFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &action)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", action.String()))
 }
@@ -98,8 +100,8 @@ func (self *OrchestratorActionResource) Read(
 		return
 	}
 
-	var actionRaw OrchestratorActionAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &action, &actionRaw)
+	var actionFromAPI OrchestratorActionAPIModel
+	found, _, readDiags := self.client.ReadIt(ctx, &action, &actionFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -108,7 +110,7 @@ func (self *OrchestratorActionResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated action into Terraform state
-		resp.Diagnostics.Append(action.FromAPI(ctx, actionRaw)...)
+		resp.Diagnostics.Append(action.FromAPI(ctx, actionFromAPI)...)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &action)...)
 	}
 }
@@ -125,17 +127,19 @@ func (self *OrchestratorActionResource) Update(
 		return
 	}
 
-	actionRaw, diags := action.ToAPI(ctx)
+	actionToAPI, diags := action.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	var actionFromAPI OrchestratorActionAPIModel
+	path := action.UpdatePath()
 	response, err := self.client.Client.R().
-		// TODO SetQueryParam("apiVersion", ORCHESTRATOR_API_VERSION).
-		SetBody(actionRaw).
-		SetResult(&actionRaw).
-		Put(action.UpdatePath())
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+		SetBody(actionToAPI).
+		SetResult(&actionFromAPI).
+		Put(path)
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
@@ -146,7 +150,7 @@ func (self *OrchestratorActionResource) Update(
 	}
 
 	// Save updated action into Terraform state
-	resp.Diagnostics.Append(action.FromAPI(ctx, actionRaw)...)
+	resp.Diagnostics.Append(action.FromAPI(ctx, actionFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &action)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", action.String()))
 }

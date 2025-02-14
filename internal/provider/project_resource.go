@@ -61,18 +61,20 @@ func (self *ProjectResource) Create(
 		return
 	}
 
-	projectRaw, diags := project.ToAPI(ctx)
+	projectToAPI, diags := project.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	var projectFromAPI ProjectAPIModel
+	path := project.CreatePath()
 	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", PROJECT_API_VERSION).
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
 		SetQueryParam("validatePrincipals", "true").
 		SetQueryParam("syncPrincipals", "true").
-		SetBody(projectRaw).
-		SetResult(&projectRaw).
+		SetBody(projectToAPI).
+		SetResult(&projectFromAPI).
 		Post(project.CreatePath())
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
@@ -83,7 +85,7 @@ func (self *ProjectResource) Create(
 	}
 
 	// Save property group into Terraform state
-	resp.Diagnostics.Append(project.FromAPI(ctx, projectRaw)...)
+	resp.Diagnostics.Append(project.FromAPI(ctx, projectFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &project)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", project.String()))
 }
@@ -100,8 +102,8 @@ func (self *ProjectResource) Read(
 		return
 	}
 
-	var projectRaw ProjectAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &project, &projectRaw)
+	var projectFromAPI ProjectAPIModel
+	found, _, readDiags := self.client.ReadIt(ctx, &project, &projectFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -110,7 +112,7 @@ func (self *ProjectResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated property group into Terraform state
-		resp.Diagnostics.Append(project.FromAPI(ctx, projectRaw)...)
+		resp.Diagnostics.Append(project.FromAPI(ctx, projectFromAPI)...)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &project)...)
 	}
 }
@@ -127,19 +129,21 @@ func (self *ProjectResource) Update(
 		return
 	}
 
-	projectRaw, diags := project.ToAPI(ctx)
+	projectToAPI, diags := project.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	var projectFromAPI ProjectAPIModel
+	path := project.UpdatePath()
 	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", PROJECT_API_VERSION).
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
 		SetQueryParam("validatePrincipals", "true").
 		SetQueryParam("syncPrincipals", "true").
-		SetBody(projectRaw).
-		SetResult(&projectRaw).
-		Patch(project.UpdatePath())
+		SetBody(projectToAPI).
+		SetResult(&projectFromAPI).
+		Patch(path)
 
 	// TODO Also call PATCH project-service/api/projects/{id}/cost
 	// TODO Also call PATCH project-service/api/projects/{id}/principals
@@ -154,7 +158,7 @@ func (self *ProjectResource) Update(
 	}
 
 	// Save updated property group into Terraform state
-	resp.Diagnostics.Append(project.FromAPI(ctx, projectRaw)...)
+	resp.Diagnostics.Append(project.FromAPI(ctx, projectFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &project)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", project.String()))
 }

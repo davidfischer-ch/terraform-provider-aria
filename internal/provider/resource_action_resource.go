@@ -65,7 +65,7 @@ func (self *ResourceActionResource) Create(
 	}
 
 	self.client.Mutex.Lock(ctx, action.LockKey())
-	actionRaw, diags := self.ManageIt(ctx, &action, "create")
+	actionFromAPI, diags := self.ManageIt(ctx, &action, "create")
 	self.client.Mutex.Unlock(ctx, action.LockKey())
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -73,7 +73,7 @@ func (self *ResourceActionResource) Create(
 	}
 
 	// Save resource action into Terraform state
-	resp.Diagnostics.Append(action.FromAPI(ctx, actionRaw)...)
+	resp.Diagnostics.Append(action.FromAPI(ctx, actionFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &action)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", action.String()))
 }
@@ -90,9 +90,9 @@ func (self *ResourceActionResource) Read(
 		return
 	}
 
-	var actionRaw ResourceActionAPIModel
+	var actionFromAPI ResourceActionAPIModel
 	self.client.Mutex.RLock(ctx, action.LockKey())
-	found, _, diags := self.client.ReadIt(ctx, &action, &actionRaw)
+	found, _, diags := self.client.ReadIt(ctx, &action, &actionFromAPI)
 	self.client.Mutex.RUnlock(ctx, action.LockKey())
 	resp.Diagnostics.Append(diags...)
 	if !found {
@@ -102,7 +102,7 @@ func (self *ResourceActionResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated resource action into Terraform state
-		resp.Diagnostics.Append(action.FromAPI(ctx, actionRaw)...)
+		resp.Diagnostics.Append(action.FromAPI(ctx, actionFromAPI)...)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &action)...)
 	}
 }
@@ -120,7 +120,7 @@ func (self *ResourceActionResource) Update(
 	}
 
 	self.client.Mutex.Lock(ctx, action.LockKey())
-	actionRaw, diags := self.ManageIt(ctx, &action, "update")
+	actionFromAPI, diags := self.ManageIt(ctx, &action, "update")
 	self.client.Mutex.Unlock(ctx, action.LockKey())
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -128,7 +128,7 @@ func (self *ResourceActionResource) Update(
 	}
 
 	// Save updated resource action into Terraform state
-	resp.Diagnostics.Append(action.FromAPI(ctx, actionRaw)...)
+	resp.Diagnostics.Append(action.FromAPI(ctx, actionFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &action)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", action.String()))
 }

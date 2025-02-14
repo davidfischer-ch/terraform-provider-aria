@@ -61,17 +61,19 @@ func (self *PolicyResource) Create(
 		return
 	}
 
-	policyRaw, diags := policy.ToAPI(ctx)
+	policyToAPI, diags := policy.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	var policyFromAPI PolicyAPIModel
+	path := policy.CreatePath()
 	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", POLICY_API_VERSION).
-		SetBody(policyRaw).
-		SetResult(&policyRaw).
-		Post(policy.CreatePath())
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+		SetBody(policyToAPI).
+		SetResult(&policyFromAPI).
+		Post(path)
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -81,7 +83,7 @@ func (self *PolicyResource) Create(
 	}
 
 	// Save policy into Terraform state
-	resp.Diagnostics.Append(policy.FromAPI(ctx, policyRaw)...)
+	resp.Diagnostics.Append(policy.FromAPI(ctx, policyFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &policy)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", policy.String()))
 }
@@ -98,8 +100,8 @@ func (self *PolicyResource) Read(
 		return
 	}
 
-	var policyRaw PolicyAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &policy, &policyRaw)
+	var policyFromAPI PolicyAPIModel
+	found, _, readDiags := self.client.ReadIt(ctx, &policy, &policyFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -108,7 +110,7 @@ func (self *PolicyResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated policy into Terraform state
-		resp.Diagnostics.Append(policy.FromAPI(ctx, policyRaw)...)
+		resp.Diagnostics.Append(policy.FromAPI(ctx, policyFromAPI)...)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &policy)...)
 	}
 }
@@ -125,17 +127,19 @@ func (self *PolicyResource) Update(
 		return
 	}
 
-	policyRaw, diags := policy.ToAPI(ctx)
+	policyToAPI, diags := policy.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	var policyFromAPI PolicyAPIModel
+	path := policy.UpdatePath()
 	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", FORM_API_VERSION).
-		SetBody(policyRaw).
-		SetResult(&policyRaw).
-		Post(policy.UpdatePath())
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+		SetBody(policyToAPI).
+		SetResult(&policyFromAPI).
+		Post(path)
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -145,7 +149,7 @@ func (self *PolicyResource) Update(
 	}
 
 	// Save policy into Terraform state
-	resp.Diagnostics.Append(policy.FromAPI(ctx, policyRaw)...)
+	resp.Diagnostics.Append(policy.FromAPI(ctx, policyFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &policy)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", policy.String()))
 }
@@ -155,9 +159,8 @@ func (self *PolicyResource) Delete(
 	req resource.DeleteRequest,
 	resp *resource.DeleteResponse,
 ) {
-	var policy PolicyModel
-
 	// Read Terraform prior state data into the model
+	var policy PolicyModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &policy)...)
 	if !resp.Diagnostics.HasError() {
 		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &policy)...)
