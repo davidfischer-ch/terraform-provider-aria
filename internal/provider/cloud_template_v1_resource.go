@@ -82,6 +82,24 @@ func (self *CloudTemplateV1Resource) Create(
 		return
 	}
 
+	// Refresh available attributes (such as id)
+	template.FromCreateAPI(templateFromAPI)
+
+	// Read (using API) to retrieve the projects & templates (and counters)
+	path = template.ReadPath()
+	response, err = self.client.Client.R().
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+		SetResult(&templateFromAPI).
+		Get(path)
+
+	err = handleAPIResponse(ctx, response, err, []int{200})
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to read %s, got error: %s", template.String(), err))
+		return
+	}
+
 	// Save cloud template into Terraform state
 	resp.Diagnostics.Append(template.FromAPI(ctx, templateFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &template)...)

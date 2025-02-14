@@ -171,7 +171,6 @@ resource "aria_cloud_template_v1" "test" {
 				ImportStateVerify: true,
 			},
 			// Delete testing automatically occurs in TestCase
-			// TODO Check https://developer.hashicorp.com/terraform/plugin/sdkv2/testing/acceptance-tests/testcase#checkdestroy
 		},
 	})
 }
