@@ -37,7 +37,7 @@ func OrchestratorTaskSchema() schema.Schema {
 					"\t* `one-time` -> \"(Europe/Zurich) \"",
 					"\t* `every-minutes` -> \"(Europe/Zurich) 30,\"",
 					"\t* `every-hours` -> \"(Europe/Zurich) 10:00,\"",
-					"\t* every-days` -> \"(Europe/Zurich) 01:00:00,19:30:00,\"",
+					"\t* `every-days` -> \"(Europe/Zurich) 01:00:00,19:30:00,\"",
 					"\t* `every-weeks` -> \"(Europe/Zurich) Monday 02:00:00,Friday 22:00:00,\"",
 					"\t* `every-months` -> \"(Europe/Zurich) 01 00:00:00,12 00:00:00,\"",
 				}, "\n"),
