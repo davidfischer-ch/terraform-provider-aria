@@ -4,12 +4,11 @@
 package provider
 
 import (
-	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/boolplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int32default"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int32planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
 // A Template declared inside a CustomNamingSchema.
@@ -22,25 +21,7 @@ func CustomNamingTemplateSchema() schema.NestedAttributeObject {
 					"named templates)",
 				Required: true,
 			},
-			"resource_type": schema.StringAttribute{
-				MarkdownDescription: "Resource type, one of COMPUTE, COMPUTE_STORAGE, " +
-					"NETWORK, LOAD_BALANCER, RESOURCE_GROUP, GATEWAY, NAT, " +
-					"SECURITY_GROUP, GENERIC",
-				Required: true,
-				Validators: []validator.String{
-					stringvalidator.OneOf([]string{
-						"COMPUTE",
-						"COMPUTE_STORAGE",
-						"NETWORK",
-						"LOAD_BALANCER",
-						"RESOURCE_GROUP",
-						"GATEWAY",
-						"NAT",
-						"SECURITY_GROUP",
-						"GENERIC",
-					}...),
-				},
-			},
+			"resource_type": RequiredCustomNamingResourceTypeSchema(),
 			"resource_type_name": schema.StringAttribute{
 				MarkdownDescription: "Resource type name (e.g. Machine)",
 				Required:            true,
@@ -70,12 +51,23 @@ func CustomNamingTemplateSchema() schema.NestedAttributeObject {
 				Computed:            true,
 				Optional:            true,
 				Default:             int32default.StaticInt32(1),
+				PlanModifiers: []planmodifier.Int32{
+					int32planmodifier.UseStateForUnknown(),
+				},
 			},
 			"increment_step": schema.Int32Attribute{
 				MarkdownDescription: "TODO",
 				Computed:            true,
 				Optional:            true,
 				Default:             int32default.StaticInt32(1),
+				PlanModifiers: []planmodifier.Int32{
+					int32planmodifier.UseStateForUnknown(),
+				},
+			},
+			"counters": schema.ListNestedAttribute{
+				MarkdownDescription: "Counters",
+				Computed:            true,
+				NestedObject:        CustomNamingTemplateCounterSchema(),
 			},
 		},
 	}

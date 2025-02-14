@@ -4,8 +4,10 @@
 package provider
 
 import (
+	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
@@ -59,11 +61,13 @@ func (self CustomNamingModel) DeletePath() string {
 	return self.ReadPath()
 }
 
-func (self *CustomNamingModel) FromAPI(raw CustomNamingAPIModel) {
+func (self *CustomNamingModel) FromAPI(
+	ctx context.Context,
+	raw CustomNamingAPIModel,
+) diag.Diagnostics {
+	self.FromCreateAPI(raw)
 
-	self.Id = types.StringValue(raw.Id)
-	self.Name = types.StringValue(raw.Name)
-	self.Description = types.StringValue(raw.Description)
+	diags := diag.Diagnostics{}
 
 	self.Projects = []CustomNamingProjectFilterModel{}
 	for _, projectRaw := range raw.Projects {
@@ -76,12 +80,26 @@ func (self *CustomNamingModel) FromAPI(raw CustomNamingAPIModel) {
 	self.Templates = map[string]CustomNamingTemplateModel{}
 	for _, templateRaw := range raw.Templates {
 		template := CustomNamingTemplateModel{}
-		template.FromAPI(templateRaw)
+		diags.Append(template.FromAPI(ctx, templateRaw)...)
 		self.Templates[template.Key()] = template
 	}
+
+	return diags
 }
 
-func (self *CustomNamingModel) ToAPI(state CustomNamingModel) CustomNamingAPIModel {
+func (self *CustomNamingModel) FromCreateAPI(raw CustomNamingAPIModel) {
+	self.Id = types.StringValue(raw.Id)
+	self.Name = types.StringValue(raw.Name)
+	self.Description = types.StringValue(raw.Description)
+	// Projects and templates are not available
+}
+
+func (self *CustomNamingModel) ToAPI(
+	ctx context.Context,
+	state CustomNamingModel,
+) (CustomNamingAPIModel, diag.Diagnostics) {
+
+	diags := diag.Diagnostics{}
 
 	projectsRaw := []CustomNamingProjectFilterAPIModel{}
 	for _, project := range self.Projects {
@@ -90,8 +108,13 @@ func (self *CustomNamingModel) ToAPI(state CustomNamingModel) CustomNamingAPIMod
 
 	templatesRaw := []CustomNamingTemplateAPIModel{}
 	for key, template := range self.Templates {
-		templateState := state.Templates[key]
-		templatesRaw = append(templatesRaw, template.ToAPI(templateState))
+		templateState, found := state.Templates[key]
+		if !found {
+			templateState = CustomNamingTemplateModel{}
+		}
+		templateRaw, someDiags := template.ToAPI(ctx, templateState)
+		templatesRaw = append(templatesRaw, templateRaw)
+		diags.Append(someDiags...)
 	}
 
 	return CustomNamingAPIModel{
@@ -100,5 +123,5 @@ func (self *CustomNamingModel) ToAPI(state CustomNamingModel) CustomNamingAPIMod
 		Description: CleanString(self.Description.ValueString()),
 		Projects:    projectsRaw,
 		Templates:   templatesRaw,
-	}
+	}, diags
 }

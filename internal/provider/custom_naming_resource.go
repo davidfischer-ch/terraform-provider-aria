@@ -61,12 +61,19 @@ func (self *CustomNamingResource) Create(
 		return
 	}
 
-	namingRaw := naming.ToAPI(CustomNamingModel{})
+	namingToAPI, someDiags := naming.ToAPI(ctx, CustomNamingModel{})
+	resp.Diagnostics.Append(someDiags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	var namingFromAPI CustomNamingAPIModel
+	path := naming.CreatePath()
 	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", IAAS_API_VERSION).
-		SetBody(namingRaw).
-		SetResult(&namingRaw).
-		Post(naming.CreatePath())
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+		SetBody(namingToAPI).
+		SetResult(&namingFromAPI).
+		Post(path)
 	err = handleAPIResponse(ctx, response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -75,8 +82,26 @@ func (self *CustomNamingResource) Create(
 		return
 	}
 
+	// Refresh available attributes (such as id)
+	naming.FromCreateAPI(namingFromAPI)
+
+	// Read (using API) to retrieve the projects & templates (and counters)
+	path = naming.ReadPath()
+	response, err = self.client.Client.R().
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+		SetResult(&namingFromAPI).
+		Get(path)
+
+	err = handleAPIResponse(ctx, response, err, []int{200})
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to read %s, got error: %s", naming.String(), err))
+		return
+	}
+
 	// Save custom naming into Terraform state
-	naming.FromAPI(namingRaw)
+	resp.Diagnostics.Append(naming.FromAPI(ctx, namingFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &naming)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", naming.String()))
 }
@@ -93,8 +118,8 @@ func (self *CustomNamingResource) Read(
 		return
 	}
 
-	var namingRaw CustomNamingAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &naming, &namingRaw)
+	var namingFromAPI CustomNamingAPIModel
+	found, _, readDiags := self.client.ReadIt(ctx, &naming, &namingFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -103,7 +128,7 @@ func (self *CustomNamingResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated custom naming into Terraform state
-		naming.FromAPI(namingRaw)
+		resp.Diagnostics.Append(naming.FromAPI(ctx, namingFromAPI)...)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &naming)...)
 	}
 }
@@ -121,12 +146,19 @@ func (self *CustomNamingResource) Update(
 		return
 	}
 
-	namingRaw := naming.ToAPI(namingState)
+	namingToAPI, someDiags := naming.ToAPI(ctx, namingState)
+	resp.Diagnostics.Append(someDiags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	var namingFromAPI CustomNamingAPIModel
+	path := naming.UpdatePath()
 	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", IAAS_API_VERSION).
-		SetBody(namingRaw).
-		SetResult(&namingRaw).
-		Put(naming.UpdatePath())
+		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+		SetBody(namingToAPI).
+		SetResult(&namingFromAPI).
+		Put(path)
 
 	err = handleAPIResponse(ctx, response, err, []int{200})
 	if err != nil {
@@ -137,7 +169,7 @@ func (self *CustomNamingResource) Update(
 	}
 
 	// Save updated custom naming into Terraform state
-	naming.FromAPI(namingRaw)
+	resp.Diagnostics.Append(naming.FromAPI(ctx, namingFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &naming)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", naming.String()))
 }
