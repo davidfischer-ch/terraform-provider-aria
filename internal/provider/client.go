@@ -92,11 +92,12 @@ func (self *AriaClient) GetAccessToken() diag.Diagnostics {
 		self.Debug("Requesting a new API access token at %s", self.Host)
 
 		var token AccessTokenResponse
-		response, err := self.Client.R().
+		path := "iaas/api/login"
+		response, err := self.R(path).
 			SetHeader("Content-Type", "application/json").
 			SetBody(map[string]string{"refreshToken": self.RefreshToken}).
 			SetResult(&token).
-			Post("iaas/api/login")
+			Post(path)
 		err = self.HandleAPIResponse(response, err, []int{200})
 		if err != nil {
 			diags.AddError("Unable to retrieve a valid access token", err.Error())
@@ -117,7 +118,10 @@ func (self *AriaClient) GetAccessToken() diag.Diagnostics {
 
 // Return a new request insance with apiVersion header set, based on path.
 func (self AriaClient) R(path string) *resty.Request {
-	return self.Client.R().SetQueryParam("apiVersion", GetVersionFromPath(path))
+	if version := self.GetVersionFromPath(path); len(version) > 0 {
+		return self.Client.R().SetQueryParam("apiVersion", version)
+	}
+	return self.Client.R()
 }
 
 func (self AriaClient) ReadIt(
@@ -304,7 +308,7 @@ func (self AriaClient) LogAPIResponseInfo(
 	}, "\n"))
 }
 
-func GetIdFromLocation(response *resty.Response) (string, error) {
+func (self AriaClient) GetIdFromLocation(response *resty.Response) (string, error) {
 	location, err := url.Parse(response.Header().Get("Location"))
 	if err != nil {
 		return "", err
@@ -314,7 +318,7 @@ func GetIdFromLocation(response *resty.Response) (string, error) {
 	return parts[len(parts)-1], nil
 }
 
-func GetVersionFromPath(path string) string {
+func (self AriaClient) GetVersionFromPath(path string) string {
 	// TODO Take first element of path before /, then map it (faster)
 	if strings.HasPrefix(path, "abx") {
 		return ABX_API_VERSION
@@ -336,6 +340,9 @@ func GetVersionFromPath(path string) string {
 	}
 	if strings.HasPrefix(path, "icon") {
 		return ICON_API_VERSION
+	}
+	if strings.HasPrefix(path, "platform") {
+		return PLATFORM_API_VERSION
 	}
 	if strings.HasPrefix(path, "policy") {
 		return POLICY_API_VERSION

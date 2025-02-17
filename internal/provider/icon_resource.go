@@ -78,7 +78,7 @@ func (self *IconResource) Create(
 		return
 	}
 
-	iconId, err := GetIdFromLocation(response)
+	iconId, err := self.client.GetIdFromLocation(response)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
