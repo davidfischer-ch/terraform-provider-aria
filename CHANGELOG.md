@@ -1,12 +1,31 @@
 # Changelog
 
+## Release v0.6.8 (2025-02-17)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.7...v0.6.8
+
+### Features
+
+* Resource `aria_custom_naming`: Add `counters` nested attribute (fix #38 counters are reset on UPDATE)
+* Provider config: Add `ok_api_calls_log_level` (defaulting to `TRACE`)
++ Provider config: Add `ko_api_calls_log_level` (defaulting to `DEBUG`)
+
+### Fix and enhancements
+
+* SDK: Differentiate from/to API content and implement read after create and/or update if necessary
+* SDK: API client's tries to indent response Body (if JSON) to make it more readable in logs
+* SDK: API client's do not set apiVersion header if version is ""
+* SDK: Refactor API client (add more functions) to reduce code boilerplate (make code DRY)
+* Docs: Drop caution since #114 (random catalog item's download error...) is fixed
+* CI: Fix linters deprecations
+
 ## Release v0.6.7 (2025-02-11)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.6...v0.6.7
 
 ### Features
 
-* Resource `aria_catalog_source` implement Cloud Templates & ABX Actions use-cases
+* Resource `aria_catalog_source`: Implement Cloud Templates & ABX Actions use-cases
 
 ## Release v0.6.6 (2025-02-10)
 
