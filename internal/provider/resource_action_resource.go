@@ -65,7 +65,7 @@ func (self *ResourceActionResource) Create(
 	}
 
 	self.client.Mutex.Lock(ctx, action.LockKey())
-	actionRaw, diags := self.ManageIt(ctx, &action, "create")
+	actionFromAPI, diags := self.ManageIt(ctx, &action, "create")
 	self.client.Mutex.Unlock(ctx, action.LockKey())
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -73,7 +73,7 @@ func (self *ResourceActionResource) Create(
 	}
 
 	// Save resource action into Terraform state
-	resp.Diagnostics.Append(action.FromAPI(ctx, actionRaw)...)
+	resp.Diagnostics.Append(action.FromAPI(ctx, actionFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &action)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", action.String()))
 }
@@ -90,9 +90,9 @@ func (self *ResourceActionResource) Read(
 		return
 	}
 
-	var actionRaw ResourceActionAPIModel
+	var actionFromAPI ResourceActionAPIModel
 	self.client.Mutex.RLock(ctx, action.LockKey())
-	found, _, diags := self.client.ReadIt(ctx, &action, &actionRaw)
+	found, _, diags := self.client.ReadIt(&action, &actionFromAPI)
 	self.client.Mutex.RUnlock(ctx, action.LockKey())
 	resp.Diagnostics.Append(diags...)
 	if !found {
@@ -102,7 +102,7 @@ func (self *ResourceActionResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated resource action into Terraform state
-		resp.Diagnostics.Append(action.FromAPI(ctx, actionRaw)...)
+		resp.Diagnostics.Append(action.FromAPI(ctx, actionFromAPI)...)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &action)...)
 	}
 }
@@ -120,7 +120,7 @@ func (self *ResourceActionResource) Update(
 	}
 
 	self.client.Mutex.Lock(ctx, action.LockKey())
-	actionRaw, diags := self.ManageIt(ctx, &action, "update")
+	actionFromAPI, diags := self.ManageIt(ctx, &action, "update")
 	self.client.Mutex.Unlock(ctx, action.LockKey())
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -128,7 +128,7 @@ func (self *ResourceActionResource) Update(
 	}
 
 	// Save updated resource action into Terraform state
-	resp.Diagnostics.Append(action.FromAPI(ctx, actionRaw)...)
+	resp.Diagnostics.Append(action.FromAPI(ctx, actionFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &action)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", action.String()))
 }
@@ -186,7 +186,7 @@ func (self *ResourceActionResource) ManageIt(
 
 		// Retrieve the custom resource
 		tflog.Debug(ctx, fmt.Sprintf("Retrieve %s", resource.String()))
-		found, _, someDiags := self.client.ReadIt(ctx, &resource, &resourceRaw)
+		found, _, someDiags := self.client.ReadIt(&resource, &resourceRaw)
 		diags.Append(someDiags...)
 		diags.Append(resource.FromAPI(ctx, resourceRaw)...)
 
@@ -281,13 +281,9 @@ func (self *ResourceActionResource) ManageIt(
 		}
 
 		// Update the custom resource
-		response, err := self.client.Client.R().
-			SetQueryParam("apiVersion", FORM_API_VERSION).
-			SetBody(resourceRaw).
-			SetResult(&resourceRaw).
-			Post(resource.UpdatePath())
-
-		err = handleAPIResponse(ctx, response, err, []int{200})
+		path := resource.UpdatePath()
+		response, err := self.client.R(path).SetBody(resourceRaw).SetResult(&resourceRaw).Post(path)
+		err = self.client.HandleAPIResponse(response, err, []int{200})
 		if err != nil {
 			diags.AddError(
 				"Client error",
@@ -336,7 +332,7 @@ func (self *ResourceActionResource) ManageIt(
 
 		/* Delete: Delete the resource action */
 		if method == "delete" {
-			diags.Append(self.client.DeleteIt(ctx, action)...)
+			diags.Append(self.client.DeleteIt(action)...)
 			return actionRaw, diags
 		}
 
@@ -348,13 +344,8 @@ func (self *ResourceActionResource) ManageIt(
 			path = action.UpdatePath()
 		}
 
-		response, err := self.client.Client.R().
-			SetQueryParam("apiVersion", FORM_API_VERSION).
-			SetBody(actionRaw).
-			SetResult(&actionRaw).
-			Post(path)
-
-		err = handleAPIResponse(ctx, response, err, []int{200})
+		response, err := self.client.R(path).SetBody(actionRaw).SetResult(&actionRaw).Post(path)
+		err = self.client.HandleAPIResponse(response, err, []int{200})
 		if err != nil {
 			diags.AddError(
 				"Client error",

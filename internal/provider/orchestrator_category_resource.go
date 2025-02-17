@@ -61,13 +61,13 @@ func (self *OrchestratorCategoryResource) Create(
 		return
 	}
 
-	categoryRaw := category.ToAPI()
-	response, err := self.client.Client.R().
-		// TODO SetQueryParam("apiVersion", ORCHESTRATOR_API_VERSION).
-		SetBody(categoryRaw).
-		SetResult(&categoryRaw).
-		Post(category.CreatePath())
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	var categoryFromAPI OrchestratorCategoryAPIModel
+	path := category.CreatePath()
+	response, err := self.client.R(path).
+		SetBody(category.ToAPI()).
+		SetResult(&categoryFromAPI).
+		Post(path)
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -76,7 +76,7 @@ func (self *OrchestratorCategoryResource) Create(
 	}
 
 	// Save category into Terraform state
-	category.FromAPI(categoryRaw)
+	category.FromAPI(categoryFromAPI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &category)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", category.String()))
 }
@@ -93,8 +93,8 @@ func (self *OrchestratorCategoryResource) Read(
 		return
 	}
 
-	var categoryRaw OrchestratorCategoryAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &category, &categoryRaw)
+	var categoryFromAPI OrchestratorCategoryAPIModel
+	found, _, readDiags := self.client.ReadIt(&category, &categoryFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -103,7 +103,7 @@ func (self *OrchestratorCategoryResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated category into Terraform state
-		category.FromAPI(categoryRaw)
+		category.FromAPI(categoryFromAPI)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &category)...)
 	}
 }
@@ -120,13 +120,9 @@ func (self *OrchestratorCategoryResource) Update(
 		return
 	}
 
-	categoryRaw := category.ToAPI()
-	response, err := self.client.Client.R().
-		// TODO SetQueryParam("apiVersion", ORCHESTRATOR_API_VERSION).
-		SetBody(categoryRaw).
-		Put(category.UpdatePath())
-
-	err = handleAPIResponse(ctx, response, err, []int{204})
+	path := category.UpdatePath()
+	response, err := self.client.R(path).SetBody(category.ToAPI()).Put(path)
+	err = self.client.HandleAPIResponse(response, err, []int{204})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -135,12 +131,10 @@ func (self *OrchestratorCategoryResource) Update(
 	}
 
 	// Read (using API) to retrieve the category content (and not empty stuff)
-	response, err = self.client.Client.R().
-		// TODO SetQueryParam("apiVersion", ORCHESTRATOR_API_VERSION).
-		SetResult(&categoryRaw).
-		Get(category.ReadPath())
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	var categoryFromAPI OrchestratorCategoryAPIModel
+	path = category.ReadPath()
+	response, err = self.client.R(path).SetResult(&categoryFromAPI).Get(category.ReadPath())
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -149,7 +143,7 @@ func (self *OrchestratorCategoryResource) Update(
 	}
 
 	// Save updated category into Terraform state
-	category.FromAPI(categoryRaw)
+	category.FromAPI(categoryFromAPI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &category)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", category.String()))
 }
@@ -163,7 +157,7 @@ func (self *OrchestratorCategoryResource) Delete(
 	var category OrchestratorCategoryModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &category)...)
 	if !resp.Diagnostics.HasError() {
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &category)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&category)...)
 	}
 }
 

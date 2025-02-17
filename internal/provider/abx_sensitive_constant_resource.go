@@ -59,14 +59,11 @@ func (self *ABXSensitiveConstantResource) Create(
 		return
 	}
 
-	var constantRaw ABXSensitiveConstantAPIModel
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", ABX_API_VERSION).
-		SetBody(constant.ToAPI()).
-		SetResult(&constantRaw).
-		Post(constant.CreatePath())
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	var constantFromAPI ABXSensitiveConstantAPIModel
+	path := constant.CreatePath()
+	body := constant.ToAPI()
+	response, err := self.client.R(path).SetBody(body).SetResult(&constantFromAPI).Post(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -75,7 +72,7 @@ func (self *ABXSensitiveConstantResource) Create(
 	}
 
 	// Save sensitive constant into Terraform state
-	constant.FromAPI(constantRaw)
+	constant.FromAPI(constantFromAPI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", constant.String()))
 }
@@ -92,8 +89,8 @@ func (self *ABXSensitiveConstantResource) Read(
 		return
 	}
 
-	var constantRaw ABXSensitiveConstantAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &constant, &constantRaw)
+	var constantFromAPI ABXSensitiveConstantAPIModel
+	found, _, readDiags := self.client.ReadIt(&constant, &constantFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -102,7 +99,7 @@ func (self *ABXSensitiveConstantResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated secret into Terraform state
-		constant.FromAPI(constantRaw)
+		constant.FromAPI(constantFromAPI)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
 	}
 }
@@ -119,14 +116,11 @@ func (self *ABXSensitiveConstantResource) Update(
 		return
 	}
 
-	var constantRaw ABXSensitiveConstantAPIModel
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", ABX_API_VERSION).
-		SetBody(constant.ToAPI()).
-		SetResult(&constantRaw).
-		Put(constant.UpdatePath())
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	var constantFromAPI ABXSensitiveConstantAPIModel
+	path := constant.UpdatePath()
+	body := constant.ToAPI()
+	response, err := self.client.R(path).SetBody(body).SetResult(&constantFromAPI).Put(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -135,7 +129,7 @@ func (self *ABXSensitiveConstantResource) Update(
 	}
 
 	// Save sensitive constant into Terraform state
-	constant.FromAPI(constantRaw)
+	constant.FromAPI(constantFromAPI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", constant.String()))
 }
@@ -149,6 +143,6 @@ func (self *ABXSensitiveConstantResource) Delete(
 	var constant ABXSensitiveConstantModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &constant)...)
 	if !resp.Diagnostics.HasError() {
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &constant)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&constant)...)
 	}
 }

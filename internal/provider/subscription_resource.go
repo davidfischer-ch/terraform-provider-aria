@@ -62,17 +62,15 @@ func (self *SubscriptionResource) Create(
 	}
 
 	subscription.GenerateId()
-	subscriptionRaw, diags := subscription.ToAPI(ctx)
+	subscriptionToAPI, diags := subscription.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	response, err := self.client.Client.R().
-		// TODO SetQueryParam("apiVersion", EVENT_BROKER_API_VERSION).
-		SetBody(subscriptionRaw).
-		Post(subscription.CreatePath())
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	path := subscription.CreatePath()
+	response, err := self.client.R(path).SetBody(subscriptionToAPI).Post(path)
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -81,12 +79,10 @@ func (self *SubscriptionResource) Create(
 	}
 
 	// Read (using API) to retrieve the subscription content (and not empty stuff)
-	response, err = self.client.Client.R().
-		// TODO SetQueryParam("apiVersion", EVENT_BROKER_API_VERSION).
-		SetResult(&subscriptionRaw).
-		Get(subscription.ReadPath())
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	var subscriptionFromAPI SubscriptionAPIModel
+	path = subscription.ReadPath()
+	response, err = self.client.R(path).SetResult(&subscriptionFromAPI).Get(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -95,7 +91,7 @@ func (self *SubscriptionResource) Create(
 	}
 
 	// Save subscription into Terraform state
-	resp.Diagnostics.Append(subscription.FromAPI(ctx, subscriptionRaw)...)
+	resp.Diagnostics.Append(subscription.FromAPI(ctx, subscriptionFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &subscription)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", subscription.String()))
 }
@@ -112,8 +108,8 @@ func (self *SubscriptionResource) Read(
 		return
 	}
 
-	var subscriptionRaw SubscriptionAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &subscription, &subscriptionRaw)
+	var subscriptionFromAPI SubscriptionAPIModel
+	found, _, readDiags := self.client.ReadIt(&subscription, &subscriptionFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -122,7 +118,7 @@ func (self *SubscriptionResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated subscription into Terraform state
-		resp.Diagnostics.Append(subscription.FromAPI(ctx, subscriptionRaw)...)
+		resp.Diagnostics.Append(subscription.FromAPI(ctx, subscriptionFromAPI)...)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &subscription)...)
 	}
 }
@@ -139,17 +135,15 @@ func (self *SubscriptionResource) Update(
 		return
 	}
 
-	subscriptionRaw, diags := subscription.ToAPI(ctx)
+	subscriptionToAPI, diags := subscription.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	response, err := self.client.Client.R().
-		// TODO SetQueryParam("apiVersion", EVENT_BROKER_API_VERSION).
-		SetBody(subscriptionRaw).
-		Post(subscription.UpdatePath())
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	path := subscription.UpdatePath()
+	response, err := self.client.R(path).SetBody(subscriptionToAPI).Post(path)
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -158,11 +152,10 @@ func (self *SubscriptionResource) Update(
 	}
 
 	// Read (using API) to retrieve the subscription content (and not empty stuff)
-	response, err = self.client.Client.R().
-		SetResult(&subscriptionRaw).
-		Get(subscription.ReadPath())
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	var subscriptionFromAPI SubscriptionAPIModel
+	path = subscription.ReadPath()
+	response, err = self.client.R(path).SetResult(&subscriptionFromAPI).Get(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -171,7 +164,7 @@ func (self *SubscriptionResource) Update(
 	}
 
 	// Save subscription into Terraform state
-	resp.Diagnostics.Append(subscription.FromAPI(ctx, subscriptionRaw)...)
+	resp.Diagnostics.Append(subscription.FromAPI(ctx, subscriptionFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &subscription)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", subscription.String()))
 }
@@ -181,12 +174,11 @@ func (self *SubscriptionResource) Delete(
 	req resource.DeleteRequest,
 	resp *resource.DeleteResponse,
 ) {
-	var subscription SubscriptionModel
-
 	// Read Terraform prior state data into the model
+	var subscription SubscriptionModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &subscription)...)
 	if !resp.Diagnostics.HasError() {
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &subscription)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&subscription)...)
 	}
 }
 

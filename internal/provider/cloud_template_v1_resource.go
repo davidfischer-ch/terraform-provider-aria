@@ -61,18 +61,19 @@ func (self *CloudTemplateV1Resource) Create(
 		return
 	}
 
-	templateRaw, diags := template.ToAPI(ctx)
+	templateToAPI, diags := template.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", BLUEPRINT_API_VERSION).
-		SetBody(templateRaw).
-		SetResult(&templateRaw).
-		Post(template.CreatePath())
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	var templateFromAPI CloudTemplateV1APIModel
+	path := template.CreatePath()
+	response, err := self.client.R(path).
+		SetBody(templateToAPI).
+		SetResult(&templateFromAPI).
+		Post(path)
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -80,8 +81,22 @@ func (self *CloudTemplateV1Resource) Create(
 		return
 	}
 
+	// Refresh available attributes (such as id)
+	template.FromCreateAPI(templateFromAPI)
+
+	// Read (using API) to retrieve the projects & templates (and counters)
+	path = template.ReadPath()
+	response, err = self.client.R(path).SetResult(&templateFromAPI).Get(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to read %s, got error: %s", template.String(), err))
+		return
+	}
+
 	// Save cloud template into Terraform state
-	resp.Diagnostics.Append(template.FromAPI(ctx, templateRaw)...)
+	resp.Diagnostics.Append(template.FromAPI(ctx, templateFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &template)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", template.String()))
 }
@@ -99,7 +114,7 @@ func (self *CloudTemplateV1Resource) Read(
 	}
 
 	var templateRaw CloudTemplateV1APIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &template, &templateRaw)
+	found, _, readDiags := self.client.ReadIt(&template, &templateRaw)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -125,19 +140,19 @@ func (self *CloudTemplateV1Resource) Update(
 		return
 	}
 
-	templateRaw, diags := template.ToAPI(ctx)
+	templateToAPI, diags := template.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", BLUEPRINT_API_VERSION).
-		SetBody(templateRaw).
-		SetResult(&templateRaw).
-		Put(template.UpdatePath())
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	var templateFromAPI CloudTemplateV1APIModel
+	path := template.UpdatePath()
+	response, err := self.client.R(path).
+		SetBody(templateToAPI).
+		SetResult(&templateFromAPI).
+		Put(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -146,7 +161,7 @@ func (self *CloudTemplateV1Resource) Update(
 	}
 
 	// Save updated cloud template into Terraform state
-	resp.Diagnostics.Append(template.FromAPI(ctx, templateRaw)...)
+	resp.Diagnostics.Append(template.FromAPI(ctx, templateFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &template)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", template.String()))
 }
@@ -160,7 +175,7 @@ func (self *CloudTemplateV1Resource) Delete(
 	var template CloudTemplateV1Model
 	resp.Diagnostics.Append(req.State.Get(ctx, &template)...)
 	if !resp.Diagnostics.HasError() {
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &template)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&template)...)
 	}
 }
 

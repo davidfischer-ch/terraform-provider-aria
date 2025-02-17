@@ -61,19 +61,19 @@ func (self *OrchestratorConfigurationResource) Create(
 		return
 	}
 
-	configurationRaw, diags := configuration.ToAPI(ctx)
+	configurationToAPI, diags := configuration.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	var configurationFromAPI OrchestratorConfigurationAPIModel
 	path := configuration.CreatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(configurationRaw).
-		SetResult(&configurationRaw).
+	response, err := self.client.R(path).
+		SetBody(configurationToAPI).
+		SetResult(&configurationFromAPI).
 		Post(path)
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -82,7 +82,7 @@ func (self *OrchestratorConfigurationResource) Create(
 	}
 
 	// Save configuration into Terraform state
-	resp.Diagnostics.Append(configuration.FromAPI(ctx, configurationRaw, response)...)
+	resp.Diagnostics.Append(configuration.FromAPI(ctx, configurationFromAPI, response)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &configuration)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", configuration.String()))
 }
@@ -99,8 +99,8 @@ func (self *OrchestratorConfigurationResource) Read(
 		return
 	}
 
-	var configurationRaw OrchestratorConfigurationAPIModel
-	found, response, someDiags := self.client.ReadIt(ctx, &configuration, &configurationRaw)
+	var configurationFromAPI OrchestratorConfigurationAPIModel
+	found, response, someDiags := self.client.ReadIt(&configuration, &configurationFromAPI)
 	resp.Diagnostics.Append(someDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -109,7 +109,7 @@ func (self *OrchestratorConfigurationResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated configuration into Terraform state
-		resp.Diagnostics.Append(configuration.FromAPI(ctx, configurationRaw, response)...)
+		resp.Diagnostics.Append(configuration.FromAPI(ctx, configurationFromAPI, response)...)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &configuration)...)
 	}
 }
@@ -133,7 +133,7 @@ func (self *OrchestratorConfigurationResource) Update(
 		return
 	}
 
-	configurationRaw, diags := configuration.ToAPI(ctx)
+	configurationToAPI, diags := configuration.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -141,13 +141,11 @@ func (self *OrchestratorConfigurationResource) Update(
 
 	// No response body from API, only the changeset (version) available in response headers
 	path := configuration.UpdatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+	response, err := self.client.R(path).
 		SetHeader("x-vro-changeset-sha", configurationFromState.VersionId.ValueString()).
-		SetBody(configurationRaw).
+		SetBody(configurationToAPI).
 		Put(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{204})
+	err = self.client.HandleAPIResponse(response, err, []int{204})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -156,7 +154,7 @@ func (self *OrchestratorConfigurationResource) Update(
 	}
 
 	// Save updated configuration into Terraform state
-	resp.Diagnostics.Append(configuration.FromAPI(ctx, configurationRaw, response)...)
+	resp.Diagnostics.Append(configuration.FromAPI(ctx, configurationToAPI, response)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &configuration)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", configuration.String()))
 }
@@ -170,7 +168,7 @@ func (self *OrchestratorConfigurationResource) Delete(
 	var configuration OrchestratorConfigurationModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &configuration)...)
 	if !resp.Diagnostics.HasError() {
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &configuration)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&configuration)...)
 	}
 }
 

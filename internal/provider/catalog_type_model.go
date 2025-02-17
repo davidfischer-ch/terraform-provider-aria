@@ -37,7 +37,7 @@ func (self CatalogTypeModel) String() string {
 }
 
 func (self CatalogTypeModel) ReadPath() string {
-	return "/catalog/api/types/" + self.Id.ValueString()
+	return "catalog/api/types/" + self.Id.ValueString()
 }
 
 func (self *CatalogTypeModel) FromAPI(raw CatalogTypeAPIModel) {

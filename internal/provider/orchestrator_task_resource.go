@@ -61,19 +61,16 @@ func (self *OrchestratorTaskResource) Create(
 		return
 	}
 
-	taskRaw, diags := task.ToAPI(ctx)
+	taskToAPI, diags := task.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	var taskFromAPI OrchestratorTaskAPIModel
 	path := task.CreatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(taskRaw).
-		SetResult(&taskRaw).
-		Post(path)
-	err = handleAPIResponse(ctx, response, err, []int{202})
+	response, err := self.client.R(path).SetBody(taskToAPI).SetResult(&taskFromAPI).Post(path)
+	err = self.client.HandleAPIResponse(response, err, []int{202})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -82,7 +79,7 @@ func (self *OrchestratorTaskResource) Create(
 	}
 
 	// Save task into Terraform state
-	resp.Diagnostics.Append(task.FromAPI(ctx, taskRaw)...)
+	resp.Diagnostics.Append(task.FromAPI(ctx, taskFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &task)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", task.String()))
 }
@@ -99,8 +96,8 @@ func (self *OrchestratorTaskResource) Read(
 		return
 	}
 
-	var taskRaw OrchestratorTaskAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &task, &taskRaw)
+	var taskFromAPI OrchestratorTaskAPIModel
+	found, _, readDiags := self.client.ReadIt(&task, &taskFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -109,7 +106,7 @@ func (self *OrchestratorTaskResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated task into Terraform state
-		resp.Diagnostics.Append(task.FromAPI(ctx, taskRaw)...)
+		resp.Diagnostics.Append(task.FromAPI(ctx, taskFromAPI)...)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &task)...)
 	}
 }
@@ -126,20 +123,16 @@ func (self *OrchestratorTaskResource) Update(
 		return
 	}
 
-	taskRaw, diags := task.ToAPI(ctx)
+	taskToAPI, diags := task.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
+	var taskFromAPI OrchestratorTaskAPIModel
 	path := task.UpdatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(taskRaw).
-		SetResult(&taskRaw).
-		Post(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	response, err := self.client.R(path).SetBody(taskToAPI).SetResult(&taskFromAPI).Post(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -148,7 +141,7 @@ func (self *OrchestratorTaskResource) Update(
 	}
 
 	// Save updated task into Terraform state
-	resp.Diagnostics.Append(task.FromAPI(ctx, taskRaw)...)
+	resp.Diagnostics.Append(task.FromAPI(ctx, taskFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &task)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", task.String()))
 }
@@ -162,7 +155,7 @@ func (self *OrchestratorTaskResource) Delete(
 	var task OrchestratorTaskModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &task)...)
 	if !resp.Diagnostics.HasError() {
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &task)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&task)...)
 	}
 }
 

@@ -140,7 +140,7 @@ Required:
 
 - `name` (String) Template name (valid for types that supports named templates)
 - `pattern` (String) TODO
-- `resource_type` (String) Resource type, one of COMPUTE, COMPUTE_STORAGE, NETWORK, LOAD_BALANCER, RESOURCE_GROUP, GATEWAY, NAT, SECURITY_GROUP, GENERIC
+- `resource_type` (String) Resource type, one of `COMPUTE`, `COMPUTE_STORAGE`, `NETWORK`, `LOAD_BALANCER`, `RESOURCE_GROUP`, `GATEWAY`, `NAT`, `SECURITY_GROUP`, `GENERIC`
 - `resource_type_name` (String) Resource type name (e.g. Machine)
 - `static_pattern` (String) TODO
 - `unique_name` (Boolean) TODO
@@ -152,8 +152,19 @@ Optional:
 
 Read-Only:
 
+- `counters` (Attributes List) Counters (see [below for nested schema](#nestedatt--templates--counters))
 - `id` (String) Identifier
 - `resource_default` (Boolean) True when static pattern is empty (automatically inferred by the provider)
+
+<a id="nestedatt--templates--counters"></a>
+### Nested Schema for `templates.counters`
+
+Read-Only:
+
+- `current_counter` (Number) Current counter value
+- `id` (String) Identifier
+- `project_id` (String) TODO
+- `resource_type` (String) Resource type, one of `COMPUTE`, `COMPUTE_STORAGE`, `NETWORK`, `LOAD_BALANCER`, `RESOURCE_GROUP`, `GATEWAY`, `NAT`, `SECURITY_GROUP`, `GENERIC`
 
 ## Import
 

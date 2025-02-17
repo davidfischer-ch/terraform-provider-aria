@@ -58,22 +58,18 @@ func (self *SecretDataSource) Read(
 		return
 	}
 
-	var secretRaw SecretAPIModel
-	secretId := secret.Id.ValueString()
-	response, err := self.client.Client.R().
-		// TODO SetQueryParam("apiVersion", PLATFORM_API_VERSION).
-		SetResult(&secretRaw).
-		Get("/platform/api/secrets/" + secretId)
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	var secretFromAPI SecretAPIModel
+	path := secret.ReadPath()
+	response, err := self.client.R(path).SetResult(&secretFromAPI).Get(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read secret %s, got error: %s", secretId, err))
+			fmt.Sprintf("Unable to read %s, got error: %s", secret.String(), err))
 		return
 	}
 
 	// Save updated secret into Terraform state
-	resp.Diagnostics.Append(secret.FromAPI(ctx, secretRaw)...)
+	resp.Diagnostics.Append(secret.FromAPI(ctx, secretFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &secret)...)
 }

@@ -121,6 +121,13 @@ func (self *CloudTemplateV1Model) FromAPI(
 	return diags
 }
 
+func (self *CloudTemplateV1Model) FromCreateAPI(raw CloudTemplateV1APIModel) {
+	self.Id = types.StringValue(raw.Id)
+	// self.Name = types.StringValue(raw.Name)
+	// self.Description = types.StringValue(raw.Description)
+	// Projects and templates are not available
+}
+
 func (self CloudTemplateV1Model) ToAPI(
 	ctx context.Context,
 ) (CloudTemplateV1APIModel, diag.Diagnostics) {

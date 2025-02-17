@@ -61,13 +61,9 @@ func (self *CatalogItemIconResource) Create(
 		return
 	}
 
-	itemIconRaw := itemIcon.ToAPI()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", CATALOG_API_VERSION).
-		SetBody(itemIconRaw).
-		SetResult(&itemIconRaw).
-		Patch(itemIcon.CreatePath())
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	path := itemIcon.CreatePath()
+	response, err := self.client.R(path).SetBody(itemIcon.ToAPI()).Patch(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -75,8 +71,20 @@ func (self *CatalogItemIconResource) Create(
 		return
 	}
 
+	// Read (using API) to retrieve the item content (and not empty stuff)
+	var itemIconFromAPI CatalogItemIconAPIModel
+	path = itemIcon.ReadPath()
+	response, err = self.client.R(path).SetResult(&itemIconFromAPI).Get(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to read %s, got error: %s", itemIcon.String(), err))
+		return
+	}
+
 	// Save item's icon into Terraform state
-	itemIcon.FromAPI(itemIconRaw)
+	itemIcon.FromAPI(itemIconFromAPI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &itemIcon)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", itemIcon.String()))
 }
@@ -93,8 +101,8 @@ func (self *CatalogItemIconResource) Read(
 		return
 	}
 
-	var itemIconRaw CatalogItemIconAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &itemIcon, &itemIconRaw)
+	var itemIconFromAPI CatalogItemIconAPIModel
+	found, _, readDiags := self.client.ReadIt(&itemIcon, &itemIconFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -103,7 +111,7 @@ func (self *CatalogItemIconResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated item's icon into Terraform state
-		itemIcon.FromAPI(itemIconRaw)
+		itemIcon.FromAPI(itemIconFromAPI)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &itemIcon)...)
 	}
 }
@@ -120,13 +128,9 @@ func (self *CatalogItemIconResource) Update(
 		return
 	}
 
-	itemIconRaw := itemIcon.ToAPI()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", CATALOG_API_VERSION).
-		SetBody(itemIconRaw).
-		Patch(itemIcon.UpdatePath())
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	path := itemIcon.UpdatePath()
+	response, err := self.client.R(path).SetBody(itemIcon.ToAPI()).Patch(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -134,8 +138,20 @@ func (self *CatalogItemIconResource) Update(
 		return
 	}
 
-	// Save updated category into Terraform state
-	itemIcon.FromAPI(itemIconRaw)
+	// Read (using API) to retrieve the item content (and not empty stuff)
+	var itemIconFromAPI CatalogItemIconAPIModel
+	path = itemIcon.ReadPath()
+	response, err = self.client.R(path).SetResult(&itemIconFromAPI).Get(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to read %s, got error: %s", itemIcon.String(), err))
+		return
+	}
+
+	// Save updated item's icon into Terraform state
+	itemIcon.FromAPI(itemIconFromAPI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &itemIcon)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", itemIcon.String()))
 }

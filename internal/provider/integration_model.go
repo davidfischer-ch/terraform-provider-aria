@@ -69,7 +69,7 @@ func (self IntegrationDataSourceModel) ReadPath() string {
 	} else {
 		panic(fmt.Sprintf("Internal error: %s as unexpected type: %s.", self.String(), typeId))
 	}
-	return fmt.Sprintf("/catalog/api/types/%s/data/%s", typeId, resource)
+	return fmt.Sprintf("catalog/api/types/%s/data/%s", typeId, resource)
 }
 
 // Utils -------------------------------------------------------------------------------------------

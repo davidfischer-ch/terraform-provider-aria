@@ -61,14 +61,11 @@ func (self *CustomFormResource) Create(
 		return
 	}
 
+	var fromFromAPI CustomFormAPIModel
 	form.GenerateId()
-	formRaw := form.ToAPI()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", FORM_API_VERSION).
-		SetBody(formRaw).
-		SetResult(&formRaw).
-		Post(form.CreatePath())
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	path := form.CreatePath()
+	response, err := self.client.R(path).SetBody(form.ToAPI()).SetResult(&fromFromAPI).Post(path)
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -77,7 +74,7 @@ func (self *CustomFormResource) Create(
 	}
 
 	// Save custom form into Terraform state
-	form.FromAPI(formRaw)
+	form.FromAPI(fromFromAPI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &form)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", form.String()))
 }
@@ -94,8 +91,8 @@ func (self *CustomFormResource) Read(
 		return
 	}
 
-	var formRaw CustomFormAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &form, &formRaw)
+	var formFromAPI CustomFormAPIModel
+	found, _, readDiags := self.client.ReadIt(&form, &formFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -104,7 +101,7 @@ func (self *CustomFormResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated custom form into Terraform state
-		form.FromAPI(formRaw)
+		form.FromAPI(formFromAPI)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &form)...)
 	}
 }
@@ -121,13 +118,10 @@ func (self *CustomFormResource) Update(
 		return
 	}
 
-	formRaw := form.ToAPI()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", FORM_API_VERSION).
-		SetBody(formRaw).
-		SetResult(&formRaw).
-		Post(form.UpdatePath())
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	var formFromAPI CustomFormAPIModel
+	path := form.UpdatePath()
+	response, err := self.client.R(path).SetBody(form.ToAPI()).SetResult(&formFromAPI).Post(path)
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -136,7 +130,7 @@ func (self *CustomFormResource) Update(
 	}
 
 	// Save custom form into Terraform state
-	form.FromAPI(formRaw)
+	form.FromAPI(formFromAPI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &form)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", form.String()))
 }
@@ -151,7 +145,7 @@ func (self *CustomFormResource) Delete(
 	// Read Terraform prior state data into the model
 	resp.Diagnostics.Append(req.State.Get(ctx, &form)...)
 	if !resp.Diagnostics.HasError() {
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &form)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&form)...)
 	}
 }
 

@@ -59,12 +59,9 @@ func (self *CatalogTypeDataSource) Read(
 	}
 
 	var catalogTypeRaw CatalogTypeAPIModel
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", CATALOG_API_VERSION).
-		SetResult(&catalogTypeRaw).
-		Get(catalogType.ReadPath())
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	path := catalogType.ReadPath()
+	response, err := self.client.R(path).SetResult(&catalogTypeRaw).Get(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",

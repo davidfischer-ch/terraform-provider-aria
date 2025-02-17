@@ -61,18 +61,19 @@ func (self *CustomResourceResource) Create(
 		return
 	}
 
-	resourceRaw, diags := resource.ToAPI(ctx)
+	resourceToAPI, diags := resource.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", FORM_API_VERSION).
-		SetBody(resourceRaw).
-		SetResult(&resourceRaw).
-		Post(resource.CreatePath())
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	var resourceFromAPI CustomResourceAPIModel
+	path := resource.CreatePath()
+	response, err := self.client.R(path).
+		SetBody(resourceToAPI).
+		SetResult(&resourceFromAPI).
+		Post(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -81,7 +82,7 @@ func (self *CustomResourceResource) Create(
 	}
 
 	// Save custom resource into Terraform state
-	resp.Diagnostics.Append(resource.FromAPI(ctx, resourceRaw)...)
+	resp.Diagnostics.Append(resource.FromAPI(ctx, resourceFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &resource)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", resource.String()))
 }
@@ -98,9 +99,9 @@ func (self *CustomResourceResource) Read(
 		return
 	}
 
-	var resourceRaw CustomResourceAPIModel
+	var resourceFromAPI CustomResourceAPIModel
 	self.client.Mutex.RLock(ctx, resource.LockKey())
-	found, _, diags := self.client.ReadIt(ctx, &resource, &resourceRaw)
+	found, _, diags := self.client.ReadIt(&resource, &resourceFromAPI)
 	self.client.Mutex.RUnlock(ctx, resource.LockKey())
 	resp.Diagnostics.Append(diags...)
 
@@ -111,7 +112,7 @@ func (self *CustomResourceResource) Read(
 
 	if !resp.Diagnostics.HasError() {
 		// Save updated custom resource into Terraform state
-		resp.Diagnostics.Append(resource.FromAPI(ctx, resourceRaw)...)
+		resp.Diagnostics.Append(resource.FromAPI(ctx, resourceFromAPI)...)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &resource)...)
 	}
 }
@@ -128,7 +129,7 @@ func (self *CustomResourceResource) Update(
 		return
 	}
 
-	resourceRaw, diags := resource.ToAPI(ctx)
+	resourceToAPI, diags := resource.ToAPI(ctx)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -137,8 +138,8 @@ func (self *CustomResourceResource) Update(
 	self.client.Mutex.Lock(ctx, resource.LockKey())
 
 	// Read resource to retrieve latest value for additional actions
-	var resourceRawBis CustomResourceAPIModel
-	found, _, diags := self.client.ReadIt(ctx, &resource, &resourceRawBis)
+	var resourceFromAPI CustomResourceAPIModel
+	found, _, diags := self.client.ReadIt(&resource, &resourceFromAPI)
 	resp.Diagnostics.Append(diags...)
 
 	if !found || resp.Diagnostics.HasError() {
@@ -155,17 +156,19 @@ func (self *CustomResourceResource) Update(
 	}
 
 	// Ensure additional actions are left untouched
-	resourceRaw.AdditionalActions = resourceRawBis.AdditionalActions
+	resourceToAPI.AdditionalActions = resourceFromAPI.AdditionalActions
 
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", FORM_API_VERSION).
-		SetBody(resourceRaw).
-		SetResult(&resourceRaw).
-		Post(resource.UpdatePath())
+	// Reset to prevent muxing of old/new data
+	resourceFromAPI = CustomResourceAPIModel{}
+	path := resource.UpdatePath()
+	response, err := self.client.R(path).
+		SetBody(resourceToAPI).
+		SetResult(&resourceFromAPI).
+		Post(path)
 
 	self.client.Mutex.Unlock(ctx, resource.LockKey())
 
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -174,7 +177,7 @@ func (self *CustomResourceResource) Update(
 	}
 
 	// Save updated custom resource into Terraform state
-	resp.Diagnostics.Append(resource.FromAPI(ctx, resourceRaw)...)
+	resp.Diagnostics.Append(resource.FromAPI(ctx, resourceFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &resource)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", resource.String()))
 }
@@ -189,7 +192,7 @@ func (self *CustomResourceResource) Delete(
 	resp.Diagnostics.Append(req.State.Get(ctx, &resource)...)
 	if !resp.Diagnostics.HasError() {
 		self.client.Mutex.Lock(ctx, resource.LockKey())
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &resource)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&resource)...)
 		self.client.Mutex.Unlock(ctx, resource.LockKey())
 	}
 }

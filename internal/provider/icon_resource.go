@@ -67,13 +67,10 @@ func (self *IconResource) Create(
 	// So we implement this protection (mutex) at the client side (provider)
 
 	lockKey := icon.LockKey()
+	path := icon.CreatePath()
 	self.client.Mutex.Lock(ctx, lockKey)
-	response, err := self.client.Client.R().
-		// TODO SetQueryParam("apiVersion", ICON_API_VERSION).
-		SetFile("file", icon.Path.ValueString()).
-		Post(icon.CreatePath())
-
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	response, err := self.client.R(path).SetFile("file", icon.Path.ValueString()).Post(path)
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -81,7 +78,7 @@ func (self *IconResource) Create(
 		return
 	}
 
-	iconId, err := GetIdFromLocation(response)
+	iconId, err := self.client.GetIdFromLocation(response)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -96,13 +93,10 @@ func (self *IconResource) Create(
 
 	// Read the icon to retrieve its content (duplicated code with read)
 
-	response, err = self.client.Client.R().
-		// TODO SetQueryParam("apiVersion", ICON_API_VERSION).
-		Get(icon.ReadPath())
-
+	path = icon.ReadPath()
+	response, err = self.client.R(path).Get(path)
 	self.client.Mutex.Unlock(ctx, lockKey)
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -129,10 +123,9 @@ func (self *IconResource) Read(
 		return
 	}
 
+	path := icon.ReadPath()
 	self.client.Mutex.RLock(ctx, icon.LockKey())
-	response, err := self.client.Client.R().
-		// TODO SetQueryParam("apiVersion", ICON_API_VERSION).
-		Get(icon.ReadPath())
+	response, err := self.client.R(path).Get(path)
 	self.client.Mutex.RUnlock(ctx, icon.LockKey())
 
 	// Handle gracefully a resource that has vanished on the platform
@@ -142,7 +135,7 @@ func (self *IconResource) Read(
 		return
 	}
 
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -182,7 +175,7 @@ func (self *IconResource) Delete(
 	resp.Diagnostics.Append(req.State.Get(ctx, &icon)...)
 	if !resp.Diagnostics.HasError() && !icon.KeepOnDestroy.ValueBool() {
 		self.client.Mutex.Lock(ctx, icon.LockKey())
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &icon)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&icon)...)
 		self.client.Mutex.Unlock(ctx, icon.LockKey())
 	}
 }
