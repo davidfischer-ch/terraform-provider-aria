@@ -60,33 +60,33 @@ func (self *AriaProvider) Schema(
 			"host": schema.StringAttribute{
 				MarkdownDescription: "The URI to Aria. " +
 					"May also be provided via ARIA_HOST environment variable.",
-				Optional:            true,
+				Optional: true,
 			},
 			"refresh_token": schema.StringAttribute{
 				MarkdownDescription: "The refresh token to use for making API requests. " +
 					"May also be provided via ARIA_REFRESH_TOKEN environment variable.",
-				Optional:            true,
-				Sensitive:           true,
+				Optional:  true,
+				Sensitive: true,
 			},
 			"access_token": schema.StringAttribute{
 				MarkdownDescription: "The access token to use for making API requests. " +
 					"May also be provided via ARIA_ACCESS_TOKEN environment variable.",
-				Optional:            true,
-				Sensitive:           true,
+				Optional:  true,
+				Sensitive: true,
 			},
 			"insecure": schema.BoolAttribute{
 				MarkdownDescription: "Whether server should be accessed without verifying the " +
 					"TLS certificate. May also be provided via ARIA_INSECURE environment variable.",
-				Optional:            true,
+				Optional: true,
 			},
 			"ok_api_calls_log_level": schema.StringAttribute{
-				Optional:             true,
+				Optional: true,
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{"INFO", "DEBUG", "TRACE"}...),
 				},
 			},
 			"ko_api_calls_log_level": schema.StringAttribute{
-				Optional:             true,
+				Optional: true,
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{"INFO", "DEBUG", "TRACE"}...),
 				},
