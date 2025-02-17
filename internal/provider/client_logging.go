@@ -10,15 +10,15 @@ import (
 )
 
 func (self AriaClient) Debug(message string, args ...any) {
-	tflog.Debug(self.Context, fmt.Sprintf(message, args))
+	tflog.Debug(self.Context, fmt.Sprintf(message, args...))
 }
 
 func (self AriaClient) Info(message string, args ...any) {
-	tflog.Debug(self.Context, fmt.Sprintf(message, args))
+	tflog.Debug(self.Context, fmt.Sprintf(message, args...))
 }
 
 func (self AriaClient) Trace(message string, args ...any) {
-	tflog.Trace(self.Context, fmt.Sprintf(message, args))
+	tflog.Trace(self.Context, fmt.Sprintf(message, args...))
 }
 
 func (self AriaClient) Log(level string, message string, args ...any) {
