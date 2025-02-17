@@ -49,7 +49,7 @@ func (self SecretModel) String() string {
 }
 
 func (self SecretModel) ReadPath() string {
-	return "/platform/api/secrets/" + self.Id.ValueString()
+	return "platform/api/secrets/" + self.Id.ValueString()
 }
 
 func (self *SecretModel) FromAPI(
