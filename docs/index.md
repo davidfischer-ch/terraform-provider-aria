@@ -26,6 +26,6 @@ provider "aria" {
 - `access_token` (String, Sensitive) The access token to use for making API requests. May also be provided via ARIA_ACCESS_TOKEN environment variable.
 - `host` (String) The URI to Aria. May also be provided via ARIA_HOST environment variable.
 - `insecure` (Boolean) Whether server should be accessed without verifying the TLS certificate. May also be provided via ARIA_INSECURE environment variable.
-- `ko_api_calls_log_level` (String)
-- `ok_api_calls_log_level` (String)
+- `ko_api_calls_log_level` (String) Successful API calls log level. One of `INFO`, `DEBUG` (default) or `TRACE`.
+- `ok_api_calls_log_level` (String) Successful API calls log level. One of `INFO`, `DEBUG` or `TRACE` (default).
 - `refresh_token` (String, Sensitive) The refresh token to use for making API requests. May also be provided via ARIA_REFRESH_TOKEN environment variable.
