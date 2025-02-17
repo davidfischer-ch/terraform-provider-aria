@@ -80,12 +80,16 @@ func (self *AriaProvider) Schema(
 				Optional: true,
 			},
 			"ok_api_calls_log_level": schema.StringAttribute{
+				MarkdownDescription: "Successful API calls log level. " +
+					"One of `INFO`, `DEBUG` or `TRACE` (default).",
 				Optional: true,
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{"INFO", "DEBUG", "TRACE"}...),
 				},
 			},
 			"ko_api_calls_log_level": schema.StringAttribute{
+				MarkdownDescription: "Successful API calls log level. " +
+					"One of `INFO`, `DEBUG` (default) or `TRACE`.",
 				Optional: true,
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{"INFO", "DEBUG", "TRACE"}...),
