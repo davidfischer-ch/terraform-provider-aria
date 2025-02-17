@@ -69,11 +69,8 @@ func (self *SubscriptionResource) Create(
 	}
 
 	path := subscription.CreatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(subscriptionToAPI).
-		Post(path)
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	response, err := self.client.R(path).SetBody(subscriptionToAPI).Post(path)
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -84,12 +81,8 @@ func (self *SubscriptionResource) Create(
 	// Read (using API) to retrieve the subscription content (and not empty stuff)
 	var subscriptionFromAPI SubscriptionAPIModel
 	path = subscription.ReadPath()
-	response, err = self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetResult(&subscriptionFromAPI).
-		Get(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	response, err = self.client.R(path).SetResult(&subscriptionFromAPI).Get(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -116,7 +109,7 @@ func (self *SubscriptionResource) Read(
 	}
 
 	var subscriptionFromAPI SubscriptionAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &subscription, &subscriptionFromAPI)
+	found, _, readDiags := self.client.ReadIt(&subscription, &subscriptionFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -149,11 +142,8 @@ func (self *SubscriptionResource) Update(
 	}
 
 	path := subscription.UpdatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(subscriptionToAPI).
-		Post(path)
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	response, err := self.client.R(path).SetBody(subscriptionToAPI).Post(path)
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -164,12 +154,8 @@ func (self *SubscriptionResource) Update(
 	// Read (using API) to retrieve the subscription content (and not empty stuff)
 	var subscriptionFromAPI SubscriptionAPIModel
 	path = subscription.ReadPath()
-	response, err = self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetResult(&subscriptionFromAPI).
-		Get(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	response, err = self.client.R(path).SetResult(&subscriptionFromAPI).Get(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -192,7 +178,7 @@ func (self *SubscriptionResource) Delete(
 	var subscription SubscriptionModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &subscription)...)
 	if !resp.Diagnostics.HasError() {
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &subscription)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&subscription)...)
 	}
 }
 

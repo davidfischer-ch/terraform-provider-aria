@@ -69,12 +69,8 @@ func (self *OrchestratorActionResource) Create(
 
 	var actionFromAPI OrchestratorActionAPIModel
 	path := action.CreatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(actionToAPI).
-		SetResult(&actionFromAPI).
-		Post(path)
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	response, err := self.client.R(path).SetBody(actionToAPI).SetResult(&actionFromAPI).Post(path)
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -101,7 +97,7 @@ func (self *OrchestratorActionResource) Read(
 	}
 
 	var actionFromAPI OrchestratorActionAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &action, &actionFromAPI)
+	found, _, readDiags := self.client.ReadIt(&action, &actionFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -134,12 +130,8 @@ func (self *OrchestratorActionResource) Update(
 	}
 
 	path := action.UpdatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(actionToAPI).
-		Put(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	response, err := self.client.R(path).SetBody(actionToAPI).Put(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -150,12 +142,8 @@ func (self *OrchestratorActionResource) Update(
 	// Read (using API) to retrieve the action content (and not empty stuff)
 	var actionFromAPI OrchestratorActionAPIModel
 	path = action.ReadPath()
-	response, err = self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetResult(&actionFromAPI).
-		Get(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	response, err = self.client.R(path).SetResult(&actionFromAPI).Get(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -178,7 +166,7 @@ func (self *OrchestratorActionResource) Delete(
 	var action OrchestratorActionModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &action)...)
 	if !resp.Diagnostics.HasError() {
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &action)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&action)...)
 	}
 }
 

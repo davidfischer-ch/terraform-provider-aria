@@ -58,16 +58,15 @@ func (self *IntegrationDataSource) Read(
 		return
 	}
 
-	var responseRaw IntegrationResponseAPIodel
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", CATALOG_API_VERSION).
+	var responseFromAPI IntegrationResponseAPIodel
+	path := integration.ReadPath()
+	response, err := self.client.R(path).
 		SetQueryParam("size", "1").
 		SetQueryParam("page", "0").
 		SetQueryParam("sort", "name,asc").
-		SetResult(&responseRaw).
-		Get(integration.ReadPath())
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+		SetResult(&responseFromAPI).
+		Get(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -75,14 +74,14 @@ func (self *IntegrationDataSource) Read(
 		return
 	}
 
-	if len(responseRaw.Content) == 0 {
+	if len(responseFromAPI.Content) == 0 {
 		resp.Diagnostics.AddError(
 			"Client error",
 			fmt.Sprintf("Unable to get %s, no content found.", integration.String()))
 		return
 	}
 
-	for _, contentsRaw := range responseRaw.Content {
+	for _, contentsRaw := range responseFromAPI.Content {
 		integration.FromAPI(contentsRaw.Integration)
 		break // Make sure we don't set it multiple times for nothing
 	}

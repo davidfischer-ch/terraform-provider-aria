@@ -63,12 +63,11 @@ func (self *OrchestratorEnvironmentRepositoryResource) Create(
 
 	var repositoryFromAPI OrchestratorEnvironmentRepositoryAPIModel
 	path := repository.CreatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+	response, err := self.client.R(path).
 		SetBody(repository.ToAPI()).
 		SetResult(&repositoryFromAPI).
 		Post(path)
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -95,7 +94,7 @@ func (self *OrchestratorEnvironmentRepositoryResource) Read(
 	}
 
 	var repositoryFromAPI OrchestratorEnvironmentRepositoryAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &repository, &repositoryFromAPI)
+	found, _, readDiags := self.client.ReadIt(&repository, &repositoryFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -123,13 +122,9 @@ func (self *OrchestratorEnvironmentRepositoryResource) Update(
 
 	var repositoryFromAPI OrchestratorEnvironmentRepositoryAPIModel
 	path := repository.UpdatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(repository.ToAPI()).
-		SetResult(&repositoryFromAPI).
-		Put(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{202})
+	body := repository.ToAPI()
+	response, err := self.client.R(path).SetBody(body).SetResult(&repositoryFromAPI).Put(path)
+	err = self.client.HandleAPIResponse(response, err, []int{202})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -152,7 +147,7 @@ func (self *OrchestratorEnvironmentRepositoryResource) Delete(
 	var repository OrchestratorEnvironmentRepositoryModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &repository)...)
 	if !resp.Diagnostics.HasError() {
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &repository)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&repository)...)
 	}
 }
 

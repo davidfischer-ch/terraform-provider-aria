@@ -63,12 +63,11 @@ func (self *OrchestratorWorkflowResource) Create(
 
 	var workflowFromCreateAPI OrchestratorWorkflowCreateAPIModel
 	path := workflow.CreatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+	response, err := self.client.R(path).
 		SetBody(workflow.ToCreateAPI()).
 		SetResult(&workflowFromCreateAPI).
 		Post(path)
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -91,13 +90,11 @@ func (self *OrchestratorWorkflowResource) Create(
 
 	var workflowFromVersionAPI OrchestratorWorkflowVersionResponseAPIModel
 	path = workflow.UpdatePath()
-	response, err = self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+	response, err = self.client.R(path).
 		SetBody(workflowToVersionAPI).
 		SetResult(&workflowFromVersionAPI).
 		Post(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -114,7 +111,7 @@ func (self *OrchestratorWorkflowResource) Create(
 
 	// Read content
 	var workflowFromContentAPI OrchestratorWorkflowContentAPIModel
-	found, response, readDiags := self.client.ReadIt(ctx, &workflow, &workflowFromContentAPI)
+	found, response, readDiags := self.client.ReadIt(&workflow, &workflowFromContentAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -123,7 +120,7 @@ func (self *OrchestratorWorkflowResource) Create(
 
 	// Read forms
 	var fromsFromAPI any
-	_, _, readDiags = self.client.ReadIt(ctx, &workflow, &fromsFromAPI, workflow.ReadFormPath())
+	_, _, readDiags = self.client.ReadIt(&workflow, &fromsFromAPI, workflow.ReadFormPath())
 	resp.Diagnostics.Append(readDiags...)
 
 	if !resp.Diagnostics.HasError() {
@@ -148,7 +145,7 @@ func (self *OrchestratorWorkflowResource) Read(
 
 	// Read content
 	var workflowFromContentAPI OrchestratorWorkflowContentAPIModel
-	found, response, readDiags := self.client.ReadIt(ctx, &workflow, &workflowFromContentAPI)
+	found, response, readDiags := self.client.ReadIt(&workflow, &workflowFromContentAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -157,7 +154,7 @@ func (self *OrchestratorWorkflowResource) Read(
 
 	// Read forms
 	var formsFromAPI any
-	_, _, readDiags = self.client.ReadIt(ctx, &workflow, &formsFromAPI, workflow.ReadFormPath())
+	_, _, readDiags = self.client.ReadIt(&workflow, &formsFromAPI, workflow.ReadFormPath())
 	resp.Diagnostics.Append(readDiags...)
 
 	if !resp.Diagnostics.HasError() {
@@ -188,13 +185,11 @@ func (self *OrchestratorWorkflowResource) Update(
 
 	var workflowFromVersionAPI OrchestratorWorkflowVersionResponseAPIModel
 	path := workflow.UpdatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+	response, err := self.client.R(path).
 		SetBody(workflowToVersionAPI).
 		SetResult(&workflowFromVersionAPI).
 		Post(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -217,7 +212,7 @@ func (self *OrchestratorWorkflowResource) Delete(
 	var workflow OrchestratorWorkflowModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &workflow)...)
 	if !resp.Diagnostics.HasError() {
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &workflow)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&workflow)...)
 	}
 }
 

@@ -69,12 +69,11 @@ func (self *CustomResourceResource) Create(
 
 	var resourceFromAPI CustomResourceAPIModel
 	path := resource.CreatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+	response, err := self.client.R(path).
 		SetBody(resourceToAPI).
 		SetResult(&resourceFromAPI).
 		Post(path)
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -102,7 +101,7 @@ func (self *CustomResourceResource) Read(
 
 	var resourceFromAPI CustomResourceAPIModel
 	self.client.Mutex.RLock(ctx, resource.LockKey())
-	found, _, diags := self.client.ReadIt(ctx, &resource, &resourceFromAPI)
+	found, _, diags := self.client.ReadIt(&resource, &resourceFromAPI)
 	self.client.Mutex.RUnlock(ctx, resource.LockKey())
 	resp.Diagnostics.Append(diags...)
 
@@ -140,7 +139,7 @@ func (self *CustomResourceResource) Update(
 
 	// Read resource to retrieve latest value for additional actions
 	var resourceFromAPI CustomResourceAPIModel
-	found, _, diags := self.client.ReadIt(ctx, &resource, &resourceFromAPI)
+	found, _, diags := self.client.ReadIt(&resource, &resourceFromAPI)
 	resp.Diagnostics.Append(diags...)
 
 	if !found || resp.Diagnostics.HasError() {
@@ -162,15 +161,14 @@ func (self *CustomResourceResource) Update(
 	// Reset to prevent muxing of old/new data
 	resourceFromAPI = CustomResourceAPIModel{}
 	path := resource.UpdatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+	response, err := self.client.R(path).
 		SetBody(resourceToAPI).
 		SetResult(&resourceFromAPI).
 		Post(path)
 
 	self.client.Mutex.Unlock(ctx, resource.LockKey())
 
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -194,7 +192,7 @@ func (self *CustomResourceResource) Delete(
 	resp.Diagnostics.Append(req.State.Get(ctx, &resource)...)
 	if !resp.Diagnostics.HasError() {
 		self.client.Mutex.Lock(ctx, resource.LockKey())
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &resource)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&resource)...)
 		self.client.Mutex.Unlock(ctx, resource.LockKey())
 	}
 }

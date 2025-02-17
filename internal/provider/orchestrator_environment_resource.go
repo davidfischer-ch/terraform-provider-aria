@@ -71,12 +71,11 @@ func (self *OrchestratorEnvironmentResource) Create(
 
 	var environmentFromAPI OrchestratorEnvironmentAPIModel
 	path := environment.CreatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+	response, err := self.client.R(path).
 		SetBody(environmentToAPI).
 		SetResult(&environmentFromAPI).
 		Post(path)
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -108,7 +107,7 @@ func (self *OrchestratorEnvironmentResource) Read(
 	}
 
 	var environmentFromAPI OrchestratorEnvironmentAPIModel
-	found, response, someDiags := self.client.ReadIt(ctx, &environment, &environmentFromAPI)
+	found, response, someDiags := self.client.ReadIt(&environment, &environmentFromAPI)
 	resp.Diagnostics.Append(someDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -149,14 +148,12 @@ func (self *OrchestratorEnvironmentResource) Update(
 
 	var environmentFromAPI OrchestratorEnvironmentAPIModel
 	path := environment.UpdatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+	response, err := self.client.R(path).
 		SetHeader("x-vro-changeset-sha", environmentFromState.VersionId.ValueString()).
 		SetBody(environmentToAPI).
 		SetResult(&environmentFromAPI).
 		Put(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{202})
+	err = self.client.HandleAPIResponse(response, err, []int{202})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -185,7 +182,7 @@ func (self *OrchestratorEnvironmentResource) Delete(
 	var environment OrchestratorEnvironmentModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &environment)...)
 	if !resp.Diagnostics.HasError() {
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &environment)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&environment)...)
 	}
 }
 
@@ -223,7 +220,7 @@ func (self *OrchestratorEnvironmentResource) WaitUpToDate(
 			fmt.Sprintf("Poll %d of %d - Check %s is up-to-date...", attempt+1, maxAttempts, name))
 
 		var environmentFromAPI OrchestratorEnvironmentAPIModel
-		found, response, someDiags := self.client.ReadIt(ctx, environment, &environmentFromAPI)
+		found, response, someDiags := self.client.ReadIt(environment, &environmentFromAPI)
 		diags.Append(someDiags...)
 		if !found {
 			diags.AddError(

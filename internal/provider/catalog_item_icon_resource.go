@@ -62,12 +62,8 @@ func (self *CatalogItemIconResource) Create(
 	}
 
 	path := itemIcon.CreatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(itemIcon.ToAPI()).
-		Patch(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	response, err := self.client.R(path).SetBody(itemIcon.ToAPI()).Patch(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -78,12 +74,8 @@ func (self *CatalogItemIconResource) Create(
 	// Read (using API) to retrieve the item content (and not empty stuff)
 	var itemIconFromAPI CatalogItemIconAPIModel
 	path = itemIcon.ReadPath()
-	response, err = self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetResult(&itemIconFromAPI).
-		Get(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	response, err = self.client.R(path).SetResult(&itemIconFromAPI).Get(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -110,7 +102,7 @@ func (self *CatalogItemIconResource) Read(
 	}
 
 	var itemIconFromAPI CatalogItemIconAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &itemIcon, &itemIconFromAPI)
+	found, _, readDiags := self.client.ReadIt(&itemIcon, &itemIconFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -137,12 +129,8 @@ func (self *CatalogItemIconResource) Update(
 	}
 
 	path := itemIcon.UpdatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(itemIcon.ToAPI()).
-		Patch(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	response, err := self.client.R(path).SetBody(itemIcon.ToAPI()).Patch(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -153,12 +141,8 @@ func (self *CatalogItemIconResource) Update(
 	// Read (using API) to retrieve the item content (and not empty stuff)
 	var itemIconFromAPI CatalogItemIconAPIModel
 	path = itemIcon.ReadPath()
-	response, err = self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetResult(&itemIconFromAPI).
-		Get(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	response, err = self.client.R(path).SetResult(&itemIconFromAPI).Get(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",

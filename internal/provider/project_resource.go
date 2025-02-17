@@ -69,14 +69,13 @@ func (self *ProjectResource) Create(
 
 	var projectFromAPI ProjectAPIModel
 	path := project.CreatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+	response, err := self.client.R(path).
 		SetQueryParam("validatePrincipals", "true").
 		SetQueryParam("syncPrincipals", "true").
 		SetBody(projectToAPI).
 		SetResult(&projectFromAPI).
 		Post(project.CreatePath())
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -103,7 +102,7 @@ func (self *ProjectResource) Read(
 	}
 
 	var projectFromAPI ProjectAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &project, &projectFromAPI)
+	found, _, readDiags := self.client.ReadIt(&project, &projectFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -137,19 +136,16 @@ func (self *ProjectResource) Update(
 
 	var projectFromAPI ProjectAPIModel
 	path := project.UpdatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+	response, err := self.client.R(path).
 		SetQueryParam("validatePrincipals", "true").
 		SetQueryParam("syncPrincipals", "true").
 		SetBody(projectToAPI).
 		SetResult(&projectFromAPI).
 		Patch(path)
-
 	// TODO Also call PATCH project-service/api/projects/{id}/cost
 	// TODO Also call PATCH project-service/api/projects/{id}/principals
 	// TODO Also call PATCH project-service/api/projects/{id}/resource-metadata
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -172,7 +168,7 @@ func (self *ProjectResource) Delete(
 	var project ProjectModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &project)...)
 	if !resp.Diagnostics.HasError() {
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &project)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&project)...)
 	}
 }
 

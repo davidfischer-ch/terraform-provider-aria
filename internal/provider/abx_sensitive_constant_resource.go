@@ -61,13 +61,9 @@ func (self *ABXSensitiveConstantResource) Create(
 
 	var constantFromAPI ABXSensitiveConstantAPIModel
 	path := constant.CreatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(constant.ToAPI()).
-		SetResult(&constantFromAPI).
-		Post(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	body := constant.ToAPI()
+	response, err := self.client.R(path).SetBody(body).SetResult(&constantFromAPI).Post(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -94,7 +90,7 @@ func (self *ABXSensitiveConstantResource) Read(
 	}
 
 	var constantFromAPI ABXSensitiveConstantAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &constant, &constantFromAPI)
+	found, _, readDiags := self.client.ReadIt(&constant, &constantFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -122,13 +118,9 @@ func (self *ABXSensitiveConstantResource) Update(
 
 	var constantFromAPI ABXSensitiveConstantAPIModel
 	path := constant.UpdatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(constant.ToAPI()).
-		SetResult(&constantFromAPI).
-		Put(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	body := constant.ToAPI()
+	response, err := self.client.R(path).SetBody(body).SetResult(&constantFromAPI).Put(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -151,6 +143,6 @@ func (self *ABXSensitiveConstantResource) Delete(
 	var constant ABXSensitiveConstantModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &constant)...)
 	if !resp.Diagnostics.HasError() {
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &constant)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&constant)...)
 	}
 }

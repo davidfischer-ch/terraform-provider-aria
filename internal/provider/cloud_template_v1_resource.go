@@ -69,12 +69,11 @@ func (self *CloudTemplateV1Resource) Create(
 
 	var templateFromAPI CloudTemplateV1APIModel
 	path := template.CreatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+	response, err := self.client.R(path).
 		SetBody(templateToAPI).
 		SetResult(&templateFromAPI).
 		Post(path)
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -87,12 +86,8 @@ func (self *CloudTemplateV1Resource) Create(
 
 	// Read (using API) to retrieve the projects & templates (and counters)
 	path = template.ReadPath()
-	response, err = self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetResult(&templateFromAPI).
-		Get(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	response, err = self.client.R(path).SetResult(&templateFromAPI).Get(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -119,7 +114,7 @@ func (self *CloudTemplateV1Resource) Read(
 	}
 
 	var templateRaw CloudTemplateV1APIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &template, &templateRaw)
+	found, _, readDiags := self.client.ReadIt(&template, &templateRaw)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -153,13 +148,11 @@ func (self *CloudTemplateV1Resource) Update(
 
 	var templateFromAPI CloudTemplateV1APIModel
 	path := template.UpdatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+	response, err := self.client.R(path).
 		SetBody(templateToAPI).
 		SetResult(&templateFromAPI).
 		Put(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -182,7 +175,7 @@ func (self *CloudTemplateV1Resource) Delete(
 	var template CloudTemplateV1Model
 	resp.Diagnostics.Append(req.State.Get(ctx, &template)...)
 	if !resp.Diagnostics.HasError() {
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &template)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&template)...)
 	}
 }
 

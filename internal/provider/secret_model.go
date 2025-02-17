@@ -5,6 +5,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -38,6 +39,17 @@ type SecretAPIModel struct {
 	CreatedBy   string   `json:"createdBy"`
 	UpdatedAt   string   `json:"updatedAt"`
 	UpdatedBy   string   `json:"updatedBy"`
+}
+
+func (self SecretModel) String() string {
+	return fmt.Sprintf(
+		"Secret %s (%s)",
+		self.Id.ValueString(),
+		self.Name.ValueString())
+}
+
+func (self SecretModel) ReadPath() string {
+	return "/platform/api/secrets/" + self.Id.ValueString()
 }
 
 func (self *SecretModel) FromAPI(

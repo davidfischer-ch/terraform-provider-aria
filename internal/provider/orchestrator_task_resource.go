@@ -69,12 +69,8 @@ func (self *OrchestratorTaskResource) Create(
 
 	var taskFromAPI OrchestratorTaskAPIModel
 	path := task.CreatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(taskToAPI).
-		SetResult(&taskFromAPI).
-		Post(path)
-	err = handleAPIResponse(ctx, response, err, []int{202})
+	response, err := self.client.R(path).SetBody(taskToAPI).SetResult(&taskFromAPI).Post(path)
+	err = self.client.HandleAPIResponse(response, err, []int{202})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -101,7 +97,7 @@ func (self *OrchestratorTaskResource) Read(
 	}
 
 	var taskFromAPI OrchestratorTaskAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &task, &taskFromAPI)
+	found, _, readDiags := self.client.ReadIt(&task, &taskFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -135,13 +131,8 @@ func (self *OrchestratorTaskResource) Update(
 
 	var taskFromAPI OrchestratorTaskAPIModel
 	path := task.UpdatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(taskToAPI).
-		SetResult(&taskFromAPI).
-		Post(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	response, err := self.client.R(path).SetBody(taskToAPI).SetResult(&taskFromAPI).Post(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -164,7 +155,7 @@ func (self *OrchestratorTaskResource) Delete(
 	var task OrchestratorTaskModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &task)...)
 	if !resp.Diagnostics.HasError() {
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &task)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&task)...)
 	}
 }
 

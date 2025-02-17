@@ -69,12 +69,8 @@ func (self *ABXActionResource) Create(
 
 	var actionFromAPI ABXActionAPIModel
 	path := action.CreatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(actionToAPI).
-		SetResult(&actionFromAPI).
-		Post(path)
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	response, err := self.client.R(path).SetBody(actionToAPI).SetResult(&actionFromAPI).Post(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -101,7 +97,7 @@ func (self *ABXActionResource) Read(
 	}
 
 	var actionFromAPI ABXActionAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &action, &actionFromAPI)
+	found, _, readDiags := self.client.ReadIt(&action, &actionFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -135,13 +131,8 @@ func (self *ABXActionResource) Update(
 
 	var actionFromAPI ABXActionAPIModel
 	path := action.UpdatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(actionToAPI).
-		SetResult(&actionFromAPI).
-		Put(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	response, err := self.client.R(path).SetBody(actionToAPI).SetResult(&actionFromAPI).Put(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -164,7 +155,7 @@ func (self *ABXActionResource) Delete(
 	var action ABXActionModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &action)...)
 	if !resp.Diagnostics.HasError() {
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &action)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&action)...)
 	}
 }
 

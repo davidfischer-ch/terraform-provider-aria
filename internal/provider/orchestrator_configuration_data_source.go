@@ -59,12 +59,9 @@ func (self *OrchestratorConfigurationDataSource) Read(
 	}
 
 	var configurationRaw OrchestratorConfigurationAPIModel
-	response, err := self.client.Client.R().
-		// TODO SetQueryParam("apiVersion", ORCHESTRATOR_API_VERSION).
-		SetResult(&configurationRaw).
-		Get(configuration.ReadPath())
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	path := configuration.ReadPath()
+	response, err := self.client.R(path).SetResult(&configurationRaw).Get(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",

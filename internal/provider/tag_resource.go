@@ -63,13 +63,8 @@ func (self *TagResource) Create(
 
 	var tagFromAPI TagAPIModel
 	path := tag.CreatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(tag.ToAPI()).
-		SetResult(&tagFromAPI).
-		Post(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	response, err := self.client.R(path).SetBody(tag.ToAPI()).SetResult(&tagFromAPI).Post(path)
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -98,13 +93,12 @@ func (self *TagResource) Read(
 	// TODO Read by filtering tag list by ID
 	var listFromAPI TagListAPIModel
 	listPath := tag.ListPath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(listPath)).
+	response, err := self.client.R(listPath).
 		SetQueryParam("$filter", fmt.Sprintf("id eq %s", tag.Id.ValueString())).
 		SetQueryParam("$top", "2"). // Make it possible to know if filter works properly
 		SetResult(&listFromAPI).
 		Get(listPath)
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -161,7 +155,7 @@ func (self *TagResource) Delete(
 	var tag TagModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &tag)...)
 	if !resp.Diagnostics.HasError() && !tag.KeepOnDestroy.ValueBool() {
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &tag)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&tag)...)
 	}
 }
 

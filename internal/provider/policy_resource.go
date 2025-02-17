@@ -69,12 +69,11 @@ func (self *PolicyResource) Create(
 
 	var policyFromAPI PolicyAPIModel
 	path := policy.CreatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+	response, err := self.client.R(path).
 		SetBody(policyToAPI).
 		SetResult(&policyFromAPI).
 		Post(path)
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -101,7 +100,7 @@ func (self *PolicyResource) Read(
 	}
 
 	var policyFromAPI PolicyAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &policy, &policyFromAPI)
+	found, _, readDiags := self.client.ReadIt(&policy, &policyFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -135,12 +134,11 @@ func (self *PolicyResource) Update(
 
 	var policyFromAPI PolicyAPIModel
 	path := policy.UpdatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+	response, err := self.client.R(path).
 		SetBody(policyToAPI).
 		SetResult(&policyFromAPI).
 		Post(path)
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -163,7 +161,7 @@ func (self *PolicyResource) Delete(
 	var policy PolicyModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &policy)...)
 	if !resp.Diagnostics.HasError() {
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &policy)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&policy)...)
 	}
 }
 

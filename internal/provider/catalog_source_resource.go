@@ -70,12 +70,8 @@ func (self *CatalogSourceResource) Create(
 
 	var sourceFromAPI CatalogSourceAPIModel
 	path := source.CreatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(sourceToAPI).
-		SetResult(&sourceFromAPI).
-		Post(path)
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	response, err := self.client.R(path).SetBody(sourceToAPI).SetResult(&sourceFromAPI).Post(path)
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -107,7 +103,7 @@ func (self *CatalogSourceResource) Read(
 	}
 
 	var sourceFromAPI CatalogSourceAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &source, &sourceFromAPI)
+	found, _, readDiags := self.client.ReadIt(&source, &sourceFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -141,12 +137,8 @@ func (self *CatalogSourceResource) Update(
 
 	var sourceFromAPI CatalogSourceAPIModel
 	path := source.UpdatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(sourceToAPI).
-		SetResult(&sourceFromAPI).
-		Post(path)
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	response, err := self.client.R(path).SetBody(sourceToAPI).SetResult(&sourceFromAPI).Post(path)
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -174,7 +166,7 @@ func (self *CatalogSourceResource) Delete(
 	var source CatalogSourceModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &source)...)
 	if !resp.Diagnostics.HasError() {
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &source)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&source)...)
 	}
 }
 
@@ -203,7 +195,7 @@ func (self *CatalogSourceResource) WaitImported(
 			fmt.Sprintf("Poll %d of %d - Check %s is imported...", attempt+1, maxAttempts, name))
 
 		var sourceFromAPI CatalogSourceAPIModel
-		found, _, someDiags := self.client.ReadIt(ctx, source, &sourceFromAPI)
+		found, _, someDiags := self.client.ReadIt(source, &sourceFromAPI)
 		diags.Append(someDiags...)
 		if !found {
 			diags.AddError(
@@ -234,11 +226,8 @@ func (self *CatalogSourceResource) WaitImported(
 			// Refresh and continue polling but only if there is no error (conversion, ...)
 			if !diags.HasError() {
 				path := source.UpdatePath()
-				response, err := self.client.Client.R().
-					SetQueryParam("apiVersion", GetVersionFromPath(path)).
-					SetBody(sourceToAPI).
-					Post(path)
-				err = handleAPIResponse(ctx, response, err, []int{201})
+				response, err := self.client.R(path).SetBody(sourceToAPI).Post(path)
+				err = self.client.HandleAPIResponse(response, err, []int{201})
 				if err == nil {
 					continue // Continue polling
 				}

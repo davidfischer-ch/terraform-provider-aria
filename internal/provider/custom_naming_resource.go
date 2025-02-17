@@ -69,12 +69,8 @@ func (self *CustomNamingResource) Create(
 
 	var namingFromAPI CustomNamingAPIModel
 	path := naming.CreatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(namingToAPI).
-		SetResult(&namingFromAPI).
-		Post(path)
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	response, err := self.client.R(path).SetBody(namingToAPI).SetResult(&namingFromAPI).Post(path)
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -87,12 +83,8 @@ func (self *CustomNamingResource) Create(
 
 	// Read (using API) to retrieve the projects & templates (and counters)
 	path = naming.ReadPath()
-	response, err = self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetResult(&namingFromAPI).
-		Get(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	response, err = self.client.R(path).SetResult(&namingFromAPI).Get(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -119,7 +111,7 @@ func (self *CustomNamingResource) Read(
 	}
 
 	var namingFromAPI CustomNamingAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &naming, &namingFromAPI)
+	found, _, readDiags := self.client.ReadIt(&naming, &namingFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -154,13 +146,8 @@ func (self *CustomNamingResource) Update(
 
 	var namingFromAPI CustomNamingAPIModel
 	path := naming.UpdatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(namingToAPI).
-		SetResult(&namingFromAPI).
-		Put(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	response, err := self.client.R(path).SetBody(namingToAPI).SetResult(&namingFromAPI).Put(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -183,7 +170,7 @@ func (self *CustomNamingResource) Delete(
 	var naming CustomNamingModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &naming)...)
 	if !resp.Diagnostics.HasError() {
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &naming)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&naming)...)
 	}
 }
 

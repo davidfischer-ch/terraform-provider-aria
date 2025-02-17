@@ -16,7 +16,6 @@ import (
 
 	"github.com/go-resty/resty/v2"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
 type AriaClient struct {
@@ -29,6 +28,9 @@ type AriaClient struct {
 
 	RefreshToken string `datapolicy:"token"`
 	AccessToken  string `datapolicy:"token"`
+
+	OKAPICallsLogLevel string
+	KOAPICallsLogLevel string
 
 	// Transport Layer.
 	Insecure bool
@@ -87,7 +89,7 @@ func (self *AriaClient) GetAccessToken() diag.Diagnostics {
 
 	// Refresh access token if refresh token is set and access token is empty
 	if len(self.RefreshToken) > 0 && len(self.AccessToken) == 0 {
-		tflog.Debug(self.Context, "Requesting a new API access token at "+self.Host)
+		self.Debug("Requesting a new API access token at %s", self.Host)
 
 		var token AccessTokenResponse
 		response, err := self.Client.R().
@@ -95,7 +97,7 @@ func (self *AriaClient) GetAccessToken() diag.Diagnostics {
 			SetBody(map[string]string{"refreshToken": self.RefreshToken}).
 			SetResult(&token).
 			Post("iaas/api/login")
-		err = handleAPIResponse(self.Context, response, err, []int{200})
+		err = self.HandleAPIResponse(response, err, []int{200})
 		if err != nil {
 			diags.AddError("Unable to retrieve a valid access token", err.Error())
 			return diags
@@ -113,8 +115,12 @@ func (self *AriaClient) GetAccessToken() diag.Diagnostics {
 	return diags
 }
 
+// Return a new request insance with apiVersion header set, based on path.
+func (self AriaClient) R(path string) *resty.Request {
+	return self.Client.R().SetQueryParam("apiVersion", GetVersionFromPath(path))
+}
+
 func (self AriaClient) ReadIt(
-	ctx context.Context,
 	instance Model,
 	instanceRaw APIModel,
 	readPath ...string,
@@ -139,17 +145,13 @@ func (self AriaClient) ReadIt(
 		return false, nil, diags
 	}
 
-	response, err := self.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetResult(&instanceRaw).
-		Get(path)
-
+	response, err := self.R(path).SetResult(&instanceRaw).Get(path)
 	if response.StatusCode() == 404 {
-		tflog.Debug(ctx, fmt.Sprintf("%s not found", instance.String()))
+		self.Debug("%s not found", instance.String())
 		return false, response, diags
 	}
 
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	err = self.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		diags.AddError(
 			"Client error",
@@ -160,7 +162,6 @@ func (self AriaClient) ReadIt(
 }
 
 func (self AriaClient) DeleteIt(
-	ctx context.Context,
 	instance Model,
 	conflictMaxAttemptsOptional ...int,
 ) diag.Diagnostics {
@@ -172,17 +173,14 @@ func (self AriaClient) DeleteIt(
 
 	diags := diag.Diagnostics{}
 	name := instance.String()
-	tflog.Debug(ctx, fmt.Sprintf("Deleting %s...", name))
+	self.Debug("Deleting %s...", name)
 
 	for attempt := 0; attempt <= conflictMaxAttempts; attempt++ {
 
 		// Delete the resource
 		deletePath := instance.DeletePath()
-		response, err := self.Client.R().
-			SetQueryParam("apiVersion", GetVersionFromPath(deletePath)).
-			Delete(deletePath)
-
-		err = handleAPIResponse(ctx, response, err, []int{200, 204})
+		response, err := self.R(deletePath).Delete(deletePath)
+		err = self.HandleAPIResponse(response, err, []int{200, 204})
 		if err != nil {
 			// This is potentially an error that will be solved by the deletion of other resources.
 			// We can retry the delete operation after some time to converge to desired state.
@@ -200,19 +198,16 @@ func (self AriaClient) DeleteIt(
 		// Poll resource until deleted, but if we cant read it...
 		readPath := instance.ReadPath()
 		if len(readPath) == 0 {
-			tflog.Debug(ctx, fmt.Sprintf("Deleted %s successfully (without polling)", name))
+			self.Debug("Deleted %s successfully (without polling)", name)
 			return diags
 		}
 
 		for retry := range []int{0, 1, 2, 3, 4} {
 			time.Sleep(time.Duration(retry) * time.Second)
-			tflog.Debug(ctx, fmt.Sprintf("Poll %d of 5 - Check %s is deleted...", retry+1, name))
+			self.Debug("Poll %d of 5 - Check %s is deleted...", retry+1, name)
 
-			response, err := self.Client.R().
-				SetQueryParam("apiVersion", GetVersionFromPath(readPath)).
-				Get(readPath)
-
-			err = handleAPIResponse(ctx, response, err, []int{200, 404})
+			response, err := self.R(readPath).Get(readPath)
+			err = self.HandleAPIResponse(response, err, []int{200, 404})
 			if err != nil {
 				diags.AddError(
 					"Client error",
@@ -221,7 +216,7 @@ func (self AriaClient) DeleteIt(
 			}
 
 			if response.StatusCode() == 404 {
-				tflog.Debug(ctx, fmt.Sprintf("Deleted %s successfully", name))
+				self.Debug("Deleted %s successfully", name)
 				return diags
 			}
 		}
@@ -231,8 +226,7 @@ func (self AriaClient) DeleteIt(
 	return diags
 }
 
-func handleAPIResponse(
-	ctx context.Context,
+func (self AriaClient) HandleAPIResponse(
 	response *resty.Response,
 	err error,
 	statusCodes []int,
@@ -246,7 +240,7 @@ func handleAPIResponse(
 	statusCodesText := strings.Join(statusCodesString, ", ")
 
 	if err != nil {
-		logAPIResponseInfo(ctx, response, err, statusCodesText)
+		self.LogAPIResponseInfo(response, err, statusCodesText)
 		return err
 	}
 
@@ -258,12 +252,11 @@ func handleAPIResponse(
 			response.String())
 	}
 
-	logAPIResponseInfo(ctx, response, err, statusCodesText)
+	self.LogAPIResponseInfo(response, err, statusCodesText)
 	return err
 }
 
-func logAPIResponseInfo(
-	ctx context.Context,
+func (self AriaClient) LogAPIResponseInfo(
 	response *resty.Response,
 	err error,
 	statusCodesText string,
@@ -288,12 +281,12 @@ func logAPIResponseInfo(
 		}
 	}
 
-	method := tflog.Trace
+	level := self.OKAPICallsLogLevel
 	if err != nil {
-		method = tflog.Debug
+		level = self.KOAPICallsLogLevel
 	}
 
-	method(ctx, strings.Join([]string{
+	self.Log(level, strings.Join([]string{
 		"",
 		"Request Info:",
 		fmt.Sprintf("  URL         : %s", request.URL),

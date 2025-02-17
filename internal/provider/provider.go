@@ -8,12 +8,14 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/function"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -31,10 +33,12 @@ type AriaProvider struct {
 
 // AriaProviderModel describes the provider data model.
 type AriaProviderModel struct {
-	Host         types.String `tfsdk:"host"`
-	Insecure     types.Bool   `tfsdk:"insecure"`
-	RefreshToken types.String `tfsdk:"refresh_token"`
-	AccessToken  types.String `tfsdk:"access_token"`
+	Host               types.String `tfsdk:"host"`
+	Insecure           types.Bool   `tfsdk:"insecure"`
+	RefreshToken       types.String `tfsdk:"refresh_token"`
+	AccessToken        types.String `tfsdk:"access_token"`
+	OKAPICallsLogLevel types.String `tfsdk:"ok_api_calls_log_level"`
+	KOAPICallsLogLevel types.String `tfsdk:"ko_api_calls_log_level"`
 }
 
 func (self *AriaProvider) Metadata(
@@ -54,22 +58,38 @@ func (self *AriaProvider) Schema(
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"host": schema.StringAttribute{
+				MarkdownDescription: "The URI to Aria. " +
+					"May also be provided via ARIA_HOST environment variable.",
 				Optional:            true,
-				MarkdownDescription: "The URI to Aria. May also be provided via ARIA_HOST environment variable.",
 			},
 			"refresh_token": schema.StringAttribute{
+				MarkdownDescription: "The refresh token to use for making API requests. " +
+					"May also be provided via ARIA_REFRESH_TOKEN environment variable.",
 				Optional:            true,
 				Sensitive:           true,
-				MarkdownDescription: "The refresh token to use for making API requests. May also be provided via ARIA_REFRESH_TOKEN environment variable.",
 			},
 			"access_token": schema.StringAttribute{
+				MarkdownDescription: "The access token to use for making API requests. " +
+					"May also be provided via ARIA_ACCESS_TOKEN environment variable.",
 				Optional:            true,
 				Sensitive:           true,
-				MarkdownDescription: "The access token to use for making API requests. May also be provided via ARIA_ACCESS_TOKEN environment variable.",
 			},
 			"insecure": schema.BoolAttribute{
+				MarkdownDescription: "Whether server should be accessed without verifying the " +
+					"TLS certificate. May also be provided via ARIA_INSECURE environment variable.",
 				Optional:            true,
-				MarkdownDescription: "Whether server should be accessed without verifying the TLS certificate. May also be provided via ARIA_INSECURE environment variable.",
+			},
+			"ok_api_calls_log_level": schema.StringAttribute{
+				Optional:             true,
+				Validators: []validator.String{
+					stringvalidator.OneOf([]string{"INFO", "DEBUG", "TRACE"}...),
+				},
+			},
+			"ko_api_calls_log_level": schema.StringAttribute{
+				Optional:             true,
+				Validators: []validator.String{
+					stringvalidator.OneOf([]string{"INFO", "DEBUG", "TRACE"}...),
+				},
 			},
 		},
 	}
@@ -128,6 +148,24 @@ func (self *AriaProvider) Configure(
 		)
 	}
 
+	if config.OKAPICallsLogLevel.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("ok_api_calls_log_level"),
+			"Unknown OK API Calls Log Level",
+			"Either set the level in the provider configuration to a static value or "+
+				"apply the source of the value first.",
+		)
+	}
+
+	if config.KOAPICallsLogLevel.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("ko_api_calls_log_level"),
+			"Unknown KO API Calls Log Level",
+			"Either set the level in the provider configuration to a static value "+
+				"or apply the source of the value first.",
+		)
+	}
+
 	// Retrieve default values from environment variables if set
 
 	host := os.Getenv("ARIA_HOST")
@@ -144,10 +182,10 @@ func (self *AriaProvider) Configure(
 	}
 
 	var insecure bool
-	var err error
 	if !config.Insecure.IsNull() {
 		insecure = config.Insecure.ValueBool()
 	} else {
+		var err error
 		insecure, err = strconv.ParseBool(os.Getenv("ARIA_INSECURE"))
 		if err != nil {
 			resp.Diagnostics.AddAttributeError(
@@ -177,6 +215,16 @@ func (self *AriaProvider) Configure(
 		)
 	}
 
+	okLogLevel := "TRACE"
+	if !config.OKAPICallsLogLevel.IsNull() {
+		okLogLevel = config.OKAPICallsLogLevel.ValueString()
+	}
+
+	koLogLevel := "DEBUG"
+	if !config.KOAPICallsLogLevel.IsNull() {
+		koLogLevel = config.KOAPICallsLogLevel.ValueString()
+	}
+
 	ctx = tflog.SetField(ctx, "aria_host", host)
 	ctx = tflog.MaskFieldValuesWithFieldKeys(ctx, "aria_refresh_token", refresh_token)
 	ctx = tflog.MaskFieldValuesWithFieldKeys(ctx, "aria_access_token", access_token)
@@ -186,11 +234,13 @@ func (self *AriaProvider) Configure(
 
 	// Create a new Aria client using the configuration values
 	client := AriaClient{
-		Host:         host,
-		RefreshToken: refresh_token,
-		AccessToken:  access_token,
-		Insecure:     insecure,
-		Context:      ctx,
+		Host:               host,
+		RefreshToken:       refresh_token,
+		AccessToken:        access_token,
+		Insecure:           insecure,
+		Context:            ctx,
+		OKAPICallsLogLevel: okLogLevel,
+		KOAPICallsLogLevel: koLogLevel,
 	}
 
 	clientDiags := client.Init()

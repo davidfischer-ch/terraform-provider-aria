@@ -69,12 +69,11 @@ func (self *PropertyGroupResource) Create(
 
 	var propertyGroupFromAPI PropertyGroupAPIModel
 	path := propertyGroup.CreatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+	response, err := self.client.R(path).
 		SetBody(propertyGroupToAPI).
 		SetResult(&propertyGroupFromAPI).
 		Post(path)
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -101,7 +100,7 @@ func (self *PropertyGroupResource) Read(
 	}
 
 	var propertyGroupFromAPI PropertyGroupAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &propertyGroup, &propertyGroupFromAPI)
+	found, _, readDiags := self.client.ReadIt(&propertyGroup, &propertyGroupFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -135,13 +134,11 @@ func (self *PropertyGroupResource) Update(
 
 	var propertyGroupFromAPI PropertyGroupAPIModel
 	path := propertyGroup.UpdatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+	response, err := self.client.R(path).
 		SetBody(propertyGroupToAPI).
 		SetResult(&propertyGroupFromAPI).
 		Put(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -167,7 +164,7 @@ func (self *PropertyGroupResource) Delete(
 		return
 	}
 
-	resp.Diagnostics.Append(self.client.DeleteIt(ctx, &propertyGroup)...)
+	resp.Diagnostics.Append(self.client.DeleteIt(&propertyGroup)...)
 }
 
 func (self *PropertyGroupResource) ImportState(

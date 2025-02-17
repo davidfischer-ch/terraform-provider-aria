@@ -69,12 +69,11 @@ func (self *OrchestratorConfigurationResource) Create(
 
 	var configurationFromAPI OrchestratorConfigurationAPIModel
 	path := configuration.CreatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+	response, err := self.client.R(path).
 		SetBody(configurationToAPI).
 		SetResult(&configurationFromAPI).
 		Post(path)
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -101,7 +100,7 @@ func (self *OrchestratorConfigurationResource) Read(
 	}
 
 	var configurationFromAPI OrchestratorConfigurationAPIModel
-	found, response, someDiags := self.client.ReadIt(ctx, &configuration, &configurationFromAPI)
+	found, response, someDiags := self.client.ReadIt(&configuration, &configurationFromAPI)
 	resp.Diagnostics.Append(someDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -142,13 +141,11 @@ func (self *OrchestratorConfigurationResource) Update(
 
 	// No response body from API, only the changeset (version) available in response headers
 	path := configuration.UpdatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+	response, err := self.client.R(path).
 		SetHeader("x-vro-changeset-sha", configurationFromState.VersionId.ValueString()).
 		SetBody(configurationToAPI).
 		Put(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{204})
+	err = self.client.HandleAPIResponse(response, err, []int{204})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -171,7 +168,7 @@ func (self *OrchestratorConfigurationResource) Delete(
 	var configuration OrchestratorConfigurationModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &configuration)...)
 	if !resp.Diagnostics.HasError() {
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &configuration)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&configuration)...)
 	}
 }
 

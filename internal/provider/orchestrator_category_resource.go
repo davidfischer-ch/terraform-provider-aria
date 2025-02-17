@@ -63,12 +63,11 @@ func (self *OrchestratorCategoryResource) Create(
 
 	var categoryFromAPI OrchestratorCategoryAPIModel
 	path := category.CreatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
+	response, err := self.client.R(path).
 		SetBody(category.ToAPI()).
 		SetResult(&categoryFromAPI).
 		Post(path)
-	err = handleAPIResponse(ctx, response, err, []int{201})
+	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -95,7 +94,7 @@ func (self *OrchestratorCategoryResource) Read(
 	}
 
 	var categoryFromAPI OrchestratorCategoryAPIModel
-	found, _, readDiags := self.client.ReadIt(ctx, &category, &categoryFromAPI)
+	found, _, readDiags := self.client.ReadIt(&category, &categoryFromAPI)
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -122,12 +121,8 @@ func (self *OrchestratorCategoryResource) Update(
 	}
 
 	path := category.UpdatePath()
-	response, err := self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetBody(category.ToAPI()).
-		Put(path)
-
-	err = handleAPIResponse(ctx, response, err, []int{204})
+	response, err := self.client.R(path).SetBody(category.ToAPI()).Put(path)
+	err = self.client.HandleAPIResponse(response, err, []int{204})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -138,12 +133,8 @@ func (self *OrchestratorCategoryResource) Update(
 	// Read (using API) to retrieve the category content (and not empty stuff)
 	var categoryFromAPI OrchestratorCategoryAPIModel
 	path = category.ReadPath()
-	response, err = self.client.Client.R().
-		SetQueryParam("apiVersion", GetVersionFromPath(path)).
-		SetResult(&categoryFromAPI).
-		Get(category.ReadPath())
-
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	response, err = self.client.R(path).SetResult(&categoryFromAPI).Get(category.ReadPath())
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
@@ -166,7 +157,7 @@ func (self *OrchestratorCategoryResource) Delete(
 	var category OrchestratorCategoryModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &category)...)
 	if !resp.Diagnostics.HasError() {
-		resp.Diagnostics.Append(self.client.DeleteIt(ctx, &category)...)
+		resp.Diagnostics.Append(self.client.DeleteIt(&category)...)
 	}
 }
 

@@ -59,14 +59,13 @@ func (self *IconDataSource) Read(
 		return
 	}
 
-	response, err := self.client.Client.R().
-		// TODO SetQueryParam("apiVersion", ICON_API_VERSION).
-		Get(icon.ReadPath())
-	err = handleAPIResponse(ctx, response, err, []int{200})
+	path := icon.ReadPath()
+	response, err := self.client.R(path).Get(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
-			fmt.Sprintf("Unable to read icon %s, got error: %s", icon.Id.ValueString(), err))
+			fmt.Sprintf("Unable to read %s, got error: %s", icon.String(), err))
 		return
 	}
 
