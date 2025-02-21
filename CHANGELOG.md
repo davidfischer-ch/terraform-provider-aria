@@ -1,5 +1,17 @@
 # Changelog
 
+## Release v0.6.9 (2025-02-21)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.8...v0.6.9
+
+### Features
+
+* Resource `aria_orchestrator_action`: Serialize write requests to prevent vRO deadlocks
+
+### Fix and enhancements
+
+* Merge dependabot dependencies update requests
+
 ## Release v0.6.8 (2025-02-17)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.7...v0.6.8
