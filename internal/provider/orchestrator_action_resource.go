@@ -142,6 +142,7 @@ func (self *OrchestratorActionResource) Update(
 	response, err := self.client.R(path).SetBody(actionToAPI).Put(path)
 	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
+		self.client.Mutex.Unlock(ctx, action.LockKey())
 		resp.Diagnostics.AddError(
 			"Client error",
 			fmt.Sprintf("Unable to update %s, got error: %s", action.String(), err))
