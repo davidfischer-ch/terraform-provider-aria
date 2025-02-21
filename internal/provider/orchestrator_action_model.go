@@ -65,7 +65,7 @@ func (self OrchestratorActionModel) String() string {
 // Create: Identifier can be used to prevent concurrent creation of vRO actions.
 // Read Update Delete: Identifier can be used to prevent concurrent modifications on the instance.
 func (self OrchestratorActionModel) LockKey() string {
-	return "orchestrator-action" // + self.Id.ValueString()
+	return "orchestrator-action" // Prevent Orchestrator deadlocks by serializing "write" requests
 }
 
 func (self OrchestratorActionModel) CreatePath() string {
