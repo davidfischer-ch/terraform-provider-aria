@@ -1,5 +1,17 @@
 # Changelog
 
+## Release v0.6.10 (2025-02-21)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.9...v0.6.10
+
+### Features
+
+* Resource `aria_custom_form`: Seamlessly use (and overwrite) existing form
+
+### Fix and enhancements
+
+* Merge dependabot dependencies update requests
+
 ## Release v0.6.9 (2025-02-21)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.8...v0.6.9
