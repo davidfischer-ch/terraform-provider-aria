@@ -61,10 +61,30 @@ func (self *CustomFormResource) Create(
 		return
 	}
 
-	var fromFromAPI CustomFormAPIModel
-	form.GenerateId()
-	path := form.CreatePath()
-	response, err := self.client.R(path).SetBody(form.ToAPI()).SetResult(&fromFromAPI).Post(path)
+	// First, try to fetch (existing form)
+	var formFromFetchAPI CustomFormAPIModel
+	path := form.FetchPath()
+	response, err := self.client.R(path).
+		SetQueryParam("formFormat", "JSON").
+		SetQueryParam("formType", form.Type.ValueString()).
+		SetQueryParam("sourceId", form.SourceId.ValueString()).
+		SetQueryParam("sourceType", form.SourceType.ValueString()).
+		SetResult(&formFromFetchAPI).
+		Get(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200, 404})
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to fetch %s, got error: %s", form.String(), err))
+		return
+	}
+
+	// It may be missing, so generate the identifier in such as case...
+	form.GenerateId(formFromFetchAPI.Id)
+
+	// Then create (or update) it
+	path = form.CreatePath()
+	response, err = self.client.R(path).SetBody(form.ToAPI()).Post(path)
 	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -73,8 +93,20 @@ func (self *CustomFormResource) Create(
 		return
 	}
 
+	// Read (using API) to retrieve the custom form content (and not empty stuff)
+	var formFromAPI CustomFormAPIModel
+	path = form.ReadPath()
+	response, err = self.client.R(path).SetResult(&formFromAPI).Get(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to read %s, got error: %s", form.String(), err))
+		return
+	}
+
 	// Save custom form into Terraform state
-	form.FromAPI(fromFromAPI)
+	form.FromAPI(formFromAPI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &form)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", form.String()))
 }
@@ -118,14 +150,25 @@ func (self *CustomFormResource) Update(
 		return
 	}
 
-	var formFromAPI CustomFormAPIModel
 	path := form.UpdatePath()
-	response, err := self.client.R(path).SetBody(form.ToAPI()).SetResult(&formFromAPI).Post(path)
+	response, err := self.client.R(path).SetBody(form.ToAPI()).Post(path)
 	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Client error",
 			fmt.Sprintf("Unable to update %s, got error: %s", form.String(), err))
+		return
+	}
+
+	// Read (using API) to retrieve the custom form content (and not empty stuff)
+	var formFromAPI CustomFormAPIModel
+	path = form.ReadPath()
+	response, err = self.client.R(path).SetResult(&formFromAPI).Get(path)
+	err = self.client.HandleAPIResponse(response, err, []int{200})
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to read %s, got error: %s", form.String(), err))
 		return
 	}
 
