@@ -61,6 +61,10 @@ func (self CustomFormModel) CreatePath() string {
 	return "form-service/api/forms"
 }
 
+func (self CustomFormModel) FetchPath() string {
+	return "form-service/api/forms/fetchBySourceAndType"
+}
+
 func (self CustomFormModel) ReadPath() string {
 	return "form-service/api/forms/" + self.Id.ValueString()
 }
@@ -73,9 +77,13 @@ func (self CustomFormModel) DeletePath() string {
 	return self.ReadPath()
 }
 
-func (self *CustomFormModel) GenerateId() {
+func (self *CustomFormModel) GenerateId(recoveredId string) {
 	if len(self.Id.ValueString()) == 0 {
-		self.Id = types.StringValue(uuid.New().String())
+		if len(recoveredId) == 0 {
+			self.Id = types.StringValue(uuid.New().String())
+		} else {
+			self.Id = types.StringValue(recoveredId)
+		}
 	}
 }
 
