@@ -69,7 +69,11 @@ func (self *OrchestratorActionResource) Create(
 
 	var actionFromAPI OrchestratorActionAPIModel
 	path := action.CreatePath()
+
+	self.client.Mutex.Lock(ctx, action.LockKey())
 	response, err := self.client.R(path).SetBody(actionToAPI).SetResult(&actionFromAPI).Post(path)
+	self.client.Mutex.Unlock(ctx, action.LockKey())
+
 	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -97,7 +101,10 @@ func (self *OrchestratorActionResource) Read(
 	}
 
 	var actionFromAPI OrchestratorActionAPIModel
+	self.client.Mutex.RLock(ctx, action.LockKey())
 	found, _, readDiags := self.client.ReadIt(&action, &actionFromAPI)
+	self.client.Mutex.RUnlock(ctx, action.LockKey())
+
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -129,6 +136,8 @@ func (self *OrchestratorActionResource) Update(
 		return
 	}
 
+	self.client.Mutex.Lock(ctx, action.LockKey())
+
 	path := action.UpdatePath()
 	response, err := self.client.R(path).SetBody(actionToAPI).Put(path)
 	err = self.client.HandleAPIResponse(response, err, []int{200})
@@ -143,6 +152,9 @@ func (self *OrchestratorActionResource) Update(
 	var actionFromAPI OrchestratorActionAPIModel
 	path = action.ReadPath()
 	response, err = self.client.R(path).SetResult(&actionFromAPI).Get(path)
+
+	self.client.Mutex.Unlock(ctx, action.LockKey())
+
 	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -166,7 +178,9 @@ func (self *OrchestratorActionResource) Delete(
 	var action OrchestratorActionModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &action)...)
 	if !resp.Diagnostics.HasError() {
+		self.client.Mutex.Lock(ctx, action.LockKey())
 		resp.Diagnostics.Append(self.client.DeleteIt(&action)...)
+		self.client.Mutex.Unlock(ctx, action.LockKey())
 	}
 }
 
