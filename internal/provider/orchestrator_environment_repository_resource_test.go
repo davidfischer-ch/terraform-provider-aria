@@ -20,7 +20,7 @@ func TestAccOrchestratorEnvironmentRepositoryResource(t *testing.T) {
 resource "aria_orchestrator_environment_repository" "test" {
 	name     = "TEST_ARIA_PROVIDER"
 	runtime  = "python:3.10"
-	location = "https://registry.devops.etat-ge.ch/ctinexus/repository/pypi-all/simple"
+	location = "https://your-registry.your-company.net/repository/pypi-all/simple"
 }
 `,
 				Check: resource.ComposeAggregateTestCheckFunc(
@@ -36,7 +36,7 @@ resource "aria_orchestrator_environment_repository" "test" {
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_environment_repository.test", "location",
-						"https://registry.devops.etat-ge.ch/ctinexus/repository/pypi-all/simple",
+						"https://your-registry.your-company.net/repository/pypi-all/simple",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_environment_repository.test", "basic_auth", "false",
@@ -61,7 +61,7 @@ resource "aria_orchestrator_environment_repository" "test" {
 resource "aria_orchestrator_environment_repository" "test" {
 	name               = "TEST_ARIA_PROVIDER"
 	runtime            = "python:3.10"
-	location           = "https://registry.devops.etat-ge.ch/ctinexus/repository/pypi-all/simple"
+	location           = "https://your-registry.your-company.net/repository/pypi-all/simple"
 	system_user        = "toto"
 	system_credentials = "tata"
 }
@@ -79,7 +79,7 @@ resource "aria_orchestrator_environment_repository" "test" {
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_environment_repository.test", "location",
-						"https://registry.devops.etat-ge.ch/ctinexus/repository/pypi-all/simple",
+						"https://your-registry.your-company.net/repository/pypi-all/simple",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_environment_repository.test", "basic_auth", "true",
@@ -99,7 +99,7 @@ resource "aria_orchestrator_environment_repository" "test" {
 resource "aria_orchestrator_environment_repository" "test" {
 	name     = "TEST_ARIA_PROVIDER_RENAMED"
 	runtime  = "python:3.10"
-	location = "https://registry.devops.etat-ge.ch/ctinexus/repository/pypi-all/other"
+	location = "https://your-registry.your-company.net/repository/pypi-all/other"
 }
 `,
 				Check: resource.ComposeAggregateTestCheckFunc(
@@ -115,7 +115,7 @@ resource "aria_orchestrator_environment_repository" "test" {
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_environment_repository.test", "location",
-						"https://registry.devops.etat-ge.ch/ctinexus/repository/pypi-all/other",
+						"https://your-registry.your-company.net/repository/pypi-all/other",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_environment_repository.test", "basic_auth", "false",

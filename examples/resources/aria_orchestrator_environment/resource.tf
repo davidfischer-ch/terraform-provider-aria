@@ -3,7 +3,7 @@
 resource "aria_orchestrator_environment_repository" "python_ocsin" {
   name     = "Python_OCSIN"
   runtime  = "python:3.10"
-  location = "https://registry.devops.etat-ge.ch/ctinexus/repository/pypi-all/simple"
+  location = "https://your-registry.your-company.net/repository/pypi-all/simple"
 }
 
 resource "aria_orchestrator_environment" "python_for_tools" {
