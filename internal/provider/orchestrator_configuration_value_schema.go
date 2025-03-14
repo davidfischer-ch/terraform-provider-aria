@@ -16,6 +16,7 @@ func OrchestratorConfigurationValueSchema() schema.SingleNestedAttribute {
 			"boolean":       OrchestratorConfigurationBooleanSchema(),
 			"string":        OrchestratorConfigurationStringSchema(),
 			"secure_string": OrchestratorConfigurationSecureStringSchema(),
+			"sdk_object":    OrchestratorConfigurationSDKObjectSchema(),
 		},
 	}
 }
@@ -29,6 +30,7 @@ func ComputedOrchestratorConfigurationValueSchema() schema.SingleNestedAttribute
 			"boolean":       ComputedOrchestratorConfigurationBooleanSchema(),
 			"string":        ComputedOrchestratorConfigurationStringSchema(),
 			"secure_string": ComputedOrchestratorConfigurationSecureStringSchema(),
+			"sdk_object":    ComputedOrchestratorConfigurationSDKObjectSchema(),
 		},
 	}
 }

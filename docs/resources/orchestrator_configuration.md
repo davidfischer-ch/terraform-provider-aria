@@ -47,6 +47,17 @@ resource "aria_orchestrator_configuration" "Dummy" {
           value = true
         }
       }
+    },
+    {
+      name        = "restServer"
+      description = "Some REST Host"
+      type        = "REST:RESTHost"
+      value = {
+        sdk_object = {
+          id   = "08bb4b24-2f8e-4d4a-ba6f-07c8aa7b3c2d"
+          type = "REST:RESTHost"
+        }
+      }
     }
     /*
     This is not yet well handled (mutated by the platform), we have to find a pattern for this.
@@ -105,6 +116,7 @@ Required:
 Optional:
 
 - `boolean` (Attributes) Boolean (see [below for nested schema](#nestedatt--attributes--value--boolean))
+- `sdk_object` (Attributes) SDK Object (see [below for nested schema](#nestedatt--attributes--value--sdk_object))
 - `secure_string` (Attributes) Secure String (see [below for nested schema](#nestedatt--attributes--value--secure_string))
 - `string` (Attributes) String (see [below for nested schema](#nestedatt--attributes--value--string))
 
@@ -114,6 +126,15 @@ Optional:
 Required:
 
 - `value` (Boolean) Value
+
+
+<a id="nestedatt--attributes--value--sdk_object"></a>
+### Nested Schema for `attributes.value.sdk_object`
+
+Required:
+
+- `id` (String) Identifier
+- `type` (String) Type
 
 
 <a id="nestedatt--attributes--value--secure_string"></a>
