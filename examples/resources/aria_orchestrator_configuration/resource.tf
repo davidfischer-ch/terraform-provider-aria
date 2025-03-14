@@ -32,6 +32,17 @@ resource "aria_orchestrator_configuration" "Dummy" {
           value = true
         }
       }
+    },
+    {
+      name        = "restServer"
+      description = "Some REST Host"
+      type        = "REST:RESTHost"
+      value = {
+        sdk_object = {
+          id   = "08bb4b24-2f8e-4d4a-ba6f-07c8aa7b3c2d"
+          type = "REST:RESTHost"
+        }
+      }
     }
     /*
     This is not yet well handled (mutated by the platform), we have to find a pattern for this.

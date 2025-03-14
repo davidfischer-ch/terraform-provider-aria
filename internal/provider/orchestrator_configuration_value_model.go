@@ -14,9 +14,10 @@ import (
 
 // OrchestratorConfigurationValueModel describes the resource data model.
 type OrchestratorConfigurationValueModel struct {
-	Boolean      types.Object `tfsdk:"boolean"`       // Of type OrchestratorConfigurationBooleanModel
-	String       types.Object `tfsdk:"string"`        // Of type OrchestratorConfigurationStringModel
+	Boolean      types.Object `tfsdk:"boolean"`       // Of type ...BooleanModel
+	String       types.Object `tfsdk:"string"`        // Of type ...StringModel
 	SecureString types.Object `tfsdk:"secure_string"` // Of type ...SecureStringModel
+	SDKObject    types.Object `tfsdk:"sdk_object"`    // Of type ...SDKObjectModel
 }
 
 // OrchestratorConfigurationValueAPIModel describes the resource API model.
@@ -24,6 +25,7 @@ type OrchestratorConfigurationValueAPIModel struct {
 	Boolean      *OrchestratorConfigurationBooleanAPIModel      `json:"boolean,omitempty"`
 	String       *OrchestratorConfigurationStringAPIModel       `json:"string,omitempty"`
 	SecureString *OrchestratorConfigurationSecureStringAPIModel `json:"secure-string,omitempty"`
+	SDKObject    *OrchestratorConfigurationSDKObjectAPIModel    `json:"sdk-object,omitempty"`
 }
 
 func (self *OrchestratorConfigurationValueModel) FromAPI(
@@ -68,6 +70,17 @@ func (self *OrchestratorConfigurationValueModel) FromAPI(
 		diags.Append(someDiags...)
 	}
 
+	// Convert secure string from raw and then to object
+	objVal := OrchestratorConfigurationSDKObjectModel{}
+	if raw.SDKObject == nil {
+		self.SDKObject = types.ObjectNull(objVal.AttributeTypes())
+	} else {
+		var someDiags diag.Diagnostics
+		objVal.FromAPI(*raw.SDKObject)
+		self.SDKObject, someDiags = types.ObjectValueFrom(ctx, objVal.AttributeTypes(), objVal)
+		diags.Append(someDiags...)
+	}
+
 	return diags
 }
 
@@ -105,6 +118,15 @@ func (self OrchestratorConfigurationValueModel) ToAPI(
 		raw.SecureString = &secureRaw
 	}
 
+	if self.SDKObject.IsNull() || self.SDKObject.IsUnknown() {
+		raw.SDKObject = nil
+	} else {
+		var objVal OrchestratorConfigurationSDKObjectModel
+		diags.Append(self.SDKObject.As(ctx, &objVal, basetypes.ObjectAsOptions{})...)
+		objRaw := objVal.ToAPI()
+		raw.SDKObject = &objRaw
+	}
+
 	return raw, diags
 }
 
@@ -121,6 +143,9 @@ func (self OrchestratorConfigurationValueModel) AttributeTypes() map[string]attr
 		},
 		"secure_string": types.ObjectType{
 			AttrTypes: OrchestratorConfigurationSecureStringModel{}.AttributeTypes(),
+		},
+		"sdk_object": types.ObjectType{
+			AttrTypes: OrchestratorConfigurationSDKObjectModel{}.AttributeTypes(),
 		},
 	}
 }
