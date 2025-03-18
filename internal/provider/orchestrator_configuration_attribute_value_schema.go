@@ -8,11 +8,12 @@ import (
 )
 
 // The Value embedded inside an Orchestrator Configuration Attribute.
-func OrchestratorConfigurationValueSchema() schema.SingleNestedAttribute {
+func OrchestratorConfigurationAttributeValueSchema() schema.SingleNestedAttribute {
 	return schema.SingleNestedAttribute{
 		MarkdownDescription: "Value",
 		Required:            true,
 		Attributes: map[string]schema.Attribute{
+			"array":         OrchestratorConfigurationArraySchema(),
 			"boolean":       OrchestratorConfigurationBooleanSchema(),
 			"string":        OrchestratorConfigurationStringSchema(),
 			"secure_string": OrchestratorConfigurationSecureStringSchema(),
@@ -22,11 +23,12 @@ func OrchestratorConfigurationValueSchema() schema.SingleNestedAttribute {
 }
 
 // The Value embedded inside a Computed Orchestrator Configuration Attribute.
-func ComputedOrchestratorConfigurationValueSchema() schema.SingleNestedAttribute {
+func ComputedOrchestratorConfigurationAttributeValueSchema() schema.SingleNestedAttribute {
 	return schema.SingleNestedAttribute{
 		MarkdownDescription: "Value",
 		Computed:            true,
 		Attributes: map[string]schema.Attribute{
+			"array":         ComputedOrchestratorConfigurationArraySchema(),
 			"boolean":       ComputedOrchestratorConfigurationBooleanSchema(),
 			"string":        ComputedOrchestratorConfigurationStringSchema(),
 			"secure_string": ComputedOrchestratorConfigurationSecureStringSchema(),

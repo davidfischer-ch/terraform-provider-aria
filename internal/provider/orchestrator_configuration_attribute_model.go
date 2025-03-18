@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
@@ -28,7 +29,7 @@ type OrchestratorConfigurationAttributeAPIModel struct {
 	Description string `json:"description"`
 	Type        string `json:"type"`
 
-	Value OrchestratorConfigurationValueAPIModel `json:"value"`
+	Value OrchestratorConfigurationAttributeValueAPIModel `json:"value"`
 }
 
 func (self OrchestratorConfigurationAttributeModel) String() string {
@@ -48,9 +49,9 @@ func (self *OrchestratorConfigurationAttributeModel) FromAPI(
 
 	// Convert value from raw and then to object
 	var someDiags diag.Diagnostics
-	value := OrchestratorConfigurationValueModel{}
+	value := OrchestratorConfigurationAttributeValueModel{}
 	diags := value.FromAPI(ctx, raw.Value)
-	self.Value, someDiags = types.ObjectValueFrom(ctx, value.AttributeTypes(), value)
+	self.Value, someDiags = types.ObjectValueFrom(ctx, value.AttributeTypes(ctx), value)
 	diags.Append(someDiags...)
 
 	return diags
@@ -61,7 +62,7 @@ func (self OrchestratorConfigurationAttributeModel) ToAPI(
 ) (OrchestratorConfigurationAttributeAPIModel, diag.Diagnostics) {
 
 	diags := diag.Diagnostics{}
-	valueRaw := OrchestratorConfigurationValueAPIModel{}
+	valueRaw := OrchestratorConfigurationAttributeValueAPIModel{}
 
 	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/object
 	if self.Value.IsNull() || self.Value.IsUnknown() {
@@ -71,7 +72,7 @@ func (self OrchestratorConfigurationAttributeModel) ToAPI(
 	} else {
 		// Convert value from object to raw
 		var someDiags diag.Diagnostics
-		value := OrchestratorConfigurationValueModel{}
+		value := OrchestratorConfigurationAttributeValueModel{}
 		diags.Append(self.Value.As(ctx, &value, basetypes.ObjectAsOptions{})...)
 		valueRaw, someDiags = value.ToAPI(ctx)
 		diags.Append(someDiags...)
@@ -83,4 +84,20 @@ func (self OrchestratorConfigurationAttributeModel) ToAPI(
 		Type:        self.Type.ValueString(),
 		Value:       valueRaw,
 	}, diags
+}
+
+// Utils -------------------------------------------------------------------------------------------
+
+// Used to convert structure to a types.Object.
+func (self OrchestratorConfigurationAttributeModel) AttributeTypes(
+	ctx context.Context,
+) map[string]attr.Type {
+	return map[string]attr.Type{
+		"name":        types.StringType,
+		"description": types.StringType,
+		"type":        types.StringType,
+		"value": types.ObjectType{
+			AttrTypes: OrchestratorConfigurationAttributeValueModel{}.AttributeTypes(ctx),
+		},
+	}
 }

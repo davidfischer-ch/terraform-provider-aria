@@ -113,6 +113,27 @@ resource "aria_orchestrator_configuration" "test" {
           type = "REST:RESTHost"
         }
       }
+    },
+    {
+      name        = "someArrayOfString"
+      description = "Some array of string"
+      type        = "Array/string"
+      value = {
+        array = {
+          elements = [
+            {
+              string = {
+                value = "foo"
+              }
+            },
+            {
+              string = {
+                value = "bar"
+              }
+            }
+          ]
+        }
+      }
     }
     /*
     This is not yet well handled (mutated by the platform), we have to find a pattern for this.
@@ -154,7 +175,7 @@ resource "aria_orchestrator_configuration" "test" {
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_configuration.test", "attributes.#",
-						"3",
+						"4",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_configuration.test", "attributes.0.name",
@@ -206,6 +227,32 @@ resource "aria_orchestrator_configuration" "test" {
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_configuration.test", "attributes.2.value.sdk_object.type",
 						"REST:RESTHost",
+					),
+					resource.TestCheckResourceAttr(
+						"aria_orchestrator_configuration.test", "attributes.3.name",
+						"someArrayOfString",
+					),
+					resource.TestCheckResourceAttr(
+						"aria_orchestrator_configuration.test", "attributes.3.description",
+						"Some array of string",
+					),
+					resource.TestCheckResourceAttr(
+						"aria_orchestrator_configuration.test", "attributes.3.type",
+						"Array/string",
+					),
+					resource.TestCheckResourceAttr(
+						"aria_orchestrator_configuration.test", "attributes.3.value.array.elements.#",
+						"2",
+					),
+					resource.TestCheckResourceAttr(
+						"aria_orchestrator_configuration.test",
+						"attributes.3.value.array.elements.0.string.value",
+						"foo",
+					),
+					resource.TestCheckResourceAttr(
+						"aria_orchestrator_configuration.test",
+						"attributes.3.value.array.elements.1.string.value",
+						"bar",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_configuration.test", "force_delete",

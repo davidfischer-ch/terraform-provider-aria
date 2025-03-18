@@ -115,10 +115,64 @@ Required:
 
 Optional:
 
+- `array` (Attributes) Array (see [below for nested schema](#nestedatt--attributes--value--array))
 - `boolean` (Attributes) Boolean (see [below for nested schema](#nestedatt--attributes--value--boolean))
 - `sdk_object` (Attributes) SDK Object (see [below for nested schema](#nestedatt--attributes--value--sdk_object))
 - `secure_string` (Attributes) Secure String (see [below for nested schema](#nestedatt--attributes--value--secure_string))
 - `string` (Attributes) String (see [below for nested schema](#nestedatt--attributes--value--string))
+
+<a id="nestedatt--attributes--value--array"></a>
+### Nested Schema for `attributes.value.array`
+
+Required:
+
+- `elements` (Attributes List) Elements (see [below for nested schema](#nestedatt--attributes--value--array--elements))
+
+<a id="nestedatt--attributes--value--array--elements"></a>
+### Nested Schema for `attributes.value.array.elements`
+
+Optional:
+
+- `boolean` (Attributes) Boolean (see [below for nested schema](#nestedatt--attributes--value--array--elements--boolean))
+- `sdk_object` (Attributes) SDK Object (see [below for nested schema](#nestedatt--attributes--value--array--elements--sdk_object))
+- `secure_string` (Attributes) Secure String (see [below for nested schema](#nestedatt--attributes--value--array--elements--secure_string))
+- `string` (Attributes) String (see [below for nested schema](#nestedatt--attributes--value--array--elements--string))
+
+<a id="nestedatt--attributes--value--array--elements--boolean"></a>
+### Nested Schema for `attributes.value.array.elements.boolean`
+
+Required:
+
+- `value` (Boolean) Value
+
+
+<a id="nestedatt--attributes--value--array--elements--sdk_object"></a>
+### Nested Schema for `attributes.value.array.elements.sdk_object`
+
+Required:
+
+- `id` (String) Identifier
+- `type` (String) Type
+
+
+<a id="nestedatt--attributes--value--array--elements--secure_string"></a>
+### Nested Schema for `attributes.value.array.elements.secure_string`
+
+Required:
+
+- `is_plain_text` (Boolean) Plain text?
+- `value` (String, Sensitive) Value
+
+
+<a id="nestedatt--attributes--value--array--elements--string"></a>
+### Nested Schema for `attributes.value.array.elements.string`
+
+Required:
+
+- `value` (String) Value
+
+
+
 
 <a id="nestedatt--attributes--value--boolean"></a>
 ### Nested Schema for `attributes.value.boolean`

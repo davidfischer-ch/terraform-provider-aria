@@ -20,7 +20,7 @@ func OrchestratorConfigurationAttributeSchema() schema.NestedAttributeObject {
 				MarkdownDescription: "Type",
 				Required:            true,
 			},
-			"value": OrchestratorConfigurationValueSchema(),
+			"value": OrchestratorConfigurationAttributeValueSchema(),
 		},
 	}
 }
@@ -38,7 +38,7 @@ func ComputedOrchestratorConfigurationAttributeSchema() schema.NestedAttributeOb
 				MarkdownDescription: "Type",
 				Computed:            true,
 			},
-			"value": ComputedOrchestratorConfigurationValueSchema(),
+			"value": ComputedOrchestratorConfigurationAttributeValueSchema(),
 		},
 	}
 }
