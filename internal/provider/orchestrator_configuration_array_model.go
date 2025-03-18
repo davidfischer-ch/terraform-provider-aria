@@ -32,20 +32,19 @@ func (self *OrchestratorConfigurationArrayModel) FromAPI(
 	attrs := types.ObjectType{
 		AttrTypes: OrchestratorConfigurationArrayElementModel{}.AttributeTypes(),
 	}
-	if raw.Elements == nil {
-		self.Elements = types.ListNull(attrs)
-	} else {
-		elements := []OrchestratorConfigurationArrayElementModel{}
+	elements := []OrchestratorConfigurationArrayElementModel{}
+	// Seamlessly convert nil to an empty list
+	if raw.Elements != nil {
 		for _, elementRaw := range raw.Elements {
 			element := OrchestratorConfigurationArrayElementModel{}
 			diags.Append(element.FromAPI(ctx, elementRaw)...)
 			elements = append(elements, element)
 		}
-
-		var someDiags diag.Diagnostics
-		self.Elements, someDiags = types.ListValueFrom(ctx, attrs, elements)
-		diags.Append(someDiags...)
 	}
+
+	var someDiags diag.Diagnostics
+	self.Elements, someDiags = types.ListValueFrom(ctx, attrs, elements)
+	diags.Append(someDiags...)
 
 	return diags
 }

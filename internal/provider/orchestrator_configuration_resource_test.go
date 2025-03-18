@@ -134,6 +134,16 @@ resource "aria_orchestrator_configuration" "test" {
           ]
         }
       }
+    },
+    {
+      name        = "someEmptyArray"
+      description = "Some array with no elements."
+      type        = "Array/REST:RESTHost"
+      value = {
+        array = {
+          elements = []
+        }
+      }
     }
     /*
     This is not yet well handled (mutated by the platform), we have to find a pattern for this.
@@ -175,7 +185,7 @@ resource "aria_orchestrator_configuration" "test" {
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_configuration.test", "attributes.#",
-						"4",
+						"5",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_configuration.test", "attributes.0.name",
@@ -253,6 +263,10 @@ resource "aria_orchestrator_configuration" "test" {
 						"aria_orchestrator_configuration.test",
 						"attributes.3.value.array.elements.1.string.value",
 						"bar",
+					),
+					resource.TestCheckResourceAttr(
+						"aria_orchestrator_configuration.test", "attributes.4.value.array.elements.#",
+						"0",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_configuration.test", "force_delete",
