@@ -1,5 +1,18 @@
 # Changelog
 
+## Release v0.6.11 (2025-03-18)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.10...v0.6.11
+
+### Features
+
+* Resource `aria_orchestrator_configuration`: Manage attribute of type `array`
+* Resource `aria_orchestrator_configuration`: Manage attribute of type `sdk-object`
+
+### Fix and enhancements
+
+* Merge dependabot dependencies update requests
+
 ## Release v0.6.10 (2025-02-21)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.9...v0.6.10
