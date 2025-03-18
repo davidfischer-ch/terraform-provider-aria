@@ -58,6 +58,27 @@ resource "aria_orchestrator_configuration" "Dummy" {
           type = "REST:RESTHost"
         }
       }
+    },
+    {
+      name        = "someArrayOfString"
+      description = "Some array of string"
+      type        = "Array/string"
+      value = {
+        array = {
+          elements = [
+            {
+              string = {
+                value = "foo"
+              }
+            },
+            {
+              string = {
+                value = "bar"
+              }
+            }
+          ]
+        }
+      }
     }
     /*
     This is not yet well handled (mutated by the platform), we have to find a pattern for this.
