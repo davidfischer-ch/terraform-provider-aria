@@ -12,25 +12,25 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
 
-// OrchestratorConfigurationValueModel describes the resource data model.
-type OrchestratorConfigurationValueModel struct {
+// OrchestratorConfigurationArrayElementModel describes the resource data model.
+type OrchestratorConfigurationArrayElementModel struct {
 	Boolean      types.Object `tfsdk:"boolean"`       // Of type ...BooleanModel
 	String       types.Object `tfsdk:"string"`        // Of type ...StringModel
 	SecureString types.Object `tfsdk:"secure_string"` // Of type ...SecureStringModel
 	SDKObject    types.Object `tfsdk:"sdk_object"`    // Of type ...SDKObjectModel
 }
 
-// OrchestratorConfigurationValueAPIModel describes the resource API model.
-type OrchestratorConfigurationValueAPIModel struct {
+// OrchestratorConfigurationArrayElementAPIModel describes the resource API model.
+type OrchestratorConfigurationArrayElementAPIModel struct {
 	Boolean      *OrchestratorConfigurationBooleanAPIModel      `json:"boolean,omitempty"`
 	String       *OrchestratorConfigurationStringAPIModel       `json:"string,omitempty"`
 	SecureString *OrchestratorConfigurationSecureStringAPIModel `json:"secure-string,omitempty"`
 	SDKObject    *OrchestratorConfigurationSDKObjectAPIModel    `json:"sdk-object,omitempty"`
 }
 
-func (self *OrchestratorConfigurationValueModel) FromAPI(
+func (self *OrchestratorConfigurationArrayElementModel) FromAPI(
 	ctx context.Context,
-	raw OrchestratorConfigurationValueAPIModel,
+	raw OrchestratorConfigurationArrayElementAPIModel,
 ) diag.Diagnostics {
 
 	diags := diag.Diagnostics{}
@@ -84,12 +84,12 @@ func (self *OrchestratorConfigurationValueModel) FromAPI(
 	return diags
 }
 
-func (self OrchestratorConfigurationValueModel) ToAPI(
+func (self OrchestratorConfigurationArrayElementModel) ToAPI(
 	ctx context.Context,
-) (OrchestratorConfigurationValueAPIModel, diag.Diagnostics) {
+) (OrchestratorConfigurationArrayElementAPIModel, diag.Diagnostics) {
 
 	var diags diag.Diagnostics
-	raw := OrchestratorConfigurationValueAPIModel{}
+	raw := OrchestratorConfigurationArrayElementAPIModel{}
 
 	if self.Boolean.IsNull() || self.Boolean.IsUnknown() {
 		raw.Boolean = nil
@@ -133,7 +133,7 @@ func (self OrchestratorConfigurationValueModel) ToAPI(
 // Utils -------------------------------------------------------------------------------------------
 
 // Used to convert structure to a types.Object.
-func (self OrchestratorConfigurationValueModel) AttributeTypes() map[string]attr.Type {
+func (self OrchestratorConfigurationArrayElementModel) AttributeTypes() map[string]attr.Type {
 	return map[string]attr.Type{
 		"boolean": types.ObjectType{
 			AttrTypes: OrchestratorConfigurationBooleanModel{}.AttributeTypes(),

@@ -21,6 +21,7 @@ type OrchestratorConfigurationDataSourceModel struct {
 	Version     types.String `tfsdk:"version"`
 	VersionId   types.String `tfsdk:"version_id"`
 
+	// Of type OrchestratrorConfigurationAttributeModel
 	Attributes types.List `tfsdk:"attributes"`
 }
 
@@ -100,9 +101,10 @@ func (self *OrchestratorConfigurationDataSourceModel) FromAPI(
 
 	// Store attributes to list value
 	var someDiags diag.Diagnostics
-	self.Attributes, someDiags = types.ListValueFrom(
-		ctx, self.Attributes.ElementType(ctx), attributes,
-	)
+	attrs := types.ObjectType{
+		AttrTypes: OrchestratorConfigurationAttributeModel{}.AttributeTypes(ctx),
+	}
+	self.Attributes, someDiags = types.ListValueFrom(ctx, attrs, attributes)
 	diags.Append(someDiags...)
 
 	return diags
