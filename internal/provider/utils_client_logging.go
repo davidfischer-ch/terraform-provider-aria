@@ -30,7 +30,7 @@ func (self AriaClient) Trace(message string, args ...any) {
 }
 
 func (self AriaClient) Log(level string, message string, args ...any) {
-	// Sorted by occurences to optimize branching a little bit
+	// Sorted by occurrences to optimize branching a little bit
 	if level == "DEBUG" {
 		self.Debug(message, args...)
 	} else if level == "INFO" {
