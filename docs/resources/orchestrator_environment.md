@@ -25,7 +25,7 @@ resource "aria_orchestrator_environment" "python_for_tools" {
   name                 = "Python_For_Tools"
   description          = "Python runtime for our tools (packaged with common dependencies)."
   version              = "1.0.0"
-  runtime              = "python:3.10"
+  runtime              = aria_orchestrator_environment_repository.python_ocsin.runtime
   runtime_memory_limit = 256 * 1024 * 1024 # 256 MB
   runtime_timeout      = 180               # seconds
 
@@ -35,7 +35,7 @@ resource "aria_orchestrator_environment" "python_for_tools" {
     requests    = "== 2.32.3"
   }
 
-  repository = {
+  repositories = {
     build-tools = aria_orchestrator_environment_repository.python_ocsin.id
     pydantic    = aria_orchestrator_environment_repository.python_ocsin.id
     requests    = aria_orchestrator_environment_repository.python_ocsin.id
