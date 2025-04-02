@@ -81,7 +81,8 @@ func (self *AriaProvider) Schema(
 			},
 			"ok_api_calls_log_level": schema.StringAttribute{
 				MarkdownDescription: "Successful API calls log level. " +
-					"One of `INFO`, `DEBUG` or `TRACE` (default).",
+					"One of `INFO`, `DEBUG` or `TRACE` (default). " +
+					"May also be provided via ARIA_OK_API_CALLS_LOG_LEVEL environment variable.",
 				Optional: true,
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{"INFO", "DEBUG", "TRACE"}...),
@@ -89,10 +90,11 @@ func (self *AriaProvider) Schema(
 			},
 			"ko_api_calls_log_level": schema.StringAttribute{
 				MarkdownDescription: "Successful API calls log level. " +
-					"One of `INFO`, `DEBUG` (default) or `TRACE`.",
+					"One of `ERROR` (default), `WARN`, `DEBUG` or `TRACE`. " +
+					"May also be provided via ARIA_KO_API_CALLS_LOG_LEVEL environment variable.",
 				Optional: true,
 				Validators: []validator.String{
-					stringvalidator.OneOf([]string{"INFO", "DEBUG", "TRACE"}...),
+					stringvalidator.OneOf([]string{"ERROR", "WARN", "DEBUG", "TRACE"}...),
 				},
 			},
 		},
@@ -189,8 +191,12 @@ func (self *AriaProvider) Configure(
 	if !config.Insecure.IsNull() {
 		insecure = config.Insecure.ValueBool()
 	} else {
+		insecure_raw := os.Getenv("ARIA_INSECURE")
+		if len(insecure_raw) == 0 {
+			insecure_raw = "false"
+		}
 		var err error
-		insecure, err = strconv.ParseBool(os.Getenv("ARIA_INSECURE"))
+		insecure, err = strconv.ParseBool(insecure_raw)
 		if err != nil {
 			resp.Diagnostics.AddAttributeError(
 				path.Root("insecure"),
@@ -219,14 +225,18 @@ func (self *AriaProvider) Configure(
 		)
 	}
 
-	okLogLevel := "TRACE"
+	okLogLevel := os.Getenv("ARIA_OK_API_CALLS_LOG_LEVEL")
 	if !config.OKAPICallsLogLevel.IsNull() {
 		okLogLevel = config.OKAPICallsLogLevel.ValueString()
+	} else if len(okLogLevel) == 0 {
+		okLogLevel = "TRACE"
 	}
 
-	koLogLevel := "DEBUG"
+	koLogLevel := os.Getenv("ARIA_KO_API_CALLS_LOG_LEVEL")
 	if !config.KOAPICallsLogLevel.IsNull() {
 		koLogLevel = config.KOAPICallsLogLevel.ValueString()
+	} else if len(koLogLevel) == 0 {
+		koLogLevel = "ERROR"
 	}
 
 	ctx = tflog.SetField(ctx, "aria_host", host)
