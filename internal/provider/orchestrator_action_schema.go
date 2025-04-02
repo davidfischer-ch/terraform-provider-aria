@@ -41,6 +41,7 @@ func OrchestratorActionSchema() schema.Schema {
 				Optional: true,
 				Validators: []validator.String{
 					stringvalidator.ExactlyOneOf(path.Expressions{
+						path.MatchRoot("environment_id"),
 						path.MatchRoot("runtime"),
 					}...),
 				},
