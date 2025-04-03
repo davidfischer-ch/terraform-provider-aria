@@ -1,5 +1,23 @@
 # Changelog
 
+## Release v0.6.12 (2025-04-03)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.11...v0.6.12
+
+### Features
+
+* Resource `aria_orchestrator_action`: Add `environment_id` attribute (to link to a `aria_orchestrator_environment`)
+* Resource `aria_orchestrator_action`: Add `validation_message` attribute (to check if there are any validation errors)
+* Provider: Allow to set `ok_api_calls_log_level` & `ko_api_calls_log_level` using environment variables
+* Provider: Update `ko_api_calls_log_level` enum to `ERROR` (new default), `WARN`, `DEBUG` and `TRACE`
+* Provider: Now `insecure` will default to `false`
+
+### Fix and enhancements
+
+* Resource `aria_orchestrator_action`: Allow parallel execution of deletes otherwise `terraform apply` may not converge in some tricky cases
+* Resource `aria_orchestrator_action`: Fix and update examples accordingly to newest features
+* Merge dependabot dependencies update requests
+
 ## Release v0.6.11 (2025-03-18)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.10...v0.6.11
