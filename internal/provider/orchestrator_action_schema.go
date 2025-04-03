@@ -4,8 +4,11 @@
 package provider
 
 import (
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
 func OrchestratorActionSchema() schema.Schema {
@@ -31,9 +34,23 @@ func OrchestratorActionSchema() schema.Schema {
 				MarkdownDescription: "Action version",
 				Required:            true,
 			},
+			"environment_id": schema.StringAttribute{
+				MarkdownDescription: "Environment identifier (omit or empty string if using a " +
+					"standard runtime)",
+				Computed: true,
+				Optional: true,
+				Validators: []validator.String{
+					stringvalidator.ExactlyOneOf(path.Expressions{
+						path.MatchRoot("environment_id"),
+						path.MatchRoot("runtime"),
+					}...),
+				},
+			},
 			"runtime": schema.StringAttribute{
-				MarkdownDescription: "Runtime (for javascript, set it to an empty string)",
-				Required:            true,
+				MarkdownDescription: "Runtime (omit or empty string for javascript " +
+					"or when using a custom execution environment)",
+				Computed: true,
+				Optional: true,
 			},
 			"runtime_memory_limit": schema.Int64Attribute{
 				MarkdownDescription: "Runtime memory constraint in bytes (can be 0 for unlimited)",
@@ -62,6 +79,11 @@ func OrchestratorActionSchema() schema.Schema {
 				Computed:            true,
 				Optional:            true,
 				Default:             booldefault.StaticBool(false),
+			},
+			"validation_message": schema.StringAttribute{
+				MarkdownDescription: "Validation message (in case of error). " +
+					"You may use a postcondition or a check to ensure its empty.",
+				Computed: true,
 			},
 		},
 	}

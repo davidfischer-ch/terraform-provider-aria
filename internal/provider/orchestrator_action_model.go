@@ -20,6 +20,7 @@ type OrchestratorActionModel struct {
 	Description types.String `tfsdk:"description"`
 	Version     types.String `tfsdk:"version"`
 
+	EnvironmentId      types.String `tfsdk:"environment_id"`
 	Runtime            types.String `tfsdk:"runtime"`
 	RuntimeMemoryLimit types.Int64  `tfsdk:"runtime_memory_limit"`
 	RuntimeTimeout     types.Int32  `tfsdk:"runtime_timeout"`
@@ -32,6 +33,8 @@ type OrchestratorActionModel struct {
 	OutputType types.String `tfsdk:"output_type"`
 
 	ForceDelete types.Bool `tfsdk:"force_delete"`
+
+	ValidationMessage types.String `tfsdk:"validation_message"`
 }
 
 // OrchestratorActionAPIModel describes the resource API model.
@@ -43,6 +46,7 @@ type OrchestratorActionAPIModel struct {
 	Description string `json:"description"`
 	Version     string `json:"version"`
 
+	EnvironmentId      string `json:"actionEnvironmentId,omitempty"`
 	Runtime            string `json:"runtime,omitempty"`
 	RuntimeMemoryLimit int64  `json:"runtimeMemoryLimit"`
 	RuntimeTimeout     int32  `json:"runtimeTimeout"`
@@ -52,6 +56,8 @@ type OrchestratorActionAPIModel struct {
 	InputParameters []ParameterAPIModel `json:"input-parameters,omitempty"`
 
 	OutputType string `json:"output-type"`
+
+	ValidationMessage string `json:"validationMessage,omitempty"`
 }
 
 func (self OrchestratorActionModel) String() string {
@@ -77,7 +83,7 @@ func (self OrchestratorActionModel) ReadPath() string {
 }
 
 func (self OrchestratorActionModel) UpdatePath() string {
-	return self.ReadPath()
+	return self.ReadPath() + "?updateReferences=true"
 }
 
 func (self OrchestratorActionModel) DeletePath() string {
@@ -98,12 +104,14 @@ func (self *OrchestratorActionModel) FromAPI(
 	self.FQN = types.StringValue(raw.FQN)
 	self.Description = types.StringValue(raw.Description)
 	self.Version = types.StringValue(raw.Version)
+	self.EnvironmentId = types.StringValue(raw.EnvironmentId)
 	self.Runtime = types.StringValue(raw.Runtime)
 	self.RuntimeMemoryLimit = types.Int64Value(raw.RuntimeMemoryLimit)
 	self.RuntimeTimeout = types.Int32Value(raw.RuntimeTimeout)
 	self.Script = types.StringValue(raw.Script)
 	self.InputParameters = parameters
 	self.OutputType = types.StringValue(raw.OutputType)
+	self.ValidationMessage = types.StringValue(raw.ValidationMessage)
 	return diags
 }
 
@@ -122,6 +130,7 @@ func (self OrchestratorActionModel) ToAPI(
 		FQN:                self.FQN.ValueString(),
 		Description:        CleanString(self.Description.ValueString()),
 		Version:            self.Version.ValueString(),
+		EnvironmentId:      self.EnvironmentId.ValueString(),
 		Runtime:            self.Runtime.ValueString(),
 		RuntimeMemoryLimit: self.RuntimeMemoryLimit.ValueInt64(),
 		RuntimeTimeout:     self.RuntimeTimeout.ValueInt32(),

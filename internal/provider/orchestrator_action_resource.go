@@ -179,9 +179,9 @@ func (self *OrchestratorActionResource) Delete(
 	var action OrchestratorActionModel
 	resp.Diagnostics.Append(req.State.Get(ctx, &action)...)
 	if !resp.Diagnostics.HasError() {
-		self.client.Mutex.Lock(ctx, action.LockKey())
+		// Do not serialize deletion (with a mutex) to allow convering (if possible) when deletion
+		// is not forced by some of the actions
 		resp.Diagnostics.Append(self.client.DeleteIt(&action)...)
-		self.client.Mutex.Unlock(ctx, action.LockKey())
 	}
 }
 
