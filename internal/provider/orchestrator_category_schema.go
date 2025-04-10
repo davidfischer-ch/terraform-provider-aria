@@ -26,7 +26,8 @@ func OrchestratorCategorySchema() schema.Schema {
 				MarkdownDescription: "Category's type, " +
 					"`ConfigurationElementCategory`, " +
 					"`PolicyTemplateCategory`, " +
-					"`ResourceElementCategory` or " +
+					"`ResourceElementCategory`, " +
+					"`ScriptModuleCategory` or " +
 					"`WorkflowCategory`",
 				Required: true,
 				Validators: []validator.String{
@@ -34,6 +35,7 @@ func OrchestratorCategorySchema() schema.Schema {
 						"ConfigurationElementCategory",
 						"PolicyTemplateCategory",
 						"ResourceElementCategory",
+						"ScriptModuleCategory",
 						"WorkflowCategory",
 					}...),
 				},
