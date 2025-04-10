@@ -1,5 +1,17 @@
 # Changelog
 
+## Release v0.6.13 (2025-04-10)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.12...v0.6.13
+
+### Features
+
+* Resource `aria_orchestrator_category`: Add `ScriptModuleCategory` to valid types
+
+### Fix and enhancements
+
+* Merge depndabot dependencies update requests
+
 ## Release v0.6.12 (2025-04-03)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.11...v0.6.12
