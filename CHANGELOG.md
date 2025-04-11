@@ -10,7 +10,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.12
 
 ### Fix and enhancements
 
-* Merge depndabot dependencies update requests
+* Merge dependabot dependencies update requests
 
 ## Release v0.6.12 (2025-04-03)
 
