@@ -60,6 +60,7 @@ Read-Only:
 
 - `array` (Attributes) Array (see [below for nested schema](#nestedatt--attributes--value--array))
 - `boolean` (Attributes) Boolean (see [below for nested schema](#nestedatt--attributes--value--boolean))
+- `number` (Attributes) Number (see [below for nested schema](#nestedatt--attributes--value--number))
 - `sdk_object` (Attributes) SDK Object (see [below for nested schema](#nestedatt--attributes--value--sdk_object))
 - `secure_string` (Attributes) Secure String (see [below for nested schema](#nestedatt--attributes--value--secure_string))
 - `string` (Attributes) String (see [below for nested schema](#nestedatt--attributes--value--string))
@@ -77,6 +78,7 @@ Read-Only:
 Read-Only:
 
 - `boolean` (Attributes) Boolean (see [below for nested schema](#nestedatt--attributes--value--array--elements--boolean))
+- `number` (Attributes) Number (see [below for nested schema](#nestedatt--attributes--value--array--elements--number))
 - `sdk_object` (Attributes) SDK Object (see [below for nested schema](#nestedatt--attributes--value--array--elements--sdk_object))
 - `secure_string` (Attributes) Secure String (see [below for nested schema](#nestedatt--attributes--value--array--elements--secure_string))
 - `string` (Attributes) String (see [below for nested schema](#nestedatt--attributes--value--array--elements--string))
@@ -87,6 +89,14 @@ Read-Only:
 Read-Only:
 
 - `value` (Boolean) Value
+
+
+<a id="nestedatt--attributes--value--array--elements--number"></a>
+### Nested Schema for `attributes.value.array.elements.number`
+
+Read-Only:
+
+- `value` (Number) Value
 
 
 <a id="nestedatt--attributes--value--array--elements--sdk_object"></a>
@@ -123,6 +133,14 @@ Read-Only:
 Read-Only:
 
 - `value` (Boolean) Value
+
+
+<a id="nestedatt--attributes--value--number"></a>
+### Nested Schema for `attributes.value.number`
+
+Read-Only:
+
+- `value` (Number) Value
 
 
 <a id="nestedatt--attributes--value--sdk_object"></a>

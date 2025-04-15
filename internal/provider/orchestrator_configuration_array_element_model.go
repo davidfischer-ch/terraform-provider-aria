@@ -15,6 +15,7 @@ import (
 // OrchestratorConfigurationArrayElementModel describes the resource data model.
 type OrchestratorConfigurationArrayElementModel struct {
 	Boolean      types.Object `tfsdk:"boolean"`       // Of type ...BooleanModel
+	Number       types.Object `tfsdk:"number"`        // Of type ...NumberModel
 	String       types.Object `tfsdk:"string"`        // Of type ...StringModel
 	SecureString types.Object `tfsdk:"secure_string"` // Of type ...SecureStringModel
 	SDKObject    types.Object `tfsdk:"sdk_object"`    // Of type ...SDKObjectModel
@@ -23,6 +24,7 @@ type OrchestratorConfigurationArrayElementModel struct {
 // OrchestratorConfigurationArrayElementAPIModel describes the resource API model.
 type OrchestratorConfigurationArrayElementAPIModel struct {
 	Boolean      *OrchestratorConfigurationBooleanAPIModel      `json:"boolean,omitempty"`
+	Number       *OrchestratorConfigurationNumberAPIModel       `json:"number,omitempty"`
 	String       *OrchestratorConfigurationStringAPIModel       `json:"string,omitempty"`
 	SecureString *OrchestratorConfigurationSecureStringAPIModel `json:"secure-string,omitempty"`
 	SDKObject    *OrchestratorConfigurationSDKObjectAPIModel    `json:"sdk-object,omitempty"`
@@ -43,6 +45,17 @@ func (self *OrchestratorConfigurationArrayElementModel) FromAPI(
 		var someDiags diag.Diagnostics
 		boolVal.FromAPI(*raw.Boolean)
 		self.Boolean, someDiags = types.ObjectValueFrom(ctx, boolVal.AttributeTypes(), boolVal)
+		diags.Append(someDiags...)
+	}
+
+	// Convert number from raw and then to object
+	numberVal := OrchestratorConfigurationNumberModel{}
+	if raw.Number == nil {
+		self.Number = types.ObjectNull(numberVal.AttributeTypes())
+	} else {
+		var someDiags diag.Diagnostics
+		numberVal.FromAPI(*raw.Number)
+		self.Number, someDiags = types.ObjectValueFrom(ctx, numberVal.AttributeTypes(), numberVal)
 		diags.Append(someDiags...)
 	}
 
@@ -100,6 +113,15 @@ func (self OrchestratorConfigurationArrayElementModel) ToAPI(
 		raw.Boolean = &boolRaw
 	}
 
+	if self.Number.IsNull() || self.Number.IsUnknown() {
+		raw.Number = nil
+	} else {
+		var numberVal OrchestratorConfigurationNumberModel
+		diags.Append(self.Number.As(ctx, &numberVal, basetypes.ObjectAsOptions{})...)
+		numberRaw := numberVal.ToAPI()
+		raw.Number = &numberRaw
+	}
+
 	if self.String.IsNull() || self.String.IsUnknown() {
 		raw.String = nil
 	} else {
@@ -137,6 +159,9 @@ func (self OrchestratorConfigurationArrayElementModel) AttributeTypes() map[stri
 	return map[string]attr.Type{
 		"boolean": types.ObjectType{
 			AttrTypes: OrchestratorConfigurationBooleanModel{}.AttributeTypes(),
+		},
+		"number": types.ObjectType{
+			AttrTypes: OrchestratorConfigurationNumberModel{}.AttributeTypes(),
 		},
 		"string": types.ObjectType{
 			AttrTypes: OrchestratorConfigurationStringModel{}.AttributeTypes(),

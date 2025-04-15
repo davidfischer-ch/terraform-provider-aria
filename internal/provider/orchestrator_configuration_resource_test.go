@@ -104,6 +104,26 @@ resource "aria_orchestrator_configuration" "test" {
       }
     },
     {
+      name        = "someInteger"
+      description = "Some integer value"
+      type        = "number"
+      value = {
+        number = {
+          value = 42
+        }
+      }
+    },
+    {
+      name        = "someFloat"
+      description = "Some float value"
+      type        = "number"
+      value = {
+        number = {
+          value = 3.141592
+        }
+      }
+    },
+    {
       name        = "restServer"
       description = "Some REST Host"
       type        = "REST:RESTHost"
@@ -185,8 +205,10 @@ resource "aria_orchestrator_configuration" "test" {
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_configuration.test", "attributes.#",
-						"5",
+						"7",
 					),
+
+					// String
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_configuration.test", "attributes.0.name",
 						"someString",
@@ -203,6 +225,8 @@ resource "aria_orchestrator_configuration" "test" {
 						"aria_orchestrator_configuration.test", "attributes.0.value.string.value",
 						"some value",
 					),
+
+					// Boolean
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_configuration.test", "attributes.1.name",
 						"someBoolean",
@@ -219,53 +243,95 @@ resource "aria_orchestrator_configuration" "test" {
 						"aria_orchestrator_configuration.test", "attributes.1.value.boolean.value",
 						"true",
 					),
+
+					// Number (Integer)
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_configuration.test", "attributes.2.name",
-						"restServer",
+						"someInteger",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_configuration.test", "attributes.2.description",
-						"Some REST Host",
+						"Some integer value",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_configuration.test", "attributes.2.type",
-						"REST:RESTHost",
-					),
-					resource.TestCheckResourceAttrSet(
-						"aria_orchestrator_configuration.test", "attributes.2.value.sdk_object.id",
+						"number",
 					),
 					resource.TestCheckResourceAttr(
-						"aria_orchestrator_configuration.test", "attributes.2.value.sdk_object.type",
-						"REST:RESTHost",
+						"aria_orchestrator_configuration.test", "attributes.2.value.number.value",
+						"42",
 					),
+
+					// Number (Float)
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_configuration.test", "attributes.3.name",
-						"someArrayOfString",
+						"someFloat",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_configuration.test", "attributes.3.description",
-						"Some array of string",
+						"Some float value",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_configuration.test", "attributes.3.type",
+						"number",
+					),
+					resource.TestCheckResourceAttr(
+						"aria_orchestrator_configuration.test", "attributes.3.value.number.value",
+						"3.141592",
+					),
+
+					// SDK Object
+					resource.TestCheckResourceAttr(
+						"aria_orchestrator_configuration.test", "attributes.4.name",
+						"restServer",
+					),
+					resource.TestCheckResourceAttr(
+						"aria_orchestrator_configuration.test", "attributes.4.description",
+						"Some REST Host",
+					),
+					resource.TestCheckResourceAttr(
+						"aria_orchestrator_configuration.test", "attributes.4.type",
+						"REST:RESTHost",
+					),
+					resource.TestCheckResourceAttrSet(
+						"aria_orchestrator_configuration.test", "attributes.4.value.sdk_object.id",
+					),
+					resource.TestCheckResourceAttr(
+						"aria_orchestrator_configuration.test", "attributes.4.value.sdk_object.type",
+						"REST:RESTHost",
+					),
+
+					// Array of Strings
+					resource.TestCheckResourceAttr(
+						"aria_orchestrator_configuration.test", "attributes.5.name",
+						"someArrayOfString",
+					),
+					resource.TestCheckResourceAttr(
+						"aria_orchestrator_configuration.test", "attributes.5.description",
+						"Some array of string",
+					),
+					resource.TestCheckResourceAttr(
+						"aria_orchestrator_configuration.test", "attributes.5.type",
 						"Array/string",
 					),
 					resource.TestCheckResourceAttr(
-						"aria_orchestrator_configuration.test", "attributes.3.value.array.elements.#",
+						"aria_orchestrator_configuration.test", "attributes.5.value.array.elements.#",
 						"2",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_configuration.test",
-						"attributes.3.value.array.elements.0.string.value",
+						"attributes.5.value.array.elements.0.string.value",
 						"foo",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_configuration.test",
-						"attributes.3.value.array.elements.1.string.value",
+						"attributes.5.value.array.elements.1.string.value",
 						"bar",
 					),
+
+					// Array (Empty)
 					resource.TestCheckResourceAttr(
-						"aria_orchestrator_configuration.test", "attributes.4.value.array.elements.#",
+						"aria_orchestrator_configuration.test", "attributes.6.value.array.elements.#",
 						"0",
 					),
 					resource.TestCheckResourceAttr(

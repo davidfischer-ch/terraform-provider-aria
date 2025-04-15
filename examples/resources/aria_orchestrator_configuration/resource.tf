@@ -34,6 +34,26 @@ resource "aria_orchestrator_configuration" "Dummy" {
       }
     },
     {
+      name        = "someInteger"
+      description = "Some integer value"
+      type        = "number"
+      value = {
+        number = {
+          value = 42
+        }
+      }
+    },
+    {
+      name        = "someFloat"
+      description = "Some float value"
+      type        = "number"
+      value = {
+        number = {
+          value = 3.141592
+        }
+      }
+    },
+    {
       name        = "restServer"
       description = "Some REST Host"
       type        = "REST:RESTHost"
