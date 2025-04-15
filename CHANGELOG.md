@@ -1,5 +1,13 @@
 # Changelog
 
+## Release v0.6.14 (2025-04-15)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.13...v0.6.14
+
+### Features
+
+* Resource `aria_orchestrator_category`: Manage attribute of type `number`
+
 ## Release v0.6.13 (2025-04-10)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.12...v0.6.13
