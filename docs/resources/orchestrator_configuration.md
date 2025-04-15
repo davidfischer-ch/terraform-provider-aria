@@ -49,6 +49,26 @@ resource "aria_orchestrator_configuration" "Dummy" {
       }
     },
     {
+      name        = "someInteger"
+      description = "Some integer value"
+      type        = "number"
+      value = {
+        number = {
+          value = 42
+        }
+      }
+    },
+    {
+      name        = "someFloat"
+      description = "Some float value"
+      type        = "number"
+      value = {
+        number = {
+          value = 3.141592
+        }
+      }
+    },
+    {
       name        = "restServer"
       description = "Some REST Host"
       type        = "REST:RESTHost"
@@ -138,6 +158,7 @@ Optional:
 
 - `array` (Attributes) Array (see [below for nested schema](#nestedatt--attributes--value--array))
 - `boolean` (Attributes) Boolean (see [below for nested schema](#nestedatt--attributes--value--boolean))
+- `number` (Attributes) Number (see [below for nested schema](#nestedatt--attributes--value--number))
 - `sdk_object` (Attributes) SDK Object (see [below for nested schema](#nestedatt--attributes--value--sdk_object))
 - `secure_string` (Attributes) Secure String (see [below for nested schema](#nestedatt--attributes--value--secure_string))
 - `string` (Attributes) String (see [below for nested schema](#nestedatt--attributes--value--string))
@@ -155,6 +176,7 @@ Required:
 Optional:
 
 - `boolean` (Attributes) Boolean (see [below for nested schema](#nestedatt--attributes--value--array--elements--boolean))
+- `number` (Attributes) Number (see [below for nested schema](#nestedatt--attributes--value--array--elements--number))
 - `sdk_object` (Attributes) SDK Object (see [below for nested schema](#nestedatt--attributes--value--array--elements--sdk_object))
 - `secure_string` (Attributes) Secure String (see [below for nested schema](#nestedatt--attributes--value--array--elements--secure_string))
 - `string` (Attributes) String (see [below for nested schema](#nestedatt--attributes--value--array--elements--string))
@@ -165,6 +187,14 @@ Optional:
 Required:
 
 - `value` (Boolean) Value
+
+
+<a id="nestedatt--attributes--value--array--elements--number"></a>
+### Nested Schema for `attributes.value.array.elements.number`
+
+Required:
+
+- `value` (Number) Value
 
 
 <a id="nestedatt--attributes--value--array--elements--sdk_object"></a>
@@ -201,6 +231,14 @@ Required:
 Required:
 
 - `value` (Boolean) Value
+
+
+<a id="nestedatt--attributes--value--number"></a>
+### Nested Schema for `attributes.value.number`
+
+Required:
+
+- `value` (Number) Value
 
 
 <a id="nestedatt--attributes--value--sdk_object"></a>

@@ -12,6 +12,7 @@ func OrchestratorConfigurationArrayElementSchema() schema.NestedAttributeObject 
 	return schema.NestedAttributeObject{
 		Attributes: map[string]schema.Attribute{
 			"boolean":       OrchestratorConfigurationBooleanSchema(),
+			"number":        OrchestratorConfigurationNumberSchema(),
 			"string":        OrchestratorConfigurationStringSchema(),
 			"secure_string": OrchestratorConfigurationSecureStringSchema(),
 			"sdk_object":    OrchestratorConfigurationSDKObjectSchema(),
@@ -24,6 +25,7 @@ func ComputedOrchestratorConfigurationArrayElementSchema() schema.NestedAttribut
 	return schema.NestedAttributeObject{
 		Attributes: map[string]schema.Attribute{
 			"boolean":       ComputedOrchestratorConfigurationBooleanSchema(),
+			"number":        ComputedOrchestratorConfigurationNumberSchema(),
 			"string":        ComputedOrchestratorConfigurationStringSchema(),
 			"secure_string": ComputedOrchestratorConfigurationSecureStringSchema(),
 			"sdk_object":    ComputedOrchestratorConfigurationSDKObjectSchema(),
