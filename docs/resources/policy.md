@@ -80,9 +80,9 @@ resource "aria_policy" "redis_day2" {
           "${local.redis_custom_resource.type}.custom.getresourcestatus",
         ]
         authorities = [
-          "GROUP:<redacted>.CMP.CMP-ARIA-AUT-ALL-ADMINISTRATOR.DEV@<redacted>",
-          "GROUP:<redacted>.CMP.CMP-ARIA-AUT-ALL-INT-OPERATOR.DEV@<redacted>",
-          "GROUP:<redacted>.CMP.CMP-ARIA-AUT-ALL-EXPL-OPERATOR.DEV@<redacted>"
+          "GROUP:<redacted>.ADMINISTRATOR@<redacted>@<redacted>",
+          "GROUP:<redacted>.DEV@<redacted>@<redacted>",
+          "GROUP:<redacted>.OPS@<redacted>@<redacted>"
         ]
       }
     ]
