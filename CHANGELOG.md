@@ -1,5 +1,13 @@
 # Changelog
 
+## Release v0.6.15 (2205-06-13)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.14...v0.6.15
+
+### Fix and enhancements
+
+* Merge dependabot dependencies update requests
+
 ## Release v0.6.14 (2025-04-15)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.13...v0.6.14
