@@ -52,7 +52,7 @@ type OrchestratorWorkflowCreateAPIModel struct {
 	CategoryId string `json:"category-id"`
 }
 
-// OrchestratorWorkflowContentAPIModel describes the version API model.
+// OrchestratorWorkflowContentAPIModel describes the content API model.
 type OrchestratorWorkflowContentAPIModel struct {
 	Id          string `json:"id,omitempty"`
 	Name        string `json:"display-name"`
@@ -87,8 +87,29 @@ type OrchestratorWorkflowVersionAPIModel struct {
 	Schema     OrchestratorWorkflowContentAPIModel `json:"workflowSchema"`
 }
 
+// OrchestratorWorkflowVersionsAPIModel describes the create version's API response model.
 type OrchestratorWorkflowVersionResponseAPIModel struct {
 	ObjectId string `json:"objectId"`
+}
+
+// OrchestratorWorkflowVersionsAPIModel describes the versions API model.
+type OrchestratorWorkflowVersionsAPIModel struct {
+	Commits []OrchestratorWorkflowCommitAPIModel `json:"commits"`
+}
+
+type OrchestratorWorkflowCommitAPIModel struct {
+	Commit OrchestratorWorkflowCommitCommitAPIModel `json:"commit"`
+}
+
+type OrchestratorWorkflowCommitCommitAPIModel struct {
+	AuthorEmail    string `json:"authorEmail"`
+	AuthorName     string `json:"authorName"`
+	CommitDate     string `json:"commitDate"`
+	CommitterEmail string `json:"committerEmail"`
+	CommitterName  string `json:"committerName"`
+	Message        string `json:"message"`
+	ObjectId       string `json:"objectId"`
+	ParentId       string `json:"parentId"`
 }
 
 func (self OrchestratorWorkflowModel) String() string {
@@ -123,8 +144,12 @@ func (self OrchestratorWorkflowModel) ReadFormPath() string {
 		self.Id.ValueString())
 }
 
-func (self OrchestratorWorkflowModel) UpdatePath() string {
+func (self OrchestratorWorkflowModel) ReadVersionsPath() string {
 	return fmt.Sprintf("vco/api/workflows/%s/versions", self.Id.ValueString())
+}
+
+func (self OrchestratorWorkflowModel) UpdatePath() string {
+	return self.ReadVersionsPath()
 }
 
 func (self OrchestratorWorkflowModel) DeletePath() string {
@@ -195,18 +220,27 @@ func (self *OrchestratorWorkflowModel) FromContentAPI(
 	return diags
 }
 
-// Save response from form API endpoint.
+// Update InputForms with the data returned by the form API endpoint.
 func (self *OrchestratorWorkflowModel) FromFormAPI(ctx context.Context, raw any) diag.Diagnostics {
 	var diags diag.Diagnostics
 	self.InputForms, diags = JSONNormalizedFromAny(self.String(), raw)
 	return diags
 }
 
-// Save response from version API endpoint.
+// Update VersionId with the data returned by the version API endpoint.
 func (self *OrchestratorWorkflowModel) FromVersionAPI(
 	raw OrchestratorWorkflowVersionResponseAPIModel,
 ) {
 	self.VersionId = types.StringValue(raw.ObjectId)
+}
+
+// Update VersionId with the data returned by the versions API endpoint.
+func (self *OrchestratorWorkflowModel) FromVersionsAPI(
+	raw OrchestratorWorkflowVersionsAPIModel,
+) {
+	if len(raw.Commits) > 0 {
+		self.VersionId = types.StringValue(raw.Commits[0].Commit.ObjectId)
+	}
 }
 
 // Prepare data for calling the create API endpoint.
