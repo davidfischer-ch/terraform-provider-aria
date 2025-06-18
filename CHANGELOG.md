@@ -1,6 +1,14 @@
 # Changelog
 
-## Release v0.6.15 (2205-06-13)
+## Release v0.6.16 (2025-06-18)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.15...v0.6.16
+
+### Fix and enhancements
+
+* Resource `aria_orchestrator_workflow`: Read now retrieve VersionId attribute using versions API endpoint
+
+## Release v0.6.15 (2025-06-13)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.14...v0.6.15
 
