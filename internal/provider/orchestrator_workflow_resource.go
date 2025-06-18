@@ -157,10 +157,16 @@ func (self *OrchestratorWorkflowResource) Read(
 	_, _, readDiags = self.client.ReadIt(&workflow, &formsFromAPI, workflow.ReadFormPath())
 	resp.Diagnostics.Append(readDiags...)
 
+	// Read versions
+	var versionsFromAPI OrchestratorWorkflowVersionsAPIModel
+	_, _, readDiags = self.client.ReadIt(&workflow, &versionsFromAPI, workflow.ReadVersionsPath())
+	resp.Diagnostics.Append(readDiags...)
+
 	if !resp.Diagnostics.HasError() {
 		// Save updated workflow into Terraform state
 		resp.Diagnostics.Append(workflow.FromContentAPI(ctx, workflowFromContentAPI, response)...)
 		resp.Diagnostics.Append(workflow.FromFormAPI(ctx, formsFromAPI)...)
+		workflow.FromVersionsAPI(versionsFromAPI)
 		resp.Diagnostics.Append(resp.State.Set(ctx, &workflow)...)
 	}
 }
