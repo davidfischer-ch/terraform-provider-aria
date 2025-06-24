@@ -70,7 +70,7 @@ func (self ResourceActionRunnableModel) ToAPI() ResourceActionRunnableAPIModel {
 	}
 
 	outputParametersRaw := []ParameterAPIModel{}
-	for _, parameter := range self.InputParameters {
+	for _, parameter := range self.OutputParameters {
 		outputParametersRaw = append(outputParametersRaw, parameter.ToAPI())
 	}
 
