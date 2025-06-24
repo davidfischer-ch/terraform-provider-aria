@@ -1,10 +1,12 @@
-# variables.tf
+# Example with ABX Actions
+
+## variables.tf
 
 variable "test_project_id" {
   type = string
 }
 
-# main.tf
+## main.tf
 
 resource "aria_abx_action" "hello_world" {
   name         = "Hello World"
@@ -112,5 +114,59 @@ section {
   --main-bg-color: brown;
 }
 EOT
+  }
+}
+
+# Example with vRO Workflows
+
+resource "aria_orchestrator_workflow" "dummy" {
+  name        = "Dummy"
+  description = "Dummy workflow."
+  category_id = aria_orchestrator_category.root.id
+  version     = "0.1.0"
+
+  position = { x = 100, y = 50 }
+
+  restart_mode            = 1 # resume
+  resume_from_failed_mode = 0 # default
+
+  attrib        = jsonencode([])
+  presentation  = jsonencode({})
+  workflow_item = jsonencode([])
+
+  input_parameters  = []
+  output_parameters = []
+
+  input_forms = jsonencode([
+    {
+      layout = {
+        pages = []
+      }
+      schema = {}
+    }
+  ])
+}
+
+data "aria_integration" "workflows" {
+  type_id = "com.vmw.vro.workflow"
+}
+
+resource "aria_resource_action" "dummy" {
+  name          = "dummy"
+  display_name  = "Dummy Action"
+  description   = "Do nothing."
+  provider_name = "vro-workflow"
+  resource_type = "Deployment"
+  status        = "RELEASED"
+  project_id    = ""
+  runnable_item = {
+    id            = aria_orchestrator_workflow.dummy.id
+    name          = aria_orchestrator_workflow.dummy.name
+    project_id    = ""
+    type          = "vro.workflow"
+    endpoint_link = data.aria_integration.workflows.endpoint_configuration_link
+
+    input_parameters  = []
+    output_parameters = []
   }
 }
