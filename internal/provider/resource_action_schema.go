@@ -31,7 +31,7 @@ func ResourceActionSchema() schema.Schema {
 			},
 			"description": RequiredDescriptionSchema(),
 			"provider_name": schema.StringAttribute{
-				MarkdownDescription: "Provider name, one of `xaas` (and that's all, maybe)",
+				MarkdownDescription: "Provider name, one of `xaas` or `vro-workflow` (and that's all, maybe)",
 				Computed:            true,
 				Optional:            true,
 				Default:             stringdefault.StaticString("xaas"),

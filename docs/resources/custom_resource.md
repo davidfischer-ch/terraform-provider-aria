@@ -302,6 +302,10 @@ Required:
 - `project_id` (String) Project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
 
+Optional:
+
+- `endpoint_link` (String) Integration API endpoint (e.g. /resources/endpoints/8a430db3-924c-4d58-a29a-da811f9c992e)
+
 <a id="nestedatt--create--input_parameters"></a>
 ### Nested Schema for `create.input_parameters`
 
@@ -334,6 +338,10 @@ Required:
 - `output_parameters` (Attributes List) (see [below for nested schema](#nestedatt--delete--output_parameters))
 - `project_id` (String) Project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
+
+Optional:
+
+- `endpoint_link` (String) Integration API endpoint (e.g. /resources/endpoints/8a430db3-924c-4d58-a29a-da811f9c992e)
 
 <a id="nestedatt--delete--input_parameters"></a>
 ### Nested Schema for `delete.input_parameters`
@@ -406,6 +414,10 @@ Required:
 - `project_id` (String) Project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
 
+Optional:
+
+- `endpoint_link` (String) Integration API endpoint (e.g. /resources/endpoints/8a430db3-924c-4d58-a29a-da811f9c992e)
+
 <a id="nestedatt--read--input_parameters"></a>
 ### Nested Schema for `read.input_parameters`
 
@@ -438,6 +450,10 @@ Required:
 - `output_parameters` (Attributes List) (see [below for nested schema](#nestedatt--update--output_parameters))
 - `project_id` (String) Project identifier
 - `type` (String) Runnable type, either abx.action or vro.workflow
+
+Optional:
+
+- `endpoint_link` (String) Integration API endpoint (e.g. /resources/endpoints/8a430db3-924c-4d58-a29a-da811f9c992e)
 
 <a id="nestedatt--update--input_parameters"></a>
 ### Nested Schema for `update.input_parameters`

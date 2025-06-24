@@ -6,6 +6,7 @@ package provider
 import (
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
@@ -27,6 +28,12 @@ func ResourceActionRunnableSchema(description string) schema.SingleNestedAttribu
 				},
 			},
 			"project_id": RequiredProjectIdSchema(),
+			"endpoint_link": schema.StringAttribute{
+				MarkdownDescription: "Integration API endpoint (e.g. /resources/endpoints/8a430db3-924c-4d58-a29a-da811f9c992e)",
+				Computed:            true,
+				Optional:            true,
+				Default:             stringdefault.StaticString(""),
+			},
 			"input_parameters": schema.ListNestedAttribute{
 				Required: true,
 				NestedObject: schema.NestedAttributeObject{

@@ -15,6 +15,7 @@ type ResourceActionRunnableModel struct {
 	Name             types.String     `tfsdk:"name"`
 	Type             types.String     `tfsdk:"type"`
 	ProjectId        types.String     `tfsdk:"project_id"`
+	EndpointLink     types.String     `tfsdk:"endpoint_link"`
 	InputParameters  []ParameterModel `tfsdk:"input_parameters"`
 	OutputParameters []ParameterModel `tfsdk:"output_parameters"`
 }
@@ -24,7 +25,8 @@ type ResourceActionRunnableAPIModel struct {
 	Id               string              `json:"id,omitempty"`
 	Name             string              `json:"name"`
 	Type             string              `json:"type"`
-	ProjectId        string              `json:"projectId"`
+	ProjectId        string              `json:"projectId,omitempty"`
+	EndpointLink     string              `json:"endpointLink,omitempty"`
 	InputParameters  []ParameterAPIModel `json:"inputParameters"`
 	OutputParameters []ParameterAPIModel `json:"outputParameters"`
 }
@@ -43,6 +45,7 @@ func (self *ResourceActionRunnableModel) FromAPI(raw ResourceActionRunnableAPIMo
 	self.Name = types.StringValue(raw.Name)
 	self.Type = types.StringValue(raw.Type)
 	self.ProjectId = types.StringValue(raw.ProjectId)
+	self.EndpointLink = types.StringValue(raw.EndpointLink)
 
 	self.InputParameters = []ParameterModel{}
 	for _, parameterItem := range raw.InputParameters {
@@ -76,6 +79,7 @@ func (self ResourceActionRunnableModel) ToAPI() ResourceActionRunnableAPIModel {
 		Name:             self.Name.ValueString(),
 		Type:             self.Type.ValueString(),
 		ProjectId:        self.ProjectId.ValueString(),
+		EndpointLink:     self.EndpointLink.ValueString(),
 		InputParameters:  inputParametersRaw,
 		OutputParameters: outputParametersRaw,
 	}
