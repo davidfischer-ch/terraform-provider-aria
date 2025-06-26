@@ -208,14 +208,12 @@ resource "aria_orchestrator_workflow" "dummy" {
       schema = {}
     }
   ])
-
-  wait_imported = true
 }
 
 resource "aria_catalog_source" "dummy" {
   name        = "Dummy Workflow Catalog Source"
   description = "Publish the dummy workflow."
-  type_id     = data.aria_integration.workflows.type_id
+  type_id     = "com.vmw.vro.workflow"
 
   config = {
     workflows = [
