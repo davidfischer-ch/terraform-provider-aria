@@ -9,7 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
-func TestAccCatalogSourceForWorkflowsResource(t *testing.T) {
+func TestAccCatalogSourceForWorkflowResource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
@@ -65,7 +65,7 @@ resource "aria_resource_action" "test" {
     name          = aria_orchestrator_workflow.test.name
     project_id    = ""
     type          = "vro.workflow"
-    endpoint_link = aria_orchestrator_workflow.test.endpoint_configuration_link
+    endpoint_link = aria_orchestrator_workflow.test.integration.endpoint_configuration_link
     input_parameters = [
       {
         name        = "deployment"

@@ -136,11 +136,9 @@ func (self *OrchestratorWorkflowResource) Create(
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", workflow.String()))
 
 	// Optionally wait imported then save updated workflow into Terraform state
-	if workflow.WaitImported.ValueBool() {
-		resp.Diagnostics.Append(self.WaitImported(ctx, &workflow)...)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &workflow)...)
-		tflog.Debug(ctx, fmt.Sprintf("Updated (post-import) %s successfully", workflow.String()))
-	}
+	resp.Diagnostics.Append(self.WaitImported(ctx, &workflow)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &workflow)...)
+	tflog.Debug(ctx, fmt.Sprintf("Updated (post-import) %s successfully", workflow.String()))
 }
 
 func (self *OrchestratorWorkflowResource) Read(
@@ -223,11 +221,9 @@ func (self *OrchestratorWorkflowResource) Update(
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", workflow.String()))
 
 	// Optionally wait imported then save updated workflow into Terraform state
-	if workflow.WaitImported.ValueBool() {
-		resp.Diagnostics.Append(self.WaitImported(ctx, &workflow)...)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &workflow)...)
-		tflog.Debug(ctx, fmt.Sprintf("Updated (post-import) %s successfully", workflow.String()))
-	}
+	resp.Diagnostics.Append(self.WaitImported(ctx, &workflow)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &workflow)...)
+	tflog.Debug(ctx, fmt.Sprintf("Updated (post-import) %s successfully", workflow.String()))
 }
 
 func (self *OrchestratorWorkflowResource) Delete(
@@ -261,6 +257,7 @@ func (self *OrchestratorWorkflowResource) WaitImported(
 
 	diags := diag.Diagnostics{}
 	if !workflow.WaitImported.ValueBool() {
+		workflow.ResetIntegration()
 		return diags
 	}
 

@@ -186,9 +186,6 @@ func (self *OrchestratorWorkflowModel) FromCreateAPI(raw OrchestratorWorkflowCre
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
 	self.CategoryId = types.StringValue(raw.CategoryId)
-
-	// Set integration to null
-	self.Integration = types.ObjectNull(IntegrationModel{}.AttributeTypes())
 }
 
 // Save response from content API endpoint.
@@ -375,4 +372,10 @@ func (self OrchestratorWorkflowModel) ToVersionAPI(
 		ParentId:   self.VersionId.ValueString(),
 		Schema:     schemaRaw,
 	}, diags
+}
+
+// Utils -----------------------------------------------------------------------------------------------------
+
+func (self *OrchestratorWorkflowModel) ResetIntegration() {
+	self.Integration = types.ObjectNull(IntegrationModel{}.AttributeTypes())
 }
