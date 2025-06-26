@@ -32,6 +32,28 @@ func IntegrationSchema() schema.SingleNestedAttribute {
 	}
 }
 
+// The integration embedded inside a resource such as workflow.
+func ComputedIntegrationSchema() schema.SingleNestedAttribute {
+	return schema.SingleNestedAttribute{
+		MarkdownDescription: "Integration",
+		Computed:            true,
+		Attributes: map[string]schema.Attribute{
+			"name": schema.StringAttribute{
+				MarkdownDescription: "Integration name",
+				Computed:            true,
+			},
+			"endpoint_configuration_link": schema.StringAttribute{
+				MarkdownDescription: "Integration endpoint configuration link",
+				Computed:            true,
+			},
+			"endpoint_uri": schema.StringAttribute{
+				MarkdownDescription: "Integration endpoint URI",
+				Computed:            true,
+			},
+		},
+	}
+}
+
 func IntegrationDataSourceSchema() dataschema.Schema {
 	return dataschema.Schema{
 		MarkdownDescription: "Integration data source",

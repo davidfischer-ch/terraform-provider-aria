@@ -520,16 +520,21 @@ Disabled (2) - If a workflow run fails, it cannot be resumed.
 
 ### Optional
 
-- `allowed_operations` (String) TODO
-- `api_version` (String) Orchestrator API Version.
-- `editor_version` (String) Orchestrator Editor Version.
-- `force_delete` (Boolean) Force destroying the workflow (bypass references check).
+- `allowed_operations` (String) TODO (default is "vef")
+- `api_version` (String) Orchestrator API Version (default is "6.0.0").
+- `editor_version` (String) Orchestrator Editor Version (default is "2.0").
+- `force_delete` (Boolean) Force destroying the workflow (bypass references check, default is false).
 - `object_name` (String) TODO
-- `root_name` (String) TODO
+- `root_name` (String) TODO (default is "item0")
+- `wait_imported` (Boolean) Wait for the workflow to be imported in the service broker (up to 15 minutes, checked every 30 seconds, default is true).
+This ensure the integration attribute is set
+This is useful when non-orchestrator resources such as `aria_resource_action` refer to this instance, ensuring the workflow is available.
+If using an `aria_catalog_source` then you can rely on its own `wait_imported` feature. However the `aria_catalog_source` must be declared in the `depends_on` clause of any non-orchestrator resources making use of this workflow.
 
 ### Read-Only
 
 - `id` (String) Identifier
+- `integration` (Attributes) Integration (see [below for nested schema](#nestedatt--integration))
 - `version_id` (String) Workflow's latest changeset identifier
 
 <a id="nestedatt--input_parameters"></a>
@@ -559,3 +564,13 @@ Required:
 
 - `x` (Number) X
 - `y` (Number) Y
+
+
+<a id="nestedatt--integration"></a>
+### Nested Schema for `integration`
+
+Read-Only:
+
+- `endpoint_configuration_link` (String) Integration endpoint configuration link
+- `endpoint_uri` (String) Integration endpoint URI
+- `name` (String) Integration name

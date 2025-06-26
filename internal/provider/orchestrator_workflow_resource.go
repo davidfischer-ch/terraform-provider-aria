@@ -6,7 +6,9 @@ package provider
 import (
 	"context"
 	"fmt"
+	"time"
 
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -132,6 +134,13 @@ func (self *OrchestratorWorkflowResource) Create(
 	resp.Diagnostics.Append(workflow.FromFormAPI(ctx, fromsFromAPI)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &workflow)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", workflow.String()))
+
+	// Optionally wait imported then save updated workflow into Terraform state
+	if workflow.WaitImported.ValueBool() {
+		resp.Diagnostics.Append(self.WaitImported(ctx, &workflow)...)
+		resp.Diagnostics.Append(resp.State.Set(ctx, &workflow)...)
+		tflog.Debug(ctx, fmt.Sprintf("Updated (post-import) %s successfully", workflow.String()))
+	}
 }
 
 func (self *OrchestratorWorkflowResource) Read(
@@ -212,6 +221,13 @@ func (self *OrchestratorWorkflowResource) Update(
 	workflow.FromVersionAPI(workflowFromVersionAPI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &workflow)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", workflow.String()))
+
+	// Optionally wait imported then save updated workflow into Terraform state
+	if workflow.WaitImported.ValueBool() {
+		resp.Diagnostics.Append(self.WaitImported(ctx, &workflow)...)
+		resp.Diagnostics.Append(resp.State.Set(ctx, &workflow)...)
+		tflog.Debug(ctx, fmt.Sprintf("Updated (post-import) %s successfully", workflow.String()))
+	}
 }
 
 func (self *OrchestratorWorkflowResource) Delete(
@@ -234,4 +250,46 @@ func (self *OrchestratorWorkflowResource) ImportState(
 ) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("force_delete"), false)...)
+}
+
+// -------------------------------------------------------------------------------------------------
+
+func (self *OrchestratorWorkflowResource) WaitImported(
+	ctx context.Context,
+	workflow *OrchestratorWorkflowModel,
+) diag.Diagnostics {
+
+	diags := diag.Diagnostics{}
+	if !workflow.WaitImported.ValueBool() {
+		return diags
+	}
+
+	name := workflow.String()
+	tflog.Debug(ctx, fmt.Sprintf("Wait %s to be imported...", name))
+
+	// Poll for the workflow to be imported up to 15 minutes (30 x 30 seconds)
+	maxAttempts := 30
+	for attempt := 0; attempt < maxAttempts; attempt++ {
+		// Poll resource until imported
+		time.Sleep(time.Duration(30) * time.Second)
+		tflog.Debug(
+			ctx,
+			fmt.Sprintf("Poll %d of %d - Check %s is imported...", attempt+1, maxAttempts, name))
+
+		var fromGatewayAPI OrchestratorWorkflowGatewayAPIModel
+		found, _, someDiags := self.client.ReadIt(workflow, &fromGatewayAPI, workflow.ReadGatewayPath())
+		diags.Append(someDiags...)
+		if !found {
+			continue // Continue polling
+		}
+
+		// Update workflow from API - Either successful or failing, its the end...
+		diags.Append(workflow.FromGatewayAPI(ctx, fromGatewayAPI)...)
+		return diags
+	}
+
+	diags.AddError(
+		"Client error",
+		fmt.Sprintf("Timeout while waiting for %s to be imported without errors.", name))
+	return diags
 }
