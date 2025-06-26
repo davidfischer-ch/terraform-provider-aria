@@ -151,7 +151,7 @@ func (self OrchestratorWorkflowModel) ReadPath() string {
 	return self.ReadContentPath()
 }
 
-// Return the URL to retrieve the workflow from the content gateway
+// Return the URL to retrieve the workflow from the content gateway.
 func (self OrchestratorWorkflowModel) ReadGatewayPath() string {
 	return "vro/workflows/" + self.Id.ValueString()
 }

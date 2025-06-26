@@ -132,7 +132,7 @@ EOT
   }
 }
 
-# Example with vRO Workflows
+# Example with vRO Workflows -----------------------------------------------------------------------
 
 resource "aria_orchestrator_workflow" "dummy" {
   name        = "Dummy"
