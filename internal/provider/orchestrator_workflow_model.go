@@ -42,7 +42,10 @@ type OrchestratorWorkflowModel struct {
 	ApiVersion    types.String `tfsdk:"api_version"`
 	EditorVersion types.String `tfsdk:"editor_version"`
 
-	ForceDelete types.Bool `tfsdk:"force_delete"`
+	Integration types.Object `tfsdk:"integration"`
+
+	ForceDelete  types.Bool `tfsdk:"force_delete"`
+	WaitImported types.Bool `tfsdk:"wait_imported"`
 }
 
 // OrchestratorWorkflowCreateAPIModel describes the resource create API model.
@@ -112,6 +115,20 @@ type OrchestratorWorkflowCommitCommitAPIModel struct {
 	ParentId       string `json:"parentId"`
 }
 
+type OrchestratorWorkflowGatewayAPIModel struct {
+	Id         string `json:"id"`
+	Name       string `json:"name"`
+	Version    string `json:"version"`
+	WorkflowId string `json:"workflowId"`
+
+	Href     string `json:"href"`
+	SelfLink string `json:"selfLink"`
+
+	Integration IntegrationAPIModel `json:"integration"`
+
+	OrgId string `json:"orgId"`
+}
+
 func (self OrchestratorWorkflowModel) String() string {
 	return fmt.Sprintf(
 		"Orchestrator Workflow %s (%s)",
@@ -132,6 +149,11 @@ func (self OrchestratorWorkflowModel) CreatePath() string {
 
 func (self OrchestratorWorkflowModel) ReadPath() string {
 	return self.ReadContentPath()
+}
+
+// Return the URL to retrieve the workflow from the content gateway
+func (self OrchestratorWorkflowModel) ReadGatewayPath() string {
+	return "vro/workflows/" + self.Id.ValueString()
 }
 
 func (self OrchestratorWorkflowModel) ReadContentPath() string {
@@ -164,6 +186,9 @@ func (self *OrchestratorWorkflowModel) FromCreateAPI(raw OrchestratorWorkflowCre
 	self.Id = types.StringValue(raw.Id)
 	self.Name = types.StringValue(raw.Name)
 	self.CategoryId = types.StringValue(raw.CategoryId)
+
+	// Set integration to null
+	self.Integration = types.ObjectNull(IntegrationModel{}.AttributeTypes())
 }
 
 // Save response from content API endpoint.
@@ -224,6 +249,21 @@ func (self *OrchestratorWorkflowModel) FromContentAPI(
 func (self *OrchestratorWorkflowModel) FromFormAPI(ctx context.Context, raw any) diag.Diagnostics {
 	var diags diag.Diagnostics
 	self.InputForms, diags = JSONNormalizedFromAny(self.String(), raw)
+	return diags
+}
+
+// Save response from content API endpoint.
+func (self *OrchestratorWorkflowModel) FromGatewayAPI(
+	ctx context.Context,
+	raw OrchestratorWorkflowGatewayAPIModel,
+) diag.Diagnostics {
+	var diags diag.Diagnostics
+
+	// Convert integration from raw and then to object
+	integration := IntegrationModel{}
+	integration.FromAPI(raw.Integration)
+	self.Integration, diags = types.ObjectValueFrom(ctx, integration.AttributeTypes(), integration)
+
 	return diags
 }
 

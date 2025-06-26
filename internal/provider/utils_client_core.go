@@ -354,7 +354,10 @@ func (self AriaClient) GetVersionFromPath(path string) string {
 		return BLUEPRINT_API_VERSION
 	}
 	if strings.HasPrefix(path, "vco") {
-		return ORCHESTRATOR_API_VERION
+		return ORCHESTRATOR_API_VERSION
+	}
+	if strings.HasPrefix(path, "vro") {
+		return ORCHESTRATOR_GATEWAY_API_VERSION
 	}
 	panic(fmt.Sprintf("GetVersionFromPath Not Implemented for path %s", path))
 }
