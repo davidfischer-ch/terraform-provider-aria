@@ -9,7 +9,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.16
 * Make `aria_resource_action` working with `aria_orchestrator_workflow` as runnable item
 * Resource `aria_orchestrator_workflow`: Add `wait_imported` attribute (defaults to `true`)
 * Resource `aria_orchestrator_workflow`: Add `integration` attribute (set only if `wait_imported` is `true`)
-* Resource `aria_resource_action`: Add `endpoint_rl` in `runnable_item` nested attribute
+* Resource `aria_resource_action`: Add `endpoint_url` in `runnable_item` nested attribute
 
 ## Release v0.6.16 (2025-06-18)
 
