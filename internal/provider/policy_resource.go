@@ -107,11 +107,13 @@ func (self *PolicyResource) Read(
 		return
 	}
 
-	if !resp.Diagnostics.HasError() {
-		// Save updated policy into Terraform state
-		resp.Diagnostics.Append(policy.FromAPI(ctx, policyFromAPI)...)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &policy)...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
+
+	// Save updated policy into Terraform state
+	resp.Diagnostics.Append(policy.FromAPI(ctx, policyFromAPI)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &policy)...)
 }
 
 func (self *PolicyResource) Update(

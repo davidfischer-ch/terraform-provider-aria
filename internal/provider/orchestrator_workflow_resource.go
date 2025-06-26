@@ -123,12 +123,15 @@ func (self *OrchestratorWorkflowResource) Create(
 	_, _, readDiags = self.client.ReadIt(&workflow, &fromsFromAPI, workflow.ReadFormPath())
 	resp.Diagnostics.Append(readDiags...)
 
-	if !resp.Diagnostics.HasError() {
-		// Save updated workflow into Terraform state
-		resp.Diagnostics.Append(workflow.FromContentAPI(ctx, workflowFromContentAPI, response)...)
-		resp.Diagnostics.Append(workflow.FromFormAPI(ctx, fromsFromAPI)...)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &workflow)...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
+
+	// Save updated workflow into Terraform state
+	resp.Diagnostics.Append(workflow.FromContentAPI(ctx, workflowFromContentAPI, response)...)
+	resp.Diagnostics.Append(workflow.FromFormAPI(ctx, fromsFromAPI)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &workflow)...)
+	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", workflow.String()))
 }
 
 func (self *OrchestratorWorkflowResource) Read(
@@ -162,13 +165,15 @@ func (self *OrchestratorWorkflowResource) Read(
 	_, _, readDiags = self.client.ReadIt(&workflow, &versionsFromAPI, workflow.ReadVersionsPath())
 	resp.Diagnostics.Append(readDiags...)
 
-	if !resp.Diagnostics.HasError() {
-		// Save updated workflow into Terraform state
-		resp.Diagnostics.Append(workflow.FromContentAPI(ctx, workflowFromContentAPI, response)...)
-		resp.Diagnostics.Append(workflow.FromFormAPI(ctx, formsFromAPI)...)
-		workflow.FromVersionsAPI(versionsFromAPI)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &workflow)...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
+
+	// Save updated workflow into Terraform state
+	resp.Diagnostics.Append(workflow.FromContentAPI(ctx, workflowFromContentAPI, response)...)
+	resp.Diagnostics.Append(workflow.FromFormAPI(ctx, formsFromAPI)...)
+	workflow.FromVersionsAPI(versionsFromAPI)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &workflow)...)
 }
 
 func (self *OrchestratorWorkflowResource) Update(

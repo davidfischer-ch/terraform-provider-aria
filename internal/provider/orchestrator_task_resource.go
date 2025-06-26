@@ -104,11 +104,13 @@ func (self *OrchestratorTaskResource) Read(
 		return
 	}
 
-	if !resp.Diagnostics.HasError() {
-		// Save updated task into Terraform state
-		resp.Diagnostics.Append(task.FromAPI(ctx, taskFromAPI)...)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &task)...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
+
+	// Save updated task into Terraform state
+	resp.Diagnostics.Append(task.FromAPI(ctx, taskFromAPI)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &task)...)
 }
 
 func (self *OrchestratorTaskResource) Update(

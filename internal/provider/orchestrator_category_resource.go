@@ -101,11 +101,13 @@ func (self *OrchestratorCategoryResource) Read(
 		return
 	}
 
-	if !resp.Diagnostics.HasError() {
-		// Save updated category into Terraform state
-		category.FromAPI(categoryFromAPI)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &category)...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
+
+	// Save updated category into Terraform state
+	category.FromAPI(categoryFromAPI)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &category)...)
 }
 
 func (self *OrchestratorCategoryResource) Update(

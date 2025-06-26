@@ -104,11 +104,13 @@ func (self *ABXActionResource) Read(
 		return
 	}
 
-	if !resp.Diagnostics.HasError() {
-		// Save updated action into Terraform state
-		resp.Diagnostics.Append(action.FromAPI(ctx, actionFromAPI)...)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &action)...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
+
+	// Save updated action into Terraform state
+	resp.Diagnostics.Append(action.FromAPI(ctx, actionFromAPI)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &action)...)
 }
 
 func (self *ABXActionResource) Update(

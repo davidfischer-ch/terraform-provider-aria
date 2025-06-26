@@ -99,11 +99,13 @@ func (self *ABXConstantResource) Read(
 		return
 	}
 
-	if !resp.Diagnostics.HasError() {
-		// Save updated constant into Terraform state
-		constant.FromAPI(constantFromAPI)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
+
+	// Save updated constant into Terraform state
+	constant.FromAPI(constantFromAPI)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
 }
 
 func (self *ABXConstantResource) Update(

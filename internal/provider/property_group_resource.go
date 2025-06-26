@@ -107,11 +107,13 @@ func (self *PropertyGroupResource) Read(
 		return
 	}
 
-	if !resp.Diagnostics.HasError() {
-		// Save updated property group into Terraform state
-		resp.Diagnostics.Append(propertyGroup.FromAPI(ctx, propertyGroupFromAPI)...)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &propertyGroup)...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
+
+	// Save updated property group into Terraform state
+	resp.Diagnostics.Append(propertyGroup.FromAPI(ctx, propertyGroupFromAPI)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &propertyGroup)...)
 }
 
 func (self *PropertyGroupResource) Update(

@@ -110,11 +110,13 @@ func (self *CatalogSourceResource) Read(
 		return
 	}
 
-	if !resp.Diagnostics.HasError() {
-		// Save updated catalog source into Terraform state
-		resp.Diagnostics.Append(source.FromAPI(ctx, sourceFromAPI)...)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &source)...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
+
+	// Save updated catalog source into Terraform state
+	resp.Diagnostics.Append(source.FromAPI(ctx, sourceFromAPI)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &source)...)
 }
 
 func (self *CatalogSourceResource) Update(
