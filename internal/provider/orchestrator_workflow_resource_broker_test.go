@@ -54,8 +54,7 @@ resource "aria_orchestrator_workflow" "test" {
 
   input_forms = jsonencode(local.input_forms)
 
-  force_delete  = true
-  wait_imported = true
+  force_delete = true
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("aria_orchestrator_workflow.test", "id"),
@@ -70,14 +69,16 @@ resource "aria_orchestrator_workflow" "test" {
 						"aria_orchestrator_workflow.test", "wait_imported", "true",
 					),
 					resource.TestCheckResourceAttrSet(
-						"aria_orchestrator_workflow.test", "integration.name",
+						"aria_orchestrator_workflow.test",
+						"integration.name",
 					),
 					resource.TestCheckResourceAttrSet(
 						"aria_orchestrator_workflow.test",
 						"integration.endpoint_configuration_link",
 					),
 					resource.TestCheckResourceAttrSet(
-						"aria_orchestrator_workflow.test", "integration.endpoint_uri",
+						"aria_orchestrator_workflow.test",
+						"integration.endpoint_uri",
 					),
 				),
 			},
