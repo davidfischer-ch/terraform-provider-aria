@@ -121,11 +121,13 @@ func (self *CloudTemplateV1Resource) Read(
 		return
 	}
 
-	if !resp.Diagnostics.HasError() {
-		// Save updated cloud template into Terraform state
-		resp.Diagnostics.Append(template.FromAPI(ctx, templateRaw)...)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &template)...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
+
+	// Save updated cloud template into Terraform state
+	resp.Diagnostics.Append(template.FromAPI(ctx, templateRaw)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &template)...)
 }
 
 func (self *CloudTemplateV1Resource) Update(

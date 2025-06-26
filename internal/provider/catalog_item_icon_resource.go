@@ -109,11 +109,13 @@ func (self *CatalogItemIconResource) Read(
 		return
 	}
 
-	if !resp.Diagnostics.HasError() {
-		// Save updated item's icon into Terraform state
-		itemIcon.FromAPI(itemIconFromAPI)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &itemIcon)...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
+
+	// Save updated item's icon into Terraform state
+	itemIcon.FromAPI(itemIconFromAPI)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &itemIcon)...)
 }
 
 func (self *CatalogItemIconResource) Update(

@@ -101,11 +101,13 @@ func (self *OrchestratorEnvironmentRepositoryResource) Read(
 		return
 	}
 
-	if !resp.Diagnostics.HasError() {
-		// Save updated repository into Terraform state
-		repository.FromAPI(repositoryFromAPI)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &repository)...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
+
+	// Save updated repository into Terraform state
+	repository.FromAPI(repositoryFromAPI)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &repository)...)
 }
 
 func (self *OrchestratorEnvironmentRepositoryResource) Update(

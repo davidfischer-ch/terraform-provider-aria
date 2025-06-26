@@ -107,11 +107,13 @@ func (self *OrchestratorConfigurationResource) Read(
 		return
 	}
 
-	if !resp.Diagnostics.HasError() {
-		// Save updated configuration into Terraform state
-		resp.Diagnostics.Append(configuration.FromAPI(ctx, configurationFromAPI, response)...)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &configuration)...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
+
+	// Save updated configuration into Terraform state
+	resp.Diagnostics.Append(configuration.FromAPI(ctx, configurationFromAPI, response)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &configuration)...)
 }
 
 func (self *OrchestratorConfigurationResource) Update(

@@ -116,11 +116,13 @@ func (self *SubscriptionResource) Read(
 		return
 	}
 
-	if !resp.Diagnostics.HasError() {
-		// Save updated subscription into Terraform state
-		resp.Diagnostics.Append(subscription.FromAPI(ctx, subscriptionFromAPI)...)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &subscription)...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
+
+	// Save updated subscription into Terraform state
+	resp.Diagnostics.Append(subscription.FromAPI(ctx, subscriptionFromAPI)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &subscription)...)
 }
 
 func (self *SubscriptionResource) Update(

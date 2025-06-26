@@ -109,11 +109,13 @@ func (self *ProjectResource) Read(
 		return
 	}
 
-	if !resp.Diagnostics.HasError() {
-		// Save updated property group into Terraform state
-		resp.Diagnostics.Append(project.FromAPI(ctx, projectFromAPI)...)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &project)...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
+
+	// Save updated property group into Terraform state
+	resp.Diagnostics.Append(project.FromAPI(ctx, projectFromAPI)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &project)...)
 }
 
 func (self *ProjectResource) Update(

@@ -118,11 +118,13 @@ func (self *CustomNamingResource) Read(
 		return
 	}
 
-	if !resp.Diagnostics.HasError() {
-		// Save updated custom naming into Terraform state
-		resp.Diagnostics.Append(naming.FromAPI(ctx, namingFromAPI)...)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &naming)...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
+
+	// Save updated custom naming into Terraform state
+	resp.Diagnostics.Append(naming.FromAPI(ctx, namingFromAPI)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &naming)...)
 }
 
 func (self *CustomNamingResource) Update(

@@ -131,11 +131,13 @@ func (self *CustomFormResource) Read(
 		return
 	}
 
-	if !resp.Diagnostics.HasError() {
-		// Save updated custom form into Terraform state
-		form.FromAPI(formFromAPI)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &form)...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
+
+	// Save updated custom form into Terraform state
+	form.FromAPI(formFromAPI)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &form)...)
 }
 
 func (self *CustomFormResource) Update(

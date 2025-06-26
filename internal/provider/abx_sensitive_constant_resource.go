@@ -97,11 +97,13 @@ func (self *ABXSensitiveConstantResource) Read(
 		return
 	}
 
-	if !resp.Diagnostics.HasError() {
-		// Save updated secret into Terraform state
-		constant.FromAPI(constantFromAPI)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
+
+	// Save updated secret into Terraform state
+	constant.FromAPI(constantFromAPI)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
 }
 
 func (self *ABXSensitiveConstantResource) Update(

@@ -114,11 +114,13 @@ func (self *OrchestratorEnvironmentResource) Read(
 		return
 	}
 
-	if !resp.Diagnostics.HasError() {
-		// Save updated environment into Terraform state
-		resp.Diagnostics.Append(environment.FromAPI(ctx, environmentFromAPI, response)...)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &environment)...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
+
+	// Save updated environment into Terraform state
+	resp.Diagnostics.Append(environment.FromAPI(ctx, environmentFromAPI, response)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &environment)...)
 }
 
 func (self *OrchestratorEnvironmentResource) Update(

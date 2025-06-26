@@ -100,11 +100,13 @@ func (self *ResourceActionResource) Read(
 		return
 	}
 
-	if !resp.Diagnostics.HasError() {
-		// Save updated resource action into Terraform state
-		resp.Diagnostics.Append(action.FromAPI(ctx, actionFromAPI)...)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &action)...)
+	if resp.Diagnostics.HasError() {
+		return
 	}
+
+	// Save updated resource action into Terraform state
+	resp.Diagnostics.Append(action.FromAPI(ctx, actionFromAPI)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &action)...)
 }
 
 func (self *ResourceActionResource) Update(
