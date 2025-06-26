@@ -131,10 +131,13 @@ func OrchestratorWorkflowSchema() schema.Schema {
 				MarkdownDescription: strings.Join([]string{
 					"Wait for the workflow to be imported in the service " +
 						"broker (up to 15 minutes, checked every 30 seconds, default is true).",
-					"This ensure the integration attribute is set",
+					"",
+					"The `integration` attribute is set if `wait_imported` is `true`, else `null`.",
+					"",
 					"This is useful when non-orchestrator resources such as " +
 						"`aria_resource_action` refer to this instance, ensuring the workflow is " +
 						"available.",
+					"",
 					"If using an `aria_catalog_source` then you can rely on its own " +
 						"`wait_imported` feature. However the `aria_catalog_source` must be declared " +
 						"in the `depends_on` clause of any non-orchestrator resources making use of " +
