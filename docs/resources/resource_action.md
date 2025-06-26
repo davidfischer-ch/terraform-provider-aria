@@ -162,10 +162,6 @@ resource "aria_orchestrator_workflow" "dummy" {
   ])
 }
 
-data "aria_integration" "workflows" {
-  type_id = "com.vmw.vro.workflow"
-}
-
 resource "aria_resource_action" "dummy" {
   name          = "dummy"
   display_name  = "Dummy Action"
@@ -179,7 +175,7 @@ resource "aria_resource_action" "dummy" {
     name          = aria_orchestrator_workflow.dummy.name
     project_id    = ""
     type          = "vro.workflow"
-    endpoint_link = data.aria_integration.workflows.endpoint_configuration_link
+    endpoint_link = aria_orchestrator_workflow.dummy.integration.endpoint_configuration_link
 
     input_parameters  = []
     output_parameters = []

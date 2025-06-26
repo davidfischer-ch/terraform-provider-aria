@@ -85,11 +85,9 @@ func (self *CatalogSourceResource) Create(
 	tflog.Debug(ctx, fmt.Sprintf("Created %s successfully", source.String()))
 
 	// Optionally wait imported then save updated catalog source into Terraform state
-	if source.WaitImported.ValueBool() {
-		resp.Diagnostics.Append(self.WaitImported(ctx, &source)...)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &source)...)
-		tflog.Debug(ctx, fmt.Sprintf("Updated (post-import) %s successfully", source.String()))
-	}
+	resp.Diagnostics.Append(self.WaitImported(ctx, &source)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &source)...)
+	tflog.Debug(ctx, fmt.Sprintf("Updated (post-import) %s successfully", source.String()))
 }
 
 func (self *CatalogSourceResource) Read(
@@ -156,11 +154,9 @@ func (self *CatalogSourceResource) Update(
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", source.String()))
 
 	// Optionally wait imported then save updated catalog source into Terraform state
-	if source.WaitImported.ValueBool() {
-		resp.Diagnostics.Append(self.WaitImported(ctx, &source)...)
-		resp.Diagnostics.Append(resp.State.Set(ctx, &source)...)
-		tflog.Debug(ctx, fmt.Sprintf("Updated (post-import) %s successfully", source.String()))
-	}
+	resp.Diagnostics.Append(self.WaitImported(ctx, &source)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &source)...)
+	tflog.Debug(ctx, fmt.Sprintf("Updated (post-import) %s successfully", source.String()))
 }
 
 func (self *CatalogSourceResource) Delete(
