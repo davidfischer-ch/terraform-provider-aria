@@ -72,7 +72,7 @@ resource "aria_subscription" "hello_world" {
 - `blocking` (Boolean) TODO
 - `contextual` (Boolean) TODO
 - `description` (String) Describe the resource in few sentences
-- `event_topic_id` (String) Event topic identifier
+- `event_topic_id` (String) Event topic identifier (force recreation on change)
 - `name` (String) Subscription name
 - `priority` (Number) TODO
 - `project_ids` (Set of String) Restrict to given projects (an empty list means all)
