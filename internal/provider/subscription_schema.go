@@ -59,7 +59,7 @@ func SubscriptionSchema() schema.Schema {
 				Optional:            true,
 			},
 			"event_topic_id": schema.StringAttribute{
-				MarkdownDescription: "Event topic identifier",
+				MarkdownDescription: "Event topic identifier" + IMMUTABLE,
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
