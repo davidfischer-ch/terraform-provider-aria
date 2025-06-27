@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -84,4 +85,14 @@ func (self CatalogSourceConfigModel) ToAPI(
 		SourceProjectId: self.SourceProjectId.ValueString(),
 		Workflows:       workflowsRaw,
 	}, diags
+}
+
+// Utils -------------------------------------------------------------------------------------------
+
+// Used to convert structure to a types.Object.
+func (self CatalogSourceConfigModel) AttributeTypes(ctx context.Context) map[string]attr.Type {
+	return map[string]attr.Type{
+		"source_project_id": types.StringType,
+		"workflows": types.ListType{ElemType: self.Workflows.ElementType(ctx)},
+	}
 }
