@@ -61,6 +61,9 @@ func SubscriptionSchema() schema.Schema {
 			"event_topic_id": schema.StringAttribute{
 				MarkdownDescription: "Event topic identifier",
 				Required:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
+				},
 			},
 			"project_ids": schema.SetAttribute{
 				MarkdownDescription: "Restrict to given projects (an empty list means all)",
