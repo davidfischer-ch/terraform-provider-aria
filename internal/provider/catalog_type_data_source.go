@@ -58,9 +58,9 @@ func (self *CatalogTypeDataSource) Read(
 		return
 	}
 
-	var catalogTypeRaw CatalogTypeAPIModel
+	var catalogTypeFromAPI CatalogTypeAPIModel
 	path := catalogType.ReadPath()
-	response, err := self.client.R(path).SetResult(&catalogTypeRaw).Get(path)
+	response, err := self.client.R(path).SetResult(&catalogTypeFromAPI).Get(path)
 	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -70,6 +70,6 @@ func (self *CatalogTypeDataSource) Read(
 	}
 
 	// Save updated catalog type into Terraform state
-	catalogType.FromAPI(catalogTypeRaw)
+	catalogType.FromAPI(catalogTypeFromAPI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &catalogType)...)
 }
