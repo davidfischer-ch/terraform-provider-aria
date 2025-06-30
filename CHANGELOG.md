@@ -1,5 +1,17 @@
 # Changelog
 
+## Release v0.6.18 (2025-06-30)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.17...v0.6.18
+
+### Features
+
+* Add `aria_catalog_item` data source
+
+### Fix and enhancements
+
+* Resource `aria_subscription`: Mark `event_topic_id` as immutable (force recreate)
+
 ## Release v0.6.17 (2025-06-26)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.16...v0.6.17
