@@ -35,6 +35,17 @@ func ComputedMutableIdentifierSchema(description string) schema.StringAttribute 
 	}
 }
 
+func OptionalIdentifierSchema(description string) schema.StringAttribute {
+	if len(description) == 0 {
+		description = "Identifier"
+	}
+	return schema.StringAttribute{
+		MarkdownDescription: description,
+		Computed:            true,
+		Optional:            true,
+	}
+}
+
 func RequiredIdentifierSchema(description string) schema.StringAttribute {
 	if len(description) == 0 {
 		description = "Identifier"

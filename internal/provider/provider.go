@@ -300,6 +300,7 @@ func (self *AriaProvider) Resources(ctx context.Context) []func() resource.Resou
 
 func (self *AriaProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
+		NewCatalogItemDataSource,
 		NewCatalogTypeDataSource,
 		NewIconDataSource,
 		NewIntegrationDataSource,
