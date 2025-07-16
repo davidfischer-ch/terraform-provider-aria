@@ -34,8 +34,14 @@ resource "aria_orchestrator_configuration" "test" {
 
   force_delete = true
 }
+
+data "aria_orchestrator_configuration" "test" {
+  id = aria_orchestrator_configuration.test.id
+}
 `,
 				Check: resource.ComposeAggregateTestCheckFunc(
+
+					// Resource
 					resource.TestCheckResourceAttrSet("aria_orchestrator_configuration.test", "id"),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_configuration.test", "name",
@@ -64,6 +70,36 @@ resource "aria_orchestrator_configuration" "test" {
 					resource.TestCheckResourceAttrPair(
 						"aria_orchestrator_configuration.test", "category_id",
 						"aria_orchestrator_category.root", "id",
+					),
+
+					// Data source
+					resource.TestCheckResourceAttrPair(
+						"aria_orchestrator_configuration.test", "id",
+						"data.aria_orchestrator_configuration.test", "id",
+					),
+					resource.TestCheckResourceAttrPair(
+						"aria_orchestrator_configuration.test", "name",
+						"data.aria_orchestrator_configuration.test", "name",
+					),
+					resource.TestCheckResourceAttrPair(
+						"aria_orchestrator_configuration.test", "description",
+						"data.aria_orchestrator_configuration.test", "description",
+					),
+					resource.TestCheckResourceAttrPair(
+						"aria_orchestrator_configuration.test", "version",
+						"data.aria_orchestrator_configuration.test", "version",
+					),
+					resource.TestCheckResourceAttrPair(
+						"aria_orchestrator_configuration.test", "version_id",
+						"data.aria_orchestrator_configuration.test", "version_id",
+					),
+					resource.TestCheckResourceAttr(
+						"data.aria_orchestrator_configuration.test", "attributes.#",
+						"0",
+					),
+					resource.TestCheckResourceAttrPair(
+						"aria_orchestrator_configuration.test", "category_id",
+						"data.aria_orchestrator_configuration.test", "category_id",
 					),
 				),
 			},
