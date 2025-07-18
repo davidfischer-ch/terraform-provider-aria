@@ -84,10 +84,10 @@ func CatalogSourceSchema() schema.Schema {
 			},
 			"import_trigger": schema.StringAttribute{
 				MarkdownDescription: strings.Join([]string{
-					"Set it to any value changing every time you want the catalog source" +
+					"Set it to any value changing every time you want the catalog source " +
 						"to be refreshed.",
 					"",
-					"One use case can be to ensure workflows are refreshed in service broker" +
+					"One use case can be to ensure workflows are refreshed in service broker " +
 						"every time its changed, by using `workflow.version_id` as value for this.",
 					"",
 				}, "\n"),
