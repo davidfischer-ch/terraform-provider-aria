@@ -1,5 +1,18 @@
 # Changelog
 
+## Release v0.6.19 (2025-07-18)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.18...v0.6.19
+
+### Features
+
+* Resource `aria_catalog_source`: Add `import_trigger` optional attribute to allow triggering the import whenever you deem necessary (workflows changed, ...)
+
+### Fix and enhancements
+
+* Also test `aria_catalog_source` data source
+* Merge dependabot dependencies update requests
+
 ## Release v0.6.18 (2025-06-30)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.17...v0.6.18
