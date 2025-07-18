@@ -4,10 +4,13 @@
 package provider
 
 import (
+	"strings"
+
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -78,6 +81,22 @@ func CatalogSourceSchema() schema.Schema {
 			"items_imported": schema.Int32Attribute{
 				MarkdownDescription: "Number of imported items",
 				Computed:            true,
+			},
+			"import_trigger": schema.StringAttribute{
+				MarkdownDescription: strings.Join([]string{
+					"Set it to any value changing every time you want the catalog source" +
+						"to be refreshed.",
+					"",
+					"One use case can be to ensure workflows are refreshed in service broker" +
+						"every time its changed, by using `workflow.version_id` as value for this.",
+					"",
+				}, "\n"),
+				Optional: true,
+				Computed: true,
+				Default:  stringdefault.StaticString(""),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"wait_imported": schema.BoolAttribute{
 				MarkdownDescription: "Wait for import to be completed " +

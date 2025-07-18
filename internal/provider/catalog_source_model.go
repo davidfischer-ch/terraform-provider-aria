@@ -37,7 +37,8 @@ type CatalogSourceModel struct {
 
 	ProjectId types.String `tfsdk:"project_id"`
 
-	WaitImported types.Bool `tfsdk:"wait_imported"`
+	ImportTrigger types.String `tfsdk:"import_trigger"`
+	WaitImported  types.Bool   `tfsdk:"wait_imported"`
 }
 
 // CatalogSourceAPIModel describes the resource API model.
