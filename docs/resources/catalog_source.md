@@ -193,9 +193,9 @@ resource "aria_catalog_source" "dummy" {
 
 ### Optional
 
-- `import_trigger` (String) Set it to any value changing every time you want the catalog sourceto be refreshed.
+- `import_trigger` (String) Set it to any value changing every time you want the catalog source to be refreshed.
 
-One use case can be to ensure workflows are refreshed in service brokerevery time its changed, by using `workflow.version_id` as value for this.
+One use case can be to ensure workflows are refreshed in service broker every time its changed, by using `workflow.version_id` as value for this.
 - `project_id` (String) Project identifier. Empty or unset means available for all projects. (force recreation on change)
 - `wait_imported` (Boolean) Wait for import to be completed (up to 15 minutes, checked every 30 seconds, default is true)
 
