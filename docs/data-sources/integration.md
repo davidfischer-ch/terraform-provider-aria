@@ -14,7 +14,7 @@ Integration data source
 
 ```terraform
 data "aria_integration" "vro_workflows" {
-  id = "com.vmw.vro.workflow"
+  type_id = "com.vmw.vro.workflow"
 }
 
 output "vro_workflows_integration" {

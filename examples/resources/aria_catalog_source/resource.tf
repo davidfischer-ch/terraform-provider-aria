@@ -86,11 +86,7 @@ resource "aria_catalog_source" "dummy" {
         name        = aria_orchestrator_workflow.dummy.name
         description = aria_orchestrator_workflow.dummy.description
         version     = aria_orchestrator_workflow.dummy.version
-        integration = {
-          name                        = data.aria_integration.workflows.name
-          endpoint_configuration_link = data.aria_integration.workflows.endpoint_configuration_link
-          endpoint_uri                = data.aria_integration.workflows.endpoint_uri
-        }
+        integration = data.aria_integration.workflows
       }
     ]
   }
