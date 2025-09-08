@@ -59,6 +59,12 @@ resource "aria_abx_action" "test" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = local.constants
+  inputs          = {
+	SomeString  = jsonencode("")
+	OtherString = jsonencode("foo")
+	SomeNumber  = jsonencode(42)
+	SomeComplex = jsonencode([1, 2, 3])
+  }
   secrets         = [] # TODO Test this once secret is available
   source          = local.source
   shared          = true
@@ -85,6 +91,24 @@ resource "aria_abx_action" "test" {
       condition     = self.source == local.source
       error_message = "Source must be ${local.source}, actual ${self.source}"
     }
+
+	# Validate inputs
+	postcondition {
+	  condition     = self.inputs["SomeString"] == jsonencode("")
+	  error_message = "Inputs must contains SomeString with expected value."
+	}
+	postcondition {
+	  condition     = self.inputs["OtherString"] == jsonencode("foo")
+	  error_message = "Inputs must contains OtherString with expected value."
+	}
+	postcondition {
+	  condition     = self.inputs["SomeNumber"] == jsonencode(42)
+	  error_message = "Inputs must contains SomeNumber with expected value."
+	}
+	postcondition {
+	  condition     = self.inputs["SomeComplex"] == jsonencode(tolist([1, 2, 3]))
+	  error_message = "Inputs must contains SomeComplex with expected value."
+	}
   }
 }`,
 				Check: resource.ComposeAggregateTestCheckFunc(
@@ -156,6 +180,7 @@ resource "aria_abx_action" "test" {
   entrypoint                 = "handler"
   dependencies               = local.dependencies
   constants                  = []
+  inputs                     = {}
   secrets                    = []
   source                     = local.source
   project_id                 = var.test_project_id
@@ -199,6 +224,7 @@ resource "aria_abx_action" "test" {
 					resource.TestCheckResourceAttr("aria_abx_action.test", "shared", "false"),
 					resource.TestCheckResourceAttr("aria_abx_action.test", "system", "false"),
 					resource.TestCheckResourceAttr("aria_abx_action.test", "async_deployed", "false"),
+					resource.TestCheckResourceAttr("aria_abx_action.test", "inputs.#", "0"),
 					resource.TestCheckResourceAttrSet("aria_abx_action.test", "org_id"),
 				),
 			},
