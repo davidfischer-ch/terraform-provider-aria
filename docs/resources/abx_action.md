@@ -38,10 +38,19 @@ resource "aria_abx_action" "hello_world" {
   memory_in_mb = 128
   entrypoint   = "handler"
   dependencies = []
+
   constants = [
     aria_abx_constant.hello_message.id,
     aria_abx_sensitive_constant.some_secret.id
   ]
+
+  inputs = {
+    SomeString  = jsonencode("")
+    OtherString = jsonencode("foo")
+    SomeNumber  = jsonencode(42)
+    SomeComplex = jsonencode([1, 2, 3])
+  }
+
   secrets = []
 
   project_id = var.project_id
@@ -75,6 +84,11 @@ EOT
 - `dependencies` (List of String) Dependencies (python packages, ...)
 - `description` (String) Describe the resource in few sentences
 - `entrypoint` (String) Main function's name
+- `inputs` (Map of String) Inputs to expose to the action (JSON encoded)
+
+We should have implemented this attribute as a dynamic type (and not JSON).
+Unfortunately Terraform SDK returns this issue:
+Dynamic types inside of collections are not currently supported in terraform-plugin-framework.
 - `memory_in_mb` (Number) Runtime memory constraint in MB
 - `name` (String) A name (must be unique)
 - `runtime_name` (String) Runtime name (`python`, `nodejs`, ...)
