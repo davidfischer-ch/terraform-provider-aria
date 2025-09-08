@@ -100,9 +100,10 @@ func ABXActionSchema() schema.Schema {
 				Required:            true,
 			},
 			"inputs": schema.MapAttribute{
-				MarkdownDescription: "Inputs to expose to the action" + JSON_INSTEAD_OF_DYNAMIC_DISCLAIMER,
-				ElementType:         jsontypes.NormalizedType{},
-				Required:            true,
+				MarkdownDescription: "Inputs to expose to the action " +
+					"(map input names to JSON encoded default value)",
+				ElementType: jsontypes.NormalizedType{},
+				Required:    true,
 			},
 			"secrets": schema.SetAttribute{
 				MarkdownDescription: "Secrets to expose to the action",

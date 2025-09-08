@@ -84,11 +84,7 @@ EOT
 - `dependencies` (List of String) Dependencies (python packages, ...)
 - `description` (String) Describe the resource in few sentences
 - `entrypoint` (String) Main function's name
-- `inputs` (Map of String) Inputs to expose to the action (JSON encoded)
-
-We should have implemented this attribute as a dynamic type (and not JSON).
-Unfortunately Terraform SDK returns this issue:
-Dynamic types inside of collections are not currently supported in terraform-plugin-framework.
+- `inputs` (Map of String) Inputs to expose to the action (map input names to JSON encoded default value)
 - `memory_in_mb` (Number) Runtime memory constraint in MB
 - `name` (String) A name (must be unique)
 - `runtime_name` (String) Runtime name (`python`, `nodejs`, ...)
