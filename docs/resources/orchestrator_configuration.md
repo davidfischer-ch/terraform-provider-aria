@@ -270,6 +270,8 @@ Required:
 
 Import is supported using the following syntax:
 
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
 # Configuration can be imported by specifying the instance's unique identifier.
 terraform import aria_orchestrator_configuration.example 21b65dcb-41c2-4734-a7b3-c1a1a3138339

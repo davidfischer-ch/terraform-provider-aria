@@ -44,6 +44,8 @@ resource "aria_catalog_item_icon" "example" {
 
 Import is supported using the following syntax:
 
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
 # Catalog item's icon can be imported by specifying the instance's unique identifier.
 terraform import aria_catalog_item_icon.example e5fa0338-943d-42fa-bb99-a29096b1cf4c
