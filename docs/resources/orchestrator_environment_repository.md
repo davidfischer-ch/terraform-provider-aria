@@ -45,6 +45,8 @@ resource "aria_orchestrator_environment_repository" "internal_python" {
 
 Import is supported using the following syntax:
 
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
 # Orchestrator environment's repository can be imported by specifying the instance's unique identifier.
 terraform import aria_orchestrator_environment_repository.example 90c8291b-e71b-44f6-8f94-be9c0edc7867

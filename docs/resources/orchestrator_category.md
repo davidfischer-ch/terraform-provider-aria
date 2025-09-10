@@ -58,6 +58,8 @@ resource "aria_orchestrator_category" "helpers" {
 
 Import is supported using the following syntax:
 
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
 # Orchestrator category can be imported by specifying the instance's unique identifier.
 terraform import aria_orchestrator_category.example 7e788b40-a936-4c0e-8f33-b420c3b61446

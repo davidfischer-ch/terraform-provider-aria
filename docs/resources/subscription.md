@@ -101,6 +101,8 @@ resource "aria_subscription" "hello_world" {
 
 Import is supported using the following syntax:
 
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
 ```shell
 # Subscription can be imported by specifying the instance's unique identifier.
 terraform import aria_subscription.example 72cfc94c-4706-4fd3-801d-c185d26266df
