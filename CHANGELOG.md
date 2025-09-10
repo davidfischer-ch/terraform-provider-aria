@@ -1,5 +1,22 @@
 # Changelog
 
+## Release v0.7.0 (2025-09-10)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.19...v0.7.0
+
+### Features
+
+* Resource `aria_abx_action`: Add `inputs` attribute
+
+### Migrations
+
+ * Resource `aria_abx_action`: Set `inputs` to `{}`
+
+### Fix and enhancements
+
+* Merge dependabot dependencies update requests
+* Factorize example code (documentation)
+
 ## Release v0.6.19 (2025-07-18)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.18...v0.6.19
