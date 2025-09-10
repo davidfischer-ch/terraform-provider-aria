@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
@@ -31,6 +32,7 @@ type ABXActionModel struct {
 	Entrypoint   types.String `tfsdk:"entrypoint"`
 	Dependencies types.List   `tfsdk:"dependencies"`
 	Constants    types.Set    `tfsdk:"constants"`
+	Inputs       types.Map    `tfsdk:"inputs"`
 	Secrets      types.Set    `tfsdk:"secrets"`
 
 	Source types.String `tfsdk:"source"`
@@ -59,9 +61,9 @@ type ABXActionAPIModel struct {
 	TimeoutSeconds           int32 `json:"timeoutSeconds"`
 	DeploymentTimeoutSeconds int32 `json:"deploymentTimeoutSeconds"`
 
-	Entrypoint   string            `json:"entrypoint"`
-	Dependencies string            `json:"dependencies"`
-	Inputs       map[string]string `json:"inputs"`
+	Entrypoint   string         `json:"entrypoint"`
+	Dependencies string         `json:"dependencies"`
+	Inputs       map[string]any `json:"inputs"`
 
 	Source string `json:"source"`
 
@@ -137,34 +139,31 @@ func (self *ABXActionModel) FromAPI(
 
 	constantsIds := []string{}
 	secretsIds := []string{}
-	inputsKeys := []string{}
+	inputs := map[string]any{}
 
-	for key := range raw.Inputs {
+	diags := diag.Diagnostics{}
+	var someDiags diag.Diagnostics
+
+	for key, value := range raw.Inputs {
 		res := strings.SplitN(key, ":", 2)
 		if len(res) == 1 {
-			inputsKeys = append(inputsKeys, key)
+			inputs[key], someDiags = JSONNormalizedFromAny(fmt.Sprintf("inputs[%s]", key), value)
+			diags.Append(someDiags...)
 		} else if res[0] == "secret" {
 			constantsIds = append(constantsIds, res[1])
 		} else if res[0] == "psecret" {
 			secretsIds = append(secretsIds, res[1])
 		} else {
 			// Unhandled -> inputsKeys
-			inputsKeys = append(inputsKeys, key)
+			inputs[key], someDiags = JSONNormalizedFromAny(fmt.Sprintf("inputs[%s]", key), value)
+			diags.Append(someDiags...)
 		}
 	}
 
-	diags := diag.Diagnostics{}
-	var someDiags diag.Diagnostics
-
-	if len(inputsKeys) > 0 {
-		diags.AddError(
-			"Client error",
-			fmt.Sprintf(
-				"Unable to manage %s, unhandled inputs keys %s",
-				self.String(), strings.Join(inputsKeys, ", ")))
-	}
-
 	self.Constants, someDiags = types.SetValueFrom(ctx, types.StringType, constantsIds)
+	diags.Append(someDiags...)
+
+	self.Inputs, someDiags = types.MapValueFrom(ctx, jsontypes.NormalizedType{}, inputs)
 	diags.Append(someDiags...)
 
 	self.Secrets, someDiags = types.SetValueFrom(ctx, types.StringType, secretsIds)
@@ -183,6 +182,7 @@ func (self ABXActionModel) ToAPI(
 ) (ABXActionAPIModel, diag.Diagnostics) {
 
 	diags := diag.Diagnostics{}
+	var someDiags diag.Diagnostics
 
 	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/list
 	if self.Dependencies.IsNull() || self.Dependencies.IsUnknown() {
@@ -205,6 +205,16 @@ func (self ABXActionModel) ToAPI(
 	}
 
 	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/list
+	if self.Inputs.IsNull() || self.Inputs.IsUnknown() {
+		diags.AddError(
+			"Configuration error",
+			fmt.Sprintf(
+				"Unable to manage %s, inputs is either null or unknown",
+				self.String()))
+		return ABXActionAPIModel{}, diags
+	}
+
+	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/list
 	if self.Secrets.IsNull() || self.Secrets.IsUnknown() {
 		diags.AddError(
 			"Configuration error",
@@ -220,6 +230,9 @@ func (self ABXActionModel) ToAPI(
 	constants := make([]string, 0, len(self.Constants.Elements()))
 	diags.Append(self.Constants.ElementsAs(ctx, &constants, false)...)
 
+	inputsJSON := make(map[string]jsontypes.Normalized, len(self.Inputs.Elements()))
+	diags.Append(self.Inputs.ElementsAs(ctx, &inputsJSON, false)...)
+
 	secrets := make([]string, 0, len(self.Secrets.Elements()))
 	diags.Append(self.Secrets.ElementsAs(ctx, &secrets, false)...)
 
@@ -227,12 +240,16 @@ func (self ABXActionModel) ToAPI(
 		return ABXActionAPIModel{}, diags
 	}
 
-	inputs := map[string]string{}
+	inputs := map[string]any{}
 	for _, constant := range constants {
 		inputs["secret:"+constant] = ""
 	}
 	for _, secret := range secrets {
 		inputs["psecret:"+secret] = ""
+	}
+	for key, valueJSON := range inputsJSON {
+		inputs[key], someDiags = JSONNormalizedToAny(valueJSON)
+		diags.Append(someDiags...)
 	}
 
 	faasProvider := self.FAASProvider.ValueString()

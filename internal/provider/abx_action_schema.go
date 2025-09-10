@@ -4,6 +4,7 @@
 package provider
 
 import (
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/booldefault"
@@ -98,17 +99,17 @@ func ABXActionSchema() schema.Schema {
 				ElementType:         types.StringType,
 				Required:            true,
 			},
+			"inputs": schema.MapAttribute{
+				MarkdownDescription: "Inputs to expose to the action " +
+					"(map input names to JSON encoded default value)",
+				ElementType: jsontypes.NormalizedType{},
+				Required:    true,
+			},
 			"secrets": schema.SetAttribute{
 				MarkdownDescription: "Secrets to expose to the action",
 				ElementType:         types.StringType,
 				Required:            true,
 			},
-			/* "inputs": schema.MapAttribute{
-			    // https://developer.hashicorp.com/terraform/plugin/framework/handling-data/dynamic-data
-			    MarkdownDescription: "Inputs to expose to the action",
-			    ElementType: types.DynamicType,
-			    Required: true,
-			}, */
 			"source": schema.StringAttribute{
 				MarkdownDescription: "Action source code",
 				Required:            true,

@@ -81,17 +81,10 @@ resource "aria_catalog_source" "dummy" {
 
   config = {
     workflows = [
-      {
-        id          = aria_orchestrator_workflow.dummy.id
-        name        = aria_orchestrator_workflow.dummy.name
-        description = aria_orchestrator_workflow.dummy.description
-        version     = aria_orchestrator_workflow.dummy.version
-        integration = {
-          name                        = data.aria_integration.workflows.name
-          endpoint_configuration_link = data.aria_integration.workflows.endpoint_configuration_link
-          endpoint_uri                = data.aria_integration.workflows.endpoint_uri
-        }
-      }
+      merge(
+        aria_orchestrator_workflow.dummy,
+        { integration = data.aria_integration.workflows }
+      )
     ]
   }
 
@@ -150,15 +143,7 @@ resource "aria_catalog_source" "dummy" {
   type_id     = "com.vmw.vro.workflow"
 
   config = {
-    workflows = [
-      {
-        id          = aria_orchestrator_workflow.dummy.id
-        name        = aria_orchestrator_workflow.dummy.name
-        description = aria_orchestrator_workflow.dummy.description
-        version     = aria_orchestrator_workflow.dummy.version
-        integration = aria_orchestrator_workflow.dummy.integration
-      }
-    ]
+    workflows = [aria_orchestrator_workflow.dummy]
   }
 
   # Refresh the catalog source every time the workflow is changed
