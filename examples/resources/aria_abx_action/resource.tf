@@ -23,10 +23,19 @@ resource "aria_abx_action" "hello_world" {
   memory_in_mb = 128
   entrypoint   = "handler"
   dependencies = []
+
   constants = [
     aria_abx_constant.hello_message.id,
     aria_abx_sensitive_constant.some_secret.id
   ]
+
+  inputs = {
+    SomeString  = jsonencode("")
+    OtherString = jsonencode("foo")
+    SomeNumber  = jsonencode(42)
+    SomeComplex = jsonencode([1, 2, 3])
+  }
+
   secrets = []
 
   project_id = var.project_id
