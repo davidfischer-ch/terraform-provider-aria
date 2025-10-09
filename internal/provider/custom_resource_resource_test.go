@@ -42,6 +42,7 @@ resource "aria_abx_action" "create" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -57,6 +58,7 @@ resource "aria_abx_action" "read" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -72,6 +74,7 @@ resource "aria_abx_action" "update" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -87,6 +90,7 @@ resource "aria_abx_action" "delete" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -102,6 +106,7 @@ resource "aria_abx_action" "reset" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -117,6 +122,7 @@ resource "aria_abx_action" "snapshot" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -132,6 +138,7 @@ resource "aria_abx_action" "restore" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -288,6 +295,7 @@ resource "aria_abx_action" "create" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -303,6 +311,7 @@ resource "aria_abx_action" "read" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -318,6 +327,7 @@ resource "aria_abx_action" "update" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -333,6 +343,7 @@ resource "aria_abx_action" "delete" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -479,6 +490,7 @@ resource "aria_abx_action" "create" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -494,6 +506,7 @@ resource "aria_abx_action" "read" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -509,6 +522,7 @@ resource "aria_abx_action" "update" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -524,6 +538,7 @@ resource "aria_abx_action" "delete" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -637,6 +652,7 @@ resource "aria_abx_action" "reset" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -670,6 +686,7 @@ resource "aria_abx_action" "snapshot" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -703,6 +720,7 @@ resource "aria_abx_action" "restore" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -781,6 +799,7 @@ resource "aria_abx_action" "create" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -796,6 +815,7 @@ resource "aria_abx_action" "read" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -811,6 +831,7 @@ resource "aria_abx_action" "update" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -826,6 +847,7 @@ resource "aria_abx_action" "delete" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -927,6 +949,7 @@ resource "aria_abx_action" "snapshot" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -960,6 +983,7 @@ resource "aria_abx_action" "restore" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -1038,6 +1062,7 @@ resource "aria_abx_action" "create" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -1053,6 +1078,7 @@ resource "aria_abx_action" "read" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -1068,6 +1094,7 @@ resource "aria_abx_action" "update" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -1083,6 +1110,7 @@ resource "aria_abx_action" "delete" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -1184,6 +1212,7 @@ resource "aria_abx_action" "snapshot" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -1217,6 +1246,7 @@ resource "aria_abx_action" "restore" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true

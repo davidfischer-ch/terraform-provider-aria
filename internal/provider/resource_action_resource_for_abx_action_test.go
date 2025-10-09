@@ -32,6 +32,7 @@ resource "aria_abx_action" "machine_test" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = <<EOT
 import os
@@ -104,6 +105,7 @@ resource "aria_abx_action" "machine_test" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = <<EOT
 import os
@@ -176,6 +178,7 @@ resource "aria_abx_action" "machine_test" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = <<EOT
 import os
@@ -248,6 +251,7 @@ resource "aria_abx_action" "machine_test" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = <<EOT
 import os
@@ -320,6 +324,7 @@ resource "aria_abx_action" "machine_test" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = <<EOT
 import os
@@ -406,6 +411,7 @@ resource "aria_abx_action" "machine_test" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = <<EOT
 import os
@@ -519,6 +525,7 @@ resource "aria_abx_action" "machine_test" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = <<EOT
 import os
@@ -613,6 +620,7 @@ resource "aria_abx_action" "machine_test" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = <<EOT
 import os
@@ -721,6 +729,7 @@ resource "aria_abx_action" "machine_test" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = <<EOT
 import os

@@ -50,6 +50,7 @@ resource "aria_abx_action" "redis_create" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -65,6 +66,7 @@ resource "aria_abx_action" "redis_read" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -80,6 +82,7 @@ resource "aria_abx_action" "redis_update" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -95,6 +98,7 @@ resource "aria_abx_action" "redis_delete" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -207,6 +211,7 @@ resource "aria_abx_action" "redis_backup" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = [aria_abx_constant.example.id]
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
@@ -240,6 +245,7 @@ resource "aria_abx_action" "redis_restore" {
   entrypoint      = "handler"
   dependencies    = []
   constants       = []
+  inputs          = {}
   secrets         = []
   source          = local.source
   shared          = true
