@@ -4,7 +4,6 @@
 package provider
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"testing"
@@ -99,7 +98,7 @@ func TestPropertyModel_Default_FromAPI(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			property := PropertyModel{}
-			diags := property.FromAPI(context.Background(), "p", PropertyAPIModel{
+			diags := property.FromAPI(t.Context(), "p", PropertyAPIModel{
 				Title:   "P",
 				Type:    tc.propertyType,
 				Default: tc.propertyRaw,
@@ -208,7 +207,7 @@ func TestPropertyModel_Default_ToAPI(t *testing.T) {
 				Type:    types.StringValue(tc.propertyType),
 				Default: tc.propertyInternal,
 			}
-			name, raw, diags := property.ToAPI(context.Background())
+			name, raw, diags := property.ToAPI(t.Context())
 			CheckDiagnostics(t, diags, tc.warningMessage, tc.errorMessage)
 			CheckDeepEqual(t, raw.Default, tc.propertyRaw)
 			CheckEqual(t, name, "p")
@@ -237,7 +236,7 @@ func TestPropertyModel_Default_ToAPI(t *testing.T) {
 
 func TestPropertyModel_OneOf_FromAPI(t *testing.T) {
 	property := PropertyModel{}
-	diags := property.FromAPI(context.Background(), "p", PropertyAPIModel{
+	diags := property.FromAPI(t.Context(), "p", PropertyAPIModel{
 		Title: "P",
 		Type:  "string",
 		OneOf: []PropertyOneOfAPIModel{
@@ -267,7 +266,7 @@ func TestPropertyModel_OneOf_FromAPI(t *testing.T) {
 
 func TestPropertyModel_OneOf_FromAPI_nil(t *testing.T) {
 	property := PropertyModel{}
-	diags := property.FromAPI(context.Background(), "p", PropertyAPIModel{
+	diags := property.FromAPI(t.Context(), "p", PropertyAPIModel{
 		Title: "P",
 		Type:  "string",
 	})
@@ -292,7 +291,7 @@ func TestPropertyModel_OneOf_ToAPI(t *testing.T) {
 			},
 		},
 	}
-	name, raw, diags := property.ToAPI(context.Background())
+	name, raw, diags := property.ToAPI(t.Context())
 	CheckDiagnostics(t, diags, "", "")
 	CheckDeepEqual(t, raw.OneOf[0], PropertyOneOfAPIModel{Const: "a", Title: "A"})
 	CheckDeepEqual(t, raw.OneOf[1], PropertyOneOfAPIModel{
@@ -309,7 +308,7 @@ func TestPropertyModel_OneOf_ToAPI_nil(t *testing.T) {
 		Title: types.StringValue("P"),
 		Type:  types.StringValue("string"),
 	}
-	_, raw, diags := property.ToAPI(context.Background())
+	_, raw, diags := property.ToAPI(t.Context())
 	CheckDiagnostics(t, diags, "", "")
 	CheckEqual(t, len(raw.OneOf), 0)
 }
