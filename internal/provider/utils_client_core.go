@@ -290,7 +290,7 @@ func (self AriaClient) LogAPIResponseInfo(
 		level = self.KOAPICallsLogLevel
 	}
 
-	self.Log(level, strings.Join([]string{
+	self.Log(level, "%s", strings.Join([]string{
 		"",
 		"Request Info:",
 		fmt.Sprintf("  URL         : %s", request.URL),
