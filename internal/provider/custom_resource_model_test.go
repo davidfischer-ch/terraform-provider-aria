@@ -4,7 +4,6 @@
 package provider
 
 import (
-	"context"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
@@ -69,7 +68,7 @@ func TestCustomResourceModelToAPI(t *testing.T) {
 		},
 		ProjectId: types.StringValue("175bed78-dd9e-4999-8669-cc62388e9abb"),
 	}
-	raw, diags := resource.ToAPI(context.Background())
+	raw, diags := resource.ToAPI(t.Context())
 	CheckDiagnostics(t, diags, "", "")
 
 	CheckEqual(t, raw.Id, "d4352b6a-84cd-4729-abbf-f3d83e53c46f")
@@ -187,7 +186,7 @@ func TestCustomResourceModelFromAPI(t *testing.T) {
 		OrgId:     "f57768e3-6710-4864-982b-68456c8ea29a",
 	}
 	resource := CustomResourceModel{}
-	diags := resource.FromAPI(context.Background(), raw)
+	diags := resource.FromAPI(t.Context(), raw)
 	CheckDiagnostics(t, diags, "", "")
 	CheckEqual(t, resource.Id.ValueString(), "d4352b6a-84cd-4729-abbf-f3d83e53c46f")
 	CheckEqual(t, resource.DisplayName.ValueString(), "My Custom Resource")

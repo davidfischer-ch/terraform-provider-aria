@@ -14,6 +14,7 @@ resource "aria_abx_action" "hello_world" {
   entrypoint   = "handler"
   dependencies = []
   constants    = []
+  inputs       = {}
   secrets      = []
 
   project_id = var.test_project_id
