@@ -18,7 +18,7 @@ func ComputedCustomNamingResourceTypeSchema() schema.StringAttribute {
 			"`SECURITY_GROUP`, `GENERIC`",
 		Computed: true,
 		PlanModifiers: []planmodifier.String{
-			stringplanmodifier.UseStateForUnknown(),
+			stringplanmodifier.UseNonNullStateForUnknown(),
 		},
 		Validators: []validator.String{
 			stringvalidator.OneOf([]string{

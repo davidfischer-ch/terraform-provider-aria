@@ -125,14 +125,14 @@ func ABXActionSchema() schema.Schema {
 				MarkdownDescription: "Flag indicating if the action is a system action",
 				Computed:            true,
 				PlanModifiers: []planmodifier.Bool{
-					boolplanmodifier.UseStateForUnknown(),
+					boolplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 			"async_deployed": schema.BoolAttribute{
 				MarkdownDescription: "TODO",
 				Computed:            true,
 				PlanModifiers: []planmodifier.Bool{
-					boolplanmodifier.UseStateForUnknown(),
+					boolplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 			"org_id": ComputedOrganizationIdSchema(),
@@ -143,7 +143,7 @@ func ABXActionSchema() schema.Schema {
 			/* "self_link": schema.StringAttribute{
 			    MarkdownDescription: "URL to the action",
 			    Computed:            true,
-			    PlanModifiers:       []planmodifier.String{stringplanmodifier.UseStateForUnknown()},
+			    PlanModifiers:       []planmodifier.String{stringplanmodifier.UseNonNullStateForUnknown()},
 			}, */
 		},
 	}

@@ -83,14 +83,14 @@ func PolicySchema() schema.Schema {
 				CustomType:          timetypes.RFC3339Type{},
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 			"created_by": schema.StringAttribute{
 				MarkdownDescription: "User who created the resource",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 			"last_updated_at": schema.StringAttribute{

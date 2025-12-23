@@ -36,7 +36,7 @@ func ResourceActionSchema() schema.Schema {
 				Optional:            true,
 				Default:             stringdefault.StaticString("xaas"),
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 			"resource_id": schema.StringAttribute{

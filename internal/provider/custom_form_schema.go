@@ -23,7 +23,7 @@ func CustomFormSchema() schema.Schema {
 				MarkdownDescription: "Form name",
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 			"type": schema.StringAttribute{
@@ -32,7 +32,7 @@ func CustomFormSchema() schema.Schema {
 				Optional:            true,
 				Default:             stringdefault.StaticString("requestForm"),
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.UseNonNullStateForUnknown(),
 				},
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{"requestForm"}...),
@@ -49,7 +49,7 @@ func CustomFormSchema() schema.Schema {
 				Computed: true,
 				Default:  stringdefault.StaticString("JSON"),
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 			"styles": schema.StringAttribute{
@@ -58,7 +58,7 @@ func CustomFormSchema() schema.Schema {
 				Optional:            true,
 				Default:             stringdefault.StaticString(""),
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 			"source_id": schema.StringAttribute{
@@ -74,7 +74,7 @@ func CustomFormSchema() schema.Schema {
 				Computed:            true,
 				Default:             stringdefault.StaticString("ON"),
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.UseNonNullStateForUnknown(),
 				},
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{"DRAFT", "ON", "RELEASED"}...),
@@ -84,7 +84,7 @@ func CustomFormSchema() schema.Schema {
 				MarkdownDescription: "TODO",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 		},
@@ -98,7 +98,7 @@ func NestedCustomFormSchema() schema.SingleNestedAttribute {
 		Computed:            true,
 		Optional:            true,
 		PlanModifiers: []planmodifier.Object{
-			objectplanmodifier.UseStateForUnknown(),
+			objectplanmodifier.UseNonNullStateForUnknown(),
 		},
 		Attributes: map[string]schema.Attribute{
 			"id": ComputedIdentifierSchema(""),
@@ -106,7 +106,7 @@ func NestedCustomFormSchema() schema.SingleNestedAttribute {
 				MarkdownDescription: "Form name",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 			"type": schema.StringAttribute{
@@ -114,7 +114,7 @@ func NestedCustomFormSchema() schema.SingleNestedAttribute {
 				Computed:            true,
 				Default:             stringdefault.StaticString("requestForm"),
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.UseNonNullStateForUnknown(),
 				},
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{"requestForm"}...),
@@ -126,7 +126,7 @@ func NestedCustomFormSchema() schema.SingleNestedAttribute {
 				Computed:            true,
 				Optional:            true,
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 			"form_format": schema.StringAttribute{
@@ -135,7 +135,7 @@ func NestedCustomFormSchema() schema.SingleNestedAttribute {
 				Computed: true,
 				Default:  stringdefault.StaticString("JSON"),
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 			"styles": schema.StringAttribute{
@@ -144,14 +144,14 @@ func NestedCustomFormSchema() schema.SingleNestedAttribute {
 				Optional:            true,
 				Default:             stringdefault.StaticString(""),
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 			"source_id": schema.StringAttribute{
 				MarkdownDescription: "Form source ientifier",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 			"source_type": schema.StringAttribute{
@@ -159,7 +159,7 @@ func NestedCustomFormSchema() schema.SingleNestedAttribute {
 				Computed:            true,
 				Default:             stringdefault.StaticString("resource.action"),
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 			"status": schema.StringAttribute{
@@ -167,7 +167,7 @@ func NestedCustomFormSchema() schema.SingleNestedAttribute {
 				Computed:            true,
 				Default:             stringdefault.StaticString("ON"),
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.UseNonNullStateForUnknown(),
 				},
 				Validators: []validator.String{
 					stringvalidator.OneOf([]string{"DRAFT", "ON", "RELEASED"}...),
@@ -177,7 +177,7 @@ func NestedCustomFormSchema() schema.SingleNestedAttribute {
 				MarkdownDescription: "TODO",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 		},

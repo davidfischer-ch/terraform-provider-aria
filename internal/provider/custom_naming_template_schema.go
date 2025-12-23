@@ -31,7 +31,7 @@ func CustomNamingTemplateSchema() schema.NestedAttributeObject {
 					" inferred by the provider)",
 				Computed: true,
 				PlanModifiers: []planmodifier.Bool{
-					boolplanmodifier.UseStateForUnknown(),
+					boolplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 			"unique_name": schema.BoolAttribute{
@@ -52,7 +52,7 @@ func CustomNamingTemplateSchema() schema.NestedAttributeObject {
 				Optional:            true,
 				Default:             int32default.StaticInt32(1),
 				PlanModifiers: []planmodifier.Int32{
-					int32planmodifier.UseStateForUnknown(),
+					int32planmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 			"increment_step": schema.Int32Attribute{
@@ -61,7 +61,7 @@ func CustomNamingTemplateSchema() schema.NestedAttributeObject {
 				Optional:            true,
 				Default:             int32default.StaticInt32(1),
 				PlanModifiers: []planmodifier.Int32{
-					int32planmodifier.UseStateForUnknown(),
+					int32planmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 			"counters": schema.ListNestedAttribute{
