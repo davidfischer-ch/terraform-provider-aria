@@ -20,7 +20,7 @@ func ComputedIdentifierSchema(description string) schema.StringAttribute {
 		MarkdownDescription: description,
 		Computed:            true,
 		PlanModifiers: []planmodifier.String{
-			stringplanmodifier.UseStateForUnknown(),
+			stringplanmodifier.UseNonNullStateForUnknown(),
 		},
 	}
 }
@@ -92,7 +92,7 @@ func ComputedOrganizationIdSchema() schema.StringAttribute {
 		MarkdownDescription: "Organization identifier",
 		Computed:            true,
 		PlanModifiers: []planmodifier.String{
-			stringplanmodifier.UseStateForUnknown(),
+			stringplanmodifier.UseNonNullStateForUnknown(),
 		},
 	}
 }
@@ -109,7 +109,7 @@ func OptionalImmutableProjectIdSchema() schema.StringAttribute {
 		Default:  stringdefault.StaticString(""),
 		PlanModifiers: []planmodifier.String{
 			stringplanmodifier.RequiresReplace(),
-			stringplanmodifier.UseStateForUnknown(),
+			stringplanmodifier.UseNonNullStateForUnknown(),
 		},
 	}
 }

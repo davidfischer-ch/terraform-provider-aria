@@ -78,7 +78,7 @@ func SubscriptionSchema() schema.Schema {
 				MarkdownDescription: "TODO",
 				Computed:            true,
 				PlanModifiers: []planmodifier.Bool{
-					boolplanmodifier.UseStateForUnknown(),
+					boolplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 			"contextual": schema.BoolAttribute{
@@ -105,7 +105,7 @@ func SubscriptionSchema() schema.Schema {
 				MarkdownDescription: "TODO",
 				Computed:            true,
 				PlanModifiers: []planmodifier.Bool{
-					boolplanmodifier.UseStateForUnknown(),
+					boolplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 			"timeout": schema.Int64Attribute{
@@ -121,7 +121,7 @@ func SubscriptionSchema() schema.Schema {
 				MarkdownDescription: "Subscriber identifier",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 		},
