@@ -3,7 +3,7 @@ module github.com/davidfischer-ch/terraform-provider-aria
 go 1.24.0
 
 require (
-	github.com/go-resty/resty/v2 v2.16.5
+	github.com/go-resty/resty/v2 v2.17.1
 	github.com/google/uuid v1.6.0
 	github.com/hashicorp/terraform-plugin-docs v0.24.0
 	github.com/hashicorp/terraform-plugin-framework v1.17.0
