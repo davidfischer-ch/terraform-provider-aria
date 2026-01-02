@@ -23,7 +23,7 @@ func CustomNamingTemplateCounterSchema() schema.NestedAttributeObject {
 				MarkdownDescription: "TODO",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
-					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 		},

@@ -24,7 +24,7 @@ func CustomNamingProjectFilterSchema() schema.NestedAttributeObject {
 				Required:            true,
 				PlanModifiers: []planmodifier.Bool{
 					boolplanmodifier.RequiresReplace(),
-					boolplanmodifier.UseStateForUnknown(),
+					boolplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 			"org_id": schema.StringAttribute{
@@ -32,7 +32,7 @@ func CustomNamingProjectFilterSchema() schema.NestedAttributeObject {
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
-					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 			"project_id": schema.StringAttribute{
@@ -40,7 +40,7 @@ func CustomNamingProjectFilterSchema() schema.NestedAttributeObject {
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
-					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 			"project_name": schema.StringAttribute{
@@ -48,7 +48,7 @@ func CustomNamingProjectFilterSchema() schema.NestedAttributeObject {
 				Required:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
-					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 		},
