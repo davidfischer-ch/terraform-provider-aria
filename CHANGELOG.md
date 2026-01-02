@@ -1,6 +1,6 @@
 # Changelog
 
-## Release v0.7.1 (2026-01-2)
+## Release v0.7.1 (2026-01-02)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.7.0...v0.7.1
 
