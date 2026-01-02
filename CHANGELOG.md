@@ -1,5 +1,16 @@
 # Changelog
 
+## Release v0.7.1 (2026-01-2)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.7.0...v0.7.1
+
+### Fix and enhancements
+
+* Merge dependabot dependencies update requests
+* Replace `UseStateForUnknown` by `UseNonNullStateForUnknown` (see [Terraform Plugin Framework release note for v1.17.0](https://github.com/hashicorp/terraform-plugin-framework/releases/tag/v1.17.0))
+* Add `inputs` attribute to `aria_abx_action` in example code (documentation)
+* Fix linter issues
+
 ## Release v0.7.0 (2025-09-10)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.19...v0.7.0
