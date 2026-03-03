@@ -148,6 +148,31 @@ func (self AriaClient) CreateIt(
 	return response, diags
 }
 
+func (self AriaClient) UpdateIt(
+	instance Model,
+	instanceRaw APIModel,
+	body any,
+	method string,
+	statusCodes ...int,
+) (*resty.Response, diag.Diagnostics) {
+	diags := diag.Diagnostics{}
+
+	// Default status codes
+	if len(statusCodes) == 0 {
+		statusCodes = []int{200}
+	}
+
+	path := instance.UpdatePath()
+	response, err := self.R(path).SetBody(body).SetResult(&instanceRaw).Execute(method, path)
+	err = self.HandleAPIResponse(response, err, statusCodes)
+	if err != nil {
+		diags.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to update %s, got error: %s", instance.String(), err))
+	}
+	return response, diags
+}
+
 func (self AriaClient) ReadIt(
 	instance Model,
 	instanceRaw APIModel,

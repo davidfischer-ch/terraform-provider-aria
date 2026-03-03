@@ -128,16 +128,9 @@ func (self *PolicyResource) Update(
 	}
 
 	var policyFromAPI PolicyAPIModel
-	path := policy.UpdatePath()
-	response, err := self.client.R(path).
-		SetBody(policyToAPI).
-		SetResult(&policyFromAPI).
-		Post(path)
-	err = self.client.HandleAPIResponse(response, err, []int{201})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to update %s, got error: %s", policy.String(), err))
+	_, updateDiags := self.client.UpdateIt(&policy, &policyFromAPI, policyToAPI, "POST", 201)
+	resp.Diagnostics.Append(updateDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 

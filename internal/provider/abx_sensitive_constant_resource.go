@@ -114,14 +114,9 @@ func (self *ABXSensitiveConstantResource) Update(
 	}
 
 	var constantFromAPI ABXSensitiveConstantAPIModel
-	path := constant.UpdatePath()
-	body := constant.ToAPI()
-	response, err := self.client.R(path).SetBody(body).SetResult(&constantFromAPI).Put(path)
-	err = self.client.HandleAPIResponse(response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to update %s, got error: %s", constant.String(), err))
+	_, updateDiags := self.client.UpdateIt(&constant, &constantFromAPI, constant.ToAPI(), "PUT")
+	resp.Diagnostics.Append(updateDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 

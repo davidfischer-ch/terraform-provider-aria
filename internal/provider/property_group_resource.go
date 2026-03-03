@@ -128,16 +128,9 @@ func (self *PropertyGroupResource) Update(
 	}
 
 	var propertyGroupFromAPI PropertyGroupAPIModel
-	path := propertyGroup.UpdatePath()
-	response, err := self.client.R(path).
-		SetBody(propertyGroupToAPI).
-		SetResult(&propertyGroupFromAPI).
-		Put(path)
-	err = self.client.HandleAPIResponse(response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to update %s, got error: %s", propertyGroup.String(), err))
+	_, updateDiags := self.client.UpdateIt(&propertyGroup, &propertyGroupFromAPI, propertyGroupToAPI, "PUT")
+	resp.Diagnostics.Append(updateDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 

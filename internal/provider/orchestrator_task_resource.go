@@ -128,13 +128,9 @@ func (self *OrchestratorTaskResource) Update(
 	}
 
 	var taskFromAPI OrchestratorTaskAPIModel
-	path := task.UpdatePath()
-	response, err := self.client.R(path).SetBody(taskToAPI).SetResult(&taskFromAPI).Post(path)
-	err = self.client.HandleAPIResponse(response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to update %s, got error: %s", task.String(), err))
+	_, updateDiags := self.client.UpdateIt(&task, &taskFromAPI, taskToAPI, "POST")
+	resp.Diagnostics.Append(updateDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
