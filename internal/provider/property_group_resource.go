@@ -68,16 +68,9 @@ func (self *PropertyGroupResource) Create(
 	}
 
 	var propertyGroupFromAPI PropertyGroupAPIModel
-	path := propertyGroup.CreatePath()
-	response, err := self.client.R(path).
-		SetBody(propertyGroupToAPI).
-		SetResult(&propertyGroupFromAPI).
-		Post(path)
-	err = self.client.HandleAPIResponse(response, err, []int{201})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to create %s, got error: %s", propertyGroup.String(), err))
+	_, createDiags := self.client.CreateIt(&propertyGroup, &propertyGroupFromAPI, propertyGroupToAPI)
+	resp.Diagnostics.Append(createDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 

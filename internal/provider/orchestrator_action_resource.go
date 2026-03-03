@@ -68,17 +68,11 @@ func (self *OrchestratorActionResource) Create(
 	}
 
 	var actionFromAPI OrchestratorActionAPIModel
-	path := action.CreatePath()
-
 	self.client.Mutex.Lock(ctx, action.LockKey())
-	response, err := self.client.R(path).SetBody(actionToAPI).SetResult(&actionFromAPI).Post(path)
+	_, createDiags := self.client.CreateIt(&action, &actionFromAPI, actionToAPI)
 	self.client.Mutex.Unlock(ctx, action.LockKey())
-
-	err = self.client.HandleAPIResponse(response, err, []int{201})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to create %s, got error: %s", action.String(), err))
+	resp.Diagnostics.Append(createDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 

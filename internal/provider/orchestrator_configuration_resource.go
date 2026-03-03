@@ -68,16 +68,9 @@ func (self *OrchestratorConfigurationResource) Create(
 	}
 
 	var configurationFromAPI OrchestratorConfigurationAPIModel
-	path := configuration.CreatePath()
-	response, err := self.client.R(path).
-		SetBody(configurationToAPI).
-		SetResult(&configurationFromAPI).
-		Post(path)
-	err = self.client.HandleAPIResponse(response, err, []int{201})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to create %s, got error: %s", configuration.String(), err))
+	response, createDiags := self.client.CreateIt(&configuration, &configurationFromAPI, configurationToAPI)
+	resp.Diagnostics.Append(createDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 

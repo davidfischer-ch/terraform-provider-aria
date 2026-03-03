@@ -60,14 +60,9 @@ func (self *ABXSensitiveConstantResource) Create(
 	}
 
 	var constantFromAPI ABXSensitiveConstantAPIModel
-	path := constant.CreatePath()
-	body := constant.ToAPI()
-	response, err := self.client.R(path).SetBody(body).SetResult(&constantFromAPI).Post(path)
-	err = self.client.HandleAPIResponse(response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to create ABX Sensitive Constant, got error: %s", err))
+	_, createDiags := self.client.CreateIt(&constant, &constantFromAPI, constant.ToAPI(), 200)
+	resp.Diagnostics.Append(createDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 

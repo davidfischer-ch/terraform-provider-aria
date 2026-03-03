@@ -68,16 +68,9 @@ func (self *CloudTemplateV1Resource) Create(
 	}
 
 	var templateFromAPI CloudTemplateV1APIModel
-	path := template.CreatePath()
-	response, err := self.client.R(path).
-		SetBody(templateToAPI).
-		SetResult(&templateFromAPI).
-		Post(path)
-	err = self.client.HandleAPIResponse(response, err, []int{201})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to create %s, got error: %s", template.String(), err))
+	_, createDiags := self.client.CreateIt(&template, &templateFromAPI, templateToAPI)
+	resp.Diagnostics.Append(createDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
@@ -85,8 +78,8 @@ func (self *CloudTemplateV1Resource) Create(
 	template.FromCreateAPI(templateFromAPI)
 
 	// Read (using API) to retrieve the projects & templates (and counters)
-	path = template.ReadPath()
-	response, err = self.client.R(path).SetResult(&templateFromAPI).Get(path)
+	path := template.ReadPath()
+	response, err := self.client.R(path).SetResult(&templateFromAPI).Get(path)
 	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(

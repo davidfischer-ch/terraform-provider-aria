@@ -68,16 +68,9 @@ func (self *PolicyResource) Create(
 	}
 
 	var policyFromAPI PolicyAPIModel
-	path := policy.CreatePath()
-	response, err := self.client.R(path).
-		SetBody(policyToAPI).
-		SetResult(&policyFromAPI).
-		Post(path)
-	err = self.client.HandleAPIResponse(response, err, []int{201})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to create %s, got error: %s", policy.String(), err))
+	_, createDiags := self.client.CreateIt(&policy, &policyFromAPI, policyToAPI)
+	resp.Diagnostics.Append(createDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 

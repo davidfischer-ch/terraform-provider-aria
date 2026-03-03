@@ -124,6 +124,30 @@ func (self AriaClient) R(path string) *resty.Request {
 	return self.Client.R()
 }
 
+func (self AriaClient) CreateIt(
+	instance Model,
+	instanceRaw APIModel,
+	body any,
+	statusCodes ...int,
+) (*resty.Response, diag.Diagnostics) {
+	diags := diag.Diagnostics{}
+
+	// Default status codes
+	if len(statusCodes) == 0 {
+		statusCodes = []int{201}
+	}
+
+	path := instance.CreatePath()
+	response, err := self.R(path).SetBody(body).SetResult(&instanceRaw).Post(path)
+	err = self.HandleAPIResponse(response, err, statusCodes)
+	if err != nil {
+		diags.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to create %s, got error: %s", instance.String(), err))
+	}
+	return response, diags
+}
+
 func (self AriaClient) ReadIt(
 	instance Model,
 	instanceRaw APIModel,
