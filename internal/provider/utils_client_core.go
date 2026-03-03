@@ -264,7 +264,7 @@ func (self AriaClient) DeleteIt(
 			if err != nil {
 				diags.AddError(
 					"Client error",
-					fmt.Sprintf("Unable to poll %s will deleting it, got error: %s", name, err))
+					fmt.Sprintf("Unable to poll %s while deleting it, got error: %s", name, err))
 				return diags
 			}
 

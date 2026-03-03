@@ -22,7 +22,7 @@ func (self AriaClient) Debug(message string, args ...any) {
 }
 
 func (self AriaClient) Info(message string, args ...any) {
-	tflog.Debug(self.Context, fmt.Sprintf(message, args...))
+	tflog.Info(self.Context, fmt.Sprintf(message, args...))
 }
 
 func (self AriaClient) Trace(message string, args ...any) {
