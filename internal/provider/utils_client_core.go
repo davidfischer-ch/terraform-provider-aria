@@ -310,6 +310,48 @@ func (self AriaClient) HandleAPIResponse(
 	return err
 }
 
+// Sensitive JSON keys whose values must be redacted in logs.
+var sensitiveJSONKeys = map[string]bool{
+	"refreshToken":      true,
+	"token":             true,
+	"systemCredentials": true,
+}
+
+// redactSensitiveKeys walks a JSON structure and replaces sensitive values with "<REDACTED>".
+func redactSensitiveKeys(data any) any {
+	switch v := data.(type) {
+	case map[string]any:
+		for key, val := range v {
+			if sensitiveJSONKeys[key] {
+				v[key] = "<REDACTED>"
+			} else {
+				v[key] = redactSensitiveKeys(val)
+			}
+		}
+		return v
+	case []any:
+		for i, val := range v {
+			v[i] = redactSensitiveKeys(val)
+		}
+		return v
+	default:
+		return data
+	}
+}
+
+func redactJSON(raw []byte) []byte {
+	var data any
+	if json.Unmarshal(raw, &data) != nil {
+		return raw
+	}
+	redactSensitiveKeys(data)
+	result, err := json.MarshalIndent(data, "", "\t")
+	if err != nil {
+		return raw
+	}
+	return result
+}
+
 func (self AriaClient) LogAPIResponseInfo(
 	response *resty.Response,
 	err error,
@@ -320,19 +362,13 @@ func (self AriaClient) LogAPIResponseInfo(
 	if requestBodyErr != nil {
 		requestBody = []byte("<body>")
 	}
+	requestBody = redactJSON(requestBody)
 
 	var responseBody []byte
 	if strings.Contains(request.URL, "icon/api/icons") && request.Method == "GET" {
 		responseBody = []byte("<THE ICON>")
 	} else {
-		var responseData any
-		responseBody = response.Body()
-		if json.Unmarshal(responseBody, &responseData) == nil {
-			body, bodyErr := json.MarshalIndent(responseData, "", "\t")
-			if bodyErr == nil {
-				responseBody = body
-			}
-		}
+		responseBody = redactJSON(response.Body())
 	}
 
 	level := self.OKAPICallsLogLevel
