@@ -69,13 +69,9 @@ func (self *CatalogSourceResource) Create(
 	}
 
 	var sourceFromAPI CatalogSourceAPIModel
-	path := source.CreatePath()
-	response, err := self.client.R(path).SetBody(sourceToAPI).SetResult(&sourceFromAPI).Post(path)
-	err = self.client.HandleAPIResponse(response, err, []int{201})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to create %s, got error: %s", source.String(), err))
+	_, createDiags := self.client.CreateIt(&source, &sourceFromAPI, sourceToAPI)
+	resp.Diagnostics.Append(createDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 

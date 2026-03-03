@@ -68,13 +68,9 @@ func (self *OrchestratorTaskResource) Create(
 	}
 
 	var taskFromAPI OrchestratorTaskAPIModel
-	path := task.CreatePath()
-	response, err := self.client.R(path).SetBody(taskToAPI).SetResult(&taskFromAPI).Post(path)
-	err = self.client.HandleAPIResponse(response, err, []int{202})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to create %s, got error: %s", task.String(), err))
+	_, createDiags := self.client.CreateIt(&task, &taskFromAPI, taskToAPI, 202)
+	resp.Diagnostics.Append(createDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 

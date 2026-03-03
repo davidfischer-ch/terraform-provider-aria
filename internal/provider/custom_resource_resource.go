@@ -68,16 +68,9 @@ func (self *CustomResourceResource) Create(
 	}
 
 	var resourceFromAPI CustomResourceAPIModel
-	path := resource.CreatePath()
-	response, err := self.client.R(path).
-		SetBody(resourceToAPI).
-		SetResult(&resourceFromAPI).
-		Post(path)
-	err = self.client.HandleAPIResponse(response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to create %s, got error: %s", resource.String(), err))
+	_, createDiags := self.client.CreateIt(&resource, &resourceFromAPI, resourceToAPI, 200)
+	resp.Diagnostics.Append(createDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 

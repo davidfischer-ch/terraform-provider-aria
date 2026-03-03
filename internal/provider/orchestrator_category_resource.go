@@ -62,16 +62,9 @@ func (self *OrchestratorCategoryResource) Create(
 	}
 
 	var categoryFromAPI OrchestratorCategoryAPIModel
-	path := category.CreatePath()
-	response, err := self.client.R(path).
-		SetBody(category.ToAPI()).
-		SetResult(&categoryFromAPI).
-		Post(path)
-	err = self.client.HandleAPIResponse(response, err, []int{201})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to create %s, got error: %s", category.String(), err))
+	_, createDiags := self.client.CreateIt(&category, &categoryFromAPI, category.ToAPI())
+	resp.Diagnostics.Append(createDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 

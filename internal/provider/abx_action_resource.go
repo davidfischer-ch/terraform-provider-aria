@@ -68,13 +68,9 @@ func (self *ABXActionResource) Create(
 	}
 
 	var actionFromAPI ABXActionAPIModel
-	path := action.CreatePath()
-	response, err := self.client.R(path).SetBody(actionToAPI).SetResult(&actionFromAPI).Post(path)
-	err = self.client.HandleAPIResponse(response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to create %s, got error: %s", action.String(), err))
+	_, createDiags := self.client.CreateIt(&action, &actionFromAPI, actionToAPI, 200)
+	resp.Diagnostics.Append(createDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
