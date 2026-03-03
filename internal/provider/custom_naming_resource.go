@@ -78,13 +78,9 @@ func (self *CustomNamingResource) Create(
 	naming.FromCreateAPI(namingFromAPI)
 
 	// Read (using API) to retrieve the projects & templates (and counters)
-	path := naming.ReadPath()
-	response, err := self.client.R(path).SetResult(&namingFromAPI).Get(path)
-	err = self.client.HandleAPIResponse(response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to read %s, got error: %s", naming.String(), err))
+	found, _, readDiags := self.client.ReadIt(&naming, &namingFromAPI)
+	resp.Diagnostics.Append(readDiags...)
+	if !found || resp.Diagnostics.HasError() {
 		return
 	}
 

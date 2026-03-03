@@ -73,13 +73,9 @@ func (self *CatalogItemIconResource) Create(
 
 	// Read (using API) to retrieve the item content (and not empty stuff)
 	var itemIconFromAPI CatalogItemIconAPIModel
-	path = itemIcon.ReadPath()
-	response, err = self.client.R(path).SetResult(&itemIconFromAPI).Get(path)
-	err = self.client.HandleAPIResponse(response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to read %s, got error: %s", itemIcon.String(), err))
+	found, _, readDiags := self.client.ReadIt(&itemIcon, &itemIconFromAPI)
+	resp.Diagnostics.Append(readDiags...)
+	if !found || resp.Diagnostics.HasError() {
 		return
 	}
 
@@ -142,13 +138,9 @@ func (self *CatalogItemIconResource) Update(
 
 	// Read (using API) to retrieve the item content (and not empty stuff)
 	var itemIconFromAPI CatalogItemIconAPIModel
-	path = itemIcon.ReadPath()
-	response, err = self.client.R(path).SetResult(&itemIconFromAPI).Get(path)
-	err = self.client.HandleAPIResponse(response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to read %s, got error: %s", itemIcon.String(), err))
+	found, _, readDiags := self.client.ReadIt(&itemIcon, &itemIconFromAPI)
+	resp.Diagnostics.Append(readDiags...)
+	if !found || resp.Diagnostics.HasError() {
 		return
 	}
 
