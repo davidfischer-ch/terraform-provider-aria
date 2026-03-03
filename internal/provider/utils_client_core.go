@@ -60,6 +60,7 @@ func (self *AriaClient) Init() diag.Diagnostics {
 
 	client := resty.New()
 	client.SetBaseURL(self.Host)
+	client.SetTimeout(300 * time.Second)
 	client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: self.Insecure})
 	if len(self.AccessToken) > 0 {
 		client.SetAuthToken(self.AccessToken)
