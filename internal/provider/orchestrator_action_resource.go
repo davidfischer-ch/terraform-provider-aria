@@ -147,16 +147,12 @@ func (self *OrchestratorActionResource) Update(
 
 	// Read (using API) to retrieve the action content (and not empty stuff)
 	var actionFromAPI OrchestratorActionAPIModel
-	path = action.ReadPath()
-	response, err = self.client.R(path).SetResult(&actionFromAPI).Get(path)
+	found, _, readDiags := self.client.ReadIt(&action, &actionFromAPI)
 
 	self.client.Mutex.Unlock(ctx, action.LockKey())
 
-	err = self.client.HandleAPIResponse(response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to read %s, got error: %s", action.String(), err))
+	resp.Diagnostics.Append(readDiags...)
+	if !found || resp.Diagnostics.HasError() {
 		return
 	}
 
