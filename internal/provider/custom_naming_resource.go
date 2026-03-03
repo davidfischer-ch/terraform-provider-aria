@@ -143,13 +143,9 @@ func (self *CustomNamingResource) Update(
 	}
 
 	var namingFromAPI CustomNamingAPIModel
-	path := naming.UpdatePath()
-	response, err := self.client.R(path).SetBody(namingToAPI).SetResult(&namingFromAPI).Put(path)
-	err = self.client.HandleAPIResponse(response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to update %s, got error: %s", naming.String(), err))
+	_, updateDiags := self.client.UpdateIt(&naming, &namingFromAPI, namingToAPI, "PUT")
+	resp.Diagnostics.Append(updateDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 

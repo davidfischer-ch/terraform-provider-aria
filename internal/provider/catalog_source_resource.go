@@ -134,13 +134,9 @@ func (self *CatalogSourceResource) Update(
 	}
 
 	var sourceFromAPI CatalogSourceAPIModel
-	path := source.UpdatePath()
-	response, err := self.client.R(path).SetBody(sourceToAPI).SetResult(&sourceFromAPI).Post(path)
-	err = self.client.HandleAPIResponse(response, err, []int{201})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to update %s, got error: %s", source.String(), err))
+	_, updateDiags := self.client.UpdateIt(&source, &sourceFromAPI, sourceToAPI, "POST", 201)
+	resp.Diagnostics.Append(updateDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 

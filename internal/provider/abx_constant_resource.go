@@ -115,20 +115,15 @@ func (self *ABXConstantResource) Update(
 		return
 	}
 
-	var contantFromAPI ABXConstantAPIModel
-	path := constant.UpdatePath()
-	body := constant.ToAPI()
-	response, err := self.client.R(path).SetBody(body).SetResult(&contantFromAPI).Put(path)
-	err = self.client.HandleAPIResponse(response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to update %s, got error: %s", constant.String(), err))
+	var constantFromAPI ABXConstantAPIModel
+	_, updateDiags := self.client.UpdateIt(&constant, &constantFromAPI, constant.ToAPI(), "PUT")
+	resp.Diagnostics.Append(updateDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Save constant into Terraform state
-	constant.FromAPI(contantFromAPI)
+	constant.FromAPI(constantFromAPI)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &constant)...)
 	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", constant.String()))
 }

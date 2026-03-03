@@ -155,19 +155,12 @@ func (self *CustomResourceResource) Update(
 
 	// Reset to prevent muxing of old/new data
 	resourceFromAPI = CustomResourceAPIModel{}
-	path := resource.UpdatePath()
-	response, err := self.client.R(path).
-		SetBody(resourceToAPI).
-		SetResult(&resourceFromAPI).
-		Post(path)
+	_, updateDiags := self.client.UpdateIt(&resource, &resourceFromAPI, resourceToAPI, "POST")
 
 	self.client.Mutex.Unlock(ctx, resource.LockKey())
 
-	err = self.client.HandleAPIResponse(response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to update %s, got error: %s", resource.String(), err))
+	resp.Diagnostics.Append(updateDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 

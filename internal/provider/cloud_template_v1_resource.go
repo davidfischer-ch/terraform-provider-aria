@@ -142,16 +142,9 @@ func (self *CloudTemplateV1Resource) Update(
 	}
 
 	var templateFromAPI CloudTemplateV1APIModel
-	path := template.UpdatePath()
-	response, err := self.client.R(path).
-		SetBody(templateToAPI).
-		SetResult(&templateFromAPI).
-		Put(path)
-	err = self.client.HandleAPIResponse(response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to update %s, got error: %s", template.String(), err))
+	_, updateDiags := self.client.UpdateIt(&template, &templateFromAPI, templateToAPI, "PUT")
+	resp.Diagnostics.Append(updateDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 

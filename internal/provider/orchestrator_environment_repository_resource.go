@@ -116,14 +116,9 @@ func (self *OrchestratorEnvironmentRepositoryResource) Update(
 	}
 
 	var repositoryFromAPI OrchestratorEnvironmentRepositoryAPIModel
-	path := repository.UpdatePath()
-	body := repository.ToAPI()
-	response, err := self.client.R(path).SetBody(body).SetResult(&repositoryFromAPI).Put(path)
-	err = self.client.HandleAPIResponse(response, err, []int{202})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to update %s, got error: %s", repository.String(), err))
+	_, updateDiags := self.client.UpdateIt(&repository, &repositoryFromAPI, repository.ToAPI(), "PUT", 202)
+	resp.Diagnostics.Append(updateDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 

@@ -128,13 +128,9 @@ func (self *ABXActionResource) Update(
 	}
 
 	var actionFromAPI ABXActionAPIModel
-	path := action.UpdatePath()
-	response, err := self.client.R(path).SetBody(actionToAPI).SetResult(&actionFromAPI).Put(path)
-	err = self.client.HandleAPIResponse(response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to update %s, got error: %s", action.String(), err))
+	_, updateDiags := self.client.UpdateIt(&action, &actionFromAPI, actionToAPI, "PUT")
+	resp.Diagnostics.Append(updateDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
