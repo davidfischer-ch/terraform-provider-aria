@@ -520,12 +520,12 @@ Disabled (2) - If a workflow run fails, it cannot be resumed.
 
 ### Optional
 
-- `allowed_operations` (String) TODO (default is "vef")
+- `allowed_operations` (String) Allowed operations as a string of flags: `v` (view), `e` (execute), `f` (inspect) (default `"vef"`)
 - `api_version` (String) Orchestrator API Version (default is "6.0.0").
 - `editor_version` (String) Orchestrator Editor Version (default is "2.0").
 - `force_delete` (Boolean) Force destroying the workflow (bypass references check, default is false).
-- `object_name` (String) TODO
-- `root_name` (String) TODO (default is "item0")
+- `object_name` (String) Internal object name for the workflow (default `"workflow:name=generic"`)
+- `root_name` (String) Name of the root workflow item (default `"item0"`)
 - `wait_imported` (Boolean) Wait for the workflow to be imported in the service broker (up to 15 minutes, checked every 30 seconds, default is true).
 
 The `integration` attribute is set if `wait_imported` is `true`, else `null`.
