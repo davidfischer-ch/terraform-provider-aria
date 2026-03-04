@@ -6,6 +6,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"net/url"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
@@ -163,7 +164,7 @@ func (self OrchestratorWorkflowModel) ReadContentPath() string {
 func (self OrchestratorWorkflowModel) ReadFormPath() string {
 	return fmt.Sprintf(
 		"vco/api/forms/?conditions=workflow=%s&designerMod=true",
-		self.Id.ValueString())
+		url.QueryEscape(self.Id.ValueString()))
 }
 
 func (self OrchestratorWorkflowModel) ReadVersionsPath() string {

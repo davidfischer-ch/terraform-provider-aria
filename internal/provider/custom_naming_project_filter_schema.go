@@ -16,7 +16,7 @@ func CustomNamingProjectFilterSchema() schema.NestedAttributeObject {
 		Attributes: map[string]schema.Attribute{
 			"id": ComputedIdentifierSchema(""),
 			"active": schema.BoolAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Whether this project filter is active",
 				Required:            true,
 			},
 			"org_default": schema.BoolAttribute{

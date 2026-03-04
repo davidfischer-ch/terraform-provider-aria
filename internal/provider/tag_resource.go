@@ -62,13 +62,9 @@ func (self *TagResource) Create(
 	}
 
 	var tagFromAPI TagAPIModel
-	path := tag.CreatePath()
-	response, err := self.client.R(path).SetBody(tag.ToAPI()).SetResult(&tagFromAPI).Post(path)
-	err = self.client.HandleAPIResponse(response, err, []int{201})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to create %s, got error: %s", tag.String(), err))
+	_, createDiags := self.client.CreateIt(&tag, &tagFromAPI, tag.ToAPI())
+	resp.Diagnostics.Append(createDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 

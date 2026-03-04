@@ -266,5 +266,5 @@ Read-Only:
 - `source_id` (String) Form source ientifier
 - `source_type` (String) Form source type
 - `status` (String) Resource status, one of DRAFT, ON, or RELEASED
-- `tenant` (String) TODO
+- `tenant` (String) Tenant identifier
 - `type` (String) Form type, requestForm

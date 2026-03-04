@@ -68,13 +68,9 @@ func (self *CustomNamingResource) Create(
 	}
 
 	var namingFromAPI CustomNamingAPIModel
-	path := naming.CreatePath()
-	response, err := self.client.R(path).SetBody(namingToAPI).SetResult(&namingFromAPI).Post(path)
-	err = self.client.HandleAPIResponse(response, err, []int{201})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to create %s, got error: %s", naming.String(), err))
+	_, createDiags := self.client.CreateIt(&naming, &namingFromAPI, namingToAPI)
+	resp.Diagnostics.Append(createDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
@@ -82,13 +78,9 @@ func (self *CustomNamingResource) Create(
 	naming.FromCreateAPI(namingFromAPI)
 
 	// Read (using API) to retrieve the projects & templates (and counters)
-	path = naming.ReadPath()
-	response, err = self.client.R(path).SetResult(&namingFromAPI).Get(path)
-	err = self.client.HandleAPIResponse(response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to read %s, got error: %s", naming.String(), err))
+	found, _, readDiags := self.client.ReadIt(&naming, &namingFromAPI)
+	resp.Diagnostics.Append(readDiags...)
+	if !found || resp.Diagnostics.HasError() {
 		return
 	}
 
@@ -147,13 +139,9 @@ func (self *CustomNamingResource) Update(
 	}
 
 	var namingFromAPI CustomNamingAPIModel
-	path := naming.UpdatePath()
-	response, err := self.client.R(path).SetBody(namingToAPI).SetResult(&namingFromAPI).Put(path)
-	err = self.client.HandleAPIResponse(response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to update %s, got error: %s", naming.String(), err))
+	_, updateDiags := self.client.UpdateIt(&naming, &namingFromAPI, namingToAPI, "PUT")
+	resp.Diagnostics.Append(updateDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
