@@ -70,33 +70,33 @@ resource "aria_subscription" "hello_world" {
 
 ### Required
 
-- `blocking` (Boolean) TODO
-- `contextual` (Boolean) TODO
+- `blocking` (Boolean) Whether the subscription blocks the event pipeline until completion
+- `contextual` (Boolean) Whether the subscription is contextual (scoped to a specific resource)
 - `description` (String) Describe the resource in few sentences
 - `event_topic_id` (String) Event topic identifier (force recreation on change)
 - `name` (String) Subscription name
-- `priority` (Number) TODO
+- `priority` (Number) Subscription priority (lower value means higher priority)
 - `project_ids` (Set of String) Restrict to given projects (an empty list means all)
 - `runnable_id` (String) Runnable identifier
 - `runnable_type` (String) Runnable type, either `extensibility.abx` or `extensibility.vro`
-- `timeout` (Number) TODO
+- `timeout` (Number) Timeout in seconds for the subscription handler execution
 - `type` (String) Subscription type, either `RUNNABLE` or `SUBSCRIBABLE`
 
 ### Optional
 
-- `criteria` (String) TODO
-- `disabled` (Boolean) TODO
+- `criteria` (String) Event filter criteria expression
+- `disabled` (Boolean) Whether the subscription is disabled (default `false`)
 - `recover_runnable_id` (String) Recovery runnable identifier
 - `recover_runnable_type` (String) Recovery runnable type, either `extensibility.abx` or `extensibility.vro`
 
 ### Read-Only
 
-- `broadcast` (Boolean) TODO
+- `broadcast` (Boolean) Whether the event is broadcast to all subscribers
 - `id` (String) Identifier
 - `org_id` (String) Organization identifier
 - `owner_id` (String) Owner identifier
 - `subscriber_id` (String) Subscriber identifier
-- `system` (Boolean) TODO
+- `system` (Boolean) Whether this is a system-managed subscription
 
 ## Import
 

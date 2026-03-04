@@ -122,7 +122,7 @@ Inspired by https://discuss.hashicorp.com/t/terraform-framework-optional-inside-
 
 Required:
 
-- `active` (Boolean) TODO
+- `active` (Boolean) Whether this project filter is active
 - `org_default` (Boolean) Default for the organization? (force recreation on change)
 - `org_id` (String) Organization identifier (force recreation on change)
 - `project_id` (String) Projects identifier pattern (e.g. *) (force recreation on change)
@@ -139,16 +139,16 @@ Read-Only:
 Required:
 
 - `name` (String) Template name (valid for types that supports named templates)
-- `pattern` (String) TODO
+- `pattern` (String) Naming pattern including dynamic parts (e.g. `${resource.name}`)
 - `resource_type` (String) Resource type, one of `COMPUTE`, `COMPUTE_STORAGE`, `NETWORK`, `LOAD_BALANCER`, `RESOURCE_GROUP`, `GATEWAY`, `NAT`, `SECURITY_GROUP`, `GENERIC`
 - `resource_type_name` (String) Resource type name (e.g. Machine)
-- `static_pattern` (String) TODO
-- `unique_name` (Boolean) TODO
+- `static_pattern` (String) Static portion of the naming pattern (without dynamic parts)
+- `unique_name` (Boolean) Whether generated names must be unique
 
 Optional:
 
-- `increment_step` (Number) TODO
-- `start_counter` (Number) TODO
+- `increment_step` (Number) Counter increment step (default `1`)
+- `start_counter` (Number) Initial counter value (default `1`)
 
 Read-Only:
 
@@ -163,7 +163,7 @@ Read-Only:
 
 - `current_counter` (Number) Current counter value
 - `id` (String) Identifier
-- `project_id` (String) TODO
+- `project_id` (String) Project identifier associated with this counter
 - `resource_type` (String) Resource type, one of `COMPUTE`, `COMPUTE_STORAGE`, `NETWORK`, `LOAD_BALANCER`, `RESOURCE_GROUP`, `GATEWAY`, `NAT`, `SECURITY_GROUP`, `GENERIC`
 
 ## Import
