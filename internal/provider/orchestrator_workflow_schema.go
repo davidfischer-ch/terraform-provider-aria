@@ -37,9 +37,9 @@ func OrchestratorWorkflowSchema() schema.Schema {
 			"allowed_operations": schema.StringAttribute{
 				MarkdownDescription: "Allowed operations as a string of flags: " +
 					"`v` (view), `e` (execute), `f` (inspect) (default `\"vef\"`)",
-				Computed:            true,
-				Optional:            true,
-				Default:             stringdefault.StaticString("vef"),
+				Computed: true,
+				Optional: true,
+				Default:  stringdefault.StaticString("vef"),
 			},
 			"attrib": schema.StringAttribute{
 				MarkdownDescription: "Workflow attributes",
@@ -49,9 +49,9 @@ func OrchestratorWorkflowSchema() schema.Schema {
 			"object_name": schema.StringAttribute{
 				MarkdownDescription: "Internal object name for the workflow " +
 					"(default `\"workflow:name=generic\"`)",
-				Computed:            true,
-				Optional:            true,
-				Default:             stringdefault.StaticString("workflow:name=generic"),
+				Computed: true,
+				Optional: true,
+				Default:  stringdefault.StaticString("workflow:name=generic"),
 			},
 			"position": PositionSchema(),
 			"presentation": schema.StringAttribute{
