@@ -65,8 +65,8 @@ func (self *ResourceActionResource) Create(
 	}
 
 	self.client.Mutex.Lock(ctx, action.LockKey())
+	defer self.client.Mutex.Unlock(ctx, action.LockKey())
 	actionFromAPI, diags := self.ManageIt(ctx, &action, "create")
-	self.client.Mutex.Unlock(ctx, action.LockKey())
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -92,8 +92,8 @@ func (self *ResourceActionResource) Read(
 
 	var actionFromAPI ResourceActionAPIModel
 	self.client.Mutex.RLock(ctx, action.LockKey())
+	defer self.client.Mutex.RUnlock(ctx, action.LockKey())
 	found, _, diags := self.client.ReadIt(&action, &actionFromAPI)
-	self.client.Mutex.RUnlock(ctx, action.LockKey())
 	resp.Diagnostics.Append(diags...)
 	if !found {
 		resp.State.RemoveResource(ctx)
@@ -122,8 +122,8 @@ func (self *ResourceActionResource) Update(
 	}
 
 	self.client.Mutex.Lock(ctx, action.LockKey())
+	defer self.client.Mutex.Unlock(ctx, action.LockKey())
 	actionFromAPI, diags := self.ManageIt(ctx, &action, "update")
-	self.client.Mutex.Unlock(ctx, action.LockKey())
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -148,8 +148,8 @@ func (self *ResourceActionResource) Delete(
 	}
 
 	self.client.Mutex.Lock(ctx, action.LockKey())
+	defer self.client.Mutex.Unlock(ctx, action.LockKey())
 	_, diags := self.ManageIt(ctx, &action, "delete")
-	self.client.Mutex.Unlock(ctx, action.LockKey())
 	resp.Diagnostics.Append(diags...)
 }
 

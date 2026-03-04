@@ -94,8 +94,8 @@ func (self *CustomResourceResource) Read(
 
 	var resourceFromAPI CustomResourceAPIModel
 	self.client.Mutex.RLock(ctx, resource.LockKey())
+	defer self.client.Mutex.RUnlock(ctx, resource.LockKey())
 	found, _, diags := self.client.ReadIt(&resource, &resourceFromAPI)
-	self.client.Mutex.RUnlock(ctx, resource.LockKey())
 	resp.Diagnostics.Append(diags...)
 
 	if !found {
@@ -131,6 +131,7 @@ func (self *CustomResourceResource) Update(
 	}
 
 	self.client.Mutex.Lock(ctx, resource.LockKey())
+	defer self.client.Mutex.Unlock(ctx, resource.LockKey())
 
 	// Read resource to retrieve latest value for additional actions
 	var resourceFromAPI CustomResourceAPIModel
@@ -145,8 +146,6 @@ func (self *CustomResourceResource) Update(
 					"Unable to update %s: Not found.",
 					resource.String()))
 		}
-
-		self.client.Mutex.Unlock(ctx, resource.LockKey())
 		return
 	}
 
@@ -156,8 +155,6 @@ func (self *CustomResourceResource) Update(
 	// Reset to prevent muxing of old/new data
 	resourceFromAPI = CustomResourceAPIModel{}
 	_, updateDiags := self.client.UpdateIt(&resource, &resourceFromAPI, resourceToAPI, "POST")
-
-	self.client.Mutex.Unlock(ctx, resource.LockKey())
 
 	resp.Diagnostics.Append(updateDiags...)
 	if resp.Diagnostics.HasError() {
@@ -180,8 +177,8 @@ func (self *CustomResourceResource) Delete(
 	resp.Diagnostics.Append(req.State.Get(ctx, &resource)...)
 	if !resp.Diagnostics.HasError() {
 		self.client.Mutex.Lock(ctx, resource.LockKey())
+		defer self.client.Mutex.Unlock(ctx, resource.LockKey())
 		resp.Diagnostics.Append(self.client.DeleteIt(&resource)...)
-		self.client.Mutex.Unlock(ctx, resource.LockKey())
 	}
 }
 
