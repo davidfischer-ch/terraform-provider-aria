@@ -200,6 +200,13 @@ func (self AriaClient) ReadIt(
 	}
 
 	response, err := self.R(path).SetResult(&instanceRaw).Get(path)
+	if err != nil {
+		diags.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to read %s, got error: %s", instance.String(), err))
+		return false, response, diags
+	}
+
 	if response.StatusCode() == 404 {
 		self.Debug("%s not found", instance.String())
 		return false, response, diags
@@ -238,7 +245,7 @@ func (self AriaClient) DeleteIt(
 		if err != nil {
 			// This is potentially an error that will be solved by the deletion of other resources.
 			// We can retry the delete operation after some time to converge to desired state.
-			if attempt < conflictMaxAttempts && response.StatusCode() == 409 {
+			if attempt < conflictMaxAttempts && response != nil && response.StatusCode() == 409 {
 				time.Sleep(time.Duration(3) * time.Second) // TODO better with randomness?
 				continue
 			}
@@ -357,6 +364,10 @@ func (self AriaClient) LogAPIResponseInfo(
 	err error,
 	statusCodesText string,
 ) {
+	if response == nil {
+		self.Error("API call failed (no response): %s", err)
+		return
+	}
 	request := response.Request
 	requestBody, requestBodyErr := json.MarshalIndent(request.Body, "", "\t")
 	if requestBodyErr != nil {
