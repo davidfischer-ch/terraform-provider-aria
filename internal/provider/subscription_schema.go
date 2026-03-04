@@ -71,45 +71,45 @@ func SubscriptionSchema() schema.Schema {
 				Required:            true,
 			},
 			"blocking": schema.BoolAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Whether the subscription blocks the event pipeline until completion",
 				Required:            true,
 			},
 			"broadcast": schema.BoolAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Whether the event is broadcast to all subscribers",
 				Computed:            true,
 				PlanModifiers: []planmodifier.Bool{
 					boolplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 			"contextual": schema.BoolAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Whether the subscription is contextual (scoped to a specific resource)",
 				Required:            true,
 			},
 			"criteria": schema.StringAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Event filter criteria expression",
 				Computed:            true,
 				Optional:            true,
 				Default:             stringdefault.StaticString(""),
 			},
 			"disabled": schema.BoolAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Whether the subscription is disabled (default `false`)",
 				Computed:            true,
 				Optional:            true,
 				Default:             booldefault.StaticBool(false),
 			},
 			"priority": schema.Int64Attribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Subscription priority (lower value means higher priority)",
 				Required:            true,
 			},
 			"system": schema.BoolAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Whether this is a system-managed subscription",
 				Computed:            true,
 				PlanModifiers: []planmodifier.Bool{
 					boolplanmodifier.UseNonNullStateForUnknown(),
 				},
 			},
 			"timeout": schema.Int64Attribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Timeout in seconds for the subscription handler execution",
 				Required:            true,
 			},
 			"org_id": ComputedOrganizationIdSchema(),

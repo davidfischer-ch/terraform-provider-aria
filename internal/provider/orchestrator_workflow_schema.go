@@ -35,7 +35,8 @@ func OrchestratorWorkflowSchema() schema.Schema {
 				Computed:            true,
 			},
 			"allowed_operations": schema.StringAttribute{
-				MarkdownDescription: "TODO (default is \"vef\")",
+				MarkdownDescription: "Allowed operations as a string of flags: " +
+					"`v` (view), `e` (execute), `f` (inspect) (default `\"vef\"`)",
 				Computed:            true,
 				Optional:            true,
 				Default:             stringdefault.StaticString("vef"),
@@ -46,7 +47,8 @@ func OrchestratorWorkflowSchema() schema.Schema {
 				Required:            true,
 			},
 			"object_name": schema.StringAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Internal object name for the workflow " +
+					"(default `\"workflow:name=generic\"`)",
 				Computed:            true,
 				Optional:            true,
 				Default:             stringdefault.StaticString("workflow:name=generic"),
@@ -82,7 +84,7 @@ func OrchestratorWorkflowSchema() schema.Schema {
 				},*/
 			},
 			"root_name": schema.StringAttribute{
-				MarkdownDescription: "TODO (default is \"item0\")",
+				MarkdownDescription: "Name of the root workflow item (default `\"item0\"`)",
 				Computed:            true,
 				Optional:            true,
 				Default:             stringdefault.StaticString("item0"),
