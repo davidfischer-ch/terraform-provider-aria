@@ -33,7 +33,7 @@ func SecretDataSourceSchema() schema.Schema {
 				Computed:            true,
 			},
 			"created_by": schema.StringAttribute{
-				MarkdownDescription: "Ask VMware",
+				MarkdownDescription: "User who performed this action",
 				Computed:            true,
 			},
 			"updated_at": schema.StringAttribute{
@@ -41,7 +41,7 @@ func SecretDataSourceSchema() schema.Schema {
 				Computed:            true,
 			},
 			"updated_by": schema.StringAttribute{
-				MarkdownDescription: "Ask VMware",
+				MarkdownDescription: "User who performed this action",
 				Computed:            true,
 			},
 		},
