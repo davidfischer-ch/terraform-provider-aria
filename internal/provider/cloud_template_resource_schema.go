@@ -27,7 +27,7 @@ func CloudTemplateResourceSchema() schema.NestedAttributeObject {
 				Required: true,
 			},*/
 			"allocate_per_instance": schema.BoolAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Whether to allocate resources per instance",
 				Optional:            true,
 			},
 		},
