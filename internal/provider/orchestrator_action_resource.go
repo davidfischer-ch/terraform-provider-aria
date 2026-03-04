@@ -69,8 +69,8 @@ func (self *OrchestratorActionResource) Create(
 
 	var actionFromAPI OrchestratorActionAPIModel
 	self.client.Mutex.Lock(ctx, action.LockKey())
+	defer self.client.Mutex.Unlock(ctx, action.LockKey())
 	_, createDiags := self.client.CreateIt(&action, &actionFromAPI, actionToAPI)
-	self.client.Mutex.Unlock(ctx, action.LockKey())
 	resp.Diagnostics.Append(createDiags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -96,8 +96,8 @@ func (self *OrchestratorActionResource) Read(
 
 	var actionFromAPI OrchestratorActionAPIModel
 	self.client.Mutex.RLock(ctx, action.LockKey())
+	defer self.client.Mutex.RUnlock(ctx, action.LockKey())
 	found, _, readDiags := self.client.ReadIt(&action, &actionFromAPI)
-	self.client.Mutex.RUnlock(ctx, action.LockKey())
 
 	resp.Diagnostics.Append(readDiags...)
 	if !found {
@@ -133,12 +133,12 @@ func (self *OrchestratorActionResource) Update(
 	}
 
 	self.client.Mutex.Lock(ctx, action.LockKey())
+	defer self.client.Mutex.Unlock(ctx, action.LockKey())
 
 	path := action.UpdatePath()
 	response, err := self.client.R(path).SetBody(actionToAPI).Put(path)
 	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
-		self.client.Mutex.Unlock(ctx, action.LockKey())
 		resp.Diagnostics.AddError(
 			"Client error",
 			fmt.Sprintf("Unable to update %s, got error: %s", action.String(), err))
@@ -148,8 +148,6 @@ func (self *OrchestratorActionResource) Update(
 	// Read (using API) to retrieve the action content (and not empty stuff)
 	var actionFromAPI OrchestratorActionAPIModel
 	found, _, readDiags := self.client.ReadIt(&action, &actionFromAPI)
-
-	self.client.Mutex.Unlock(ctx, action.LockKey())
 
 	resp.Diagnostics.Append(readDiags...)
 	if !found || resp.Diagnostics.HasError() {
