@@ -456,5 +456,6 @@ func (self AriaClient) GetVersionFromPath(path string) string {
 	if strings.HasPrefix(path, "vro") {
 		return ORCHESTRATOR_GATEWAY_API_VERSION
 	}
+	// Panic is intentional: this is a programming bug, not a runtime error.
 	panic(fmt.Sprintf("GetVersionFromPath Not Implemented for path %s", path))
 }
