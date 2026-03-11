@@ -84,9 +84,9 @@ func (r *CleanupRunner) applyCleanups(entries []cleanupEntry) {
 }
 
 // vROCleanupsByPrefix lists a vRO resource collection and returns entries whose nameField
-// attribute starts with prefix.
+// attribute starts with TestPrefix.
 func (r *CleanupRunner) vROCleanupsByPrefix(
-	listPath, label, nameField, prefix string,
+	listPath, label, nameField string,
 ) []cleanupEntry {
 	var raw vROLinksAPIModel
 	resp, err := r.Client.R(listPath).SetResult(&raw).Get(listPath)
@@ -104,7 +104,7 @@ func (r *CleanupRunner) vROCleanupsByPrefix(
 				break
 			}
 		}
-		if !strings.HasPrefix(nameValue, prefix) {
+		if !strings.HasPrefix(nameValue, TestPrefix) {
 			continue
 		}
 		id := idFromHref(link.Href)
@@ -117,9 +117,9 @@ func (r *CleanupRunner) vROCleanupsByPrefix(
 }
 
 // contentCleanupsByPrefix lists a content-based resource collection and returns entries whose
-// nameField starts with prefix.
+// nameField starts with TestPrefix.
 func (r *CleanupRunner) contentCleanupsByPrefix(
-	listPath, nameField, prefix string,
+	listPath, nameField string,
 ) []cleanupEntry {
 	var raw contentListAPIModel
 	resp, err := r.Client.R(listPath).
@@ -135,7 +135,7 @@ func (r *CleanupRunner) contentCleanupsByPrefix(
 	for _, item := range raw.Content {
 		id, _ := item["id"].(string)
 		nameRaw, _ := item[nameField].(string)
-		if !strings.HasPrefix(nameRaw, prefix) || id == "" {
+		if !strings.HasPrefix(nameRaw, TestPrefix) || id == "" {
 			continue
 		}
 		entries = append(entries, cleanupEntry{
@@ -148,7 +148,7 @@ func (r *CleanupRunner) contentCleanupsByPrefix(
 
 // contentCleanupsByPrefixInProject is like contentCleanupsByPrefix but filters by projectId.
 func (r *CleanupRunner) contentCleanupsByPrefixInProject(
-	listPath, nameField, prefix, projectID string,
+	listPath, prefix, projectID string,
 ) []cleanupEntry {
 	var raw contentListAPIModel
 	resp, err := r.Client.R(listPath).
@@ -164,7 +164,7 @@ func (r *CleanupRunner) contentCleanupsByPrefixInProject(
 	var entries []cleanupEntry
 	for _, item := range raw.Content {
 		id, _ := item["id"].(string)
-		nameRaw, _ := item[nameField].(string)
+		nameRaw, _ := item["name"].(string)
 		if !strings.HasPrefix(nameRaw, prefix) || id == "" {
 			continue
 		}
@@ -181,14 +181,14 @@ func (r *CleanupRunner) contentCleanupsByPrefixInProject(
 // OrchestratorCategories deletes vRO categories whose name starts with TestPrefix.
 func (r *CleanupRunner) OrchestratorCategories() {
 	r.applyCleanups(
-		r.vROCleanupsByPrefix("vco/api/categories", "Category", "name", TestPrefix),
+		r.vROCleanupsByPrefix("vco/api/categories", "Category", "name"),
 	)
 }
 
 // OrchestratorActions deletes vRO actions whose fqn starts with TestPrefix.
 // When Force is true, ?force=true is appended to bypass dependency checks.
 func (r *CleanupRunner) OrchestratorActions() {
-	entries := r.vROCleanupsByPrefix("vco/api/actions", "Action", "fqn", TestPrefix)
+	entries := r.vROCleanupsByPrefix("vco/api/actions", "Action", "fqn")
 	if r.Force {
 		for i := range entries {
 			entries[i].deletePath += "?force=true"
@@ -200,7 +200,7 @@ func (r *CleanupRunner) OrchestratorActions() {
 // OrchestratorWorkflows deletes vRO workflows whose name starts with TestPrefix.
 // When Force is true, ?force=true is appended to bypass dependency checks.
 func (r *CleanupRunner) OrchestratorWorkflows() {
-	entries := r.vROCleanupsByPrefix("vco/api/workflows", "Workflow", "name", TestPrefix)
+	entries := r.vROCleanupsByPrefix("vco/api/workflows", "Workflow", "name")
 	if r.Force {
 		for i := range entries {
 			entries[i].deletePath += "?force=true"
@@ -213,22 +213,21 @@ func (r *CleanupRunner) OrchestratorWorkflows() {
 func (r *CleanupRunner) OrchestratorConfigurations() {
 	r.applyCleanups(
 		r.vROCleanupsByPrefix(
-			"vco/api/configurations", "Configuration", "name", TestPrefix,
-		),
+			"vco/api/configurations", "Configuration", "name"),
 	)
 }
 
 // OrchestratorTasks deletes vRO tasks whose name starts with TestPrefix.
 func (r *CleanupRunner) OrchestratorTasks() {
 	r.applyCleanups(
-		r.vROCleanupsByPrefix("vco/api/tasks", "Task", "name", TestPrefix),
+		r.vROCleanupsByPrefix("vco/api/tasks", "Task", "name"),
 	)
 }
 
 // OrchestratorEnvironments deletes vRO environments whose name starts with TestPrefix.
 func (r *CleanupRunner) OrchestratorEnvironments() {
 	r.applyCleanups(
-		r.vROCleanupsByPrefix("vco/api/environments", "Environment", "name", TestPrefix),
+		r.vROCleanupsByPrefix("vco/api/environments", "Environment", "name"),
 	)
 }
 
@@ -239,16 +238,14 @@ func (r *CleanupRunner) OrchestratorEnvironmentRepositories() {
 		r.vROCleanupsByPrefix(
 			"vco/api/environments/repositories",
 			"EnvironmentRepository",
-			"name",
-			TestPrefix,
-		),
+			"name"),
 	)
 }
 
 // CatalogSources deletes catalog sources whose name starts with TestPrefix.
 func (r *CleanupRunner) CatalogSources() {
 	r.applyCleanups(
-		r.contentCleanupsByPrefix("catalog/api/admin/sources", "name", TestPrefix),
+		r.contentCleanupsByPrefix("catalog/api/admin/sources", "name"),
 	)
 }
 
@@ -257,8 +254,7 @@ func (r *CleanupRunner) CatalogSources() {
 func (r *CleanupRunner) CatalogSourcesInProject(projectID string) {
 	r.applyCleanups(
 		r.contentCleanupsByPrefixInProject(
-			"catalog/api/admin/sources", "name", TestPrefix, projectID,
-		),
+			"catalog/api/admin/sources", TestPrefix, projectID),
 	)
 }
 
@@ -294,8 +290,7 @@ func (r *CleanupRunner) CustomForms(sourceID, sourceType string) {
 func (r *CleanupRunner) ABXActions(projectID string) {
 	r.applyCleanups(
 		r.contentCleanupsByPrefixInProject(
-			"abx/api/resources/actions", "name", TestPrefix, projectID,
-		),
+			"abx/api/resources/actions", TestPrefix, projectID),
 	)
 }
 
@@ -304,22 +299,21 @@ func (r *CleanupRunner) ABXActions(projectID string) {
 func (r *CleanupRunner) CustomResourceABXActions(projectID string) {
 	r.applyCleanups(
 		r.contentCleanupsByPrefixInProject(
-			"abx/api/resources/actions", "name", TestCustomResourcePrefix, projectID,
-		),
+			"abx/api/resources/actions", TestCustomResourcePrefix, projectID),
 	)
 }
 
 // ABXConstants deletes ABX constants (action-secrets) whose name starts with TestPrefix.
 func (r *CleanupRunner) ABXConstants() {
 	r.applyCleanups(
-		r.contentCleanupsByPrefix("abx/api/resources/action-secrets", "name", TestPrefix),
+		r.contentCleanupsByPrefix("abx/api/resources/action-secrets", "name"),
 	)
 }
 
 // Tags deletes iaas tags whose key starts with TestPrefix.
 // When Force is true, ?ignoreUsage=true is appended to delete tags even if still in use.
 func (r *CleanupRunner) Tags() {
-	entries := r.contentCleanupsByPrefix("iaas/api/tags", "key", TestPrefix)
+	entries := r.contentCleanupsByPrefix("iaas/api/tags", "key")
 	if r.Force {
 		for i := range entries {
 			entries[i].deletePath += "?ignoreUsage=true"
@@ -332,43 +326,42 @@ func (r *CleanupRunner) Tags() {
 func (r *CleanupRunner) PropertyGroups() {
 	r.applyCleanups(
 		r.contentCleanupsByPrefix(
-			"properties/api/property-groups", "name", TestPrefix,
-		),
+			"properties/api/property-groups", "name"),
 	)
 }
 
 // Policies deletes policies whose name starts with TestPrefix.
 func (r *CleanupRunner) Policies() {
 	r.applyCleanups(
-		r.contentCleanupsByPrefix("policy/api/policies", "name", TestPrefix),
+		r.contentCleanupsByPrefix("policy/api/policies", "name"),
 	)
 }
 
 // Subscriptions deletes event subscriptions whose name starts with TestPrefix.
 func (r *CleanupRunner) Subscriptions() {
 	r.applyCleanups(
-		r.contentCleanupsByPrefix("event-broker/api/subscriptions", "name", TestPrefix),
+		r.contentCleanupsByPrefix("event-broker/api/subscriptions", "name"),
 	)
 }
 
 // CloudTemplates deletes blueprints whose name starts with TestPrefix.
 func (r *CleanupRunner) CloudTemplates() {
 	r.applyCleanups(
-		r.contentCleanupsByPrefix("blueprint/api/blueprints", "name", TestPrefix),
+		r.contentCleanupsByPrefix("blueprint/api/blueprints", "name"),
 	)
 }
 
 // Projects deletes projects whose name starts with TestPrefix.
 func (r *CleanupRunner) Projects() {
 	r.applyCleanups(
-		r.contentCleanupsByPrefix("project-service/api/projects", "name", TestPrefix),
+		r.contentCleanupsByPrefix("project-service/api/projects", "name"),
 	)
 }
 
 // CustomNamings deletes custom naming rules whose name starts with TestPrefix.
 func (r *CleanupRunner) CustomNamings() {
 	r.applyCleanups(
-		r.contentCleanupsByPrefix("iaas/api/naming", "name", TestPrefix),
+		r.contentCleanupsByPrefix("iaas/api/naming", "name"),
 	)
 }
 
@@ -376,7 +369,6 @@ func (r *CleanupRunner) CustomNamings() {
 func (r *CleanupRunner) CustomResources() {
 	r.applyCleanups(
 		r.contentCleanupsByPrefix(
-			"form-service/api/custom/resource-types", "displayName", TestPrefix,
-		),
+			"form-service/api/custom/resource-types", "displayName"),
 	)
 }

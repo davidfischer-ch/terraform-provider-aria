@@ -4,7 +4,6 @@
 package provider
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -74,11 +73,11 @@ func (rl *requestLog) hasDelete(path string) bool {
 	return false
 }
 
-func (rl *requestLog) hasDeleteWithParam(path, key, value string) bool {
+func (rl *requestLog) hasDeleteWithParam(path, key string) bool {
 	rl.mu.Lock()
 	defer rl.mu.Unlock()
 	for _, rec := range rl.records {
-		if rec.method == "DELETE" && rec.path == path && rec.query.Get(key) == value {
+		if rec.method == "DELETE" && rec.path == path && rec.query.Get(key) == "true" {
 			return true
 		}
 	}
@@ -115,7 +114,7 @@ func newTestRunner(t *testing.T, srv *httptest.Server, dryRun bool) (*CleanupRun
 		AccessToken:        "fake-token",
 		OKAPICallsLogLevel: "DEBUG",
 		KOAPICallsLogLevel: "WARN",
-		Context:            context.Background(),
+		Context:            t.Context(),
 	}
 	if diags := client.Init(); diags.HasError() {
 		t.Fatalf("AriaClient.Init: %v", diags.Errors())
@@ -125,9 +124,8 @@ func newTestRunner(t *testing.T, srv *httptest.Server, dryRun bool) (*CleanupRun
 }
 
 // writeJSON sends a JSON response.
-func writeJSON(w http.ResponseWriter, status int, body any) {
+func writeJSON(w http.ResponseWriter, body any) {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(body)
 }
 
@@ -255,7 +253,7 @@ func TestApplyCleanupsLogsWarningOnAPIError(t *testing.T) {
 
 func TestVROCleanupsByPrefixFiltersCorrectly(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		writeJSON(w, 200, vROListBody(
+		writeJSON(w, vROListBody(
 			vROTestLink("https://host/vco/api/workflows/match-1",
 				vROAttr("name", "ARIA_PROVIDER_TEST_WORKFLOW_A")),
 			vROTestLink("https://host/vco/api/workflows/match-2",
@@ -267,7 +265,7 @@ func TestVROCleanupsByPrefixFiltersCorrectly(t *testing.T) {
 	defer srv.Close()
 
 	runner, _ := newTestRunner(t, srv, false)
-	entries := runner.vROCleanupsByPrefix("vco/api/workflows", "Workflow", "name", TestPrefix)
+	entries := runner.vROCleanupsByPrefix("vco/api/workflows", "Workflow", "name")
 
 	if len(entries) != 2 {
 		t.Fatalf("expected 2 entries, got %d", len(entries))
@@ -278,12 +276,12 @@ func TestVROCleanupsByPrefixFiltersCorrectly(t *testing.T) {
 
 func TestVROCleanupsByPrefixHandlesEmptyList(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		writeJSON(w, 200, vROListBody())
+		writeJSON(w, vROListBody())
 	}))
 	defer srv.Close()
 
 	runner, _ := newTestRunner(t, srv, false)
-	entries := runner.vROCleanupsByPrefix("vco/api/workflows", "Workflow", "name", TestPrefix)
+	entries := runner.vROCleanupsByPrefix("vco/api/workflows", "Workflow", "name")
 
 	if entries != nil {
 		t.Errorf("expected nil entries for empty list, got %v", entries)
@@ -297,7 +295,7 @@ func TestVROCleanupsByPrefixHandlesListError(t *testing.T) {
 	defer srv.Close()
 
 	runner, logger := newTestRunner(t, srv, false)
-	entries := runner.vROCleanupsByPrefix("vco/api/workflows", "Workflow", "name", TestPrefix)
+	entries := runner.vROCleanupsByPrefix("vco/api/workflows", "Workflow", "name")
 
 	if entries != nil {
 		t.Error("expected nil entries on list error")
@@ -310,7 +308,7 @@ func TestVROCleanupsByPrefixHandlesListError(t *testing.T) {
 func TestVROCleanupsByPrefixUsesCorrectAttribute(t *testing.T) {
 	// A link has both "name" and "fqn"; only "fqn" should be checked when nameField="fqn".
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		writeJSON(w, 200, vROListBody(
+		writeJSON(w, vROListBody(
 			vROTestLink("https://host/vco/api/actions/act-1",
 				vROAttr("name", "getVRAHost"),
 				vROAttr("fqn", "ARIA_PROVIDER_TEST_ACTIONS/getVRAHost")),
@@ -322,7 +320,7 @@ func TestVROCleanupsByPrefixUsesCorrectAttribute(t *testing.T) {
 	defer srv.Close()
 
 	runner, _ := newTestRunner(t, srv, false)
-	entries := runner.vROCleanupsByPrefix("vco/api/actions", "Action", "fqn", TestPrefix)
+	entries := runner.vROCleanupsByPrefix("vco/api/actions", "Action", "fqn")
 
 	if len(entries) != 1 {
 		t.Fatalf("expected 1 entry (fqn match only), got %d", len(entries))
@@ -334,7 +332,7 @@ func TestVROCleanupsByPrefixUsesCorrectAttribute(t *testing.T) {
 
 func TestContentCleanupsByPrefixFiltersCorrectly(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		writeJSON(w, 200, contentListBody(
+		writeJSON(w, contentListBody(
 			map[string]any{"id": "t-1", "key": "ARIA_PROVIDER_TEST_TAG"},
 			map[string]any{"id": "t-2", "key": "ARIA_PROVIDER_TEST_OTHER"},
 			map[string]any{"id": "t-3", "key": "production:tag"},
@@ -343,7 +341,7 @@ func TestContentCleanupsByPrefixFiltersCorrectly(t *testing.T) {
 	defer srv.Close()
 
 	runner, _ := newTestRunner(t, srv, false)
-	entries := runner.contentCleanupsByPrefix("iaas/api/tags", "key", TestPrefix)
+	entries := runner.contentCleanupsByPrefix("iaas/api/tags", "key")
 
 	if len(entries) != 2 {
 		t.Fatalf("expected 2 entries, got %d", len(entries))
@@ -354,7 +352,7 @@ func TestContentCleanupsByPrefixFiltersCorrectly(t *testing.T) {
 
 func TestContentCleanupsByPrefixSkipsItemsWithoutID(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		writeJSON(w, 200, contentListBody(
+		writeJSON(w, contentListBody(
 			map[string]any{"name": "ARIA_PROVIDER_TEST_NOID"}, // no "id" field
 			map[string]any{"id": "p-1", "name": "ARIA_PROVIDER_TEST_HAS_ID"},
 		))
@@ -362,7 +360,7 @@ func TestContentCleanupsByPrefixSkipsItemsWithoutID(t *testing.T) {
 	defer srv.Close()
 
 	runner, _ := newTestRunner(t, srv, false)
-	entries := runner.contentCleanupsByPrefix("policy/api/policies", "name", TestPrefix)
+	entries := runner.contentCleanupsByPrefix("policy/api/policies", "name")
 
 	if len(entries) != 1 {
 		t.Fatalf("expected 1 entry (item with id only), got %d", len(entries))
@@ -372,12 +370,12 @@ func TestContentCleanupsByPrefixSkipsItemsWithoutID(t *testing.T) {
 
 func TestContentCleanupsByPrefixHandlesEmptyContent(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		writeJSON(w, 200, contentListBody())
+		writeJSON(w, contentListBody())
 	}))
 	defer srv.Close()
 
 	runner, _ := newTestRunner(t, srv, false)
-	entries := runner.contentCleanupsByPrefix("policy/api/policies", "name", TestPrefix)
+	entries := runner.contentCleanupsByPrefix("policy/api/policies", "name")
 
 	if entries != nil {
 		t.Errorf("expected nil entries for empty content, got %v", entries)
@@ -391,7 +389,7 @@ func TestContentCleanupsByPrefixHandlesListError(t *testing.T) {
 	defer srv.Close()
 
 	runner, logger := newTestRunner(t, srv, false)
-	entries := runner.contentCleanupsByPrefix("policy/api/policies", "name", TestPrefix)
+	entries := runner.contentCleanupsByPrefix("policy/api/policies", "name")
 
 	if entries != nil {
 		t.Error("expected nil entries on list error")
@@ -407,14 +405,13 @@ func TestContentCleanupsByPrefixInProjectSendsProjectID(t *testing.T) {
 	var rl requestLog
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		rl.record(r)
-		writeJSON(w, 200, contentListBody())
+		writeJSON(w, contentListBody())
 	}))
 	defer srv.Close()
 
 	runner, _ := newTestRunner(t, srv, false)
 	runner.contentCleanupsByPrefixInProject(
-		"abx/api/resources/actions", "name", TestPrefix, "proj-xyz",
-	)
+		"abx/api/resources/actions", TestPrefix, "proj-xyz")
 
 	if !rl.hasGetWithParam("/abx/api/resources/actions", "projectId", "proj-xyz") {
 		t.Error("expected GET with projectId=proj-xyz query param")
@@ -429,7 +426,7 @@ func TestOrchestratorWorkflowsAppliesForceDelete(t *testing.T) {
 		rl.record(r)
 		switch r.Method {
 		case "GET":
-			writeJSON(w, 200, vROListBody(
+			writeJSON(w, vROListBody(
 				vROTestLink("https://host/vco/api/workflows/wf-1",
 					vROAttr("name", "ARIA_PROVIDER_TEST_WORKFLOW")),
 			))
@@ -443,7 +440,7 @@ func TestOrchestratorWorkflowsAppliesForceDelete(t *testing.T) {
 	runner.Force = true
 	runner.OrchestratorWorkflows()
 
-	if !rl.hasDeleteWithParam("/vco/api/workflows/wf-1", "force", "true") {
+	if !rl.hasDeleteWithParam("/vco/api/workflows/wf-1", "force") {
 		t.Error("OrchestratorWorkflows: expected DELETE with force=true when Force=true")
 	}
 }
@@ -454,7 +451,7 @@ func TestOrchestratorWorkflowsNoForceWithoutFlag(t *testing.T) {
 		rl.record(r)
 		switch r.Method {
 		case "GET":
-			writeJSON(w, 200, vROListBody(
+			writeJSON(w, vROListBody(
 				vROTestLink("https://host/vco/api/workflows/wf-1",
 					vROAttr("name", "ARIA_PROVIDER_TEST_WORKFLOW")),
 			))
@@ -467,7 +464,7 @@ func TestOrchestratorWorkflowsNoForceWithoutFlag(t *testing.T) {
 	runner, _ := newTestRunner(t, srv, false)
 	runner.OrchestratorWorkflows()
 
-	if rl.hasDeleteWithParam("/vco/api/workflows/wf-1", "force", "true") {
+	if rl.hasDeleteWithParam("/vco/api/workflows/wf-1", "force") {
 		t.Error("OrchestratorWorkflows: force=true must not be sent when Force=false")
 	}
 	if !rl.hasDelete("/vco/api/workflows/wf-1") {
@@ -481,7 +478,7 @@ func TestOrchestratorWorkflowsDoesNotDeleteNonMatching(t *testing.T) {
 		rl.record(r)
 		switch r.Method {
 		case "GET":
-			writeJSON(w, 200, vROListBody(
+			writeJSON(w, vROListBody(
 				vROTestLink("https://host/vco/api/workflows/prod-1",
 					vROAttr("name", "ProductionWorkflow")),
 				vROTestLink("https://host/vco/api/workflows/prod-2",
@@ -508,7 +505,7 @@ func TestOrchestratorActionsFiltersOnFQN(t *testing.T) {
 		rl.record(r)
 		switch r.Method {
 		case "GET":
-			writeJSON(w, 200, vROListBody(
+			writeJSON(w, vROListBody(
 				// fqn starts with ARIA_PROVIDER_TEST → should be deleted
 				vROTestLink("https://host/vco/api/actions/act-match",
 					vROAttr("name", "myAction"),
@@ -541,7 +538,7 @@ func TestOrchestratorActionsAppliesForceDelete(t *testing.T) {
 		rl.record(r)
 		switch r.Method {
 		case "GET":
-			writeJSON(w, 200, vROListBody(
+			writeJSON(w, vROListBody(
 				vROTestLink("https://host/vco/api/actions/act-1",
 					vROAttr("fqn", "ARIA_PROVIDER_TEST_ACTIONS/act")),
 			))
@@ -555,7 +552,7 @@ func TestOrchestratorActionsAppliesForceDelete(t *testing.T) {
 	runner.Force = true
 	runner.OrchestratorActions()
 
-	if !rl.hasDeleteWithParam("/vco/api/actions/act-1", "force", "true") {
+	if !rl.hasDeleteWithParam("/vco/api/actions/act-1", "force") {
 		t.Error("OrchestratorActions: expected DELETE with force=true when Force=true")
 	}
 }
@@ -566,7 +563,7 @@ func TestOrchestratorActionsNoForceWithoutFlag(t *testing.T) {
 		rl.record(r)
 		switch r.Method {
 		case "GET":
-			writeJSON(w, 200, vROListBody(
+			writeJSON(w, vROListBody(
 				vROTestLink("https://host/vco/api/actions/act-1",
 					vROAttr("fqn", "ARIA_PROVIDER_TEST_ACTIONS/act")),
 			))
@@ -579,7 +576,7 @@ func TestOrchestratorActionsNoForceWithoutFlag(t *testing.T) {
 	runner, _ := newTestRunner(t, srv, false)
 	runner.OrchestratorActions()
 
-	if rl.hasDeleteWithParam("/vco/api/actions/act-1", "force", "true") {
+	if rl.hasDeleteWithParam("/vco/api/actions/act-1", "force") {
 		t.Error("OrchestratorActions: force=true must not be sent when Force=false")
 	}
 	if !rl.hasDelete("/vco/api/actions/act-1") {
@@ -593,7 +590,7 @@ func TestOrchestratorCategoriesUsesCategoryPrefix(t *testing.T) {
 		rl.record(r)
 		switch r.Method {
 		case "GET":
-			writeJSON(w, 200, vROListBody(
+			writeJSON(w, vROListBody(
 				// Matches TestPrefix = "ARIA_PROVIDER_TEST"
 				vROTestLink("https://host/vco/api/categories/cat-1",
 					vROAttr("name", "ARIA_PROVIDER_TEST")),
@@ -629,7 +626,7 @@ func TestTagsUsesKeyField(t *testing.T) {
 		rl.record(r)
 		switch r.Method {
 		case "GET":
-			writeJSON(w, 200, contentListBody(
+			writeJSON(w, contentListBody(
 				map[string]any{"id": "tag-1", "key": "ARIA_PROVIDER_TEST_KEY", "value": "v"},
 				// "name" field is not what Tags() filters on
 				map[string]any{"id": "tag-2", "name": "ARIA_PROVIDER_TEST_NAME", "key": "prod:key"},
@@ -657,7 +654,7 @@ func TestTagsAppliesIgnoreUsage(t *testing.T) {
 		rl.record(r)
 		switch r.Method {
 		case "GET":
-			writeJSON(w, 200, contentListBody(
+			writeJSON(w, contentListBody(
 				map[string]any{"id": "tag-1", "key": "ARIA_PROVIDER_TEST_TAG"},
 			))
 		case "DELETE":
@@ -670,7 +667,7 @@ func TestTagsAppliesIgnoreUsage(t *testing.T) {
 	runner.Force = true
 	runner.Tags()
 
-	if !rl.hasDeleteWithParam("/iaas/api/tags/tag-1", "ignoreUsage", "true") {
+	if !rl.hasDeleteWithParam("/iaas/api/tags/tag-1", "ignoreUsage") {
 		t.Error("Tags: expected DELETE with ignoreUsage=true when Force=true")
 	}
 }
@@ -681,7 +678,7 @@ func TestTagsNoIgnoreUsageWithoutFlag(t *testing.T) {
 		rl.record(r)
 		switch r.Method {
 		case "GET":
-			writeJSON(w, 200, contentListBody(
+			writeJSON(w, contentListBody(
 				map[string]any{"id": "tag-1", "key": "ARIA_PROVIDER_TEST_TAG"},
 			))
 		case "DELETE":
@@ -693,7 +690,7 @@ func TestTagsNoIgnoreUsageWithoutFlag(t *testing.T) {
 	runner, _ := newTestRunner(t, srv, false)
 	runner.Tags()
 
-	if rl.hasDeleteWithParam("/iaas/api/tags/tag-1", "ignoreUsage", "true") {
+	if rl.hasDeleteWithParam("/iaas/api/tags/tag-1", "ignoreUsage") {
 		t.Error("Tags: ignoreUsage=true must not be sent when Force=false")
 	}
 	if !rl.hasDelete("/iaas/api/tags/tag-1") {
@@ -707,7 +704,7 @@ func TestCustomFormsDeletesMatchingForm(t *testing.T) {
 		rl.record(r)
 		switch r.Method {
 		case "GET":
-			writeJSON(w, 200, map[string]any{
+			writeJSON(w, map[string]any{
 				"id":   "form-1",
 				"name": "ARIA_PROVIDER_TEST_FORM",
 			})
@@ -750,7 +747,7 @@ func TestCustomFormsSkipsNonMatchingName(t *testing.T) {
 		rl.record(r)
 		switch r.Method {
 		case "GET":
-			writeJSON(w, 200, map[string]any{
+			writeJSON(w, map[string]any{
 				"id":   "form-prod",
 				"name": "ProductionForm",
 			})
@@ -775,7 +772,7 @@ func TestOrchestratorCategoriesSkipsSubCategoriesWithNonMatchingName(t *testing.
 		rl.record(r)
 		switch r.Method + " " + r.URL.Path {
 		case "GET /vco/api/categories":
-			writeJSON(w, 200, vROListBody(
+			writeJSON(w, vROListBody(
 				vROTestLink("https://host/vco/api/categories/id-root", vROAttr("name", "ARIA_PROVIDER_TEST")),
 				vROTestLink("https://host/vco/api/categories/id-a", vROAttr("name", "A")),
 				vROTestLink("https://host/vco/api/categories/id-b", vROAttr("name", "B")),

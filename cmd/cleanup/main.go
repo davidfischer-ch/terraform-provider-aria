@@ -108,8 +108,7 @@ func main() {
 	} else {
 		fmt.Printf("This will DELETE all ARIA_PROVIDER_TEST resources on %s.\nType \"yes\" to confirm: ", host)
 		var answer string
-		fmt.Fscan(os.Stdin, &answer)
-		if answer != "yes" {
+		if _, err := fmt.Fscan(os.Stdin, &answer); err != nil || answer != "yes" {
 			fmt.Println("Aborted.")
 			os.Exit(1)
 		}
