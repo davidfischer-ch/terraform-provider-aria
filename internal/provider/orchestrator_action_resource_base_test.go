@@ -31,7 +31,7 @@ EOT
 }
 
 resource "aria_orchestrator_category" "test" {
-	name      = "aria_provider_tests"
+	name      = "ARIA_PROVIDER_TEST_ACTIONS"
 	type      = "ScriptModuleCategory"
 	parent_id = ""
 }
@@ -64,10 +64,10 @@ resource "aria_orchestrator_action" "test" {
 						"aria_orchestrator_action.test", "name", "getVRAHost",
 					),
 					resource.TestCheckResourceAttr(
-						"aria_orchestrator_action.test", "module", "aria_provider_tests",
+						"aria_orchestrator_action.test", "module", "ARIA_PROVIDER_TEST_ACTIONS",
 					),
 					resource.TestCheckResourceAttr(
-						"aria_orchestrator_action.test", "fqn", "aria_provider_tests/getVRAHost",
+						"aria_orchestrator_action.test", "fqn", "ARIA_PROVIDER_TEST_ACTIONS/getVRAHost",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_action.test", "description",
@@ -106,7 +106,7 @@ EOT
 }
 
 resource "aria_orchestrator_category" "test" {
-	name      = "aria_provider_tests_bis"
+	name      = "ARIA_PROVIDER_TEST_ACTIONS_BIS"
 	type      = "ScriptModuleCategory"
 	parent_id = ""
 }
@@ -139,10 +139,10 @@ resource "aria_orchestrator_action" "test" {
 						"aria_orchestrator_action.test", "name", "getVRAHost",
 					),
 					resource.TestCheckResourceAttr(
-						"aria_orchestrator_action.test", "module", "aria_provider_tests_bis",
+						"aria_orchestrator_action.test", "module", "ARIA_PROVIDER_TEST_ACTIONS_BIS",
 					),
 					resource.TestCheckResourceAttr(
-						"aria_orchestrator_action.test", "fqn", "aria_provider_tests_bis/getVRAHost",
+						"aria_orchestrator_action.test", "fqn", "ARIA_PROVIDER_TEST_ACTIONS_BIS/getVRAHost",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_action.test", "description",
@@ -201,7 +201,7 @@ EOT
 }
 
 resource "aria_orchestrator_category" "test" {
-	name      = "aria_provider_tests"
+	name      = "ARIA_PROVIDER_TEST_ACTIONS"
 	type      = "ScriptModuleCategory"
 	parent_id = ""
 }
@@ -261,10 +261,10 @@ resource "aria_orchestrator_action" "test" {
 						"aria_orchestrator_action.test", "name", "getDeploymentById",
 					),
 					resource.TestCheckResourceAttr(
-						"aria_orchestrator_action.test", "module", "aria_provider_tests",
+						"aria_orchestrator_action.test", "module", "ARIA_PROVIDER_TEST_ACTIONS",
 					),
 					resource.TestCheckResourceAttr(
-						"aria_orchestrator_action.test", "fqn", "aria_provider_tests/getDeploymentById",
+						"aria_orchestrator_action.test", "fqn", "ARIA_PROVIDER_TEST_ACTIONS/getDeploymentById",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_action.test", "description",

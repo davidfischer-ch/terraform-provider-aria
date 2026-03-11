@@ -18,7 +18,7 @@ func TestAccOrchestratorEnvironmentRepositoryResource(t *testing.T) {
 			{
 				Config: `
 resource "aria_orchestrator_environment_repository" "test" {
-	name     = "TEST_ARIA_PROVIDER"
+	name     = "ARIA_PROVIDER_TEST"
 	runtime  = "python:3.10"
 	location = "https://your-registry.your-company.net/repository/pypi-all/simple"
 }
@@ -29,7 +29,7 @@ resource "aria_orchestrator_environment_repository" "test" {
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_environment_repository.test", "name",
-						"TEST_ARIA_PROVIDER",
+						"ARIA_PROVIDER_TEST",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_environment_repository.test", "runtime", "python:3.10",
@@ -59,7 +59,7 @@ resource "aria_orchestrator_environment_repository" "test" {
 			{
 				Config: `
 resource "aria_orchestrator_environment_repository" "test" {
-	name               = "TEST_ARIA_PROVIDER"
+	name               = "ARIA_PROVIDER_TEST"
 	runtime            = "python:3.10"
 	location           = "https://your-registry.your-company.net/repository/pypi-all/simple"
 	system_user        = "toto"
@@ -72,7 +72,7 @@ resource "aria_orchestrator_environment_repository" "test" {
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_environment_repository.test", "name",
-						"TEST_ARIA_PROVIDER",
+						"ARIA_PROVIDER_TEST",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_environment_repository.test", "runtime", "python:3.10",
@@ -97,7 +97,7 @@ resource "aria_orchestrator_environment_repository" "test" {
 			{
 				Config: `
 resource "aria_orchestrator_environment_repository" "test" {
-	name     = "TEST_ARIA_PROVIDER_RENAMED"
+	name     = "ARIA_PROVIDER_TEST_RENAMED"
 	runtime  = "python:3.10"
 	location = "https://your-registry.your-company.net/repository/pypi-all/other"
 }
@@ -108,7 +108,7 @@ resource "aria_orchestrator_environment_repository" "test" {
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_environment_repository.test", "name",
-						"TEST_ARIA_PROVIDER_RENAMED",
+						"ARIA_PROVIDER_TEST_RENAMED",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_environment_repository.test", "runtime", "python:3.10",
