@@ -32,8 +32,8 @@ resource "aria_orchestrator_environment" "test" {
 
 resource "aria_orchestrator_action" "test" {
   name                 = "actionZ"
-  module               = "aria_provider_tests"
-  fqn                  = "aria_provider_tests/actionZ"
+  module               = "ARIA_PROVIDER_TEST_ACTIONS"
+  fqn                  = "ARIA_PROVIDER_TEST_ACTIONS/actionZ"
   description          = "An action"
   version              = "1.0.0"
 	environment_id       = aria_orchestrator_environment.test.id
@@ -52,10 +52,10 @@ resource "aria_orchestrator_action" "test" {
 						"aria_orchestrator_action.test", "name", "actionZ",
 					),
 					resource.TestCheckResourceAttr(
-						"aria_orchestrator_action.test", "module", "aria_provider_tests",
+						"aria_orchestrator_action.test", "module", "ARIA_PROVIDER_TEST_ACTIONS",
 					),
 					resource.TestCheckResourceAttr(
-						"aria_orchestrator_action.test", "fqn", "aria_provider_tests/actionZ",
+						"aria_orchestrator_action.test", "fqn", "ARIA_PROVIDER_TEST_ACTIONS/actionZ",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_action.test", "description", "An action",
