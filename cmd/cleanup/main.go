@@ -110,18 +110,17 @@ func main() {
 		log.Println("Force mode: dependency checks and usage locks will be bypassed")
 	}
 
-	// Sweep in dependency order: leaves first, parents last.
+	// Sweep in dependency order: referencers first, referenced last.
+	//
+	// Dependency chain (→ means "references"):
+	//   task → workflow → workflow → action
+	//   catalog source → cloud template → custom resource → ABX action / ABX constant / vRO workflow
 
-	// --- Orchestrator (vRO) ---
+	// Tasks reference workflows.
 	runner.OrchestratorTasks()
-	runner.OrchestratorActions()
-	runner.OrchestratorWorkflows()
-	runner.OrchestratorConfigurations()
-	runner.OrchestratorEnvironments()
-	runner.OrchestratorEnvironmentRepositories()
-	runner.OrchestratorCategories()
 
-	// --- Catalog / Service Broker ---
+	// Catalog sources reference vRO workflows or cloud templates;
+	// custom forms reference catalog items.
 	if catalogItemID != "" && catalogItemType != "" {
 		runner.CustomForms(catalogItemID, catalogItemType)
 	}
@@ -130,6 +129,21 @@ func main() {
 	}
 	runner.CatalogSources()
 
+	// Cloud templates reference custom resource types.
+	runner.CloudTemplates()
+
+	// Custom resources reference ABX actions, ABX constants, and/or vRO workflows.
+	runner.CustomResources()
+
+	// --- Orchestrator (vRO) ---
+	// Workflows reference sub-workflows then actions; categories contain them all.
+	runner.OrchestratorWorkflows()
+	runner.OrchestratorActions()
+	runner.OrchestratorConfigurations()
+	runner.OrchestratorEnvironments()
+	runner.OrchestratorEnvironmentRepositories()
+	runner.OrchestratorCategories()
+
 	// --- ABX ---
 	if projectID != "" {
 		runner.ABXActions(projectID)
@@ -137,13 +151,9 @@ func main() {
 	}
 	runner.ABXConstants()
 
-	// --- IaaS / Blueprint ---
-	runner.CloudTemplates()
+	// --- IaaS ---
 	runner.CustomNamings()
 	runner.Tags()
-
-	// --- Custom resources / forms ---
-	runner.CustomResources()
 
 	// --- Governance ---
 	runner.PropertyGroups()
