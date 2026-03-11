@@ -104,8 +104,8 @@ and custom form **will be modified** by the tests.
 ### Cleaning up test resources
 
 If an acceptance test run is interrupted or fails mid-way, orphaned resources may remain on the
-Aria instance. The `cleanup` binary sweeps all resources whose names follow the
-`ARIA_PROVIDER_TEST` prefix convention used by the test suite.
+Aria instance. The `cleanup` binary sweeps all resources whose names follow the `ARIA_PROVIDER_TEST`
+prefix convention used by the test suite.
 
 Build and run it:
 
@@ -127,6 +127,6 @@ bin/cleanup
 bin/cleanup -force
 ```
 
-The `TF_VAR_test_project_id`, `TF_VAR_test_catalog_item_id`, and
-`TF_VAR_test_catalog_item_type` environment variables are reused from the acceptance test
-setup above to scope ABX action and custom form cleanup.
+The `TF_VAR_test_project_id`, `TF_VAR_test_catalog_item_id`, and `TF_VAR_test_catalog_item_type`
+environment variables are reused from the acceptance test setup above to scope ABX actions
+and custom forms cleanup.
