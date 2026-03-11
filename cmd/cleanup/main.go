@@ -153,8 +153,8 @@ func main() {
 
 	// --- ABX ---
 	if projectID != "" {
-		runner.ABXActions(projectID)
 		runner.CustomResourceABXActions(projectID)
+		runner.ABXActions(projectID)
 	}
 	runner.ABXConstants()
 
