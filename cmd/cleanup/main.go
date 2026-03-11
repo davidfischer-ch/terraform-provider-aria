@@ -105,6 +105,14 @@ func main() {
 
 	if *dryRun {
 		log.Println("Dry-run mode: no resources will be deleted")
+	} else {
+		fmt.Fprintf(os.Stderr, "This will DELETE all ARIA_PROVIDER_TEST resources on %s.\nType \"yes\" to confirm: ", host)
+		var answer string
+		fmt.Fscan(os.Stdin, &answer)
+		if answer != "yes" {
+			fmt.Fprintln(os.Stderr, "Aborted.")
+			os.Exit(1)
+		}
 	}
 	if *force {
 		log.Println("Force mode: dependency checks and usage locks will be bypassed")
