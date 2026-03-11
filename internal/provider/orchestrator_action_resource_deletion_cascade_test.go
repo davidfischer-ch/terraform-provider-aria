@@ -23,8 +23,8 @@ func TestAccOrchestratorActionDeleteConvergeResource(t *testing.T) {
 
 resource "aria_orchestrator_action" "test_a" {
   name                 = "actionA"
-  module               = "aria_provider_tests"
-  fqn                  = "aria_provider_tests/actionA"
+  module               = "ARIA_PROVIDER_TEST_ACTIONS"
+  fqn                  = "ARIA_PROVIDER_TEST_ACTIONS/actionA"
   description          = "An action used by actionB."
   version              = "1.0.0"
   runtime              = "" # javascript
@@ -37,15 +37,15 @@ resource "aria_orchestrator_action" "test_a" {
 
 resource "aria_orchestrator_action" "test_b" {
   name                 = "actionB"
-  module               = "aria_provider_tests"
-  fqn                  = "aria_provider_tests/actionB"
+  module               = "ARIA_PROVIDER_TEST_ACTIONS"
+  fqn                  = "ARIA_PROVIDER_TEST_ACTIONS/actionB"
   description          = "An action using actionA."
   version              = "1.0.0"
   runtime              = "" # javascript
   runtime_memory_limit = 0
   runtime_timeout      = 0
   script               = <<EOT
- var actionA = System.getModule("aria_provider_tests").actionA();
+ var actionA = System.getModule("ARIA_PROVIDER_TEST_ACTIONS").actionA();
  EOT
   input_parameters     = []
   output_type          = "Any"
@@ -53,15 +53,15 @@ resource "aria_orchestrator_action" "test_b" {
 
 resource "aria_orchestrator_action" "test_c" {
   name                 = "actionC"
-  module               = "aria_provider_tests"
-  fqn                  = "aria_provider_tests/actionC"
+  module               = "ARIA_PROVIDER_TEST_ACTIONS"
+  fqn                  = "ARIA_PROVIDER_TEST_ACTIONS/actionC"
   description          = "An action using actionB."
   version              = "1.0.0"
   runtime              = "" # javascript
   runtime_memory_limit = 0
   runtime_timeout      = 0
   script               = <<EOT
- var actionA = System.getModule("aria_provider_tests").actionB();
+ var actionA = System.getModule("ARIA_PROVIDER_TEST_ACTIONS").actionB();
  EOT
   input_parameters     = []
   output_type          = "Any"
@@ -87,8 +87,8 @@ func TestAccOrchestratorActionForceDeleteResource(t *testing.T) {
 
 resource "aria_orchestrator_action" "test_d" {
   name                 = "actionD"
-  module               = "aria_provider_tests"
-  fqn                  = "aria_provider_tests/actionD"
+  module               = "ARIA_PROVIDER_TEST_ACTIONS"
+  fqn                  = "ARIA_PROVIDER_TEST_ACTIONS/actionD"
   description          = "An action used by actionE."
   version              = "1.0.0"
   runtime              = "" # javascript
@@ -102,15 +102,15 @@ resource "aria_orchestrator_action" "test_d" {
 
 resource "aria_orchestrator_action" "test_e" {
   name                 = "actionE"
-  module               = "aria_provider_tests"
-  fqn                  = "aria_provider_tests/actionE"
+  module               = "ARIA_PROVIDER_TEST_ACTIONS"
+  fqn                  = "ARIA_PROVIDER_TEST_ACTIONS/actionE"
   description          = "An action using actionD."
   version              = "1.0.0"
   runtime              = "" # javascript
   runtime_memory_limit = 0
   runtime_timeout      = 0
   script               = <<EOT
- var actionA = System.getModule("aria_provider_tests").actionD();
+ var actionA = System.getModule("ARIA_PROVIDER_TEST_ACTIONS").actionD();
  EOT
   input_parameters     = []
   output_type          = "Any"
@@ -122,15 +122,15 @@ resource "aria_orchestrator_action" "test_e" {
 				Config: `
 resource "aria_orchestrator_action" "test_e" {
   name                 = "actionE"
-  module               = "aria_provider_tests"
-  fqn                  = "aria_provider_tests/actionE"
+  module               = "ARIA_PROVIDER_TEST_ACTIONS"
+  fqn                  = "ARIA_PROVIDER_TEST_ACTIONS/actionE"
   description          = "An action using actionD."
   version              = "1.0.0"
   runtime              = "" # javascript
   runtime_memory_limit = 0
   runtime_timeout      = 0
   script               = <<EOT
- var actionA = System.getModule("aria_provider_tests").actionD();
+ var actionA = System.getModule("ARIA_PROVIDER_TEST_ACTIONS").actionD();
  EOT
   input_parameters     = []
   output_type          = "Any"

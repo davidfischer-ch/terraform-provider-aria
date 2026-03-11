@@ -19,7 +19,7 @@ func TestAccOrchestratorWorkflowCompleteExampleResource(t *testing.T) {
 			{
 				Config: `
 resource "aria_orchestrator_category" "root" {
-  name      = "TEST_ARIA_PROVIDER"
+  name      = "ARIA_PROVIDER_TEST"
   type      = "WorkflowCategory"
   parent_id = ""
 }
