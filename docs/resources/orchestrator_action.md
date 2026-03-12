@@ -3,12 +3,15 @@
 page_title: "aria_orchestrator_action Resource - aria"
 subcategory: ""
 description: |-
-  Orchestrator action resource
+  Orchestrator action resource.
+  ~> Note on deletion order: When Terraform knows about dependencies between actions (via depends_on or resource references), it destroys them in the correct order and deletion works reliably without force_delete. When dependencies are implicit (e.g. encoded only in action scripts), Terraform destroys actions in parallel and may encounter 409 conflicts. The provider implements a convergence algorithm that retries conflicting deletions up to 60 times with a 3-second delay (180 seconds total), expecting dependent actions to be removed concurrently. This worked on previous runs but has been consistently failing since March 2026 on our infrastructure, possibly due to a vRO API regression where the "in use" state is not cleared after dependent actions are deleted. If deletion fails, set force_delete = true on any action that may be referenced by others.
 ---
 
 # aria_orchestrator_action (Resource)
 
-Orchestrator action resource
+Orchestrator action resource.
+
+~> **Note on deletion order:** When Terraform knows about dependencies between actions (via `depends_on` or resource references), it destroys them in the correct order and deletion works reliably without `force_delete`. When dependencies are implicit (e.g. encoded only in action scripts), Terraform destroys actions in parallel and may encounter 409 conflicts. The provider implements a convergence algorithm that retries conflicting deletions up to 60 times with a 3-second delay (180 seconds total), expecting dependent actions to be removed concurrently. This worked on previous runs but has been consistently failing since March 2026 on our infrastructure, possibly due to a vRO API regression where the "in use" state is not cleared after dependent actions are deleted. If deletion fails, set `force_delete = true` on any action that may be referenced by others.
 
 ## Example Usage
 
