@@ -28,11 +28,11 @@ data "aria_secret" "example" {
 ### Read-Only
 
 - `created_at` (String) Creation date-time
-- `created_by` (String) Ask VMware
+- `created_by` (String) User who performed this action
 - `description` (String) Describe the resource in few sentences
 - `name` (String) Secret name
 - `org_id` (String) Organization identifier
 - `org_scoped` (Boolean) Scoped to the organization?
 - `project_ids` (Set of String) Restrict to given projects (an empty list means all)
 - `updated_at` (String) Changed date-time
-- `updated_by` (String) Ask VMware
+- `updated_by` (String) User who performed this action

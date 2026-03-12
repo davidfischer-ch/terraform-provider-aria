@@ -20,7 +20,7 @@ func CustomNamingTemplateCounterSchema() schema.NestedAttributeObject {
 				Computed:            true,
 			},
 			"project_id": schema.StringAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Project identifier associated with this counter",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseNonNullStateForUnknown(),

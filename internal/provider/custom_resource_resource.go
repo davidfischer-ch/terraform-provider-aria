@@ -68,16 +68,9 @@ func (self *CustomResourceResource) Create(
 	}
 
 	var resourceFromAPI CustomResourceAPIModel
-	path := resource.CreatePath()
-	response, err := self.client.R(path).
-		SetBody(resourceToAPI).
-		SetResult(&resourceFromAPI).
-		Post(path)
-	err = self.client.HandleAPIResponse(response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to create %s, got error: %s", resource.String(), err))
+	_, createDiags := self.client.CreateIt(&resource, &resourceFromAPI, resourceToAPI, 200)
+	resp.Diagnostics.Append(createDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
@@ -101,8 +94,8 @@ func (self *CustomResourceResource) Read(
 
 	var resourceFromAPI CustomResourceAPIModel
 	self.client.Mutex.RLock(ctx, resource.LockKey())
+	defer self.client.Mutex.RUnlock(ctx, resource.LockKey())
 	found, _, diags := self.client.ReadIt(&resource, &resourceFromAPI)
-	self.client.Mutex.RUnlock(ctx, resource.LockKey())
 	resp.Diagnostics.Append(diags...)
 
 	if !found {
@@ -138,6 +131,7 @@ func (self *CustomResourceResource) Update(
 	}
 
 	self.client.Mutex.Lock(ctx, resource.LockKey())
+	defer self.client.Mutex.Unlock(ctx, resource.LockKey())
 
 	// Read resource to retrieve latest value for additional actions
 	var resourceFromAPI CustomResourceAPIModel
@@ -152,8 +146,6 @@ func (self *CustomResourceResource) Update(
 					"Unable to update %s: Not found.",
 					resource.String()))
 		}
-
-		self.client.Mutex.Unlock(ctx, resource.LockKey())
 		return
 	}
 
@@ -162,19 +154,10 @@ func (self *CustomResourceResource) Update(
 
 	// Reset to prevent muxing of old/new data
 	resourceFromAPI = CustomResourceAPIModel{}
-	path := resource.UpdatePath()
-	response, err := self.client.R(path).
-		SetBody(resourceToAPI).
-		SetResult(&resourceFromAPI).
-		Post(path)
+	_, updateDiags := self.client.UpdateIt(&resource, &resourceFromAPI, resourceToAPI, "POST")
 
-	self.client.Mutex.Unlock(ctx, resource.LockKey())
-
-	err = self.client.HandleAPIResponse(response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to update %s, got error: %s", resource.String(), err))
+	resp.Diagnostics.Append(updateDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
@@ -194,8 +177,8 @@ func (self *CustomResourceResource) Delete(
 	resp.Diagnostics.Append(req.State.Get(ctx, &resource)...)
 	if !resp.Diagnostics.HasError() {
 		self.client.Mutex.Lock(ctx, resource.LockKey())
+		defer self.client.Mutex.Unlock(ctx, resource.LockKey())
 		resp.Diagnostics.Append(self.client.DeleteIt(&resource)...)
-		self.client.Mutex.Unlock(ctx, resource.LockKey())
 	}
 }
 

@@ -129,7 +129,7 @@ func ABXActionSchema() schema.Schema {
 				},
 			},
 			"async_deployed": schema.BoolAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Whether the action has been deployed asynchronously",
 				Computed:            true,
 				PlanModifiers: []planmodifier.Bool{
 					boolplanmodifier.UseNonNullStateForUnknown(),

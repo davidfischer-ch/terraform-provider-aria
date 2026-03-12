@@ -62,16 +62,9 @@ func (self *OrchestratorCategoryResource) Create(
 	}
 
 	var categoryFromAPI OrchestratorCategoryAPIModel
-	path := category.CreatePath()
-	response, err := self.client.R(path).
-		SetBody(category.ToAPI()).
-		SetResult(&categoryFromAPI).
-		Post(path)
-	err = self.client.HandleAPIResponse(response, err, []int{201})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to create %s, got error: %s", category.String(), err))
+	_, createDiags := self.client.CreateIt(&category, &categoryFromAPI, category.ToAPI())
+	resp.Diagnostics.Append(createDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
@@ -134,13 +127,9 @@ func (self *OrchestratorCategoryResource) Update(
 
 	// Read (using API) to retrieve the category content (and not empty stuff)
 	var categoryFromAPI OrchestratorCategoryAPIModel
-	path = category.ReadPath()
-	response, err = self.client.R(path).SetResult(&categoryFromAPI).Get(category.ReadPath())
-	err = self.client.HandleAPIResponse(response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to read %s, got error: %s", category.String(), err))
+	found, _, readDiags := self.client.ReadIt(&category, &categoryFromAPI)
+	resp.Diagnostics.Append(readDiags...)
+	if !found || resp.Diagnostics.HasError() {
 		return
 	}
 

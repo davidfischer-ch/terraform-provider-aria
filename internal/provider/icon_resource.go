@@ -69,6 +69,7 @@ func (self *IconResource) Create(
 	lockKey := icon.LockKey()
 	path := icon.CreatePath()
 	self.client.Mutex.Lock(ctx, lockKey)
+	defer self.client.Mutex.Unlock(ctx, lockKey)
 	response, err := self.client.R(path).SetFile("file", icon.Path.ValueString()).Post(path)
 	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
@@ -95,7 +96,6 @@ func (self *IconResource) Create(
 
 	path = icon.ReadPath()
 	response, err = self.client.R(path).Get(path)
-	self.client.Mutex.Unlock(ctx, lockKey)
 	err = self.client.HandleAPIResponse(response, err, []int{200})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -125,8 +125,8 @@ func (self *IconResource) Read(
 
 	path := icon.ReadPath()
 	self.client.Mutex.RLock(ctx, icon.LockKey())
+	defer self.client.Mutex.RUnlock(ctx, icon.LockKey())
 	response, err := self.client.R(path).Get(path)
-	self.client.Mutex.RUnlock(ctx, icon.LockKey())
 
 	// Handle gracefully a resource that has vanished on the platform
 	// Beware that some APIs respond with HTTP 404 instead of 403 ...
@@ -175,7 +175,7 @@ func (self *IconResource) Delete(
 	resp.Diagnostics.Append(req.State.Get(ctx, &icon)...)
 	if !resp.Diagnostics.HasError() && !icon.KeepOnDestroy.ValueBool() {
 		self.client.Mutex.Lock(ctx, icon.LockKey())
+		defer self.client.Mutex.Unlock(ctx, icon.LockKey())
 		resp.Diagnostics.Append(self.client.DeleteIt(&icon)...)
-		self.client.Mutex.Unlock(ctx, icon.LockKey())
 	}
 }

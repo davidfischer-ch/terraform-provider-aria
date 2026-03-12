@@ -80,13 +80,9 @@ func (self *SubscriptionResource) Create(
 
 	// Read (using API) to retrieve the subscription content (and not empty stuff)
 	var subscriptionFromAPI SubscriptionAPIModel
-	path = subscription.ReadPath()
-	response, err = self.client.R(path).SetResult(&subscriptionFromAPI).Get(path)
-	err = self.client.HandleAPIResponse(response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to read %s, got error: %s", subscription.String(), err))
+	found, _, readDiags := self.client.ReadIt(&subscription, &subscriptionFromAPI)
+	resp.Diagnostics.Append(readDiags...)
+	if !found || resp.Diagnostics.HasError() {
 		return
 	}
 
@@ -155,13 +151,9 @@ func (self *SubscriptionResource) Update(
 
 	// Read (using API) to retrieve the subscription content (and not empty stuff)
 	var subscriptionFromAPI SubscriptionAPIModel
-	path = subscription.ReadPath()
-	response, err = self.client.R(path).SetResult(&subscriptionFromAPI).Get(path)
-	err = self.client.HandleAPIResponse(response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to read %s, got error: %s", subscription.String(), err))
+	found, _, readDiags := self.client.ReadIt(&subscription, &subscriptionFromAPI)
+	resp.Diagnostics.Append(readDiags...)
+	if !found || resp.Diagnostics.HasError() {
 		return
 	}
 
