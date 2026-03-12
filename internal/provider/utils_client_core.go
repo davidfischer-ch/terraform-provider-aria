@@ -170,7 +170,7 @@ func (self AriaClient) DeleteIt(
 	conflictMaxAttemptsOptional ...int,
 ) diag.Diagnostics {
 	// Default value, see https://stackoverflow.com/questions/19612449
-	conflictMaxAttempts := 5
+	conflictMaxAttempts := 60
 	if len(conflictMaxAttemptsOptional) > 0 {
 		conflictMaxAttempts = conflictMaxAttemptsOptional[0]
 	}
