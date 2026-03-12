@@ -70,16 +70,9 @@ func (self *OrchestratorEnvironmentResource) Create(
 	}
 
 	var environmentFromAPI OrchestratorEnvironmentAPIModel
-	path := environment.CreatePath()
-	response, err := self.client.R(path).
-		SetBody(environmentToAPI).
-		SetResult(&environmentFromAPI).
-		Post(path)
-	err = self.client.HandleAPIResponse(response, err, []int{201})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to create %s, got error: %s", environment.String(), err))
+	response, createDiags := self.client.CreateIt(&environment, &environmentFromAPI, environmentToAPI)
+	resp.Diagnostics.Append(createDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 

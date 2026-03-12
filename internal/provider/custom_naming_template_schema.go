@@ -35,19 +35,19 @@ func CustomNamingTemplateSchema() schema.NestedAttributeObject {
 				},
 			},
 			"unique_name": schema.BoolAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Whether generated names must be unique",
 				Required:            true,
 			},
 			"pattern": schema.StringAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Naming pattern including dynamic parts (e.g. `${resource.name}`)",
 				Required:            true,
 			},
 			"static_pattern": schema.StringAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Static portion of the naming pattern (without dynamic parts)",
 				Required:            true,
 			},
 			"start_counter": schema.Int32Attribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Initial counter value (default `1`)",
 				Computed:            true,
 				Optional:            true,
 				Default:             int32default.StaticInt32(1),
@@ -56,7 +56,7 @@ func CustomNamingTemplateSchema() schema.NestedAttributeObject {
 				},
 			},
 			"increment_step": schema.Int32Attribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Counter increment step (default `1`)",
 				Computed:            true,
 				Optional:            true,
 				Default:             int32default.StaticInt32(1),

@@ -67,6 +67,7 @@ func (self IntegrationDataSourceModel) ReadPath() string {
 	if typeId == "com.vmw.vro.workflow" {
 		resource = "workflows"
 	} else {
+		// Panic is intentional: this is a programming bug, not a runtime error.
 		panic(fmt.Sprintf("Internal error: %s as unexpected type: %s.", self.String(), typeId))
 	}
 	return fmt.Sprintf("catalog/api/types/%s/data/%s", typeId, resource)

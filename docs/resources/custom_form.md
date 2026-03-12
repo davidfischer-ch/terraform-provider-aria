@@ -32,4 +32,4 @@ Form definition
 - `form_format` (String) Form format either `JSON` or `YAML`, will be forced to JSON by Aria so you have no choice...
 - `id` (String) Identifier
 - `status` (String) Resource status, one of `DRAFT`, `ON`, or `RELEASED`
-- `tenant` (String) TODO
+- `tenant` (String) Tenant identifier

@@ -43,6 +43,6 @@ output "abx_actions_catalog_type" {
 
 - `base_uri` (String) Base URI
 - `created_at` (String) Creation date
-- `created_by` (String) Ask VMware
+- `created_by` (String) User who created this catalog type
 - `icon_id` (String) Icon identifier
 - `name` (String) Type name

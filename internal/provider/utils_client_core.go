@@ -60,6 +60,7 @@ func (self *AriaClient) Init() diag.Diagnostics {
 
 	client := resty.New()
 	client.SetBaseURL(self.Host)
+	client.SetTimeout(300 * time.Second)
 	client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: self.Insecure})
 	if len(self.AccessToken) > 0 {
 		client.SetAuthToken(self.AccessToken)
@@ -124,6 +125,55 @@ func (self AriaClient) R(path string) *resty.Request {
 	return self.Client.R()
 }
 
+func (self AriaClient) CreateIt(
+	instance Model,
+	instanceRaw APIModel,
+	body any,
+	statusCodes ...int,
+) (*resty.Response, diag.Diagnostics) {
+	diags := diag.Diagnostics{}
+
+	// Default status codes
+	if len(statusCodes) == 0 {
+		statusCodes = []int{201}
+	}
+
+	path := instance.CreatePath()
+	response, err := self.R(path).SetBody(body).SetResult(&instanceRaw).Post(path)
+	err = self.HandleAPIResponse(response, err, statusCodes)
+	if err != nil {
+		diags.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to create %s, got error: %s", instance.String(), err))
+	}
+	return response, diags
+}
+
+func (self AriaClient) UpdateIt(
+	instance Model,
+	instanceRaw APIModel,
+	body any,
+	method string,
+	statusCodes ...int,
+) (*resty.Response, diag.Diagnostics) {
+	diags := diag.Diagnostics{}
+
+	// Default status codes
+	if len(statusCodes) == 0 {
+		statusCodes = []int{200}
+	}
+
+	path := instance.UpdatePath()
+	response, err := self.R(path).SetBody(body).SetResult(&instanceRaw).Execute(method, path)
+	err = self.HandleAPIResponse(response, err, statusCodes)
+	if err != nil {
+		diags.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to update %s, got error: %s", instance.String(), err))
+	}
+	return response, diags
+}
+
 func (self AriaClient) ReadIt(
 	instance Model,
 	instanceRaw APIModel,
@@ -150,6 +200,13 @@ func (self AriaClient) ReadIt(
 	}
 
 	response, err := self.R(path).SetResult(&instanceRaw).Get(path)
+	if err != nil {
+		diags.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to read %s, got error: %s", instance.String(), err))
+		return false, response, diags
+	}
+
 	if response.StatusCode() == 404 {
 		self.Debug("%s not found", instance.String())
 		return false, response, diags
@@ -170,7 +227,7 @@ func (self AriaClient) DeleteIt(
 	conflictMaxAttemptsOptional ...int,
 ) diag.Diagnostics {
 	// Default value, see https://stackoverflow.com/questions/19612449
-	conflictMaxAttempts := 5
+	conflictMaxAttempts := 60
 	if len(conflictMaxAttemptsOptional) > 0 {
 		conflictMaxAttempts = conflictMaxAttemptsOptional[0]
 	}
@@ -188,7 +245,7 @@ func (self AriaClient) DeleteIt(
 		if err != nil {
 			// This is potentially an error that will be solved by the deletion of other resources.
 			// We can retry the delete operation after some time to converge to desired state.
-			if attempt < conflictMaxAttempts && response.StatusCode() == 409 {
+			if attempt < conflictMaxAttempts && response != nil && response.StatusCode() == 409 {
 				time.Sleep(time.Duration(3) * time.Second) // TODO better with randomness?
 				continue
 			}
@@ -215,7 +272,7 @@ func (self AriaClient) DeleteIt(
 			if err != nil {
 				diags.AddError(
 					"Client error",
-					fmt.Sprintf("Unable to poll %s will deleting it, got error: %s", name, err))
+					fmt.Sprintf("Unable to poll %s while deleting it, got error: %s", name, err))
 				return diags
 			}
 
@@ -260,29 +317,69 @@ func (self AriaClient) HandleAPIResponse(
 	return err
 }
 
+// Sensitive JSON keys whose values must be redacted in logs.
+var sensitiveJSONKeys = map[string]bool{
+	"refreshToken":      true,
+	"token":             true,
+	"systemCredentials": true,
+}
+
+// redactSensitiveKeys walks a JSON structure and replaces sensitive values with "<REDACTED>".
+func redactSensitiveKeys(data any) any {
+	switch v := data.(type) {
+	case map[string]any:
+		for key, val := range v {
+			if sensitiveJSONKeys[key] {
+				v[key] = "<REDACTED>"
+			} else {
+				v[key] = redactSensitiveKeys(val)
+			}
+		}
+		return v
+	case []any:
+		for i, val := range v {
+			v[i] = redactSensitiveKeys(val)
+		}
+		return v
+	default:
+		return data
+	}
+}
+
+func redactJSON(raw []byte) []byte {
+	var data any
+	if json.Unmarshal(raw, &data) != nil {
+		return raw
+	}
+	redactSensitiveKeys(data)
+	result, err := json.MarshalIndent(data, "", "\t")
+	if err != nil {
+		return raw
+	}
+	return result
+}
+
 func (self AriaClient) LogAPIResponseInfo(
 	response *resty.Response,
 	err error,
 	statusCodesText string,
 ) {
+	if response == nil {
+		self.Error("API call failed (no response): %s", err)
+		return
+	}
 	request := response.Request
 	requestBody, requestBodyErr := json.MarshalIndent(request.Body, "", "\t")
 	if requestBodyErr != nil {
 		requestBody = []byte("<body>")
 	}
+	requestBody = redactJSON(requestBody)
 
 	var responseBody []byte
 	if strings.Contains(request.URL, "icon/api/icons") && request.Method == "GET" {
 		responseBody = []byte("<THE ICON>")
 	} else {
-		var responseData any
-		responseBody = response.Body()
-		if json.Unmarshal(responseBody, &responseData) == nil {
-			body, bodyErr := json.MarshalIndent(responseData, "", "\t")
-			if bodyErr == nil {
-				responseBody = body
-			}
-		}
+		responseBody = redactJSON(response.Body())
 	}
 
 	level := self.OKAPICallsLogLevel
@@ -359,5 +456,6 @@ func (self AriaClient) GetVersionFromPath(path string) string {
 	if strings.HasPrefix(path, "vro") {
 		return ORCHESTRATOR_GATEWAY_API_VERSION
 	}
+	// Panic is intentional: this is a programming bug, not a runtime error.
 	panic(fmt.Sprintf("GetVersionFromPath Not Implemented for path %s", path))
 }

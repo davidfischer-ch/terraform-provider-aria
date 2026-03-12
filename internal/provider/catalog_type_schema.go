@@ -25,7 +25,7 @@ func CatalogTypeDataSourceSchema() schema.Schema {
 				Computed:            true,
 			},
 			"created_by": schema.StringAttribute{
-				MarkdownDescription: "Ask VMware",
+				MarkdownDescription: "User who created this catalog type",
 				Computed:            true,
 			},
 			"icon_id": schema.StringAttribute{

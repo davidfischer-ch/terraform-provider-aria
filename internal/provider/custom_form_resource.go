@@ -95,13 +95,9 @@ func (self *CustomFormResource) Create(
 
 	// Read (using API) to retrieve the custom form content (and not empty stuff)
 	var formFromAPI CustomFormAPIModel
-	path = form.ReadPath()
-	response, err = self.client.R(path).SetResult(&formFromAPI).Get(path)
-	err = self.client.HandleAPIResponse(response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to read %s, got error: %s", form.String(), err))
+	found, _, readDiags := self.client.ReadIt(&form, &formFromAPI)
+	resp.Diagnostics.Append(readDiags...)
+	if !found || resp.Diagnostics.HasError() {
 		return
 	}
 
@@ -164,13 +160,9 @@ func (self *CustomFormResource) Update(
 
 	// Read (using API) to retrieve the custom form content (and not empty stuff)
 	var formFromAPI CustomFormAPIModel
-	path = form.ReadPath()
-	response, err = self.client.R(path).SetResult(&formFromAPI).Get(path)
-	err = self.client.HandleAPIResponse(response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to read %s, got error: %s", form.String(), err))
+	found, _, readDiags := self.client.ReadIt(&form, &formFromAPI)
+	resp.Diagnostics.Append(readDiags...)
+	if !found || resp.Diagnostics.HasError() {
 		return
 	}
 

@@ -80,7 +80,7 @@ Required:
 
 Optional:
 
-- `allocate_per_instance` (Boolean) TODO
+- `allocate_per_instance` (Boolean) Whether to allocate resources per instance
 
 
 <a id="nestedatt--validation_messages"></a>

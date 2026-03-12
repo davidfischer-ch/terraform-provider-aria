@@ -72,6 +72,7 @@ func (self ResourceActionModel) LockKey() string {
 
 func (self ResourceActionModel) CreatePath() string {
 	if self.ForCustom() {
+		// Panic is intentional: custom resource actions are managed via the custom resource API.
 		panic("Managing custom resource's action is made through the custom resource API")
 	}
 	return "form-service/api/custom/resource-actions"
@@ -88,6 +89,7 @@ func (self ResourceActionModel) ReadPath() string {
 
 func (self ResourceActionModel) UpdatePath() string {
 	if self.ForCustom() {
+		// Panic is intentional: custom resource actions are managed via the custom resource API.
 		panic("Managing custom resource's action is made through the custom resource API")
 	}
 	return "form-service/api/custom/resource-actions"
@@ -95,6 +97,7 @@ func (self ResourceActionModel) UpdatePath() string {
 
 func (self ResourceActionModel) DeletePath() string {
 	if self.ForCustom() {
+		// Panic is intentional: custom resource actions are managed via the custom resource API.
 		panic("Managing custom resource's action is made through the custom resource API")
 	}
 	return "form-service/api/custom/resource-actions/" + self.Id.ValueString()

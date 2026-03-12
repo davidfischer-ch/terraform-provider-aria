@@ -81,7 +81,7 @@ func CustomFormSchema() schema.Schema {
 				},
 			},
 			"tenant": schema.StringAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Tenant identifier",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseNonNullStateForUnknown(),
@@ -174,7 +174,7 @@ func NestedCustomFormSchema() schema.SingleNestedAttribute {
 				},
 			},
 			"tenant": schema.StringAttribute{
-				MarkdownDescription: "TODO",
+				MarkdownDescription: "Tenant identifier",
 				Computed:            true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseNonNullStateForUnknown(),

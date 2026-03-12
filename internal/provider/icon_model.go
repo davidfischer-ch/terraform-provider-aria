@@ -43,6 +43,7 @@ func (self IconModel) ReadPath() string {
 }
 
 func (self IconModel) UpdatePath() string {
+	// Panic is intentional: calling this means a programming bug, immutable resources have no update path.
 	panic(fmt.Sprintf("Cannot update %s, this type of resource is immutable.", self.String()))
 }
 
