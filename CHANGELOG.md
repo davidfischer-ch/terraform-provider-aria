@@ -1,5 +1,24 @@
 # Changelog
 
+## Release v0.7.2 (2026-03-12)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.7.1...v0.7.2
+
+### Features
+
+* Add `cleanup` standalone binary (`cmd/cleanup`) to delete leftover test resources matching the `ARIA_PROVIDER_TEST` naming convention, with interactive confirmation and correct sweep order (referencers before referenced resources)
+
+### Fix and enhancements
+
+* API client: Redact `refreshToken`, `token`, and `systemCredentials` from request/response logs
+* API client: Set HTTP timeout to 300 seconds
+* API client: Guard against nil response dereferences in `ReadIt`, `DeleteIt`, and `LogAPIResponseInfo`
+* API client: Increase delete conflict retry count to wait up to 180s (sometimes it takes up to 60s in practice)
+* Resource `aria_icon`, `aria_custom_resource`, `aria_orchestrator_action`, `aria_resource_action`: Use `defer` for mutex unlock to prevent potential deadlocks on early-return paths
+* Resource `aria_orchestrator_workflow`: URL-encode workflow ID when used as a query parameter
+* Replace placeholder descriptions (`Ask VMware`, `TODO`) in `aria_catalog_type` and `aria_secret` schema attributes
+* Merge dependabot dependencies update requests
+
 ## Release v0.7.1 (2026-01-02)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.7.0...v0.7.1
