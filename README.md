@@ -10,10 +10,12 @@ Please be aware that Broadcom is not responsible neither involved on this projec
 
 _This provider is built on the [Terraform Plugin Framework](https://github.com/hashicorp/terraform-plugin-framework). See [Which SDK Should I Use?](https://developer.hashicorp.com/terraform/plugin/framework-benefits) in the Terraform documentation for additional information._
 
+
 ## Requirements
 
-- [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.0
-- [Go](https://golang.org/doc/install) >= 1.21
+* [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.0
+* [Go](https://golang.org/doc/install) >= 1.21
+
 
 ## Building The Provider
 
@@ -24,6 +26,7 @@ _This provider is built on the [Terraform Plugin Framework](https://github.com/h
 ```shell
 go install
 ```
+
 
 ## Adding Dependencies
 
@@ -39,9 +42,11 @@ go mod tidy
 
 Then commit the changes to `go.mod` and `go.sum`.
 
+
 ## Using the provider
 
 Fill this in for each provider
+
 
 ## Developing the Provider
 
