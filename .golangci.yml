@@ -1,19 +1,15 @@
 # Visit https://golangci-lint.run/ for usage documentation
 # and information on other useful linters
-issues:
-  max-per-linter: 0
-  max-same-issues: 0
+version: "2"
 
 linters:
-  disable-all: true
+  default: none
   enable:
     - copyloopvar
     - durationcheck
     - errcheck
     - forcetypeassert
     - godot
-    - gofmt
-    - gosimple
     - govet
     - ineffassign
     - makezero
@@ -25,3 +21,19 @@ linters:
     - unparam
     - unused
     - usetesting
+  settings:
+    staticcheck:
+      # v2 folds gosimple (S1*) and stylecheck (ST*) into staticcheck and enables
+      # them by default. Restrict to the SA* (staticcheck) and S1* (gosimple) checks
+      # this repo enabled under v1, so the migration adds no new findings.
+      checks:
+        - SA*
+        - S1*
+
+formatters:
+  enable:
+    - gofmt
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
