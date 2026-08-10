@@ -13,7 +13,7 @@ _This provider is built on the [Terraform Plugin Framework](https://github.com/h
 ## Requirements
 
 - [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.0
-- [Go](https://golang.org/doc/install) >= 1.21
+- [Go](https://golang.org/doc/install) >= 1.25
 
 ## Building The Provider
 
@@ -45,12 +45,28 @@ Fill this in for each provider
 
 ## Developing the Provider
 
-If you wish to work on the provider, you'll first need [Go](http://www.golang.org) installed on your machine (see [Requirements](#requirements) above).
+If you wish to work on the provider, you'll first need [Go](http://www.golang.org) installed on your
+machine (see [Requirements](#requirements) above).
 
-To compile the provider, run `go install`. This will build the provider and put the provider binary in the `$GOPATH/bin` directory.
+To compile the provider, run `go install`. This will build the provider and put the provider binary
+in the `$GOPATH/bin` directory.
 
 To generate or update documentation, run `go generate ./...`.
 To format the code run `find . -name "*.go" -exec gofmt -s -w {} \;`.
+
+### Pre-push checks
+
+`make check` runs the same steps as the CI **Tests** workflow (build, vet, lint, generate, unit
+tests) against your working tree. Run it before pushing to catch failures locally. The unit tests
+step provides its own dummy `ARIA_HOST` and `ARIA_REFRESH_TOKEN`, no setup required.
+
+```shell
+make check                    # all steps
+make check ARGS="build lint"  # only the named steps
+```
+
+The script lives at `scripts/check.sh` and can be run directly. It installs the pinned golangci-lint
+release into `./bin` when absent, matching the version CI uses.
 
 ### Unit tests
 
@@ -64,6 +80,8 @@ go test ./...
 ```
 
 ### Linting
+
+Requires golangci-lint v2 (the `.golangci.yml` config uses the v2 schema).
 
 ```shell
 golangci-lint run --timeout 10m ./...
