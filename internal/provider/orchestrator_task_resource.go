@@ -36,7 +36,7 @@ func NewOrchestratorTaskResource() resource.Resource {
 
 // Create special-cases the "suspended" state. The API refuses to create a task directly as
 // "suspended" and silently falls back to "pending", which Terraform rejects as an inconsistent
-// result after apply. When the plan asks for "suspended", create the task as "scheduled" first,
+// result after apply. When the plan asks for "suspended", create the task as "pending" first,
 // then suspend it with a follow-up update.
 func (self *OrchestratorTaskResource) Create(
 	ctx context.Context,
@@ -57,9 +57,11 @@ func (self *OrchestratorTaskResource) Create(
 		return
 	}
 
-	// A task must exist in a non-suspended state before it can be suspended.
+	// A task must exist in a non-suspended state before it can be suspended. "pending" is the only
+	// state the API accepts on creation: it rejects "scheduled" with 400 and silently downgrades
+	// "suspended" to "pending".
 	if suspendAfterCreate {
-		toAPI.State = "scheduled"
+		toAPI.State = "pending"
 	}
 
 	var raw OrchestratorTaskAPIModel
