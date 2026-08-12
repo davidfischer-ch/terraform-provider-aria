@@ -170,7 +170,9 @@ func (self *ABXActionModel) FromAPI(
 	diags.Append(someDiags...)
 
 	self.Dependencies, someDiags = types.ListValueFrom(
-		ctx, types.StringType, SkipEmpty(strings.Split(raw.Dependencies, "\n")),
+		ctx,
+		types.StringType,
+		SkipEmpty(strings.Split(raw.Dependencies, "\n")),
 	)
 	diags.Append(someDiags...)
 
