@@ -68,7 +68,11 @@ func (self *OrchestratorConfigurationResource) Create(
 	}
 
 	var configurationFromAPI OrchestratorConfigurationAPIModel
-	response, createDiags := self.client.CreateIt(&configuration, &configurationFromAPI, configurationToAPI)
+	response, createDiags := self.client.CreateIt(
+		&configuration,
+		&configurationFromAPI,
+		configurationToAPI,
+	)
 	resp.Diagnostics.Append(createDiags...)
 	if resp.Diagnostics.HasError() {
 		return

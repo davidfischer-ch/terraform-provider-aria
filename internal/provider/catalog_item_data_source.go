@@ -49,7 +49,9 @@ func (self *CatalogItemDataSource) Configure(
 	self.client = GetDataSourceClient(ctx, req, resp)
 }
 
-func (self CatalogItemDataSource) ConfigValidators(ctx context.Context) []datasource.ConfigValidator {
+func (self CatalogItemDataSource) ConfigValidators(
+	ctx context.Context,
+) []datasource.ConfigValidator {
 	return []datasource.ConfigValidator{
 		datasourcevalidator.ExactlyOneOf(
 			path.MatchRoot("id"),

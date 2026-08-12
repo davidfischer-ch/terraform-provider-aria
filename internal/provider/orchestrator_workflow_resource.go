@@ -274,7 +274,10 @@ func (self *OrchestratorWorkflowResource) WaitImported(
 			fmt.Sprintf("Poll %d of %d - Check %s is imported...", attempt+1, maxAttempts, name))
 
 		var fromGatewayAPI OrchestratorWorkflowGatewayAPIModel
-		found, _, someDiags := self.client.ReadIt(workflow, &fromGatewayAPI, workflow.ReadGatewayPath())
+		found, _, someDiags := self.client.ReadIt(
+			workflow,
+			&fromGatewayAPI,
+			workflow.ReadGatewayPath())
 		diags.Append(someDiags...)
 		if !found {
 			continue // Continue polling
