@@ -257,7 +257,7 @@ resource "aria_orchestrator_task" "test" {
 
 			// Create directly as "suspended" and Read testing.
 			// Switching the workflow forces a replacement, so the task is created from scratch with
-			// state = "suspended". The provider must create it as "scheduled" then suspend it,
+			// state = "suspended". The provider must create it as "pending" then suspend it,
 			// otherwise the API falls back to "pending" and the apply is inconsistent.
 			{
 				Config: `

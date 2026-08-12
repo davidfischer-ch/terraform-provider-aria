@@ -159,7 +159,7 @@ func runTaskCreate(t *testing.T, plannedState string, failUpdate bool) taskCreat
 	return res
 }
 
-// A task requested as "suspended" must be created as "scheduled" then suspended with an update,
+// A task requested as "suspended" must be created as "pending" then suspended with an update,
 // otherwise the API falls back to "pending" and the apply is inconsistent.
 func TestOrchestratorTaskResourceCreateSuspended(t *testing.T) {
 	res := runTaskCreate(t, "suspended", false)
@@ -167,8 +167,8 @@ func TestOrchestratorTaskResourceCreateSuspended(t *testing.T) {
 	if res.hasError {
 		t.Fatalf("unexpected Create error: %s", res.errDetail)
 	}
-	if res.createState != "scheduled" {
-		t.Errorf("create request state = %q, want %q", res.createState, "scheduled")
+	if res.createState != "pending" {
+		t.Errorf("create request state = %q, want %q", res.createState, "pending")
 	}
 	if res.updateCalls != 1 {
 		t.Errorf("update requests = %d, want 1", res.updateCalls)
@@ -217,8 +217,8 @@ func TestOrchestratorTaskResourceCreateSuspendedUpdateFails(t *testing.T) {
 		t.Errorf("persisted id = %q, want %q (created task must stay tracked)",
 			res.finalID, "task-123")
 	}
-	if res.finalState != "scheduled" {
+	if res.finalState != "pending" {
 		t.Errorf("persisted state = %q, want %q (intermediate create state)",
-			res.finalState, "scheduled")
+			res.finalState, "pending")
 	}
 }
