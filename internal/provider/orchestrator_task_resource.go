@@ -115,3 +115,51 @@ func (self *OrchestratorTaskResource) Create(
 	resp.Diagnostics.Append(resp.State.Set(ctx, &model)...)
 	tflog.Debug(ctx, fmt.Sprintf("Created and suspended %s successfully", model.String()))
 }
+
+// Update special-cases the "state" field. The API treats any state in the update body as a
+// lifecycle transition request and rejects a no-op transition (e.g. re-suspending an
+// already-suspended task) with 409 "Cannot resume task". The state is sent only when it actually
+// changes; otherwise it is omitted (json:"state,omitempty") and the update leaves the lifecycle
+// state untouched. Read refreshes the prior state before each plan, hence a genuine drift still
+// differs from the desired state and gets reconciled.
+func (self *OrchestratorTaskResource) Update(
+	ctx context.Context,
+	req resource.UpdateRequest,
+	resp *resource.UpdateResponse,
+) {
+	var plan OrchestratorTaskModel
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	var state OrchestratorTaskModel
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	toAPI, diags := plan.ToAPI(ctx)
+	resp.Diagnostics.Append(diags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// Omit the state unless the plan actually changes it. An otherwise unrelated update (name,
+	// schedule, ...) must not trigger a spurious lifecycle transition the API refuses with 409.
+	if plan.State.ValueString() == state.State.ValueString() {
+		toAPI.State = ""
+	}
+
+	var raw OrchestratorTaskAPIModel
+	_, updateDiags := self.client.UpdateIt(
+		&plan, &raw, toAPI, self.config.getUpdateMethod(), self.config.UpdateCodes...)
+	resp.Diagnostics.Append(updateDiags...)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	resp.Diagnostics.Append(plan.FromAPI(ctx, raw)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &plan)...)
+	tflog.Debug(ctx, fmt.Sprintf("Updated %s successfully", plan.String()))
+}
