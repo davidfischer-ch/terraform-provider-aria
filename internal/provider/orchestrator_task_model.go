@@ -28,7 +28,8 @@ type OrchestratorTaskModel struct {
 	State               types.String      `tfsdk:"state"`
 	User                types.String      `tfsdk:"user"`
 
-	/* InputParameters types.List `tfsdk:"input_parameters"` */
+	InputParameters types.List `tfsdk:"input_parameters"`
+	// Of type ParameterModel
 
 	Workflow types.Object `tfsdk:"workflow"`
 
@@ -53,8 +54,9 @@ type OrchestratorTaskAPIModel struct {
 	State               string `json:"state,omitempty"`
 	User                string `json:"user,omitempty"`
 
-	InputParameters []any                            `json:"input-parameters"`
-	Workflow        OrchestratorTaskWorkflowAPIModel `json:"workflow"`
+	InputParameters []ParameterAPIModel `json:"input-parameters"`
+
+	Workflow OrchestratorTaskWorkflowAPIModel `json:"workflow"`
 
 	/*
 		Relations []RelationAPIModel `json:"relations",
@@ -120,7 +122,8 @@ func (self *OrchestratorTaskModel) FromAPI(
 		diags.Append(someDiags...)
 	}
 
-	/* InputParameters = types.List */
+	self.InputParameters, someDiags = ParameterModelListFromAPI(ctx, raw.InputParameters)
+	diags.Append(someDiags...)
 
 	// Convert workflow from raw and then to object
 	workflow := OrchestratorTaskWorkflowModel{}
@@ -134,10 +137,15 @@ func (self *OrchestratorTaskModel) FromAPI(
 func (self OrchestratorTaskModel) ToAPI(
 	ctx context.Context,
 ) (OrchestratorTaskAPIModel, diag.Diagnostics) {
-	inputParametersRaw := []any{}
-
 	diags := diag.Diagnostics{}
 	workflowRaw := OrchestratorTaskWorkflowAPIModel{}
+
+	inputParametersRaw, someDiags := ParameterModelListToAPI(
+		ctx,
+		self.InputParameters,
+		fmt.Sprintf("%s, %s", self.String(), "input_parameters"),
+	)
+	diags.Append(someDiags...)
 
 	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/object
 	if self.Workflow.IsNull() || self.Workflow.IsUnknown() {

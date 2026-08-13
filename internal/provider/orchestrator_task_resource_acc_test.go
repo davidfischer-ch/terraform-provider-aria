@@ -62,7 +62,13 @@ resource "aria_orchestrator_task" "test" {
   start_mode            = "normal"
   state                 = "pending"
 
-  # input_parameters = [] not yet implemented
+  input_parameters = [
+    {
+      name        = "vraHost"
+      type        = "VRA:Host"
+      description = "Target vRA host"
+    },
+  ]
 
   workflow = {
     id   = aria_orchestrator_workflow.test.id
@@ -83,6 +89,11 @@ resource "aria_orchestrator_task" "test" {
 					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "start_mode", "normal"),
 					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "state", "pending"),
 					resource.TestCheckResourceAttrSet("aria_orchestrator_task.test", "user"),
+					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "input_parameters.#", "1"),
+					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "input_parameters.0.name", "vraHost"),
+					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "input_parameters.0.type", "VRA:Host"),
+					resource.TestCheckResourceAttr(
+						"aria_orchestrator_task.test", "input_parameters.0.description", "Target vRA host"),
 					resource.TestCheckResourceAttrPair(
 						"aria_orchestrator_task.test", "workflow.id",
 						"aria_orchestrator_workflow.test", "id",
@@ -143,7 +154,18 @@ resource "aria_orchestrator_task" "test" {
   start_mode            = "normal"
   state                 = "suspended"
 
-  # input_parameters = [] not yet implemented
+  input_parameters = [
+    {
+      name        = "vraHost"
+      type        = "VRA:Host"
+      description = "Target vRA host"
+    },
+    {
+      name        = "maxDurationSeconds"
+      type        = "number"
+      description = "Maximum task duration in seconds"
+    },
+  ]
 
   workflow = {
     id   = aria_orchestrator_workflow.test.id
@@ -164,6 +186,9 @@ resource "aria_orchestrator_task" "test" {
 					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "start_mode", "normal"),
 					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "state", "suspended"),
 					resource.TestCheckResourceAttrSet("aria_orchestrator_task.test", "user"),
+					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "input_parameters.#", "2"),
+					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "input_parameters.1.name", "maxDurationSeconds"),
+					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "input_parameters.1.type", "number"),
 					resource.TestCheckResourceAttrPair(
 						"aria_orchestrator_task.test", "workflow.id",
 						"aria_orchestrator_workflow.test", "id",
@@ -223,7 +248,13 @@ resource "aria_orchestrator_task" "test" {
   start_mode            = "normal"
   state                 = "pending"
 
-  # input_parameters = [] not yet implemented
+  input_parameters = [
+    {
+      name        = "vraHost"
+      type        = "VRA:Host"
+      description = "Target vRA host"
+    },
+  ]
 
   workflow = {
     id   = aria_orchestrator_workflow.another_test.id
@@ -244,6 +275,8 @@ resource "aria_orchestrator_task" "test" {
 					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "start_mode", "normal"),
 					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "state", "pending"),
 					resource.TestCheckResourceAttrSet("aria_orchestrator_task.test", "user"),
+					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "input_parameters.#", "1"),
+					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "input_parameters.0.name", "vraHost"),
 					resource.TestCheckResourceAttrPair(
 						"aria_orchestrator_task.test", "workflow.id",
 						"aria_orchestrator_workflow.another_test", "id",
@@ -307,7 +340,28 @@ resource "aria_orchestrator_task" "test" {
   start_mode            = "normal"
   state                 = "suspended"
 
-  # input_parameters = [] not yet implemented
+  input_parameters = [
+    {
+      name        = "apiSecret"
+      type        = "SecureString"
+      description = "Secret used to authenticate with the external API"
+    },
+    {
+      name        = "affectedResources"
+      type        = "Array/string"
+      description = ""
+    },
+    {
+      name        = "notifyOnFailure"
+      type        = "boolean"
+      description = ""
+    },
+    {
+      name        = "extraContext"
+      type        = "Any"
+      description = "Arbitrary extra context passed to the workflow"
+    },
+  ]
 
   workflow = {
     id   = aria_orchestrator_workflow.test.id
@@ -327,6 +381,16 @@ resource "aria_orchestrator_task" "test" {
 					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "start_mode", "normal"),
 					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "state", "suspended"),
 					resource.TestCheckResourceAttrSet("aria_orchestrator_task.test", "user"),
+					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "input_parameters.#", "4"),
+					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "input_parameters.0.name", "apiSecret"),
+					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "input_parameters.0.type", "SecureString"),
+					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "input_parameters.1.name", "affectedResources"),
+					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "input_parameters.1.type", "Array/string"),
+					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "input_parameters.1.description", ""),
+					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "input_parameters.2.name", "notifyOnFailure"),
+					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "input_parameters.2.type", "boolean"),
+					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "input_parameters.3.name", "extraContext"),
+					resource.TestCheckResourceAttr("aria_orchestrator_task.test", "input_parameters.3.type", "Any"),
 					resource.TestCheckResourceAttrPair(
 						"aria_orchestrator_task.test", "workflow.id",
 						"aria_orchestrator_workflow.test", "id",

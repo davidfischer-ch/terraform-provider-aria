@@ -47,10 +47,13 @@ resource "aria_orchestrator_task" "dummy_monthly" {
   start_mode            = "normal"
   state                 = "pending"
 
-  # input_parameters = [] # not yet implemented
-  # Caveats:
-  # * Terraform cannot detect modifications (drifts)
-  # * Update method will always set it to []
+  input_parameters = [
+    {
+      name        = "vraHost"
+      type        = "VRA:Host"
+      description = "Target vRA host"
+    },
+  ]
 
   workflow = {
     id   = aria_orchestrator_workflow.dummy.id
