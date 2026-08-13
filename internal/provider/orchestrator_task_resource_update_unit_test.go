@@ -26,10 +26,14 @@ type taskUpdateResult struct {
 	errDetail   string
 }
 
-// runTaskUpdate drives the real resource Update against a fake Aria API. priorState is the state
-// Terraform already tracks (post-refresh), plannedState is the desired state. It reports whether
-// the update request carried a "state" field, mirroring the API's transition semantics.
-func runTaskUpdate(t *testing.T, priorState, plannedState string) taskUpdateResult {
+// runTaskUpdate drives the real resource Update against a fake Aria API. priorState is the
+// tracked state, plannedState is the desired one. When failUpdate is set, the update responds
+// with an error instead of the updated task.
+func runTaskUpdate(
+	t *testing.T,
+	priorState, plannedState string,
+	failUpdate bool,
+) taskUpdateResult {
 	t.Helper()
 	ctx := t.Context()
 
@@ -46,6 +50,11 @@ func runTaskUpdate(t *testing.T, priorState, plannedState string) taskUpdateResu
 			if v, ok := parsed["state"]; ok {
 				res.stateSent = true
 				res.stateValue, _ = v.(string)
+			}
+			if failUpdate {
+				w.WriteHeader(http.StatusInternalServerError)
+				writeJSON(w, map[string]any{"message": "boom"})
+				return
 			}
 			writeJSON(w, taskAPIBody(plannedState))
 		default:
@@ -139,7 +148,7 @@ func runTaskUpdate(t *testing.T, priorState, plannedState string) taskUpdateResu
 // When the state does not change, Update must not send it: the API treats a state in the body as a
 // transition request and rejects the no-op with 409 "Cannot resume task".
 func TestOrchestratorTaskResourceUpdateKeepsState(t *testing.T) {
-	res := runTaskUpdate(t, "suspended", "suspended")
+	res := runTaskUpdate(t, "suspended", "suspended", false)
 
 	if res.hasError {
 		t.Fatalf("unexpected Update error: %s", res.errDetail)
@@ -156,7 +165,7 @@ func TestOrchestratorTaskResourceUpdateKeepsState(t *testing.T) {
 // When the desired state differs from the tracked state (including a drift Read surfaced), Update
 // must send it to reconcile the task's lifecycle.
 func TestOrchestratorTaskResourceUpdateChangesState(t *testing.T) {
-	res := runTaskUpdate(t, "pending", "suspended")
+	res := runTaskUpdate(t, "pending", "suspended", false)
 
 	if res.hasError {
 		t.Fatalf("unexpected Update error: %s", res.errDetail)
@@ -169,6 +178,23 @@ func TestOrchestratorTaskResourceUpdateChangesState(t *testing.T) {
 	}
 	if res.stateValue != "suspended" {
 		t.Errorf("update body state = %q, want %q", res.stateValue, "suspended")
+	}
+}
+
+// When the update call itself fails, Update must report the error without touching resp.State:
+// Terraform then keeps the last-known-good prior state instead of losing track of drift.
+func TestOrchestratorTaskResourceUpdateAPIError(t *testing.T) {
+	res := runTaskUpdate(t, "pending", "pending", true)
+
+	if !res.hasError {
+		t.Fatal("expected Update to report an error when the update call itself fails")
+	}
+	if res.updateCalls != 1 {
+		t.Errorf("update requests = %d, want 1", res.updateCalls)
+	}
+	if res.finalState != "" {
+		t.Errorf("state was set to %q despite the update call failing, want it left unset",
+			res.finalState)
 	}
 }
 
@@ -283,9 +309,9 @@ func TestOrchestratorTaskResourceUpdateInputParameters(t *testing.T) {
 		t.Fatalf("update request input-parameters = %#v, want 4 entries", updateBody["input-parameters"])
 	}
 	newParam, ok := sentParams[2].(map[string]any)
-	if !ok || newParam["name"] != "affectedTags" || newParam["type"] != "Array/string" || newParam["description"] != "" {
-		t.Errorf(
-			"update request input-parameters[2] = %#v, want name=affectedTags type=Array/string description=\"\"",
+	if !ok || newParam["name"] != "affectedTags" || newParam["type"] != "Array/string" ||
+		newParam["description"] != "" {
+		t.Errorf("input-parameters[2] = %#v, want name=affectedTags type=Array/string description=\"\"",
 			sentParams[2])
 	}
 
@@ -301,7 +327,8 @@ func TestOrchestratorTaskResourceUpdateInputParameters(t *testing.T) {
 	if len(outParams) != 4 {
 		t.Fatalf("persisted input_parameters has %d entries, want 4", len(outParams))
 	}
-	if outParams[3].Name.ValueString() != "notifyOwners" || outParams[3].Type.ValueString() != "boolean" {
-		t.Errorf("persisted input_parameters[3] = %#v, want name=notifyOwners type=boolean", outParams[3])
+	last := outParams[3]
+	if last.Name.ValueString() != "notifyOwners" || last.Type.ValueString() != "boolean" {
+		t.Errorf("input_parameters[3] = %#v, want name=notifyOwners type=boolean", last)
 	}
 }
