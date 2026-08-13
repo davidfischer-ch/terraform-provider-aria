@@ -1,5 +1,27 @@
 # Changelog
 
+## Release v0.7.3 (2026-08-13)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.7.2...v0.7.3
+
+### Features
+
+* Resource `aria_orchestrator_task`: Add `input_parameters` attribute
+    * The underlying API does not return a parameter's `description`; `terraform import` cannot recover it (name and type are unaffected)
+
+### Fix and enhancements
+
+* Resource `aria_orchestrator_task`: Fix creating/updating a task with `state = "suspended"` (the API silently downgrades to `pending` on create, and rejects re-suspending an already-suspended task with 409 "Cannot resume task")
+* Require Go 1.25 to build from source
+* Merge dependabot dependencies update requests
+
+### Tests and tooling
+
+* Reorganize test files into `_acc_test.go` and `_unit_test.go` suffixes for a clear unit vs acceptance split
+* Add unit test coverage for provider utility helpers and the new `aria_orchestrator_task` `input_parameters` handling
+* Add `scripts/check.sh` (`make check`) to run the CI build/vet/lint/generate/test steps locally
+* Upgrade `golangci-lint` to v2 for Go 1.25 support
+
 ## Release v0.7.2 (2026-03-12)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.7.1...v0.7.2
