@@ -8,8 +8,11 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/listdefault"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
 func OrchestratorTaskSchema() schema.Schema {
@@ -78,12 +81,18 @@ func OrchestratorTaskSchema() schema.Schema {
 				Computed:            true,
 				Optional:            true,
 			},
-			/*"input_parameters": schema.ListNestedAttribute{
-				MarkdownDescription: "Workflow input parameters",
+			"input_parameters": schema.ListNestedAttribute{
+				MarkdownDescription: "Task input parameters",
+				Optional:            true,
 				Computed:            true,
-				// Make it optional and use an actual model
-				NestedObject: OrchestratorTaskInputParametersSchema(),
-			},*/
+				Default: listdefault.StaticValue(
+					types.ListValueMust(
+						types.ObjectType{AttrTypes: ParameterModel{}.AttributeTypes()},
+						[]attr.Value{},
+					),
+				),
+				NestedObject: ParameterSchema(),
+			},
 			"workflow": OrchestratorTaskWorkflowSchema(),
 		},
 	}

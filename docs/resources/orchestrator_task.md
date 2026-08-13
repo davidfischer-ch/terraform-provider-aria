@@ -62,10 +62,13 @@ resource "aria_orchestrator_task" "dummy_monthly" {
   start_mode            = "normal"
   state                 = "pending"
 
-  # input_parameters = [] # not yet implemented
-  # Caveats:
-  # * Terraform cannot detect modifications (drifts)
-  # * Update method will always set it to []
+  input_parameters = [
+    {
+      name        = "vraHost"
+      type        = "VRA:Host"
+      description = "Target vRA host"
+    },
+  ]
 
   workflow = {
     id   = aria_orchestrator_workflow.dummy.id
@@ -95,6 +98,7 @@ resource "aria_orchestrator_task" "dummy_monthly" {
 
 ### Optional
 
+- `input_parameters` (Attributes List) Task input parameters (see [below for nested schema](#nestedatt--input_parameters))
 - `recurrence_end_date` (String) Recurrence end timestamp (RFC3339)
 - `state` (String) State, either `pending` or `suspended`
 - `user` (String) User
@@ -112,6 +116,16 @@ Required:
 
 - `id` (String) Workflow identifier
 - `name` (String) Workflow name
+
+
+<a id="nestedatt--input_parameters"></a>
+### Nested Schema for `input_parameters`
+
+Required:
+
+- `description` (String) Parameter description
+- `name` (String) Parameter name
+- `type` (String) Parameter type
 
 ## Import
 

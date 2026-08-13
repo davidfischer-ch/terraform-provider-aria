@@ -4,6 +4,7 @@
 package provider
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -27,20 +28,47 @@ type taskCreateResult struct {
 	errDetail   string
 }
 
+// taskInputParametersAPI is a fixed set of input parameters used as the default fixture across
+// task unit tests, so every test exercises a non-empty round trip.
+var taskInputParametersAPI = []ParameterAPIModel{
+	{Name: "resourceId", Type: "string", Description: "Target resource identifier"},
+	{Name: "environment", Type: "string", Description: "Deployment environment"},
+}
+
+// taskInputParameters is the JSON-friendly counterpart of taskInputParametersAPI, for embedding in
+// a fake API response body.
+var taskInputParameters = []map[string]any{
+	{"name": "resourceId", "type": "string", "description": "Target resource identifier"},
+	{"name": "environment", "type": "string", "description": "Deployment environment"},
+}
+
+// taskInputParametersModel builds the types.List counterpart of taskInputParametersAPI, for use
+// when constructing plan/prior OrchestratorTaskModel values.
+func taskInputParametersModel(t *testing.T, ctx context.Context) types.List {
+	t.Helper()
+	list, diags := ParameterModelListFromAPI(ctx, taskInputParametersAPI)
+	if diags.HasError() {
+		t.Fatalf("input parameters list: %v", diags.Errors())
+	}
+	return list
+}
+
 // taskAPIBody builds an OrchestratorTaskAPIModel-compatible response body. A valid
-// recurrence-start-date is required, otherwise FromAPI fails to parse it.
-func taskAPIBody(id, state string) map[string]any {
+// recurrence-start-date is required, otherwise FromAPI fails to parse it. Every test uses the same
+// task id, so it is not a parameter.
+func taskAPIBody(state string) map[string]any {
 	return map[string]any{
-		"id":                    id,
+		"id":                    "task-123",
 		"name":                  "test-task",
 		"description":           "desc",
-		"href":                  "https://aria.example/vco/api/tasks/" + id,
+		"href":                  "https://aria.example/vco/api/tasks/task-123",
 		"recurrence-cycle":      "every-months",
 		"recurrence-pattern":    "(Europe/Zurich) 01 00:00:00,",
 		"recurrence-start-date": "2050-01-06T05:02:00Z",
 		"start-mode":            "normal",
 		"state":                 state,
 		"user":                  "tester",
+		"input-parameters":      taskInputParameters,
 		"workflow":              map[string]any{"id": "wf-1", "name": "wf"},
 	}
 }
@@ -67,7 +95,7 @@ func runTaskCreate(t *testing.T, plannedState string, failUpdate bool) taskCreat
 			// unmarshalling the response body.
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusAccepted)
-			_ = json.NewEncoder(w).Encode(taskAPIBody("task-123", state))
+			_ = json.NewEncoder(w).Encode(taskAPIBody(state))
 		case r.Method == http.MethodPost && r.URL.Path == "/vco/api/tasks/task-123":
 			res.updateCalls++
 			res.updateState = state
@@ -76,7 +104,7 @@ func runTaskCreate(t *testing.T, plannedState string, failUpdate bool) taskCreat
 				writeJSON(w, map[string]any{"message": "boom"})
 				return
 			}
-			writeJSON(w, taskAPIBody("task-123", "suspended"))
+			writeJSON(w, taskAPIBody("suspended"))
 		default:
 			t.Errorf("unexpected request: %s %s", r.Method, r.URL.Path)
 			w.WriteHeader(http.StatusNotFound)
@@ -130,6 +158,7 @@ func runTaskCreate(t *testing.T, plannedState string, failUpdate bool) taskCreat
 		StartMode:           types.StringValue("normal"),
 		State:               types.StringValue(plannedState),
 		User:                types.StringNull(),
+		InputParameters:     taskInputParametersModel(t, ctx),
 		Workflow:            workflowObject,
 	}
 
@@ -199,6 +228,129 @@ func TestOrchestratorTaskResourceCreatePending(t *testing.T) {
 	}
 	if res.finalState != "pending" {
 		t.Errorf("persisted state = %q, want %q", res.finalState, "pending")
+	}
+}
+
+// Input parameters must be serialized verbatim, including a SecureString type, and read back from
+// the API response into state.
+func TestOrchestratorTaskResourceCreateInputParameters(t *testing.T) {
+	ctx := t.Context()
+
+	params := []ParameterAPIModel{
+		{Name: "credentialsToken", Type: "SecureString", Description: "Credentials token used for authentication"},
+		{Name: "dryRun", Type: "boolean"},
+	}
+
+	var createBody map[string]any
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, _ := io.ReadAll(r.Body)
+		_ = json.Unmarshal(body, &createBody)
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusAccepted)
+		resp := taskAPIBody("pending")
+		resp["input-parameters"] = params
+		_ = json.NewEncoder(w).Encode(resp)
+	}))
+	defer srv.Close()
+
+	client := &AriaClient{
+		Host:               srv.URL,
+		AccessToken:        "fake-token",
+		OKAPICallsLogLevel: "DEBUG",
+		KOAPICallsLogLevel: "WARN",
+		Context:            ctx,
+	}
+	if diags := client.Init(); diags.HasError() {
+		t.Fatalf("AriaClient.Init: %v", diags.Errors())
+	}
+
+	res0, ok := NewOrchestratorTaskResource().(*OrchestratorTaskResource)
+	if !ok {
+		t.Fatal("NewOrchestratorTaskResource() did not return *OrchestratorTaskResource")
+	}
+	res0.client = client
+
+	schema := OrchestratorTaskSchema()
+
+	workflow := OrchestratorTaskWorkflowModel{
+		Id:   types.StringValue("wf-1"),
+		Name: types.StringValue("wf"),
+	}
+	workflowObject, diags := types.ObjectValueFrom(ctx, workflow.AttributeTypes(), workflow)
+	if diags.HasError() {
+		t.Fatalf("workflow object: %v", diags.Errors())
+	}
+
+	startDate, diags := timetypes.NewRFC3339Value("2050-01-06T05:02:00Z")
+	if diags.HasError() {
+		t.Fatalf("start date: %v", diags.Errors())
+	}
+
+	inputParameters, diags := ParameterModelListFromAPI(ctx, params)
+	if diags.HasError() {
+		t.Fatalf("input parameters list: %v", diags.Errors())
+	}
+
+	model := OrchestratorTaskModel{
+		Id:                  types.StringNull(),
+		Name:                types.StringValue("test-task"),
+		Description:         types.StringValue("desc"),
+		Href:                types.StringNull(),
+		RecurrenceCycle:     types.StringValue("every-months"),
+		RecurrencePattern:   types.StringValue("(Europe/Zurich) 01 00:00:00,"),
+		RecurrenceStartDate: startDate,
+		RecurrenceEndDate:   timetypes.NewRFC3339Null(),
+		RunningInstanceId:   types.StringNull(),
+		StartMode:           types.StringValue("normal"),
+		State:               types.StringValue("pending"),
+		User:                types.StringNull(),
+		InputParameters:     inputParameters,
+		Workflow:            workflowObject,
+	}
+
+	plan := tfsdk.Plan{Schema: schema}
+	if diags := plan.Set(ctx, &model); diags.HasError() {
+		t.Fatalf("plan.Set: %v", diags.Errors())
+	}
+
+	req := resource.CreateRequest{Plan: plan}
+	resp := &resource.CreateResponse{State: tfsdk.State{Schema: schema}}
+	res0.Create(ctx, req, resp)
+
+	if resp.Diagnostics.HasError() {
+		t.Fatalf("unexpected Create error: %v", resp.Diagnostics.Errors())
+	}
+
+	sentParams, ok := createBody["input-parameters"].([]any)
+	if !ok || len(sentParams) != 2 {
+		t.Fatalf("create request input-parameters = %#v, want 2 entries", createBody["input-parameters"])
+	}
+	firstParam, ok := sentParams[0].(map[string]any)
+	if !ok || firstParam["name"] != "credentialsToken" || firstParam["type"] != "SecureString" {
+		t.Errorf("create request input-parameters[0] = %#v, want name=credentialsToken type=SecureString",
+			sentParams[0])
+	}
+	secondParam, ok := sentParams[1].(map[string]any)
+	if !ok || secondParam["name"] != "dryRun" || secondParam["type"] != "boolean" || secondParam["description"] != "" {
+		t.Errorf("create request input-parameters[1] = %#v, want name=dryRun type=boolean description=\"\"",
+			sentParams[1])
+	}
+
+	var out OrchestratorTaskModel
+	if diags := resp.State.Get(ctx, &out); diags.HasError() {
+		t.Fatalf("state.Get: %v", diags.Errors())
+	}
+
+	var outParams []ParameterModel
+	if diags := out.InputParameters.ElementsAs(ctx, &outParams, false); diags.HasError() {
+		t.Fatalf("input parameters elements: %v", diags.Errors())
+	}
+	if len(outParams) != 2 || outParams[0].Type.ValueString() != "SecureString" ||
+		outParams[1].Type.ValueString() != "boolean" {
+		t.Errorf("persisted input_parameters = %#v, want credentialsToken as SecureString and dryRun as boolean",
+			outParams)
 	}
 }
 
