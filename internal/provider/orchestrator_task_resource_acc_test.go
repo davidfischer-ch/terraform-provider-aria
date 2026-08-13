@@ -412,7 +412,13 @@ resource "aria_orchestrator_task" "test" {
 				// - "recurrence_start_date": "2085-01-06T05:02:00Z",
 				// + "recurrence_start_date": "2085-01-06T05:02:00.000+00:00",
 				// }
-				ImportStateVerifyIgnore: []string{"recurrence_start_date", "recurrence_end_date"},
+				//
+				// input_parameters is also ignored: vRO's Task API never returns a description
+				// (see taskInputParametersFromAPI), and import starts from a bare state with
+				// nothing to preserve it from; the description always comes back empty here.
+				ImportStateVerifyIgnore: []string{
+					"recurrence_start_date", "recurrence_end_date", "input_parameters",
+				},
 			},
 			// Delete testing automatically occurs in TestCase
 		},
