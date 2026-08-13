@@ -122,7 +122,8 @@ func (self *OrchestratorTaskModel) FromAPI(
 		diags.Append(someDiags...)
 	}
 
-	self.InputParameters, someDiags = ParameterModelListFromAPI(ctx, raw.InputParameters)
+	self.InputParameters, someDiags = taskInputParametersFromAPI(
+		ctx, self.InputParameters, raw.InputParameters)
 	diags.Append(someDiags...)
 
 	// Convert workflow from raw and then to object
@@ -132,6 +133,45 @@ func (self *OrchestratorTaskModel) FromAPI(
 	diags.Append(someDiags...)
 
 	return diags
+}
+
+// taskInputParametersFromAPI converts raw input parameters, preserving each entry's description
+// from priorList (the plan on Create/Update, the prior state on Read) instead of the API's.
+func taskInputParametersFromAPI(
+	ctx context.Context,
+	priorList types.List,
+	raw []ParameterAPIModel,
+) (types.List, diag.Diagnostics) {
+	diags := diag.Diagnostics{}
+
+	// vRO's Task API accepts a description on create/update but always echoes back an empty
+	// string on read (name and type round-trip correctly); index priorList by name to restore
+	// it below.
+	descriptionByName := map[string]types.String{}
+	if !priorList.IsNull() && !priorList.IsUnknown() {
+		var prior []ParameterModel
+		diags.Append(priorList.ElementsAs(ctx, &prior, false)...)
+		for _, parameter := range prior {
+			descriptionByName[parameter.Name.ValueString()] = parameter.Description
+		}
+	}
+
+	// Name and which parameters currently exist still come from the API: drift on those stays
+	// detectable; only description is overridden.
+	parameters := make([]ParameterModel, 0, len(raw))
+	for _, parameterRaw := range raw {
+		parameter := ParameterModel{}
+		parameter.FromAPI(parameterRaw)
+		if description, ok := descriptionByName[parameterRaw.Name]; ok {
+			parameter.Description = description
+		}
+		parameters = append(parameters, parameter)
+	}
+
+	parameterAttrs := types.ObjectType{AttrTypes: ParameterModel{}.AttributeTypes()}
+	list, someDiags := types.ListValueFrom(ctx, parameterAttrs, parameters)
+	diags.Append(someDiags...)
+	return list, diags
 }
 
 func (self OrchestratorTaskModel) ToAPI(
