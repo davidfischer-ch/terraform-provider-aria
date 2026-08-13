@@ -28,22 +28,19 @@ type taskCreateResult struct {
 	errDetail   string
 }
 
-// taskInputParametersAPI is a fixed set of input parameters used as the default fixture across
-// task unit tests, so every test exercises a non-empty round trip.
+// taskInputParametersAPI is the default input parameters fixture, reused across tests.
 var taskInputParametersAPI = []ParameterAPIModel{
 	{Name: "resourceId", Type: "string", Description: "Target resource identifier"},
 	{Name: "environment", Type: "string", Description: "Deployment environment"},
 }
 
-// taskInputParameters is the JSON-friendly counterpart of taskInputParametersAPI, for embedding in
-// a fake API response body.
+// taskInputParameters is the JSON counterpart of taskInputParametersAPI, for a fake response body.
 var taskInputParameters = []map[string]any{
 	{"name": "resourceId", "type": "string", "description": "Target resource identifier"},
 	{"name": "environment", "type": "string", "description": "Deployment environment"},
 }
 
-// taskInputParametersModel builds the types.List counterpart of taskInputParametersAPI, for use
-// when constructing plan/prior OrchestratorTaskModel values.
+// taskInputParametersModel builds the types.List counterpart of taskInputParametersAPI.
 func taskInputParametersModel(t *testing.T, ctx context.Context) types.List {
 	t.Helper()
 	list, diags := ParameterModelListFromAPI(ctx, taskInputParametersAPI)
@@ -53,9 +50,8 @@ func taskInputParametersModel(t *testing.T, ctx context.Context) types.List {
 	return list
 }
 
-// taskAPIBody builds an OrchestratorTaskAPIModel-compatible response body. A valid
-// recurrence-start-date is required, otherwise FromAPI fails to parse it. Every test uses the same
-// task id, so it is not a parameter.
+// taskAPIBody builds an OrchestratorTaskAPIModel-compatible response body. Every test uses the
+// same task id; recurrence-start-date must be valid, otherwise FromAPI fails to parse it.
 func taskAPIBody(state string) map[string]any {
 	return map[string]any{
 		"id":                    "task-123",
@@ -237,7 +233,11 @@ func TestOrchestratorTaskResourceCreateInputParameters(t *testing.T) {
 	ctx := t.Context()
 
 	params := []ParameterAPIModel{
-		{Name: "credentialsToken", Type: "SecureString", Description: "Credentials token used for authentication"},
+		{
+			Name:        "credentialsToken",
+			Type:        "SecureString",
+			Description: "Credentials token used for authentication",
+		},
 		{Name: "dryRun", Type: "boolean"},
 	}
 
@@ -333,8 +333,9 @@ func TestOrchestratorTaskResourceCreateInputParameters(t *testing.T) {
 			sentParams[0])
 	}
 	secondParam, ok := sentParams[1].(map[string]any)
-	if !ok || secondParam["name"] != "dryRun" || secondParam["type"] != "boolean" || secondParam["description"] != "" {
-		t.Errorf("create request input-parameters[1] = %#v, want name=dryRun type=boolean description=\"\"",
+	if !ok || secondParam["name"] != "dryRun" || secondParam["type"] != "boolean" ||
+		secondParam["description"] != "" {
+		t.Errorf("input-parameters[1] = %#v, want name=dryRun type=boolean description=\"\"",
 			sentParams[1])
 	}
 
@@ -349,8 +350,7 @@ func TestOrchestratorTaskResourceCreateInputParameters(t *testing.T) {
 	}
 	if len(outParams) != 2 || outParams[0].Type.ValueString() != "SecureString" ||
 		outParams[1].Type.ValueString() != "boolean" {
-		t.Errorf("persisted input_parameters = %#v, want credentialsToken as SecureString and dryRun as boolean",
-			outParams)
+		t.Errorf("persisted input_parameters = %#v, want SecureString then boolean", outParams)
 	}
 }
 
@@ -372,5 +372,84 @@ func TestOrchestratorTaskResourceCreateSuspendedUpdateFails(t *testing.T) {
 	if res.finalState != "pending" {
 		t.Errorf("persisted state = %q, want %q (intermediate create state)",
 			res.finalState, "pending")
+	}
+}
+
+// When the initial create call itself fails (as opposed to the follow-up suspend update tested
+// above), no task was ever created API-side. Nothing must be persisted to state, otherwise
+// Terraform would track a resource that does not exist.
+func TestOrchestratorTaskResourceCreateAPIError(t *testing.T) {
+	ctx := t.Context()
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+		writeJSON(w, map[string]any{"message": "boom"})
+	}))
+	defer srv.Close()
+
+	client := &AriaClient{
+		Host:               srv.URL,
+		AccessToken:        "fake-token",
+		OKAPICallsLogLevel: "DEBUG",
+		KOAPICallsLogLevel: "WARN",
+		Context:            ctx,
+	}
+	if diags := client.Init(); diags.HasError() {
+		t.Fatalf("AriaClient.Init: %v", diags.Errors())
+	}
+
+	res0, ok := NewOrchestratorTaskResource().(*OrchestratorTaskResource)
+	if !ok {
+		t.Fatal("NewOrchestratorTaskResource() did not return *OrchestratorTaskResource")
+	}
+	res0.client = client
+
+	schema := OrchestratorTaskSchema()
+
+	workflow := OrchestratorTaskWorkflowModel{
+		Id:   types.StringValue("wf-1"),
+		Name: types.StringValue("wf"),
+	}
+	workflowObject, diags := types.ObjectValueFrom(ctx, workflow.AttributeTypes(), workflow)
+	if diags.HasError() {
+		t.Fatalf("workflow object: %v", diags.Errors())
+	}
+
+	startDate, diags := timetypes.NewRFC3339Value("2050-01-06T05:02:00Z")
+	if diags.HasError() {
+		t.Fatalf("start date: %v", diags.Errors())
+	}
+
+	model := OrchestratorTaskModel{
+		Id:                  types.StringNull(),
+		Name:                types.StringValue("test-task"),
+		Description:         types.StringValue("desc"),
+		Href:                types.StringNull(),
+		RecurrenceCycle:     types.StringValue("every-months"),
+		RecurrencePattern:   types.StringValue("(Europe/Zurich) 01 00:00:00,"),
+		RecurrenceStartDate: startDate,
+		RecurrenceEndDate:   timetypes.NewRFC3339Null(),
+		RunningInstanceId:   types.StringNull(),
+		StartMode:           types.StringValue("normal"),
+		State:               types.StringValue("pending"),
+		User:                types.StringNull(),
+		InputParameters:     taskInputParametersModel(t, ctx),
+		Workflow:            workflowObject,
+	}
+
+	plan := tfsdk.Plan{Schema: schema}
+	if diags := plan.Set(ctx, &model); diags.HasError() {
+		t.Fatalf("plan.Set: %v", diags.Errors())
+	}
+
+	req := resource.CreateRequest{Plan: plan}
+	resp := &resource.CreateResponse{State: tfsdk.State{Schema: schema}}
+	res0.Create(ctx, req, resp)
+
+	if !resp.Diagnostics.HasError() {
+		t.Fatal("expected Create to report an error when the create call itself fails")
+	}
+	if !resp.State.Raw.IsNull() {
+		t.Error("state was set despite the create call failing, want it left unset")
 	}
 }
