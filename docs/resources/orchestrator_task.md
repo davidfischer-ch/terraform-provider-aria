@@ -69,6 +69,8 @@ resource "aria_orchestrator_task" "dummy_monthly" {
       description = "Target vRA host"
     },
   ]
+  # Caveat: the underlying API does not return a description; `terraform import` cannot
+  # recover it, name and type are unaffected.
 
   workflow = {
     id   = aria_orchestrator_workflow.dummy.id

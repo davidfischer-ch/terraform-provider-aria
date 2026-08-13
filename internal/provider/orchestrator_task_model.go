@@ -137,6 +137,8 @@ func (self *OrchestratorTaskModel) FromAPI(
 
 // taskInputParametersFromAPI converts raw input parameters, preserving each entry's description
 // from priorList (the plan on Create/Update, the prior state on Read) instead of the API's.
+// priorList is empty on `terraform import` (a cold read with no prior state): description is then
+// unrecoverable through import; see ImportStateVerifyIgnore in the acceptance test.
 func taskInputParametersFromAPI(
 	ctx context.Context,
 	priorList types.List,
