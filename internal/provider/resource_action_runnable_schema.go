@@ -4,6 +4,7 @@
 package provider
 
 import (
+	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
@@ -33,6 +34,12 @@ func ResourceActionRunnableSchema(description string) schema.SingleNestedAttribu
 				Computed:            true,
 				Optional:            true,
 				Default:             stringdefault.StaticString(""),
+			},
+			"input_bindings": schema.StringAttribute{
+				MarkdownDescription: "Input bindings" + JSON_INSTEAD_OF_DYNAMIC_DISCLAIMER,
+				CustomType:          jsontypes.NormalizedType{},
+				Computed:            true,
+				Optional:            true,
 			},
 			"input_parameters": schema.ListNestedAttribute{
 				Required: true,

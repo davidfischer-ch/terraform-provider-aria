@@ -311,6 +311,11 @@ Required:
 Optional:
 
 - `endpoint_link` (String) Integration API endpoint (e.g. /resources/endpoints/8a430db3-924c-4d58-a29a-da811f9c992e)
+- `input_bindings` (String) Input bindings (JSON encoded)
+
+We should have implemented this attribute as a dynamic type (and not JSON).
+Unfortunately Terraform SDK returns this issue:
+Dynamic types inside of collections are not currently supported in terraform-plugin-framework.
 
 <a id="nestedatt--create--input_parameters"></a>
 ### Nested Schema for `create.input_parameters`
@@ -348,6 +353,11 @@ Required:
 Optional:
 
 - `endpoint_link` (String) Integration API endpoint (e.g. /resources/endpoints/8a430db3-924c-4d58-a29a-da811f9c992e)
+- `input_bindings` (String) Input bindings (JSON encoded)
+
+We should have implemented this attribute as a dynamic type (and not JSON).
+Unfortunately Terraform SDK returns this issue:
+Dynamic types inside of collections are not currently supported in terraform-plugin-framework.
 
 <a id="nestedatt--delete--input_parameters"></a>
 ### Nested Schema for `delete.input_parameters`
@@ -423,6 +433,11 @@ Required:
 Optional:
 
 - `endpoint_link` (String) Integration API endpoint (e.g. /resources/endpoints/8a430db3-924c-4d58-a29a-da811f9c992e)
+- `input_bindings` (String) Input bindings (JSON encoded)
+
+We should have implemented this attribute as a dynamic type (and not JSON).
+Unfortunately Terraform SDK returns this issue:
+Dynamic types inside of collections are not currently supported in terraform-plugin-framework.
 
 <a id="nestedatt--read--input_parameters"></a>
 ### Nested Schema for `read.input_parameters`
@@ -460,6 +475,11 @@ Required:
 Optional:
 
 - `endpoint_link` (String) Integration API endpoint (e.g. /resources/endpoints/8a430db3-924c-4d58-a29a-da811f9c992e)
+- `input_bindings` (String) Input bindings (JSON encoded)
+
+We should have implemented this attribute as a dynamic type (and not JSON).
+Unfortunately Terraform SDK returns this issue:
+Dynamic types inside of collections are not currently supported in terraform-plugin-framework.
 
 <a id="nestedatt--update--input_parameters"></a>
 ### Nested Schema for `update.input_parameters`
