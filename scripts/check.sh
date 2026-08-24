@@ -111,8 +111,12 @@ run_generate() {
 
 run_test() {
   step 'go test ./internal/provider/'
+  mkdir -p bin
   TF_ACC='' ARIA_HOST='my-aria-instance.net' ARIA_REFRESH_TOKEN='faketokenhere' \
-    go test -cover ./internal/provider/ && ok 'tests'
+    go test -coverprofile=bin/coverage.out ./internal/provider/ && ok 'tests'
+
+  go tool cover -html=bin/coverage.out -o bin/coverage.html
+  printf '%scoverage report: bin/coverage.html%s\n' "$dim" "$reset"
 }
 
 # --- Dispatch -------------------------------------------------------------------------------------

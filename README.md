@@ -10,10 +10,12 @@ Please be aware that Broadcom is not responsible neither involved on this projec
 
 _This provider is built on the [Terraform Plugin Framework](https://github.com/hashicorp/terraform-plugin-framework). See [Which SDK Should I Use?](https://developer.hashicorp.com/terraform/plugin/framework-benefits) in the Terraform documentation for additional information._
 
+
 ## Requirements
 
 - [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.0
 - [Go](https://golang.org/doc/install) >= 1.25
+
 
 ## Building The Provider
 
@@ -24,6 +26,7 @@ _This provider is built on the [Terraform Plugin Framework](https://github.com/h
 ```shell
 go install
 ```
+
 
 ## Adding Dependencies
 
@@ -39,9 +42,11 @@ go mod tidy
 
 Then commit the changes to `go.mod` and `go.sum`.
 
+
 ## Using the provider
 
 Fill this in for each provider
+
 
 ## Developing the Provider
 
@@ -51,14 +56,16 @@ machine (see [Requirements](#requirements) above).
 To compile the provider, run `go install`. This will build the provider and put the provider binary
 in the `$GOPATH/bin` directory.
 
-To generate or update documentation, run `go generate ./...`.
-To format the code run `find . -name "*.go" -exec gofmt -s -w {} \;`.
+To generate or update documentation, run `make docs`.
+To format the code run `make fmt`.
+To do both in one step, run `make tidy`.
 
 ### Pre-push checks
 
 `make check` runs the same steps as the CI **Tests** workflow (build, vet, lint, generate, unit
 tests) against your working tree. Run it before pushing to catch failures locally. The unit tests
-step provides its own dummy `ARIA_HOST` and `ARIA_REFRESH_TOKEN`, no setup required.
+step provides its own dummy `ARIA_HOST` and `ARIA_REFRESH_TOKEN`, no setup required, and writes an
+HTML coverage report to `bin/coverage.html` (see [Unit tests](#unit-tests) below).
 
 ```shell
 make check                    # all steps
@@ -68,24 +75,23 @@ make check ARGS="build lint"  # only the named steps
 The script lives at `scripts/check.sh` and can be run directly. It installs the pinned golangci-lint
 release into `./bin` when absent, matching the version CI uses.
 
-### Unit tests
-
-Set `ARIA_HOST` and `ARIA_REFRESH_TOKEN` to any non-empty values (no real API is called):
-
-```shell
-export ARIA_HOST=https://aria.example.com
-export ARIA_REFRESH_TOKEN=dummy
-
-go test ./...
-```
-
 ### Linting
 
 Requires golangci-lint v2 (the `.golangci.yml` config uses the v2 schema).
 
 ```shell
-golangci-lint run --timeout 10m ./...
+make lint
 ```
+
+### Unit tests
+
+```shell
+make test
+```
+
+`make test` sets dummy `ARIA_HOST`/`ARIA_REFRESH_TOKEN` values for you (no real API is called), and
+writes an HTML coverage report to `bin/coverage.html` (open it in a browser). To run tests with your
+own values or flags, set the environment variables yourself and run `go test ./...` directly.
 
 ### Acceptance tests
 
