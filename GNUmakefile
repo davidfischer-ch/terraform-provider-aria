@@ -31,7 +31,10 @@ lint:
 test:
 	./scripts/check.sh test
 
-# Run acceptance tests
+# Run unit tests first (fast, no live API needed): a broken unit test then fails before any time
+# is spent on the slow, real-API acceptance run. Go interleaves *_unit_test.go and *_acc_test.go
+# files alphabetically within a package; without this split a broken unit test can sit behind
+# several acceptance tests instead of failing immediately.
 .PHONY: testacc
-testacc:
-	TF_ACC=1 go test ./... -v $(TESTARGS) -timeout 120m
+testacc: test
+	TF_ACC=1 go test ./... -v -run '^TestAcc' $(TESTARGS) -timeout 120m

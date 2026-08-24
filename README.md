@@ -122,6 +122,10 @@ Then run:
 make testacc
 ```
 
+`make testacc` runs the unit tests first (`make test`, no live API needed), then the acceptance
+tests against your Aria instance. This fails fast on a broken unit test before spending time on the
+slower acceptance run.
+
 Variables marked with `TF_VAR_test_catalog_item_*` point to an existing catalog item whose icon
 and custom form **will be modified** by the tests.
 
