@@ -1,6 +1,26 @@
 # Changelog
 
 
+## Release v0.7.4 (2026-08-24)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.7.3...v0.7.4
+
+### Features
+
+* Resources `aria_custom_resource` and `aria_resource_action`'s `runnable_item`: Add `input_bindings` attribute (JSON encoded)
+
+### Fix and enhancements
+
+* Bump `golang.org/x/text` from `0.40.0` to `0.41.0`
+
+### Tests and tooling
+
+* Add `make fmt`, `make docs`, `make tidy`, `make lint`, and `make test` targets to `GNUmakefile`, wrapping the existing dev commands
+* `make test` (and `make check`'s test step) now writes an HTML coverage report to `bin/coverage.html`
+* `make testacc` runs unit tests first, failing fast before the slower acceptance run
+* Add unit test coverage for `input_bindings` null/unknown handling
+
+
 ## Release v0.7.3 (2026-08-13)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.7.2...v0.7.3
