@@ -1,5 +1,6 @@
 # Changelog
 
+
 ## Release v0.7.3 (2026-08-13)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.7.2...v0.7.3
@@ -22,6 +23,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.7.2.
 * Add `scripts/check.sh` (`make check`) to run the CI build/vet/lint/generate/test steps locally
 * Upgrade `golangci-lint` to v2 for Go 1.25 support
 
+
 ## Release v0.7.2 (2026-03-12)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.7.1...v0.7.2
@@ -41,6 +43,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.7.1.
 * Replace placeholder descriptions (`Ask VMware`, `TODO`) in `aria_catalog_type` and `aria_secret` schema attributes
 * Merge dependabot dependencies update requests
 
+
 ## Release v0.7.1 (2026-01-02)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.7.0...v0.7.1
@@ -51,6 +54,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.7.0.
 * Replace `UseStateForUnknown` by `UseNonNullStateForUnknown` (see [Terraform Plugin Framework release note for v1.17.0](https://github.com/hashicorp/terraform-plugin-framework/releases/tag/v1.17.0))
 * Add `inputs` attribute to `aria_abx_action` in example code (documentation)
 * Fix linter issues
+
 
 ## Release v0.7.0 (2025-09-10)
 
@@ -69,6 +73,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.19
 * Merge dependabot dependencies update requests
 * Factorize example code (documentation)
 
+
 ## Release v0.6.19 (2025-07-18)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.18...v0.6.19
@@ -82,6 +87,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.18
 * Also test `aria_catalog_source` data source
 * Merge dependabot dependencies update requests
 
+
 ## Release v0.6.18 (2025-06-30)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.17...v0.6.18
@@ -94,6 +100,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.17
 
 * Resource `aria_subscription`: Mark `event_topic_id` as immutable (force recreate)
 
+
 ## Release v0.6.17 (2025-06-26)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.16...v0.6.17
@@ -105,6 +112,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.16
 * Resource `aria_orchestrator_workflow`: Add `integration` attribute (set only if `wait_imported` is `true`)
 * Resource `aria_resource_action`: Add `endpoint_url` in `runnable_item` nested attribute
 
+
 ## Release v0.6.16 (2025-06-18)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.15...v0.6.16
@@ -112,6 +120,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.15
 ### Fix and enhancements
 
 * Resource `aria_orchestrator_workflow`: Read now retrieve VersionId attribute using versions API endpoint
+
 
 ## Release v0.6.15 (2025-06-13)
 
@@ -121,6 +130,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.14
 
 * Merge dependabot dependencies update requests
 
+
 ## Release v0.6.14 (2025-04-15)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.13...v0.6.14
@@ -128,6 +138,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.13
 ### Features
 
 * Resource `aria_orchestrator_category`: Manage attribute of type `number`
+
 
 ## Release v0.6.13 (2025-04-10)
 
@@ -140,6 +151,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.12
 ### Fix and enhancements
 
 * Merge dependabot dependencies update requests
+
 
 ## Release v0.6.12 (2025-04-03)
 
@@ -159,6 +171,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.11
 * Resource `aria_orchestrator_action`: Fix and update examples accordingly to newest features
 * Merge dependabot dependencies update requests
 
+
 ## Release v0.6.11 (2025-03-18)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.10...v0.6.11
@@ -172,6 +185,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.10
 
 * Merge dependabot dependencies update requests
 
+
 ## Release v0.6.10 (2025-02-21)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.9...v0.6.10
@@ -184,6 +198,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.9.
 
 * Merge dependabot dependencies update requests
 
+
 ## Release v0.6.9 (2025-02-21)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.8...v0.6.9
@@ -195,6 +210,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.8.
 ### Fix and enhancements
 
 * Merge dependabot dependencies update requests
+
 
 ## Release v0.6.8 (2025-02-17)
 
@@ -215,6 +231,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.7.
 * Docs: Drop caution since #114 (random catalog item's download error...) is fixed
 * CI: Fix linters deprecations
 
+
 ## Release v0.6.7 (2025-02-11)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.6...v0.6.7
@@ -222,6 +239,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.6.
 ### Features
 
 * Resource `aria_catalog_source`: Implement Cloud Templates & ABX Actions use-cases
+
 
 ## Release v0.6.6 (2025-02-10)
 
@@ -231,6 +249,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.5.
 
 * Add resource `aria_orchestrator_environment`
 * Add resource `aria_orchestrator_environment_repository`
+
 
 ## Release v0.6.5 (2025-02-06)
 
@@ -242,6 +261,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.4.
 * Resource `aria_catalog_source`, if `wait_imported = true` then the polling function will (up to 15 minutes) :
   * Proactively wait for catalog items to be available (by doing the equivalent of save & import multiple times)
   * Immediately return an error if there are any *hard* errors (not related to catalog item's availability)
+
 
 ## Release v0.6.4 (2025-01-31)
 
@@ -259,6 +279,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.3.
 * SDK: Simplify code (do not return & manage empty diagnostics)
 * Doc: Improve it with more examples & declare immutable attributes
 
+
 ## Release v0.6.3 (2025-01-30)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.2...v0.6.3
@@ -275,6 +296,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.2.
 * Validate `aria_orchestrator_category`'s `type` attribute
 * SDK: Make `AttributeTypes` a func of `*Model` struct (as per in doc)
 * Merge dependabot dependencies update requests
+
 
 ## Release v0.6.2 (2024-12-11)
 
@@ -296,6 +318,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.1.
 * Change icon used by tests to prevent a conflict with icons we use at OCSIN
 * Fix Changelog
 
+
 ## Release v0.6.1 (2024-12-05)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.6.0...v0.6.1
@@ -313,6 +336,7 @@ So :
 
 * Cover `aria_catalog_item_icon` with tests
 
+
 ## Release v0.6.0 (2024-12-04)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.6...v0.6.0
@@ -329,6 +353,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.6.
 ### Fix and enhancements
 
 * Don't store `aria_icon`'s content inside the state (only path & its SHA-256 checksum)
+
 
 ## Release v0.5.6 (2024-12-03)
 
@@ -353,6 +378,7 @@ If this "magic number" of 5 (or the delay) has to be tuned per resource, please 
 
 * Document import of resources when available
 
+
 ## Release v0.5.5 (2024-11-29)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.4...v0.5.5
@@ -371,6 +397,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.4.
   * Bump github.com/hashicorp/terraform-plugin-testing from 1.10.0 to 1.11.0
 * Make code consistent
 
+
 ## Release v0.5.4 (2024-10-08)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.3...v0.5.4
@@ -378,6 +405,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.3.
 ### Features
 
 * Add ressource `aria_custom_form`
+
 
 ## Release v0.5.3 (2024-09-30)
 
@@ -390,6 +418,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.2.
 * Bump `github.com/go-resty/resty/v2` from `2.14.0` to `2.15.1` #70
 * Drop "example" function
 
+
 ## Release v0.5.2 (2024-09-02)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.1...v0.5.2
@@ -399,6 +428,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.1.
 * Fix `aria_subscription`'s project scoping: Was scoped to 0 projects instead of being unscoped
 * Fix `aria_sbuscription`'s `owner_id`: It may change, cannot use previous known value
 
+
 ## Release v0.5.1 (2024-08-26)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.0...v0.5.1
@@ -406,6 +436,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.5.0.
 ### Fix and enhancements
 
 * Fix UPDATE on `aria_custom_resources` when projectID is empty (by omitting this field on update, crazy POST != full object)
+
 
 ## Release v0.5.0 (2024-08-22)
 
@@ -472,6 +503,7 @@ Here is the error:
 * Implement utility methods on models that are exposed as resources
 * Refactor resources to use `AriaClient` capabilities
 
+
 ## Release v0.4.1 (2024-07-25)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.4.0...v0.4.1
@@ -484,6 +516,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.4.0.
 See https://pkg.go.dev/github.com/hashicorp/terraform-plugin-framework-jsontypes@v0.1.0/jsontypes#Normalized:
 
 Semantic equality logic is defined for Normalized such that inconsequential differences between JSON strings are ignored (whitespace, property order, etc). If you need strict, byte-for-byte, string equality, consider using ExactType.
+
 
 ## Release v0.4.0 (2024-07-23)
 
@@ -499,6 +532,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.3.1.
 * Diff of `aria_custom_resource` and `aria_property_group` should be more readable (+/- & ~)
 * Managing `aria_custom_resource` and `aria_property_group` will be immune to Terraform "diff" after apply errors
 
+
 ## Release v0.3.1 (2024-07-23)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.3.0...v0.3.1
@@ -507,6 +541,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.3.0.
 
 * Resource `aria_resource_action`: Add attribute `criteria`
 * Resource `aria_resource_action`: Add attribute `form_definition`
+
 
 ## Release v0.3.0 (2024-07-16)
 
@@ -528,6 +563,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.7.
 * Test imports in acceptance tests
 * Add TODOs for the future
 
+
 ## Release v0.2.7 (2024-07-11)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.6...v0.2.7
@@ -538,6 +574,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.6.
 * Add CAUTION section in `aria_custom_naming` resource description
 * Log API call details only in case of error
 
+
 ## Release v0.2.6 (2024-07-11)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.5...v0.2.6
@@ -545,6 +582,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.5.
 ### Fix and enhancements
 
 * Resource `aria_resource_action`: Omit `project_id` when empty (JSON marshaling)
+
 
 ## Release v0.2.5 (2024-07-10)
 
@@ -563,6 +601,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.4.
 * Upgrade go modules
 * Instruct Terraform to replace a `aria_resource_action` when its `project_id` is changed
 
+
 ## Release v0.2.4 (2024-07-09)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.3...v0.2.4
@@ -570,6 +609,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.3.
 ### Fix and enhancements
 
 * Make `aria_resource_action.runnable_item.name` required
+
 
 ## Release v0.2.3 (2024-07-09)
 
@@ -580,6 +620,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.2.
 * Add resource `aria_custom_resource` with some missing features
 * Add resource `aria_resource_action` limited to natives types (for now)
 
+
 ## Release v0.2.2 (2024-06-24)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.1...v0.2.2
@@ -587,6 +628,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.1.
 ### Features
 
 * Add data source `aria_secret`
+
 
 ## Release v0.2.1 (2204-06-24)
 
@@ -596,6 +638,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.2.0.
 
 * Resource `aria_abx_action`: Add attributes `cpu_shares`, `deployment_timeout_seconds`, `shared`, `system`, `async_deployed`
 
+
 ## Release v0.2.0 (2024-06-21)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.1.2...v0.2.0
@@ -603,6 +646,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.1.2.
 ### Minor compatibility breaks
 
 * Rename resource `aria_abx_secret` to `aria_abx_sensitive_constant`
+
 
 ## Release v0.1.2 (2024-06-19)
 
@@ -612,6 +656,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.1.1.
 
 * Resource `aria_abx_action`: Fix conversion from/to "" <-> "auto" (#9)
 * Documentation: Update example code and description of resources
+
 
 ## Release v0.1.1 (2024-06-19)
 
@@ -628,6 +673,7 @@ Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.1.0.
 * Documentation: Update section about acceptance testing
 * Dependencies: Upgrade terraform-plugin-framework to 1.9.0
 * Code Style: Favor self over one letter names
+
 
 ## Release v0.1.0 (2024-06-05)
 
