@@ -31,7 +31,7 @@ type ResourceActionRunnableAPIModel struct {
 	Type             string              `json:"type"`
 	ProjectId        string              `json:"projectId,omitempty"`
 	EndpointLink     string              `json:"endpointLink,omitempty"`
-	InputBindings    any                 `json:"inputBindings"`
+	InputBindings    any                 `json:"inputBindings,omitempty"`
 	InputParameters  []ParameterAPIModel `json:"inputParameters"`
 	OutputParameters []ParameterAPIModel `json:"outputParameters"`
 }
@@ -78,8 +78,13 @@ func (self ResourceActionRunnableModel) ToAPI(
 	ctx context.Context,
 ) (ResourceActionRunnableAPIModel, diag.Diagnostics) {
 
+	var diags diag.Diagnostics
+
 	// InputBindings JSON Encoded -> API data
-	inputBindingsRaw, diags := JSONNormalizedToAny(self.InputBindings)
+	var inputBindingsRaw any
+	if !self.InputBindings.IsNull() && !self.InputBindings.IsUnknown() {
+		inputBindingsRaw, diags = JSONNormalizedToAny(self.InputBindings)
+	}
 
 	inputParametersRaw := []ParameterAPIModel{}
 	for _, parameter := range self.InputParameters {
