@@ -150,7 +150,13 @@ resource "aria_orchestrator_workflow" "dummy" {
   presentation  = jsonencode({})
   workflow_item = jsonencode([])
 
-  input_parameters  = []
+  input_parameters = [
+    {
+      name        = "resourceId"
+      type        = "string"
+      description = "Identifier of the resource the workflow runs against"
+    }
+  ]
   output_parameters = []
 
   input_forms = jsonencode([
@@ -178,8 +184,25 @@ resource "aria_resource_action" "dummy" {
     type          = "vro.workflow"
     endpoint_link = aria_orchestrator_workflow.dummy.integration.endpoint_configuration_link
 
-    input_parameters  = []
+    input_parameters = [
+      {
+        name        = "resourceId"
+        type        = "string"
+        description = "Identifier of the resource the workflow runs against"
+      }
+    ]
     output_parameters = []
+
+    // Bind the workflow's input parameter to a value available in the resource action's context.
+    input_bindings = jsonencode([
+      {
+        inputKey = "resourceId"
+        value    = "$${properties.resourceName}"
+        type = {
+          dataType = "string"
+        }
+      }
+    ])
   }
 }
 ```
