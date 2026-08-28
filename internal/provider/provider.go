@@ -35,6 +35,7 @@ type AriaProvider struct {
 type AriaProviderModel struct {
 	Host               types.String `tfsdk:"host"`
 	Insecure           types.Bool   `tfsdk:"insecure"`
+	Tenant             types.String `tfsdk:"tenant"`
 	RefreshToken       types.String `tfsdk:"refresh_token"`
 	AccessToken        types.String `tfsdk:"access_token"`
 	OKAPICallsLogLevel types.String `tfsdk:"ok_api_calls_log_level"`
@@ -62,8 +63,20 @@ func (self *AriaProvider) Schema(
 					"May also be provided via ARIA_HOST environment variable.",
 				Optional: true,
 			},
+			"tenant": schema.StringAttribute{
+				MarkdownDescription: "The VCF 9 organization (tenant) name the refresh token " +
+					"belongs to, e.g. `classic`. When set, the refresh token is exchanged for " +
+					"an access token using the VCF 9 API token flow instead of the legacy Aria " +
+					"Automation 8.x flow. Leave unset when targeting Aria Automation 8.x or when " +
+					"only an access token is provided. May also be provided via ARIA_TENANT " +
+					"environment variable.",
+				Optional: true,
+			},
 			"refresh_token": schema.StringAttribute{
 				MarkdownDescription: "The refresh token to use for making API requests. " +
+					"For Aria Automation 8.x this is the API token from the Identity Service " +
+					"API. For VCF 9 (when `tenant` is set) this is the tenant's API token " +
+					"created from My Account > API Tokens. " +
 					"May also be provided via ARIA_REFRESH_TOKEN environment variable.",
 				Optional:  true,
 				Sensitive: true,
@@ -124,6 +137,15 @@ func (self *AriaProvider) Configure(
 			"Unknown Aria API Host",
 			"Either set the host in the provider configuration to a static value, "+
 				"apply the source of the value first, or use ARIA_HOST.",
+		)
+	}
+
+	if config.Tenant.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("tenant"),
+			"Unknown Aria VCF 9 Tenant",
+			"Either set the tenant in the provider configuration to a static value, "+
+				"apply the source of the value first, or use ARIA_TENANT.",
 		)
 	}
 
@@ -206,6 +228,11 @@ func (self *AriaProvider) Configure(
 		}
 	}
 
+	tenant := os.Getenv("ARIA_TENANT")
+	if !config.Tenant.IsNull() {
+		tenant = config.Tenant.ValueString()
+	}
+
 	refresh_token := os.Getenv("ARIA_REFRESH_TOKEN")
 	if !config.RefreshToken.IsNull() {
 		refresh_token = config.RefreshToken.ValueString()
@@ -240,6 +267,7 @@ func (self *AriaProvider) Configure(
 	}
 
 	ctx = tflog.SetField(ctx, "aria_host", host)
+	ctx = tflog.SetField(ctx, "aria_tenant", tenant)
 	ctx = tflog.MaskFieldValuesWithFieldKeys(ctx, "aria_refresh_token", refresh_token)
 	ctx = tflog.MaskFieldValuesWithFieldKeys(ctx, "aria_access_token", access_token)
 	ctx = tflog.SetField(ctx, "aria_insecure", insecure)
@@ -249,6 +277,7 @@ func (self *AriaProvider) Configure(
 	// Create a new Aria client using the configuration values
 	client := AriaClient{
 		Host:               host,
+		Tenant:             tenant,
 		RefreshToken:       refresh_token,
 		AccessToken:        access_token,
 		Insecure:           insecure,
