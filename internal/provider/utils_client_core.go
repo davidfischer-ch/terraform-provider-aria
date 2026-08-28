@@ -26,6 +26,12 @@ type AriaClient struct {
 	// Host must be a the URL to the base of the API.
 	Host string
 
+	// Tenant is the VCF 9 organization (tenant) name the refresh token belongs to.
+	// When set, RefreshToken is exchanged for an access token using the VCF 9 API token flow
+	// (POST tm/oauth/tenant/{tenant}/token) instead of the legacy Aria Automation 8.x flow
+	// (POST iaas/api/login).
+	Tenant string
+
 	RefreshToken string `datapolicy:"token"`
 	AccessToken  string `datapolicy:"token"`
 
@@ -49,6 +55,12 @@ type AriaClient struct {
 type AccessTokenResponse struct {
 	TokenType string `json:"tokenType"`
 	Token     string `json:"token"`
+}
+
+// VCFAccessTokenResponse is the response of the VCF 9 API token exchange
+// (POST tm/oauth/tenant/{tenant}/token).
+type VCFAccessTokenResponse struct {
+	AccessToken string `json:"access_token"`
 }
 
 func (self *AriaClient) Init() diag.Diagnostics {
@@ -92,20 +104,20 @@ func (self *AriaClient) GetAccessToken() diag.Diagnostics {
 	if len(self.RefreshToken) > 0 && len(self.AccessToken) == 0 {
 		self.Debug("Requesting a new API access token at %s", self.Host)
 
-		var token AccessTokenResponse
-		path := "iaas/api/login"
-		response, err := self.R(path).
-			SetHeader("Content-Type", "application/json").
-			SetBody(map[string]string{"refreshToken": self.RefreshToken}).
-			SetResult(&token).
-			Post(path)
-		err = self.HandleAPIResponse(response, err, []int{200})
+		var token string
+		var err error
+
+		if len(self.Tenant) > 0 {
+			token, err = self.getVCFAccessToken()
+		} else {
+			token, err = self.getLegacyAccessToken()
+		}
 		if err != nil {
 			diags.AddError("Unable to retrieve a valid access token", err.Error())
 			return diags
 		}
 
-		self.AccessToken = token.Token
+		self.AccessToken = token
 	}
 
 	if len(self.AccessToken) == 0 {
@@ -115,6 +127,42 @@ func (self *AriaClient) GetAccessToken() diag.Diagnostics {
 	}
 
 	return diags
+}
+
+// getLegacyAccessToken exchanges RefreshToken for an access token using the Aria Automation 8.x
+// two-step flow, see https://kb.vmware.com/s/article/89129.
+func (self *AriaClient) getLegacyAccessToken() (string, error) {
+	var token AccessTokenResponse
+	path := "iaas/api/login"
+	response, err := self.R(path).
+		SetHeader("Content-Type", "application/json").
+		SetBody(map[string]string{"refreshToken": self.RefreshToken}).
+		SetResult(&token).
+		Post(path)
+	if err := self.HandleAPIResponse(response, err, []int{200}); err != nil {
+		return "", err
+	}
+	return token.Token, nil
+}
+
+// getVCFAccessToken exchanges RefreshToken (a VCF 9 API token) for an access token scoped to
+// Tenant, using the VCF 9 "Authenticate using API token" flow. The endpoint is not versioned
+// per-service like the rest of the API, so it bypasses R() and calls the underlying client
+// directly.
+func (self *AriaClient) getVCFAccessToken() (string, error) {
+	var token VCFAccessTokenResponse
+	path := fmt.Sprintf("tm/oauth/tenant/%s/token", self.Tenant)
+	response, err := self.Client.R().
+		SetFormData(map[string]string{
+			"grant_type":    "refresh_token",
+			"refresh_token": self.RefreshToken,
+		}).
+		SetResult(&token).
+		Post(path)
+	if err := self.HandleAPIResponse(response, err, []int{200}); err != nil {
+		return "", err
+	}
+	return token.AccessToken, nil
 }
 
 // Return a new request insance with apiVersion header set, based on path.
@@ -319,9 +367,11 @@ func (self AriaClient) HandleAPIResponse(
 
 // Sensitive JSON keys whose values must be redacted in logs.
 var sensitiveJSONKeys = map[string]bool{
+	"access_token":      true,
+	"refresh_token":     true,
 	"refreshToken":      true,
-	"token":             true,
 	"systemCredentials": true,
+	"token":             true,
 }
 
 // redactSensitiveKeys walks a JSON structure and replaces sensitive values with "<REDACTED>".

@@ -102,6 +102,7 @@ Set the required environment variables:
 ```shell
 export ARIA_HOST=https://some-aria-host.net
 export ARIA_INSECURE=false
+export ARIA_TENANT=classic # VCF 9 only, name of the VM Apps tenant, uses the VCF 9 API token flow
 export ARIA_REFRESH_TOKEN=*****
 export ARIA_ACCESS_TOKEN=***** # If you have one, not required
 

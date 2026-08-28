@@ -16,6 +16,9 @@
 //
 // Optional environment variables:
 //
+//	ARIA_TENANT                    VCF 9 organization (tenant) name. When set, ARIA_REFRESH_TOKEN
+//	                               is exchanged for an access token using the VCF 9 API token
+//	                               flow instead of the legacy Aria Automation 8.x flow.
 //	ARIA_INSECURE                  Set to "true" to skip TLS certificate verification
 //	TF_VAR_test_project_id         Project ID used for ABX actions and project-scoped catalog sources
 //	TF_VAR_test_catalog_item_id    Catalog item ID used to look up custom forms
@@ -53,6 +56,8 @@ func main() {
 		fmt.Fprintf(os.Stderr, "  ARIA_REFRESH_TOKEN   Refresh token (mutually exclusive with ARIA_ACCESS_TOKEN)\n")
 		fmt.Fprintf(os.Stderr, "  ARIA_ACCESS_TOKEN    Access token  (mutually exclusive with ARIA_REFRESH_TOKEN)\n")
 		fmt.Fprintf(os.Stderr, "\nOptional environment variables:\n")
+		fmt.Fprintf(os.Stderr, "  ARIA_TENANT          VCF 9 organization (tenant) name, "+
+			"uses the VCF 9 API token flow when set\n")
 		fmt.Fprintf(os.Stderr, "  ARIA_INSECURE                  Skip TLS certificate verification (\"true\")\n")
 		fmt.Fprintf(os.Stderr, "  TF_VAR_test_project_id         Project ID for ABX actions and project-scoped catalog sources\n")
 		fmt.Fprintf(os.Stderr, "  TF_VAR_test_catalog_item_id    Catalog item ID for custom forms\n")
@@ -62,6 +67,7 @@ func main() {
 	flag.Parse()
 
 	host := os.Getenv("ARIA_HOST")
+	tenant := os.Getenv("ARIA_TENANT")
 	refreshToken := os.Getenv("ARIA_REFRESH_TOKEN")
 	accessToken := os.Getenv("ARIA_ACCESS_TOKEN")
 	insecure := strings.EqualFold(os.Getenv("ARIA_INSECURE"), "true")
@@ -81,6 +87,7 @@ func main() {
 
 	client := &provider.AriaClient{
 		Host:               host,
+		Tenant:             tenant,
 		RefreshToken:       refreshToken,
 		AccessToken:        accessToken,
 		Insecure:           insecure,
