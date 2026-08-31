@@ -3,6 +3,8 @@ locals {
   # named differently to survive it.
   prefix = "ARIA_PROVIDER_FIXTURE"
 
+  is_vcf9 = var.aria_tenant != null && var.aria_tenant != ""
+
   me = data.restful_resource.me.output
 
   # Approvers are principals stripped of their domain, e.g. USER:ELIOTT.

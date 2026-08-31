@@ -28,16 +28,15 @@ leftovers of an interrupted test run.
 
 ## Usage
 
-Nothing is configured here, every provider reads the environment. These exports are all that is
-needed, the makefile mirrors them to the `VRA_*` and `TF_VAR_aria_*` names the vra and restful
-providers expect:
+The aria provider reads the environment on its own. The vra and restful providers are configured
+explicitly, from variables the makefile mirrors under `TF_VAR_aria_*`. These exports are all that is
+needed:
 
 ```shell
 export ARIA_HOST=https://some-aria-host.net
 export ARIA_INSECURE=false
 export ARIA_TENANT=classic # VCF 9 only, name of the VM Apps tenant
 export ARIA_REFRESH_TOKEN=*****
-export ARIA_ACCESS_TOKEN=*****
 ```
 
 Then, from the repository root:

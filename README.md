@@ -97,34 +97,19 @@ own values or flags, set the environment variables yourself and run `go test ./.
 
 Acceptance tests create and destroy real resources on a live Aria instance.
 
-These five exports are all the makefile targets need, they derive the rest:
+These exports are all the makefile targets need, they derive the rest:
 
 ```shell
 export ARIA_HOST=https://some-aria-host.net
 export ARIA_INSECURE=false
 export ARIA_TENANT=classic # VCF 9 only, name of the VM Apps tenant, uses the VCF 9 API token flow
 export ARIA_REFRESH_TOKEN=*****
-export ARIA_ACCESS_TOKEN=***** # Required by tests/setup, the restful provider takes no other
+export ARIA_ACCESS_TOKEN=***** # If you have one, not required
 ```
 
-The tests also need a `TF_VAR_test_*` variable per prerequisite, each pointing to a resource that
-must already exist on the instance:
-
-```shell
-export TF_VAR_test_org_id=2817c6e5-7408-449f-a86d-8f511105e5ba
-export TF_VAR_test_project_id=2e34b115-dd18-48b3-a6af-f794469e5e0d
-export TF_VAR_test_project_ids=8f274902-94dc-40fd-98b5-f06c68ae1237,a9441e75-57c0-46fa-9262-c06a47acb1a9,2e34b115-dd18-48b3-a6af-f794469e5e0d
-export TF_VAR_test_abx_action_id=8a7480d38e535332018e857e0d4f3437
-export TF_VAR_test_catalog_item_id=c76c5478-6342-37c8-a2a2-76a786e0b232
-export TF_VAR_test_catalog_item_type=com.vmw.blueprint
-export TF_VAR_test_icon_id=72a9a2c7-494e-31d7-afe8-cd27479c407e
-export TF_VAR_test_secret_id=a9af6450-a0c6-42cf-921e-14f7f8db50b3
-export TF_VAR_test_approver_name=USER:SOMEUSER
-```
-
-Fortunately, those prerequisites can be instantiated and managed using the
-[tests/setup](tests/setup) Terraform configuration, which writes exactly that block to
-`tests/setup/env.sh`, see its [README](tests/setup/README.md):
+The tests also expect a set of resources to already exist on the instance. The
+[tests/setup](tests/setup) Terraform configuration creates and manages them, writing the matching
+`TF_VAR_test_*` exports to `tests/setup/env.sh`, see its [README](tests/setup/README.md):
 
 ```shell
 make testacc-setup    # create the prerequisites, writes tests/setup/env.sh
@@ -138,8 +123,8 @@ Then, once you have them available, run:
 make testacc
 ```
 
-`make testacc` loads `tests/setup/env.sh` when it exists. Export the values above by hand only if
-you manage the prerequisites yourself.
+`make testacc` loads `tests/setup/env.sh` when it exists. Export the `TF_VAR_test_*` values by hand
+only if you manage the prerequisites yourself.
 
 `make testacc` runs the unit tests first (`make test`, no live API needed), then the acceptance
 tests against your Aria instance. This fails fast on a broken unit test before spending time on the
@@ -162,8 +147,8 @@ make test TEST_RUN=TestCustomResourceModelToAPI
 
 Both default to the whole suite, and coverage is partial whenever a run is narrowed.
 
-Variables marked with `TF_VAR_test_catalog_item_*` point to an existing catalog item whose icon
-and custom form **will be modified** by the tests.
+The `TF_VAR_test_catalog_item_*` variables point to an existing catalog item whose icon and custom
+form **will be modified** by the tests.
 
 ### Cleaning up test resources
 
