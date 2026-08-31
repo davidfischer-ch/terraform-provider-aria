@@ -50,10 +50,10 @@ make testacc-destroy  # tear the fixtures down
 
 Terraform flags go through `ARGS`, e.g. `make testacc-setup ARGS=-auto-approve`.
 
-To run the tests separately from a setup applied earlier:
+To run the tests separately from a setup applied earlier, `make testacc` picks `env.sh` up on its
+own:
 
 ```shell
-source tests/setup/env.sh
 make testacc
 ```
 

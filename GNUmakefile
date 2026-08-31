@@ -45,8 +45,12 @@ test:
 # is spent on the slow, real-API acceptance run. Go interleaves *_unit_test.go and *_acc_test.go
 # files alphabetically within a package; without this split a broken unit test can sit behind
 # several acceptance tests instead of failing immediately.
+#
+# The TF_VAR_test_* values written by testacc-setup are loaded when present, running the tests
+# against those fixtures without sourcing anything by hand.
 .PHONY: testacc
 testacc: test
+	if [ -f ./$(TESTACC_SETUP_DIR)/env.sh ]; then . ./$(TESTACC_SETUP_DIR)/env.sh; fi; \
 	TF_ACC=1 go test ./... -v -run '$(TESTACC_RUN)' $(TESTARGS) -timeout 120m
 
 # The setup configuration mirrors ARIA_* to what the vra and restful providers expect, the aria
@@ -77,7 +81,7 @@ testacc-destroy:
 # Create the prerequisites, then run the acceptance tests against them.
 .PHONY: testacc-all
 testacc-all: testacc-setup
-	. ./$(TESTACC_SETUP_DIR)/env.sh && $(MAKE) testacc
+	$(MAKE) testacc
 
 # Sweep the ARIA_PROVIDER_TEST* resources left over by an interrupted acceptance run. The
 # TF_VAR_test_* values written by testacc-setup scope the ABX actions and custom forms it looks at,

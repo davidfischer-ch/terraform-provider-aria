@@ -135,9 +135,11 @@ make testacc-destroy  # tear them down
 Then, once you have them available, run:
 
 ```shell
-source tests/setup/env.sh
 make testacc
 ```
+
+`make testacc` loads `tests/setup/env.sh` when it exists. Export the values above by hand only if
+you manage the prerequisites yourself.
 
 `make testacc` runs the unit tests first (`make test`, no live API needed), then the acceptance
 tests against your Aria instance. This fails fast on a broken unit test before spending time on the
