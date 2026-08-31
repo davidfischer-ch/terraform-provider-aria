@@ -7,6 +7,7 @@
 #   ./scripts/check.sh              # run everything
 #   ./scripts/check.sh build lint   # run only the named steps
 #   SKIP_GENERATE=1 ./scripts/check.sh
+#   TEST_RUN=TestCustomResourceModelToAPI ./scripts/check.sh test
 #
 # Steps: build vet lint generate test
 set -euo pipefail
@@ -110,10 +111,16 @@ run_generate() {
 }
 
 run_test() {
-  step 'go test ./internal/provider/'
+  # TEST_RUN narrows the run to the test names it matches. Coverage is then partial by nature.
+  run_args=()
+  if [ -n "${TEST_RUN:-}" ]; then
+    run_args=(-run "$TEST_RUN")
+  fi
+
+  step "go test ${TEST_RUN:+-run $TEST_RUN }./internal/provider/"
   mkdir -p bin
   TF_ACC='' ARIA_HOST='my-aria-instance.net' ARIA_REFRESH_TOKEN='faketokenhere' \
-    go test -coverprofile=bin/coverage.out ./internal/provider/ && ok 'tests'
+    go test "${run_args[@]}" -coverprofile=bin/coverage.out ./internal/provider/ && ok 'tests'
 
   go tool cover -html=bin/coverage.out -o bin/coverage.html
   printf '%scoverage report: bin/coverage.html%s\n' "$dim" "$reset"
