@@ -26,10 +26,20 @@ tidy: fmt docs
 lint:
 	./scripts/check.sh lint
 
+# Narrow a run to the test names the regexp matches. Go has no per-file selection, tests are
+# functions, but one file's tests usually share a prefix:
+#   make test TEST_RUN=TestCustomResourceModelToAPI
+#   make testacc TESTACC_RUN=TestAccIconDataSource
+#   make testacc TESTACC_RUN='TestAccIcon.*'   # every test of icon_resource_acc_test.go
+# They are separate variables on purpose: narrowing the acceptance run must not silently empty the
+# unit run that gates it.
+TEST_RUN ?=
+TESTACC_RUN ?= ^TestAcc
+
 # Run unit tests (dummy ARIA_HOST/ARIA_REFRESH_TOKEN are set for you, no real API is called).
 .PHONY: test
 test:
-	./scripts/check.sh test
+	TEST_RUN='$(TEST_RUN)' ./scripts/check.sh test
 
 # Run unit tests first (fast, no live API needed): a broken unit test then fails before any time
 # is spent on the slow, real-API acceptance run. Go interleaves *_unit_test.go and *_acc_test.go
@@ -37,7 +47,7 @@ test:
 # several acceptance tests instead of failing immediately.
 .PHONY: testacc
 testacc: test
-	TF_ACC=1 go test ./... -v -run '^TestAcc' $(TESTARGS) -timeout 120m
+	TF_ACC=1 go test ./... -v -run '$(TESTACC_RUN)' $(TESTARGS) -timeout 120m
 
 # The setup configuration mirrors ARIA_* to what the vra and restful providers expect, the aria
 # provider reads ARIA_* on its own. See tests/setup/README.md. These are exported rather than

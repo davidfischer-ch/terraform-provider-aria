@@ -143,6 +143,23 @@ make testacc
 tests against your Aria instance. This fails fast on a broken unit test before spending time on the
 slower acceptance run.
 
+`TESTACC_RUN` narrows the acceptance run to a regexp matched against test names. Go selects
+functions, not files, but one file's tests usually share a prefix:
+
+```shell
+make testacc TESTACC_RUN=TestAccIconDataSource  # a single test
+make testacc TESTACC_RUN='TestAccIcon.*'        # every test of icon_resource_acc_test.go
+```
+
+The unit run that gates it still runs in full. `TEST_RUN` narrows that one, on `make test` or
+`make check`:
+
+```shell
+make test TEST_RUN=TestCustomResourceModelToAPI
+```
+
+Both default to the whole suite, and coverage is partial whenever a run is narrowed.
+
 Variables marked with `TF_VAR_test_catalog_item_*` point to an existing catalog item whose icon
 and custom form **will be modified** by the tests.
 
