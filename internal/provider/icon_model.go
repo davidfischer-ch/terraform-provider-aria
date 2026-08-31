@@ -14,6 +14,7 @@ type IconModel struct {
 	Id            types.String `tfsdk:"id"`
 	Path          types.String `tfsdk:"path"`
 	Hash          types.String `tfsdk:"hash"`
+	ContentHash   types.String `tfsdk:"content_hash"`
 	KeepOnDestroy types.Bool   `tfsdk:"keep_on_destroy"`
 }
 
