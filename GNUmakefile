@@ -64,17 +64,32 @@ export TF_VAR_aria_tenant = $(ARIA_TENANT)
 export TF_VAR_aria_refresh_token = $(ARIA_REFRESH_TOKEN)
 export TF_VAR_aria_insecure = $(ARIA_INSECURE)
 
+# DEV=1 runs the setup configuration against the provider built from this worktree instead of the
+# registry release, e.g. `make testacc-setup DEV=1`, the only way to exercise unreleased changes.
+# The acceptance tests need none of this, they load the provider in-process.
+DEV ?=
+DEV_TFRC = $(CURDIR)/bin/dev.tfrc
+ifdef DEV
+export TF_CLI_CONFIG_FILE = $(DEV_TFRC)
+endif
+
+.PHONY: dev-overrides
+dev-overrides:
+	mkdir -p bin
+	go build -o bin/terraform-provider-aria .
+	printf 'provider_installation {\n  dev_overrides {\n    "davidfischer-ch/aria" = "%s/bin"\n  }\n  direct {}\n}\n' '$(CURDIR)' > $(DEV_TFRC)
+
 # Create the prerequisites the acceptance tests expect and write tests/setup/env.sh.
 # Pass Terraform flags as args, e.g. `make testacc-setup ARGS=-auto-approve`.
 .PHONY: testacc-setup
-testacc-setup:
+testacc-setup: $(if $(DEV),dev-overrides)
 	cd $(TESTACC_SETUP_DIR) && terraform init
 	cd $(TESTACC_SETUP_DIR) && terraform apply $(ARGS)
 
 # Destroy the prerequisites. Run bin/cleanup first if an acceptance run was interrupted, a leftover
 # ARIA_PROVIDER_TEST* resource inside a fixture project blocks the project deletion.
 .PHONY: testacc-destroy
-testacc-destroy:
+testacc-destroy: $(if $(DEV),dev-overrides)
 	cd $(TESTACC_SETUP_DIR) && terraform destroy $(ARGS)
 
 # Create the prerequisites, then run the acceptance tests against them.
