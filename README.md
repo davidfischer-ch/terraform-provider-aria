@@ -117,6 +117,13 @@ make testacc-all      # the above, then the acceptance tests against those prere
 make testacc-destroy  # tear them down
 ```
 
+That configuration uses the released provider. `DEV=1` builds the one of this worktree and points
+Terraform at it instead, the only way to exercise unreleased changes:
+
+```shell
+make testacc-setup DEV=1
+```
+
 Then, once you have them available, run:
 
 ```shell

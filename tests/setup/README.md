@@ -56,8 +56,20 @@ own:
 make testacc
 ```
 
-The `aria` provider is pulled from the registry. To exercise your local build instead, declare a
-`dev_overrides` block in your Terraform CLI configuration.
+The `aria` provider is pulled from the registry. `DEV=1` builds the one of this worktree and points
+Terraform at it through a `dev_overrides` block, the only way to exercise unreleased changes:
+
+```shell
+make testacc-setup DEV=1
+```
+
+Terraform then prints a "Provider development overrides are in effect" warning naming the binary.
+The generated CLI configuration lives in `bin/`, nothing outside the repository is touched and the
+override lasts for that command alone. The lock file keeps pinning the released version. Stay on
+`DEV=1` for `make testacc-destroy` too: state written by the worktree build would otherwise be read
+back by the registry one.
+
+The acceptance tests need none of this, they load the provider in-process.
 
 Run `make cleanup` before `make testacc-destroy` if a test run was interrupted, a leftover
 `ARIA_PROVIDER_TEST*` resource inside a fixture project blocks the project deletion. That target
