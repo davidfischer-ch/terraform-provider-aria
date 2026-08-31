@@ -1,5 +1,5 @@
-# The aria and vra providers read ARIA_* and VRA_* themselves, these three are only consumed by the
-# restful provider, which has no environment variable defaults.
+# The aria provider reads ARIA_* itself, every attribute of its schema being optional. The vra and
+# restful providers need an explicit configuration, which these variables feed.
 
 variable "aria_host" {
   type        = string
@@ -11,14 +11,20 @@ variable "aria_host" {
   }
 }
 
-variable "aria_access_token" {
+variable "aria_tenant" {
   type        = string
-  description = "The access token to use for making API requests, mirror of ARIA_ACCESS_TOKEN."
+  description = "The VCF 9 organization (tenant) name, null on Aria Automation 8.x, mirror of ARIA_TENANT."
+  default     = null
+}
+
+variable "aria_refresh_token" {
+  type        = string
+  description = "The refresh token to use for making API requests, mirror of ARIA_REFRESH_TOKEN."
   sensitive   = true
 
   validation {
-    condition     = length(var.aria_access_token) > 0
-    error_message = "Argument `aria_access_token` must not be empty, is ARIA_ACCESS_TOKEN exported?"
+    condition     = length(var.aria_refresh_token) > 0
+    error_message = "Argument `aria_refresh_token` must not be empty, is ARIA_REFRESH_TOKEN exported?"
   }
 }
 

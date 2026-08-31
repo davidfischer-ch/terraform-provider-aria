@@ -53,16 +53,15 @@ testacc: test
 	if [ -f ./$(TESTACC_SETUP_DIR)/env.sh ]; then . ./$(TESTACC_SETUP_DIR)/env.sh; fi; \
 	TF_ACC=1 go test ./... -v -run '$(TESTACC_RUN)' $(TESTARGS) -timeout 120m
 
-# The setup configuration mirrors ARIA_* to what the vra and restful providers expect, the aria
-# provider reads ARIA_* on its own. See tests/setup/README.md. These are exported rather than
-# prefixed to the recipes, which would print the tokens and expose them in the process list.
+# The setup configuration mirrors ARIA_* into the variables feeding its vra and restful provider
+# blocks, the aria provider reads ARIA_* on its own. See tests/setup/README.md. These are exported
+# rather than prefixed to the recipes, which would print the tokens and expose them in the process
+# list.
 TESTACC_SETUP_DIR = tests/setup
 ARIA_INSECURE ?= false
-export VRA_URL = $(ARIA_HOST)
-export VRA_REFRESH_TOKEN = $(ARIA_REFRESH_TOKEN)
-export VRA_INSECURE = $(ARIA_INSECURE)
 export TF_VAR_aria_host = $(ARIA_HOST)
-export TF_VAR_aria_access_token = $(ARIA_ACCESS_TOKEN)
+export TF_VAR_aria_tenant = $(ARIA_TENANT)
+export TF_VAR_aria_refresh_token = $(ARIA_REFRESH_TOKEN)
 export TF_VAR_aria_insecure = $(ARIA_INSECURE)
 
 # Create the prerequisites the acceptance tests expect and write tests/setup/env.sh.
