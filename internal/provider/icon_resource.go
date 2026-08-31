@@ -134,7 +134,7 @@ func (self *IconResource) Create(
 	}
 
 	// Save updated icon into Terraform state
-	icon.Hash = types.StringValue(fmt.Sprintf("%x", sha256.Sum256(response.Body())))
+	icon.ContentHash = types.StringValue(fmt.Sprintf("%x", sha256.Sum256(response.Body())))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &icon)...)
 	tflog.Debug(ctx, fmt.Sprintf("Refreshed %s successfully", icon.String()))
 
@@ -173,7 +173,7 @@ func (self *IconResource) Read(
 	}
 
 	// Save updated icon into Terraform state
-	icon.Hash = types.StringValue(fmt.Sprintf("%x", sha256.Sum256(response.Body())))
+	icon.ContentHash = types.StringValue(fmt.Sprintf("%x", sha256.Sum256(response.Body())))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &icon)...)
 }
 
