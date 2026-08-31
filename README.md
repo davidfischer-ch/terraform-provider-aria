@@ -97,15 +97,20 @@ own values or flags, set the environment variables yourself and run `go test ./.
 
 Acceptance tests create and destroy real resources on a live Aria instance.
 
-Set the required environment variables:
+These five exports are all the makefile targets need, they derive the rest:
 
 ```shell
 export ARIA_HOST=https://some-aria-host.net
 export ARIA_INSECURE=false
 export ARIA_TENANT=classic # VCF 9 only, name of the VM Apps tenant, uses the VCF 9 API token flow
 export ARIA_REFRESH_TOKEN=*****
-export ARIA_ACCESS_TOKEN=***** # If you have one, not required
+export ARIA_ACCESS_TOKEN=***** # Required by tests/setup, the restful provider takes no other
+```
 
+The tests also need a `TF_VAR_test_*` variable per prerequisite, each pointing to a resource that
+must already exist on the instance:
+
+```shell
 export TF_VAR_test_org_id=2817c6e5-7408-449f-a86d-8f511105e5ba
 export TF_VAR_test_project_id=2e34b115-dd18-48b3-a6af-f794469e5e0d
 export TF_VAR_test_project_ids=8f274902-94dc-40fd-98b5-f06c68ae1237,a9441e75-57c0-46fa-9262-c06a47acb1a9,2e34b115-dd18-48b3-a6af-f794469e5e0d
@@ -117,9 +122,20 @@ export TF_VAR_test_secret_id=a9af6450-a0c6-42cf-921e-14f7f8db50b3
 export TF_VAR_test_approver_name=USER:SOMEUSER
 ```
 
-Then run:
+Fortunately, those prerequisites can be instantiated and managed using the
+[tests/setup](tests/setup) Terraform configuration, which writes exactly that block to
+`tests/setup/env.sh`, see its [README](tests/setup/README.md):
 
 ```shell
+make testacc-setup    # create the prerequisites, writes tests/setup/env.sh
+make testacc-all      # the above, then the acceptance tests against those prerequisites
+make testacc-destroy  # tear them down
+```
+
+Then, once you have them available, run:
+
+```shell
+source tests/setup/env.sh
 make testacc
 ```
 
@@ -136,26 +152,26 @@ If an acceptance test run is interrupted or fails mid-way, orphaned resources ma
 Aria instance. The `cleanup` binary sweeps all resources whose names follow the `ARIA_PROVIDER_TEST`
 prefix convention used by the test suite.
 
-Build and run it:
+`make cleanup` builds it, loads `tests/setup/env.sh` when present, and runs it. Flags go through
+`ARGS`:
+
+```shell
+make cleanup ARGS=-help
+make cleanup ARGS=-dry-run  # preview what would be deleted without touching the API
+make cleanup                # delete everything
+make cleanup ARGS=-force    # also bypass vRO dependency checks and tag usage locks
+```
+
+Build and run it by hand instead if you prefer:
 
 ```shell
 go build -o bin/cleanup ./cmd/cleanup/
-bin/cleanup -help
-```
-
-Preview what would be deleted without touching the API:
-
-```shell
 bin/cleanup -dry-run
-```
-
-Delete everything (add `-force` to bypass vRO dependency checks and tag usage locks):
-
-```shell
-bin/cleanup
-bin/cleanup -force
 ```
 
 The `TF_VAR_test_project_id`, `TF_VAR_test_catalog_item_id`, and `TF_VAR_test_catalog_item_type`
 environment variables are reused from the acceptance test setup above to scope ABX actions
 and custom forms cleanup.
+
+Run it before `make testacc-destroy`, a leftover `ARIA_PROVIDER_TEST*` resource inside a
+fixture project blocks the project deletion.
