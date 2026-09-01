@@ -159,3 +159,85 @@ func TestGetAccessTokenPrefersVCFWhenTenantSet(t *testing.T) {
 		t.Errorf("AccessToken = %q, want %q", client.AccessToken, "vcf-access-token")
 	}
 }
+
+// authHeaderAfterInit initializes client against a fake API and returns the Authorization header
+// of subsequent calls. The token must reach the resty client, not only the AccessToken field.
+func authHeaderAfterInit(t *testing.T, client *AriaClient, token string) string {
+	t.Helper()
+
+	var gotAuthorization string
+	server := newFakeAPI(t, func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/iaas/api/login":
+			writeJSONStatus(w, http.StatusOK, map[string]string{
+				"tokenType": "Bearer",
+				"token":     token,
+			})
+		case "/tm/oauth/tenant/classic/token":
+			writeJSONStatus(w, http.StatusOK, map[string]string{"access_token": token})
+		default:
+			gotAuthorization = r.Header.Get("Authorization")
+			writeJSONStatus(w, http.StatusOK, map[string]string{})
+		}
+	})
+
+	client.Host = server.URL
+	diags := client.Init()
+	if diags.HasError() {
+		t.Fatalf("Init: %v", diags.Errors())
+	}
+
+	path := "iaas/api/tags"
+	response, err := client.R(path).Get(path)
+	if err := client.HandleAPIResponse(response, err, []int{200}); err != nil {
+		t.Fatalf("business call: %v", err)
+	}
+
+	return gotAuthorization
+}
+
+func TestInitAuthenticatesRequestsFromLegacyToken(t *testing.T) {
+	client := &AriaClient{
+		RefreshToken:       "legacy-refresh-token",
+		OKAPICallsLogLevel: "DEBUG",
+		KOAPICallsLogLevel: "WARN",
+		Context:            t.Context(),
+	}
+
+	got := authHeaderAfterInit(t, client, "legacy-access-token")
+
+	if want := "Bearer legacy-access-token"; got != want {
+		t.Errorf("Authorization = %q, want %q", got, want)
+	}
+}
+
+func TestInitAuthenticatesRequestsFromVCFToken(t *testing.T) {
+	client := &AriaClient{
+		Tenant:             "classic",
+		RefreshToken:       "vcf-api-token",
+		OKAPICallsLogLevel: "DEBUG",
+		KOAPICallsLogLevel: "WARN",
+		Context:            t.Context(),
+	}
+
+	got := authHeaderAfterInit(t, client, "vcf-access-token")
+
+	if want := "Bearer vcf-access-token"; got != want {
+		t.Errorf("Authorization = %q, want %q", got, want)
+	}
+}
+
+func TestInitAuthenticatesRequestsFromGivenAccessToken(t *testing.T) {
+	client := &AriaClient{
+		AccessToken:        "given-access-token",
+		OKAPICallsLogLevel: "DEBUG",
+		KOAPICallsLogLevel: "WARN",
+		Context:            t.Context(),
+	}
+
+	got := authHeaderAfterInit(t, client, "unused")
+
+	if want := "Bearer given-access-token"; got != want {
+		t.Errorf("Authorization = %q, want %q", got, want)
+	}
+}

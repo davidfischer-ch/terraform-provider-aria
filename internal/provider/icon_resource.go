@@ -18,10 +18,9 @@ import (
 
 // IconMIMEType returns the MIME type of an icon, derived from its extension.
 //
-// Resty types a multipart file part by sniffing its content, and Go's sniffer has no SVG rule: an
-// SVG opens with `<?xml`, which it reports as text/xml. The VCF 9 icon API rejects any part that is
-// not an image type with "file must contain valid MIME type", where Aria Automation 8.x accepted
-// it. Deriving the type from the extension keeps both versions happy.
+// The type must be derived from the extension and passed explicitly to resty, which otherwise
+// types a multipart part by sniffing its content. Go's sniffer has no SVG rule and reports an SVG
+// as text/xml, which the icon API rejects with "file must contain valid MIME type".
 func IconMIMEType(path string) string {
 	if mimeType := mime.TypeByExtension(filepath.Ext(path)); len(mimeType) > 0 {
 		return mimeType

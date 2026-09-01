@@ -74,9 +74,6 @@ func (self *AriaClient) Init() diag.Diagnostics {
 	client.SetBaseURL(self.Host)
 	client.SetTimeout(300 * time.Second)
 	client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: self.Insecure})
-	if len(self.AccessToken) > 0 {
-		client.SetAuthToken(self.AccessToken)
-	}
 	self.Client = client
 
 	diags.Append(self.GetAccessToken()...)
@@ -124,7 +121,10 @@ func (self *AriaClient) GetAccessToken() diag.Diagnostics {
 		diags.AddError(
 			"Empty Access Token",
 			"Access Token is empty, will be unable to make API calls")
+		return diags
 	}
+
+	self.Client.SetAuthToken(self.AccessToken)
 
 	return diags
 }
