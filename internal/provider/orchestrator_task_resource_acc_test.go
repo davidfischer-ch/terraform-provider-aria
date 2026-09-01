@@ -49,6 +49,9 @@ resource "aria_orchestrator_workflow" "test" {
       schema = {}
     }
   ])
+
+  # A task is scheduled through Orchestrator, the workflow needs no service broker import
+  wait_imported = false
 }
 
 # Schedule the workflow we manage
@@ -140,6 +143,9 @@ resource "aria_orchestrator_workflow" "test" {
       schema = {}
     }
   ])
+
+  # A task is scheduled through Orchestrator, the workflow needs no service broker import
+  wait_imported = false
 }
 
 # Schedule the workflow we manage
@@ -235,6 +241,9 @@ resource "aria_orchestrator_workflow" "another_test" {
       schema = {}
     }
   ])
+
+  # A task is scheduled through Orchestrator, the workflow needs no service broker import
+  wait_imported = false
 }
 
 # Schedule the workflow we manage
@@ -326,6 +335,9 @@ resource "aria_orchestrator_workflow" "test" {
       schema = {}
     }
   ])
+
+  # A task is scheduled through Orchestrator, the workflow needs no service broker import
+  wait_imported = false
 }
 
 # Schedule the workflow we manage, created directly in the suspended state
