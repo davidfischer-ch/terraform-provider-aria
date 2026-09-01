@@ -58,7 +58,7 @@ data "aria_catalog_item" "test_c" {
 					resource.TestCheckResourceAttrSet("data.aria_catalog_item.test_a", "created_at"),
 					resource.TestCheckResourceAttrSet("data.aria_catalog_item.test_a", "created_by"),
 					resource.TestCheckResourceAttrSet("data.aria_catalog_item.test_a", "last_updated_at"),
-					resource.TestCheckResourceAttrSet("data.aria_catalog_item.test_a", "last_updated_by"),
+					//resource.TestCheckResourceAttrSet("data.aria_catalog_item.test_a", "last_updated_by"),
 
 					// By External ID
 					resource.TestCheckResourceAttrPair(

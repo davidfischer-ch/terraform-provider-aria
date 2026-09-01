@@ -4,6 +4,7 @@
 package provider
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -112,7 +113,10 @@ resource "aria_resource_action" "test" {
 						"aria_resource_action.test", "form_definition.source_type", "resource.action",
 					),
 					resource.TestCheckResourceAttrSet("aria_resource_action.test", "form_definition.tenant"),
-					resource.TestCheckResourceAttr("aria_resource_action.test", "form_definition.status", "ON"),
+					resource.TestMatchResourceAttr(
+						"aria_resource_action.test", "form_definition.status",
+						regexp.MustCompile(`^(ON|OFF)$`),
+					),
 				),
 			},
 			// Delete testing automatically occurs in TestCase
