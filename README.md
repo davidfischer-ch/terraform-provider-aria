@@ -157,6 +157,17 @@ Both default to the whole suite, and coverage is partial whenever a run is narro
 The `TF_VAR_test_catalog_item_*` variables point to an existing catalog item whose icon and custom
 form **will be modified** by the tests.
 
+The `TF_VAR_test_runtime` variable names the Orchestrator runtime the environment, action and
+repository tests are built on. It defaults to the runtime of the platform, `python:3.11` on VCF 9
+and `python:3.10` on Aria Automation 8.x. The list of runtimes differs from one appliance to
+another, an unavailable one is reported as `MISSING_RUNTIME` in the validation message of the
+resources using it:
+
+```shell
+export TF_VAR_test_runtime=python:3.12
+make testacc-setup
+```
+
 ### Cleaning up test resources
 
 If an acceptance test run is interrupted or fails mid-way, orphaned resources may remain on the

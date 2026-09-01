@@ -33,3 +33,17 @@ variable "aria_insecure" {
   description = "Whether server should be accessed without verifying the TLS certificate, mirror of ARIA_INSECURE."
   default     = false
 }
+
+variable "test_runtime" {
+  type        = string
+  description = <<-EOT
+    The Orchestrator runtime the environment, action and repository tests are built on.
+    Defaults to python:3.11 on VCF 9 and python:3.10 on Aria Automation 8.x.
+  EOT
+  default     = null
+
+  validation {
+    condition     = var.test_runtime == null ? true : length(var.test_runtime) > 0
+    error_message = "Argument `test_runtime` must not be empty."
+  }
+}

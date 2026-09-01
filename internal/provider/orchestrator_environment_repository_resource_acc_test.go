@@ -17,10 +17,22 @@ func TestAccOrchestratorEnvironmentRepositoryResource(t *testing.T) {
 			// Create and Read testing
 			{
 				Config: `
+variable "test_runtime" {
+  description = "Orchestrator runtime the repository serves dependencies for."
+  type        = string
+}
+
 resource "aria_orchestrator_environment_repository" "test" {
 	name     = "ARIA_PROVIDER_TEST"
-	runtime  = "python:3.10"
+	runtime  = var.test_runtime
 	location = "https://your-registry.your-company.net/repository/pypi-all/simple"
+
+	lifecycle {
+		postcondition {
+			condition     = self.runtime == var.test_runtime
+			error_message = "Runtime must be ${var.test_runtime}, actual ${self.runtime}"
+		}
+	}
 }
 `,
 				Check: resource.ComposeAggregateTestCheckFunc(
@@ -30,9 +42,6 @@ resource "aria_orchestrator_environment_repository" "test" {
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_environment_repository.test", "name",
 						"ARIA_PROVIDER_TEST",
-					),
-					resource.TestCheckResourceAttr(
-						"aria_orchestrator_environment_repository.test", "runtime", "python:3.10",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_environment_repository.test", "location",
@@ -58,12 +67,24 @@ resource "aria_orchestrator_environment_repository" "test" {
 			// Update and Read testing
 			{
 				Config: `
+variable "test_runtime" {
+  description = "Orchestrator runtime the repository serves dependencies for."
+  type        = string
+}
+
 resource "aria_orchestrator_environment_repository" "test" {
 	name               = "ARIA_PROVIDER_TEST"
-	runtime            = "python:3.10"
+	runtime            = var.test_runtime
 	location           = "https://your-registry.your-company.net/repository/pypi-all/simple"
 	system_user        = "toto"
 	system_credentials = "tata"
+
+	lifecycle {
+		postcondition {
+			condition     = self.runtime == var.test_runtime
+			error_message = "Runtime must be ${var.test_runtime}, actual ${self.runtime}"
+		}
+	}
 }
 `,
 				Check: resource.ComposeAggregateTestCheckFunc(
@@ -73,9 +94,6 @@ resource "aria_orchestrator_environment_repository" "test" {
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_environment_repository.test", "name",
 						"ARIA_PROVIDER_TEST",
-					),
-					resource.TestCheckResourceAttr(
-						"aria_orchestrator_environment_repository.test", "runtime", "python:3.10",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_environment_repository.test", "location",
@@ -96,10 +114,22 @@ resource "aria_orchestrator_environment_repository" "test" {
 			// Update and Read testing
 			{
 				Config: `
+variable "test_runtime" {
+  description = "Orchestrator runtime the repository serves dependencies for."
+  type        = string
+}
+
 resource "aria_orchestrator_environment_repository" "test" {
 	name     = "ARIA_PROVIDER_TEST_RENAMED"
-	runtime  = "python:3.10"
+	runtime  = var.test_runtime
 	location = "https://your-registry.your-company.net/repository/pypi-all/other"
+
+	lifecycle {
+		postcondition {
+			condition     = self.runtime == var.test_runtime
+			error_message = "Runtime must be ${var.test_runtime}, actual ${self.runtime}"
+		}
+	}
 }
 `,
 				Check: resource.ComposeAggregateTestCheckFunc(
@@ -109,9 +139,6 @@ resource "aria_orchestrator_environment_repository" "test" {
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_environment_repository.test", "name",
 						"ARIA_PROVIDER_TEST_RENAMED",
-					),
-					resource.TestCheckResourceAttr(
-						"aria_orchestrator_environment_repository.test", "runtime", "python:3.10",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_environment_repository.test", "location",

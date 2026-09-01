@@ -13,6 +13,7 @@ in the root [README](../../README.md#acceptance-tests).
 | Icon | `aria_icon` | `test_icon_id` |
 | Cloud template, its released version and a catalog source | `vra_blueprint`, `vra_blueprint_version`, `vra_catalog_source_blueprint` | `test_catalog_item_id`, `test_catalog_item_type` |
 | Secret | `restful_resource` on `platform/api/secrets` | `test_secret_id` |
+| Orchestrator environment | `aria_orchestrator_environment` | `test_environment_id`, `test_environment_name`, `test_runtime` |
 
 Nothing is created for `test_approver_name`, the approval policy tests approve on ourselves. The
 account comes from `/csp/gateway/am/api/loggedin/user` and is stripped of its domain, matching the
@@ -21,6 +22,15 @@ account comes from `/csp/gateway/am/api/loggedin/user` and is stripped of its do
 The secret goes through the `restful` provider because neither the aria provider (data source only)
 nor the vra provider exposes a secret resource. An `aria_secret` resource would remove that provider
 and the three variables it needs.
+
+The environment is built on the runtime of the platform, `python:3.11` on VCF 9 and `python:3.10`
+on Aria Automation 8.x. The runtimes an appliance offers differ from one version to another, and an
+unavailable one is reported as `MISSING_RUNTIME` in the validation message of every resource using
+it. Override the default when neither is one of yours:
+
+```shell
+export TF_VAR_test_runtime=python:3.12
+```
 
 Fixtures are named `ARIA_PROVIDER_FIXTURE_*` on purpose. The `cleanup` binary sweeps everything
 named `ARIA_PROVIDER_TEST*`. Fixtures therefore survive a cleanup run, which removes only the
