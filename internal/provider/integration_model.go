@@ -5,6 +5,8 @@ package provider
 
 import (
 	"fmt"
+	"slices"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -30,14 +32,39 @@ type IntegrationAPIModel struct {
 	EndpointURI               string `json:"endpointUri"`
 }
 
-// IntegrationResponseAPIodel describes the resource API model.
-type IntegrationResponseAPIodel struct {
-	Content []IntegrationResponseContentAPIModel `json:"content"`
+// IntegrationsResponseAPIModel describes the response of the integrations API endpoint.
+type IntegrationsResponseAPIModel struct {
+	Content       []IntegrationEntryAPIModel `json:"content"`
+	TotalElements int                        `json:"totalElements"`
 }
 
-// IntegrationResponseContentAPIModel describes the resource API model.
-type IntegrationResponseContentAPIModel struct {
-	Integration IntegrationAPIModel `json:"integration"`
+// IntegrationEntryAPIModel describes an integration as listed by the integrations API endpoint.
+type IntegrationEntryAPIModel struct {
+	Id               string            `json:"id"`
+	Name             string            `json:"name"`
+	IntegrationType  string            `json:"integrationType"`
+	CustomProperties map[string]string `json:"customProperties"`
+}
+
+// Return the integration in the shape the catalog API uses. The endpoint configuration link points
+// at the endpoint document, which shares the identifier of the integration wrapping it.
+func (self IntegrationEntryAPIModel) ToIntegrationAPI() IntegrationAPIModel {
+	return IntegrationAPIModel{
+		Name:                      self.Name,
+		EndpointConfigurationLink: "/resources/endpoints/" + self.Id,
+		EndpointURI:               self.CustomProperties["hostName"],
+	}
+}
+
+// Return the candidates sorted and joined for use in a diagnostic message. Duplicates are kept,
+// how many times a name occurs is part of what the message has to report.
+func IntegrationCandidates(candidates []IntegrationAPIModel) string {
+	entries := make([]string, 0, len(candidates))
+	for _, candidate := range candidates {
+		entries = append(entries, fmt.Sprintf("%q (%s)", candidate.Name, candidate.EndpointURI))
+	}
+	slices.Sort(entries)
+	return strings.Join(entries, ", ")
 }
 
 func (self *IntegrationModel) String() string {
@@ -61,16 +88,28 @@ func (self *IntegrationModel) ToAPI() IntegrationAPIModel {
 	}
 }
 
+// Return a description of what is looked up, the name included when it is set.
+func (self IntegrationDataSourceModel) String() string {
+	typeId := self.TypeId.ValueString()
+	if name := self.Name.ValueString(); len(name) > 0 {
+		return fmt.Sprintf("Integration %q of type %s", name, typeId)
+	}
+	return fmt.Sprintf("Integration of type %s", typeId)
+}
+
 func (self IntegrationDataSourceModel) ReadPath() string {
-	var resource string
+	return "iaas/api/integrations"
+}
+
+// Return the integration type the catalog source type identifier stands for. The listing mixes
+// every kind of integration, this is what tells an Orchestrator from an extensibility endpoint.
+func (self IntegrationDataSourceModel) IntegrationType() string {
 	typeId := self.TypeId.ValueString()
 	if typeId == "com.vmw.vro.workflow" {
-		resource = "workflows"
-	} else {
-		// Panic is intentional: this is a programming bug, not a runtime error.
-		panic(fmt.Sprintf("Internal error: %s as unexpected type: %s.", self.String(), typeId))
+		return "vro"
 	}
-	return fmt.Sprintf("catalog/api/types/%s/data/%s", typeId, resource)
+	// Panic is intentional: this is a programming bug, not a runtime error.
+	panic(fmt.Sprintf("Internal error: %s as unexpected type: %s.", self.String(), typeId))
 }
 
 // Utils -------------------------------------------------------------------------------------------

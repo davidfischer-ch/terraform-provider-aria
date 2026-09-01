@@ -16,6 +16,9 @@ const POLICY_API_VERSION = "2020-08-25"
 const PROJECT_API_VERSION = "2019-01-15"
 const PLATFORM_API_VERSION = ""
 
+// How many integrations are requested per page when walking the integrations listing.
+const INTEGRATIONS_PAGE_SIZE = 100
+
 // Helpers for documenting attributes in schema ----------------------------------------------------
 
 const IMMUTABLE = " (force recreation on change)"
