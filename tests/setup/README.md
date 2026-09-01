@@ -14,6 +14,7 @@ in the root [README](../../README.md#acceptance-tests).
 | Cloud template, its released version and a catalog source | `vra_blueprint`, `vra_blueprint_version`, `vra_catalog_source_blueprint` | `test_catalog_item_id`, `test_catalog_item_type` |
 | Secret | `restful_resource` on `platform/api/secrets` | `test_secret_id` |
 | Orchestrator environment | `aria_orchestrator_environment` | `test_environment_id`, `test_environment_name`, `test_runtime` |
+| Orchestrator category and workflow | `aria_orchestrator_category`, `aria_orchestrator_workflow` | `test_workflow_id`, `test_workflow_name` |
 
 Nothing is created for `test_approver_name`, the approval policy tests approve on ourselves. The
 account comes from `/csp/gateway/am/api/loggedin/user` and is stripped of its domain, matching the
@@ -31,6 +32,11 @@ it. Override the default when neither is one of yours:
 ```shell
 export TF_VAR_test_runtime=python:3.12
 ```
+
+The workflow is created without waiting for its service broker import. A resource action backed by
+a workflow needs the broker to know it, and that import is asynchronous: creating the workflow once
+here leaves it to happen between the setup and the runs consuming it, rather than every test paying
+a fifteen minute wait for a workflow of its own.
 
 Fixtures are named `ARIA_PROVIDER_FIXTURE_*` on purpose. The `cleanup` binary sweeps everything
 named `ARIA_PROVIDER_TEST*`. Fixtures therefore survive a cleanup run, which removes only the

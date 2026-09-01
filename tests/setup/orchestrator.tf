@@ -29,3 +29,47 @@ resource "aria_orchestrator_environment" "test" {
     }
   }
 }
+
+# Workflow referenced by the resource action tests (TF_VAR_test_workflow_id,
+# TF_VAR_test_workflow_name).
+#
+# A resource action backed by a workflow needs the service broker to know it, and the import is
+# asynchronous. Creating the workflow once here rather than inside every test leaves that import to
+# happen out of band, between the setup and the runs consuming it, instead of being waited on at
+# every run.
+
+resource "aria_orchestrator_category" "test" {
+  name      = "${local.prefix}_WORKFLOWS"
+  type      = "WorkflowCategory"
+  parent_id = ""
+}
+
+resource "aria_orchestrator_workflow" "test" {
+  name        = "${local.prefix}_WORKFLOW"
+  description = "Workflow referenced by Aria provider's acceptance tests."
+  category_id = aria_orchestrator_category.test.id
+  version     = "0.1.0"
+
+  position = { x = 100, y = 50 }
+
+  restart_mode            = 1 # resume
+  resume_from_failed_mode = 0 # default
+
+  attrib        = jsonencode([])
+  presentation  = jsonencode({})
+  workflow_item = jsonencode([])
+
+  input_parameters  = []
+  output_parameters = []
+
+  input_forms = jsonencode([
+    {
+      layout = {
+        pages = []
+      }
+      schema = {}
+    }
+  ])
+
+  wait_imported = false
+}
