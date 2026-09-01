@@ -1,5 +1,7 @@
-# Orchestrator environment referenced by the action tests (TF_VAR_test_environment_id,
-# TF_VAR_test_environment_name).
+# Orchestrator environment referenced by the action tests through two variables:
+#
+# * TF_VAR_test_environment_id
+# * TF_VAR_test_environment_name
 #
 # Building an environment is slow and its runtime must be one the appliance offers, hence a single
 # shared fixture: the tests that merely need an environment to point at reuse this one instead of
@@ -30,13 +32,14 @@ resource "aria_orchestrator_environment" "test" {
   }
 }
 
-# Workflow referenced by the resource action tests (TF_VAR_test_workflow_id,
-# TF_VAR_test_workflow_name).
+# Workflow referenced by the resource action tests through two variables:
+#
+# * TF_VAR_test_workflow_id
+# * TF_VAR_test_workflow_name
 #
 # A resource action backed by a workflow needs the service broker to know it, and the import is
-# asynchronous. Creating the workflow once here rather than inside every test leaves that import to
-# happen out of band, between the setup and the runs consuming it, instead of being waited on at
-# every run.
+# asynchronous. Waiting for it once here is what lets every run consuming this workflow start from
+# an imported one, instead of each test creating a workflow and waiting fifteen minutes for it.
 
 resource "aria_orchestrator_category" "test" {
   name      = "${local.prefix}_WORKFLOWS"
@@ -71,5 +74,5 @@ resource "aria_orchestrator_workflow" "test" {
     }
   ])
 
-  wait_imported = false
+  wait_imported = true
 }

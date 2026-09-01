@@ -33,10 +33,11 @@ it. Override the default when neither is one of yours:
 export TF_VAR_test_runtime=python:3.12
 ```
 
-The workflow is created without waiting for its service broker import. A resource action backed by
-a workflow needs the broker to know it, and that import is asynchronous: creating the workflow once
-here leaves it to happen between the setup and the runs consuming it, rather than every test paying
-a fifteen minute wait for a workflow of its own.
+The workflow waits for its service broker import, up to fifteen minutes. A resource action backed
+by a workflow needs the broker to know it, and that import is asynchronous: paying for it once here
+is what lets the tests consuming this workflow start from an imported one. An appliance whose
+import never completes therefore fails the setup, which is the intended report, the alternative
+being every run discovering it separately.
 
 Fixtures are named `ARIA_PROVIDER_FIXTURE_*` on purpose. The `cleanup` binary sweeps everything
 named `ARIA_PROVIDER_TEST*`. Fixtures therefore survive a cleanup run, which removes only the
