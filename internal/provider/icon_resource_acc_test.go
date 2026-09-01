@@ -38,7 +38,7 @@ resource "aria_icon" "test" {
 				Config: `
 resource "aria_icon" "test" {
   path = "../../tests/icon.png"
-  hash = filesha256("../../tests/icon.png")
+  hash = "724d45fec592788dcaca7526cfbb68e0867adb48ed1a9f8d6f5a6fde094bcf7d"
 }
 `,
 				Check: resource.ComposeAggregateTestCheckFunc(
@@ -54,7 +54,7 @@ resource "aria_icon" "test" {
 				Config: `
 resource "aria_icon" "test" {
   path = "../../tests/icon.png"
-  hash = filesha256("../../tests/icon.png")
+  hash = "724d45fec592788dcaca7526cfbb68e0867adb48ed1a9f8d6f5a6fde094bcf7d"
 }
 `,
 				Check: resource.ComposeAggregateTestCheckFunc(
