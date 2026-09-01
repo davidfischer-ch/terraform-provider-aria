@@ -279,6 +279,14 @@ func (self *OrchestratorWorkflowResource) WaitImported(
 			&fromGatewayAPI,
 			workflow.ReadGatewayPath())
 		diags.Append(someDiags...)
+
+		// Integration must hold a known value whatever the outcome, the caller saves the state
+		// even when the diagnostics carry an error.
+		if diags.HasError() {
+			workflow.ResetIntegration()
+			return diags
+		}
+
 		if !found {
 			continue // Continue polling
 		}
@@ -288,6 +296,7 @@ func (self *OrchestratorWorkflowResource) WaitImported(
 		return diags
 	}
 
+	workflow.ResetIntegration()
 	diags.AddError(
 		"Client error",
 		fmt.Sprintf("Timeout while waiting for %s to be imported without errors.", name))
