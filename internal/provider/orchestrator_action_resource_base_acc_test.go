@@ -31,7 +31,7 @@ EOT
 }
 
 resource "aria_orchestrator_category" "test" {
-	name      = "ARIA_PROVIDER_TEST_ACTIONS"
+	name      = "ARIA_PROVIDER_TEST_ACTIONS_BASE"
 	type      = "ScriptModuleCategory"
 	parent_id = ""
 }
@@ -64,10 +64,10 @@ resource "aria_orchestrator_action" "test" {
 						"aria_orchestrator_action.test", "name", "getVRAHost",
 					),
 					resource.TestCheckResourceAttr(
-						"aria_orchestrator_action.test", "module", "ARIA_PROVIDER_TEST_ACTIONS",
+						"aria_orchestrator_action.test", "module", "ARIA_PROVIDER_TEST_ACTIONS_BASE",
 					),
 					resource.TestCheckResourceAttr(
-						"aria_orchestrator_action.test", "fqn", "ARIA_PROVIDER_TEST_ACTIONS/getVRAHost",
+						"aria_orchestrator_action.test", "fqn", "ARIA_PROVIDER_TEST_ACTIONS_BASE/getVRAHost",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_action.test", "description",
@@ -111,7 +111,7 @@ EOT
 }
 
 resource "aria_orchestrator_category" "test" {
-	name      = "ARIA_PROVIDER_TEST_ACTIONS_BIS"
+	name      = "ARIA_PROVIDER_TEST_ACTIONS_BASE_BIS"
 	type      = "ScriptModuleCategory"
 	parent_id = ""
 }
@@ -148,10 +148,10 @@ resource "aria_orchestrator_action" "test" {
 						"aria_orchestrator_action.test", "name", "getVRAHost",
 					),
 					resource.TestCheckResourceAttr(
-						"aria_orchestrator_action.test", "module", "ARIA_PROVIDER_TEST_ACTIONS_BIS",
+						"aria_orchestrator_action.test", "module", "ARIA_PROVIDER_TEST_ACTIONS_BASE_BIS",
 					),
 					resource.TestCheckResourceAttr(
-						"aria_orchestrator_action.test", "fqn", "ARIA_PROVIDER_TEST_ACTIONS_BIS/getVRAHost",
+						"aria_orchestrator_action.test", "fqn", "ARIA_PROVIDER_TEST_ACTIONS_BASE_BIS/getVRAHost",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_action.test", "description",
@@ -207,7 +207,7 @@ EOT
 }
 
 resource "aria_orchestrator_category" "test" {
-	name      = "ARIA_PROVIDER_TEST_ACTIONS"
+	name      = "ARIA_PROVIDER_TEST_ACTIONS_BASE"
 	type      = "ScriptModuleCategory"
 	parent_id = ""
 }
@@ -267,10 +267,10 @@ resource "aria_orchestrator_action" "test" {
 						"aria_orchestrator_action.test", "name", "getDeploymentById",
 					),
 					resource.TestCheckResourceAttr(
-						"aria_orchestrator_action.test", "module", "ARIA_PROVIDER_TEST_ACTIONS",
+						"aria_orchestrator_action.test", "module", "ARIA_PROVIDER_TEST_ACTIONS_BASE",
 					),
 					resource.TestCheckResourceAttr(
-						"aria_orchestrator_action.test", "fqn", "ARIA_PROVIDER_TEST_ACTIONS/getDeploymentById",
+						"aria_orchestrator_action.test", "fqn", "ARIA_PROVIDER_TEST_ACTIONS_BASE/getDeploymentById",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_action.test", "description",

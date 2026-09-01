@@ -22,10 +22,16 @@ variable "test_environment_id" {
   type        = string
 }
 
+resource "aria_orchestrator_category" "test" {
+  name      = "ARIA_PROVIDER_TEST_ACTIONS_ENVIRONMENT"
+  type      = "ScriptModuleCategory"
+  parent_id = ""
+}
+
 resource "aria_orchestrator_action" "test" {
   name                 = "actionZ"
-  module               = "ARIA_PROVIDER_TEST_ACTIONS"
-  fqn                  = "ARIA_PROVIDER_TEST_ACTIONS/actionZ"
+  module               = aria_orchestrator_category.test.path
+  fqn                  = "${aria_orchestrator_category.test.path}/actionZ"
   description          = "An action"
   version              = "1.0.0"
   environment_id       = var.test_environment_id
@@ -51,10 +57,10 @@ resource "aria_orchestrator_action" "test" {
 						"aria_orchestrator_action.test", "name", "actionZ",
 					),
 					resource.TestCheckResourceAttr(
-						"aria_orchestrator_action.test", "module", "ARIA_PROVIDER_TEST_ACTIONS",
+						"aria_orchestrator_action.test", "module", "ARIA_PROVIDER_TEST_ACTIONS_ENVIRONMENT",
 					),
 					resource.TestCheckResourceAttr(
-						"aria_orchestrator_action.test", "fqn", "ARIA_PROVIDER_TEST_ACTIONS/actionZ",
+						"aria_orchestrator_action.test", "fqn", "ARIA_PROVIDER_TEST_ACTIONS_ENVIRONMENT/actionZ",
 					),
 					resource.TestCheckResourceAttr(
 						"aria_orchestrator_action.test", "description", "An action",
