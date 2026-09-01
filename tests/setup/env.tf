@@ -19,5 +19,7 @@ resource "local_file" "env" {
     export TF_VAR_test_project_ids=${join(",", vra_project.test[*].id)}
     export TF_VAR_test_runtime=${local.test_runtime}
     export TF_VAR_test_secret_id=${restful_resource.secret.output.id}
+    export TF_VAR_test_workflow_id=${aria_orchestrator_workflow.test.id}
+    export TF_VAR_test_workflow_name=${aria_orchestrator_workflow.test.name}
   EOT
 }
