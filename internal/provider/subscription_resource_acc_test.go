@@ -178,7 +178,7 @@ resource "aria_subscription" "hello_world" {
   description    = "Say hello when a machine is provisionned"
   type           = "RUNNABLE"
   runnable_type  = "extensibility.abx"
-  runnable_id    = "8a7480d38e535332018e857e0d4f3437"
+  runnable_id    = var.test_abx_action_id
   event_topic_id = "compute.provision.post"
   project_ids    = [] # All projects
   blocking       = false

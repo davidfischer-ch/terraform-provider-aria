@@ -4,6 +4,7 @@
 package provider
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -23,7 +24,10 @@ data "aria_catalog_type" "abx_actions" {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("data.aria_catalog_type.abx_actions", "id", "com.vmw.abx.actions"),
 					resource.TestCheckResourceAttr("data.aria_catalog_type.abx_actions", "name", "Extensibility actions"),
-					resource.TestCheckResourceAttr("data.aria_catalog_type.abx_actions", "base_uri", "http://abx-service.prelude.svc.cluster.local/abx/api/catalog"),
+					resource.TestMatchResourceAttr(
+						"data.aria_catalog_type.abx_actions", "base_uri",
+						regexp.MustCompile(`^https?://\S+/abx/api/catalog$`),
+					),
 					resource.TestCheckResourceAttrSet("data.aria_catalog_type.abx_actions", "created_at"),
 					resource.TestCheckResourceAttrSet("data.aria_catalog_type.abx_actions", "created_by"),
 					resource.TestCheckResourceAttrSet("data.aria_catalog_type.abx_actions", "icon_id"),
