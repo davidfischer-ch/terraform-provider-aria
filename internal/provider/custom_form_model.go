@@ -77,6 +77,14 @@ func (self CustomFormModel) DeletePath() string {
 	return self.ReadPath()
 }
 
+// Adopt the identifier returned by the create endpoint, which is free to mint its own instead of
+// honouring the generated one. Reading the form back requires the identifier the API kept.
+func (self *CustomFormModel) AdoptId(createdId string) {
+	if len(createdId) > 0 {
+		self.Id = types.StringValue(createdId)
+	}
+}
+
 func (self *CustomFormModel) GenerateId(recoveredId string) {
 	if len(self.Id.ValueString()) == 0 {
 		if len(recoveredId) == 0 {
