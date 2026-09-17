@@ -14,5 +14,5 @@ locals {
 
   me = data.restful_resource.me.output
 
-  test_runtime = coalesce(var.test_runtime, local.is_vcf9 ? "python:3.11" : "python:3.10")
+  test_runtime = coalesce(var.test_runtime, local.is_vcf9 ? "python:3.14" : "python:3.10")
 }
