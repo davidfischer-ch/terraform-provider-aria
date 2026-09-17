@@ -98,7 +98,7 @@ func (self IntegrationDataSourceModel) String() string {
 }
 
 func (self IntegrationDataSourceModel) ReadPath() string {
-	return "iaas/api/integrations"
+	return INTEGRATIONS_PATH
 }
 
 // Return the integration type the catalog source type identifier stands for. The listing mixes
@@ -106,7 +106,7 @@ func (self IntegrationDataSourceModel) ReadPath() string {
 func (self IntegrationDataSourceModel) IntegrationType() string {
 	typeId := self.TypeId.ValueString()
 	if typeId == "com.vmw.vro.workflow" {
-		return "vro"
+		return ORCHESTRATOR_INTEGRATION_TYPE
 	}
 	// Panic is intentional: this is a programming bug, not a runtime error.
 	panic(fmt.Sprintf("Internal error: %s as unexpected type: %s.", self.String(), typeId))
