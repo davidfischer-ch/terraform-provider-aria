@@ -105,6 +105,11 @@ export ARIA_INSECURE=false
 export ARIA_TENANT=classic # VCF 9 only, name of the VM Apps tenant, uses the VCF 9 API token flow
 export ARIA_REFRESH_TOKEN=*****
 export ARIA_ACCESS_TOKEN=***** # If you have one, not required
+
+# Only when Orchestrator is a standalone appliance rather than the embedded one, the two being
+# mutually exclusive. The vRO fixtures, tests and cleanup then address that Orchestrator.
+export ARIA_VRO_INTEGRATION_NAME='External Orchestrator' # Name of the integration declared in Aria
+export ARIA_VRO_HOST=https://some-vro-host.net           # Or its URI
 ```
 
 The tests also expect a set of resources to already exist on the instance. The
@@ -193,7 +198,9 @@ bin/cleanup -dry-run
 
 The `TF_VAR_test_project_id`, `TF_VAR_test_catalog_item_id`, and `TF_VAR_test_catalog_item_type`
 environment variables are reused from the acceptance test setup above to scope ABX actions
-and custom forms cleanup.
+and custom forms cleanup. `ARIA_VRO_HOST` and `ARIA_VRO_INTEGRATION_NAME` are reused the same way,
+and the confirmation prompt names both instances when the vRO resources live on a standalone
+Orchestrator.
 
 Run it before `make testacc-destroy`, a leftover `ARIA_PROVIDER_TEST*` resource inside a
 fixture project blocks the project deletion.

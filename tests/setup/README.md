@@ -56,6 +56,18 @@ export ARIA_TENANT=classic # VCF 9 only, name of the VM Apps tenant
 export ARIA_REFRESH_TOKEN=*****
 ```
 
+Add one of these when Orchestrator is a standalone appliance rather than the embedded one. The
+Orchestrator environment, category and workflow fixtures are then created there, as are the vRO
+resources of every test consuming them:
+
+```shell
+export ARIA_VRO_INTEGRATION_NAME='External Orchestrator' # Name of the integration declared in Aria
+export ARIA_VRO_HOST=https://some-vro-host.net           # Or its URI, the two being exclusive
+```
+
+Export it for `make cleanup` too, which otherwise sweeps the embedded Orchestrator and reports a
+clean run while the leftovers sit on the standalone one.
+
 Then, from the repository root:
 
 ```shell
