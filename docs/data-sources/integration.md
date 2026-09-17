@@ -37,8 +37,11 @@ output "vro_workflows_integration" {
 
 - `type_id` (String) Source type (`com.vmw.vro.workflow`, and that's all for now)
 
+### Optional
+
+- `name` (String) Integration name, required to disambiguate when the platform exposes more than one integration of this type
+
 ### Read-Only
 
 - `endpoint_configuration_link` (String) Integration endpoint configuration link
 - `endpoint_uri` (String) Integration endpoint URI
-- `name` (String) Integration name

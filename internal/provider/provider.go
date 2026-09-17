@@ -34,7 +34,10 @@ type AriaProvider struct {
 // AriaProviderModel describes the provider data model.
 type AriaProviderModel struct {
 	Host               types.String `tfsdk:"host"`
+	VROHost            types.String `tfsdk:"vro_host"`
+	VROIntegrationName types.String `tfsdk:"vro_integration_name"`
 	Insecure           types.Bool   `tfsdk:"insecure"`
+	Tenant             types.String `tfsdk:"tenant"`
 	RefreshToken       types.String `tfsdk:"refresh_token"`
 	AccessToken        types.String `tfsdk:"access_token"`
 	OKAPICallsLogLevel types.String `tfsdk:"ok_api_calls_log_level"`
@@ -62,8 +65,41 @@ func (self *AriaProvider) Schema(
 					"May also be provided via ARIA_HOST environment variable.",
 				Optional: true,
 			},
+			"vro_host": schema.StringAttribute{
+				MarkdownDescription: "The URI to the standalone Orchestrator serving the " +
+					"`aria_orchestrator_*` resources, e.g. `https://vro.your-company.net`. " +
+					"Leave it unset when Orchestrator is embedded in Aria, the platform then " +
+					"serves its API itself. Set `vro_integration_name` instead to let the " +
+					"provider look the URI up. " +
+					"May also be provided via ARIA_VRO_HOST environment variable.",
+				Optional: true,
+				Validators: []validator.String{
+					stringvalidator.ConflictsWith(path.MatchRoot("vro_integration_name")),
+				},
+			},
+			"vro_integration_name": schema.StringAttribute{
+				MarkdownDescription: "The name of the Orchestrator integration serving the " +
+					"`aria_orchestrator_*` resources, e.g. `External Orchestrator`. The provider " +
+					"looks its endpoint up among the integrations of the organization, which " +
+					"spares the configuration a hardcoded URI. Alternative to `vro_host`, and " +
+					"the name is the one the `aria_integration` data source reports. " +
+					"May also be provided via ARIA_VRO_INTEGRATION_NAME environment variable.",
+				Optional: true,
+			},
+			"tenant": schema.StringAttribute{
+				MarkdownDescription: "The VCF 9 organization (tenant) name the refresh token " +
+					"belongs to, e.g. `classic`. When set, the refresh token is exchanged for " +
+					"an access token using the VCF 9 API token flow instead of the legacy Aria " +
+					"Automation 8.x flow. Leave unset when targeting Aria Automation 8.x or when " +
+					"only an access token is provided. May also be provided via ARIA_TENANT " +
+					"environment variable.",
+				Optional: true,
+			},
 			"refresh_token": schema.StringAttribute{
 				MarkdownDescription: "The refresh token to use for making API requests. " +
+					"For Aria Automation 8.x this is the API token from the Identity Service " +
+					"API. For VCF 9 (when `tenant` is set) this is the tenant's API token " +
+					"created from My Account > API Tokens. " +
 					"May also be provided via ARIA_REFRESH_TOKEN environment variable.",
 				Optional:  true,
 				Sensitive: true,
@@ -127,6 +163,33 @@ func (self *AriaProvider) Configure(
 		)
 	}
 
+	if config.VROHost.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("vro_host"),
+			"Unknown Orchestrator API Host",
+			"Either set the Orchestrator host in the provider configuration to a static value, "+
+				"apply the source of the value first, or use ARIA_VRO_HOST.",
+		)
+	}
+
+	if config.VROIntegrationName.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("vro_integration_name"),
+			"Unknown Orchestrator Integration Name",
+			"Either set the integration name in the provider configuration to a static value, "+
+				"apply the source of the value first, or use ARIA_VRO_INTEGRATION_NAME.",
+		)
+	}
+
+	if config.Tenant.IsUnknown() {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("tenant"),
+			"Unknown Aria VCF 9 Tenant",
+			"Either set the tenant in the provider configuration to a static value, "+
+				"apply the source of the value first, or use ARIA_TENANT.",
+		)
+	}
+
 	if config.RefreshToken.IsUnknown() {
 		resp.Diagnostics.AddAttributeError(
 			path.Root("refresh_token"),
@@ -187,6 +250,16 @@ func (self *AriaProvider) Configure(
 		)
 	}
 
+	vroHost := os.Getenv("ARIA_VRO_HOST")
+	if !config.VROHost.IsNull() {
+		vroHost = config.VROHost.ValueString()
+	}
+
+	vroIntegrationName := os.Getenv("ARIA_VRO_INTEGRATION_NAME")
+	if !config.VROIntegrationName.IsNull() {
+		vroIntegrationName = config.VROIntegrationName.ValueString()
+	}
+
 	var insecure bool
 	if !config.Insecure.IsNull() {
 		insecure = config.Insecure.ValueBool()
@@ -204,6 +277,11 @@ func (self *AriaProvider) Configure(
 				"Environment variable ARIA_INSECURE is not a valid boolean.",
 			)
 		}
+	}
+
+	tenant := os.Getenv("ARIA_TENANT")
+	if !config.Tenant.IsNull() {
+		tenant = config.Tenant.ValueString()
 	}
 
 	refresh_token := os.Getenv("ARIA_REFRESH_TOKEN")
@@ -240,6 +318,9 @@ func (self *AriaProvider) Configure(
 	}
 
 	ctx = tflog.SetField(ctx, "aria_host", host)
+	ctx = tflog.SetField(ctx, "aria_vro_host", vroHost)
+	ctx = tflog.SetField(ctx, "aria_vro_integration_name", vroIntegrationName)
+	ctx = tflog.SetField(ctx, "aria_tenant", tenant)
 	ctx = tflog.MaskFieldValuesWithFieldKeys(ctx, "aria_refresh_token", refresh_token)
 	ctx = tflog.MaskFieldValuesWithFieldKeys(ctx, "aria_access_token", access_token)
 	ctx = tflog.SetField(ctx, "aria_insecure", insecure)
@@ -249,6 +330,9 @@ func (self *AriaProvider) Configure(
 	// Create a new Aria client using the configuration values
 	client := AriaClient{
 		Host:               host,
+		VROHost:            vroHost,
+		VROIntegrationName: vroIntegrationName,
+		Tenant:             tenant,
 		RefreshToken:       refresh_token,
 		AccessToken:        access_token,
 		Insecure:           insecure,

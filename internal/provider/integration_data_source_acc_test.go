@@ -21,15 +21,30 @@ func TestAccIntegrationDataSource(t *testing.T) {
 data "aria_integration" "test" {
   type_id = "com.vmw.vro.workflow"
 }
+
+// The name is what disambiguates a tenant exposing several integrations of the type
+data "aria_integration" "test_by_name" {
+  type_id = "com.vmw.vro.workflow"
+  name    = data.aria_integration.test.name
+}
 `,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr(
 						"data.aria_integration.test", "type_id",
 						"com.vmw.vro.workflow",
 					),
-					resource.TestCheckResourceAttr(
+					resource.TestCheckResourceAttrSet("data.aria_integration.test", "name"),
+					resource.TestCheckResourceAttrPair(
 						"data.aria_integration.test", "name",
-						"embedded-VRO",
+						"data.aria_integration.test_by_name", "name",
+					),
+					resource.TestCheckResourceAttrPair(
+						"data.aria_integration.test", "endpoint_configuration_link",
+						"data.aria_integration.test_by_name", "endpoint_configuration_link",
+					),
+					resource.TestCheckResourceAttrPair(
+						"data.aria_integration.test", "endpoint_uri",
+						"data.aria_integration.test_by_name", "endpoint_uri",
 					),
 					resource.TestMatchResourceAttr(
 						"data.aria_integration.test", "endpoint_configuration_link",

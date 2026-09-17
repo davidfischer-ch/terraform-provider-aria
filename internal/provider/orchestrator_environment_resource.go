@@ -206,10 +206,11 @@ func (self *OrchestratorEnvironmentResource) WaitUpToDate(
 	tflog.Debug(ctx, fmt.Sprintf("Wait %s to be up-to-date...", name))
 
 	// Poll for environment to be up-to-date to 10 minutes (60 x 10 seconds)
+	pollInterval := time.Duration(10) * time.Second
 	maxAttempts := 60
 	for attempt := 0; attempt < maxAttempts; attempt++ {
 		// Poll resource until up-to-date
-		time.Sleep(time.Duration(10) * time.Second)
+		time.Sleep(pollInterval)
 		tflog.Debug(
 			ctx,
 			fmt.Sprintf("Poll %d of %d - Check %s is up-to-date...", attempt+1, maxAttempts, name))
@@ -231,8 +232,22 @@ func (self *OrchestratorEnvironmentResource) WaitUpToDate(
 		}
 	}
 
+	// The state the environment is stuck in is what tells a slow build from a failing one, and
+	// the execution identifier is the handle to the install logs in Orchestrator.
+	execution := environment.DependenciesInstallExecutionId.ValueString()
+	if len(execution) == 0 {
+		execution = "none"
+	}
+
 	diags.AddError(
 		"Client error",
-		fmt.Sprintf("Timeout while waiting for %s to be up-to-date.", name))
+		fmt.Sprintf(
+			"Timeout while waiting for %s to be up-to-date after %s, its status is still %q "+
+				"(validation message %q, dependencies install execution %s).",
+			name,
+			time.Duration(maxAttempts)*pollInterval,
+			environment.Status.ValueString(),
+			environment.ValidationMessage.ValueString(),
+			execution))
 	return diags
 }

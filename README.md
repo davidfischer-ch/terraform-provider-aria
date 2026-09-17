@@ -97,37 +97,81 @@ own values or flags, set the environment variables yourself and run `go test ./.
 
 Acceptance tests create and destroy real resources on a live Aria instance.
 
-Set the required environment variables:
+These exports are all the makefile targets need, they derive the rest:
 
 ```shell
 export ARIA_HOST=https://some-aria-host.net
 export ARIA_INSECURE=false
+export ARIA_TENANT=classic # VCF 9 only, name of the VM Apps tenant, uses the VCF 9 API token flow
 export ARIA_REFRESH_TOKEN=*****
 export ARIA_ACCESS_TOKEN=***** # If you have one, not required
 
-export TF_VAR_test_org_id=2817c6e5-7408-449f-a86d-8f511105e5ba
-export TF_VAR_test_project_id=2e34b115-dd18-48b3-a6af-f794469e5e0d
-export TF_VAR_test_project_ids=8f274902-94dc-40fd-98b5-f06c68ae1237,a9441e75-57c0-46fa-9262-c06a47acb1a9,2e34b115-dd18-48b3-a6af-f794469e5e0d
-export TF_VAR_test_abx_action_id=8a7480d38e535332018e857e0d4f3437
-export TF_VAR_test_catalog_item_id=c76c5478-6342-37c8-a2a2-76a786e0b232
-export TF_VAR_test_catalog_item_type=com.vmw.blueprint
-export TF_VAR_test_icon_id=72a9a2c7-494e-31d7-afe8-cd27479c407e
-export TF_VAR_test_secret_id=a9af6450-a0c6-42cf-921e-14f7f8db50b3
-export TF_VAR_test_approver_name=USER:SOMEUSER
+# Only when Orchestrator is a standalone appliance rather than the embedded one, the two being
+# mutually exclusive. The vRO fixtures, tests and cleanup then address that Orchestrator.
+export ARIA_VRO_INTEGRATION_NAME='External Orchestrator' # Name of the integration declared in Aria
+export ARIA_VRO_HOST=https://some-vro-host.net           # Or its URI
 ```
 
-Then run:
+The tests also expect a set of resources to already exist on the instance. The
+[tests/setup](tests/setup) Terraform configuration creates and manages them, writing the matching
+`TF_VAR_test_*` exports to `tests/setup/env.sh`, see its [README](tests/setup/README.md):
+
+```shell
+make testacc-setup    # create the prerequisites, writes tests/setup/env.sh
+make testacc-all      # the above, then the acceptance tests against those prerequisites
+make testacc-destroy  # tear them down
+```
+
+That configuration uses the released provider. `DEV=1` builds the one of this worktree and points
+Terraform at it instead, the only way to exercise unreleased changes:
+
+```shell
+make testacc-setup DEV=1
+```
+
+Then, once you have them available, run:
 
 ```shell
 make testacc
 ```
 
+`make testacc` loads `tests/setup/env.sh` when it exists. Export the `TF_VAR_test_*` values by hand
+only if you manage the prerequisites yourself.
+
 `make testacc` runs the unit tests first (`make test`, no live API needed), then the acceptance
 tests against your Aria instance. This fails fast on a broken unit test before spending time on the
 slower acceptance run.
 
-Variables marked with `TF_VAR_test_catalog_item_*` point to an existing catalog item whose icon
-and custom form **will be modified** by the tests.
+`TESTACC_RUN` narrows the acceptance run to a regexp matched against test names. Go selects
+functions, not files, but one file's tests usually share a prefix:
+
+```shell
+make testacc TESTACC_RUN=TestAccIconDataSource  # a single test
+make testacc TESTACC_RUN='TestAccIcon.*'        # every test of icon_resource_acc_test.go
+```
+
+The unit run that gates it still runs in full. `TEST_RUN` narrows that one, on `make test` or
+`make check`:
+
+```shell
+make test TEST_RUN=TestCustomResourceModelToAPI
+```
+
+Both default to the whole suite, and coverage is partial whenever a run is narrowed.
+
+The `TF_VAR_test_catalog_item_*` variables point to an existing catalog item whose icon and custom
+form **will be modified** by the tests.
+
+The `TF_VAR_test_runtime` variable names the Orchestrator runtime the environment, action and
+repository tests are built on. It defaults to the runtime of the platform, `python:3.11` on VCF 9
+and `python:3.10` on Aria Automation 8.x. The list of runtimes differs from one appliance to
+another, an unavailable one is reported as `MISSING_RUNTIME` in the validation message of the
+resources using it:
+
+```shell
+export TF_VAR_test_runtime=python:3.12
+make testacc-setup
+```
 
 ### Cleaning up test resources
 
@@ -135,26 +179,28 @@ If an acceptance test run is interrupted or fails mid-way, orphaned resources ma
 Aria instance. The `cleanup` binary sweeps all resources whose names follow the `ARIA_PROVIDER_TEST`
 prefix convention used by the test suite.
 
-Build and run it:
+`make cleanup` builds it, loads `tests/setup/env.sh` when present, and runs it. Flags go through
+`ARGS`:
+
+```shell
+make cleanup ARGS=-help
+make cleanup ARGS=-dry-run  # preview what would be deleted without touching the API
+make cleanup                # delete everything
+make cleanup ARGS=-force    # also bypass vRO dependency checks and tag usage locks
+```
+
+Build and run it by hand instead if you prefer:
 
 ```shell
 go build -o bin/cleanup ./cmd/cleanup/
-bin/cleanup -help
-```
-
-Preview what would be deleted without touching the API:
-
-```shell
 bin/cleanup -dry-run
-```
-
-Delete everything (add `-force` to bypass vRO dependency checks and tag usage locks):
-
-```shell
-bin/cleanup
-bin/cleanup -force
 ```
 
 The `TF_VAR_test_project_id`, `TF_VAR_test_catalog_item_id`, and `TF_VAR_test_catalog_item_type`
 environment variables are reused from the acceptance test setup above to scope ABX actions
-and custom forms cleanup.
+and custom forms cleanup. `ARIA_VRO_HOST` and `ARIA_VRO_INTEGRATION_NAME` are reused the same way,
+and the confirmation prompt names both instances when the vRO resources live on a standalone
+Orchestrator.
+
+Run it before `make testacc-destroy`, a leftover `ARIA_PROVIDER_TEST*` resource inside a
+fixture project blocks the project deletion.

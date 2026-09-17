@@ -26,11 +26,28 @@ func IconSchema() schema.Schema {
 				},
 			},
 			"hash": schema.StringAttribute{
-				MarkdownDescription: "Content SHA-256" + IMMUTABLE,
-				Optional:            true,
-				Computed:            true,
+				MarkdownDescription: strings.Join([]string{
+					"Checksum of the file at `path`, of your choosing." + IMMUTABLE,
+					"Set it to `filesha256(...)` to replace the icon whenever its content " +
+						"changes, the provider itself never reads the value.",
+					"Compare with `content_hash` for what the platform stores back.",
+				}, "\n"),
+				Optional: true,
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.RequiresReplace(),
+				},
+			},
+			"content_hash": schema.StringAttribute{
+				MarkdownDescription: strings.Join([]string{
+					"SHA-256 of the content stored by the platform.",
+					"This is not always the checksum of the file at `path`: the platform " +
+						"rewrites some formats, SVG among them.",
+				}, "\n"),
+				Computed: true,
+				PlanModifiers: []planmodifier.String{
+					// The content is immutable, only a replacement can change this checksum.
+					// Changing keep_on_destroy then plans without a spurious "known after apply".
+					stringplanmodifier.UseStateForUnknown(),
 				},
 			},
 			"keep_on_destroy": schema.BoolAttribute{

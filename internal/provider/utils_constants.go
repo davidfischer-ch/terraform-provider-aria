@@ -16,6 +16,15 @@ const POLICY_API_VERSION = "2020-08-25"
 const PROJECT_API_VERSION = "2019-01-15"
 const PLATFORM_API_VERSION = ""
 
+// Where the integrations of the organization are listed.
+const INTEGRATIONS_PATH = "iaas/api/integrations"
+
+// How many integrations are requested per page when walking the integrations listing.
+const INTEGRATIONS_PAGE_SIZE = 100
+
+// The type the integrations listing gives an Orchestrator, embedded or standalone.
+const ORCHESTRATOR_INTEGRATION_TYPE = "vro"
+
 // Helpers for documenting attributes in schema ----------------------------------------------------
 
 const IMMUTABLE = " (force recreation on change)"

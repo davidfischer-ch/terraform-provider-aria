@@ -26,21 +26,26 @@ resource "aria_icon" "test" {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("aria_icon.test", "id"),
 					resource.TestCheckResourceAttr("aria_icon.test", "path", "../../tests/icon.svg"),
-					resource.TestMatchResourceAttr("aria_icon.test", "hash", regexp.MustCompile("[0-9a-f]{64}")),
+					resource.TestMatchResourceAttr("aria_icon.test", "content_hash", regexp.MustCompile("[0-9a-f]{64}")),
 					resource.TestCheckResourceAttr("aria_icon.test", "keep_on_destroy", "false"),
 				),
 			},
 			// Update (recreate) and Read testing
+			//
+			// The platform stores a PNG verbatim, content_hash then equals the checksum of the
+			// local file. This does not hold for every format, an SVG comes back rewritten.
 			{
 				Config: `
 resource "aria_icon" "test" {
   path = "../../tests/icon.png"
+  hash = "724d45fec592788dcaca7526cfbb68e0867adb48ed1a9f8d6f5a6fde094bcf7d"
 }
 `,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("aria_icon.test", "id"),
 					resource.TestCheckResourceAttr("aria_icon.test", "path", "../../tests/icon.png"),
 					resource.TestCheckResourceAttr("aria_icon.test", "hash", "724d45fec592788dcaca7526cfbb68e0867adb48ed1a9f8d6f5a6fde094bcf7d"),
+					resource.TestCheckResourceAttr("aria_icon.test", "content_hash", "724d45fec592788dcaca7526cfbb68e0867adb48ed1a9f8d6f5a6fde094bcf7d"),
 					resource.TestCheckResourceAttr("aria_icon.test", "keep_on_destroy", "false"),
 				),
 			},
@@ -56,6 +61,7 @@ resource "aria_icon" "test" {
 					resource.TestCheckResourceAttrSet("aria_icon.test", "id"),
 					resource.TestCheckResourceAttr("aria_icon.test", "path", "../../tests/icon.png"),
 					resource.TestCheckResourceAttr("aria_icon.test", "hash", "724d45fec592788dcaca7526cfbb68e0867adb48ed1a9f8d6f5a6fde094bcf7d"),
+					resource.TestCheckResourceAttr("aria_icon.test", "content_hash", "724d45fec592788dcaca7526cfbb68e0867adb48ed1a9f8d6f5a6fde094bcf7d"),
 					resource.TestCheckResourceAttr("aria_icon.test", "keep_on_destroy", "false"),
 				),
 				ConfigPlanChecks: resource.ConfigPlanChecks{
@@ -90,7 +96,7 @@ resource "aria_icon" "test_others" {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("aria_icon.test", "id"),
 					resource.TestCheckResourceAttr("aria_icon.test", "path", "../../tests/icon.svg"),
-					resource.TestMatchResourceAttr("aria_icon.test", "hash", regexp.MustCompile("[0-9a-f]{64}")),
+					resource.TestMatchResourceAttr("aria_icon.test", "content_hash", regexp.MustCompile("[0-9a-f]{64}")),
 					resource.TestCheckResourceAttr("aria_icon.test", "keep_on_destroy", "false"),
 				),
 			},
@@ -137,7 +143,7 @@ resource "aria_icon" "test_other" {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("aria_icon.test", "id"),
 					resource.TestCheckResourceAttr("aria_icon.test", "path", "../../tests/icon.png"),
-					resource.TestMatchResourceAttr("aria_icon.test", "hash", regexp.MustCompile("[0-9a-f]{64}")),
+					resource.TestMatchResourceAttr("aria_icon.test", "content_hash", regexp.MustCompile("[0-9a-f]{64}")),
 					resource.TestCheckResourceAttr("aria_icon.test", "keep_on_destroy", "false"),
 					resource.TestCheckResourceAttrPair("aria_icon.test", "id", "aria_icon.test_other", "id"),
 					resource.TestCheckResourceAttr("aria_icon.test_other", "keep_on_destroy", "true"),
@@ -153,7 +159,7 @@ resource "aria_icon" "test" {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("aria_icon.test", "id"),
 					resource.TestCheckResourceAttr("aria_icon.test", "path", "../../tests/icon.png"),
-					resource.TestMatchResourceAttr("aria_icon.test", "hash", regexp.MustCompile("[0-9a-f]{64}")),
+					resource.TestMatchResourceAttr("aria_icon.test", "content_hash", regexp.MustCompile("[0-9a-f]{64}")),
 					resource.TestCheckResourceAttr("aria_icon.test", "keep_on_destroy", "false"),
 				),
 			},

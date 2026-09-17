@@ -5,7 +5,6 @@ package provider
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 )
@@ -58,33 +57,26 @@ func (self *IntegrationDataSource) Read(
 		return
 	}
 
-	var responseFromAPI IntegrationResponseAPIodel
-	path := integration.ReadPath()
-	response, err := self.client.R(path).
-		SetQueryParam("size", "1").
-		SetQueryParam("page", "0").
-		SetQueryParam("sort", "name,asc").
-		SetResult(&responseFromAPI).
-		Get(path)
-	err = self.client.HandleAPIResponse(response, err, []int{200})
-	if err != nil {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to get %s, got error: %s", integration.String(), err))
+	description := integration.String()
+
+	entries, someDiags := ReadIntegrations(self.client, description)
+	resp.Diagnostics.Append(someDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	if len(responseFromAPI.Content) == 0 {
-		resp.Diagnostics.AddError(
-			"Client error",
-			fmt.Sprintf("Unable to get %s, no content found.", integration.String()))
+	match, someDiags := SelectIntegration(
+		entries,
+		integration.IntegrationType(),
+		integration.Name.ValueString(),
+		description,
+	)
+	resp.Diagnostics.Append(someDiags...)
+	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	for _, contentsRaw := range responseFromAPI.Content {
-		integration.FromAPI(contentsRaw.Integration)
-		break // Make sure we don't set it multiple times for nothing
-	}
+	integration.FromAPI(match)
 
 	// Save updated integration into Terraform state
 	resp.Diagnostics.Append(resp.State.Set(ctx, &integration)...)
