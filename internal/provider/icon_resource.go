@@ -7,11 +7,26 @@ import (
 	"context"
 	"crypto/sha256"
 	"fmt"
+	"mime"
+	"os"
+	"path/filepath"
 
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
+
+// IconMIMEType returns the MIME type of an icon, derived from its extension.
+//
+// The type must be derived from the extension and passed explicitly to resty, which otherwise
+// types a multipart part by sniffing its content. Go's sniffer has no SVG rule and reports an SVG
+// as text/xml, which the icon API rejects with "file must contain valid MIME type".
+func IconMIMEType(path string) string {
+	if mimeType := mime.TypeByExtension(filepath.Ext(path)); len(mimeType) > 0 {
+		return mimeType
+	}
+	return "application/octet-stream"
+}
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &IconResource{}
@@ -66,11 +81,24 @@ func (self *IconResource) Create(
 	// The platform is not handling properly concurrent requests to icon create/delete API
 	// So we implement this protection (mutex) at the client side (provider)
 
+	iconPath := icon.Path.ValueString()
+	file, err := os.Open(iconPath)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to open %s, got error: %s", icon.String(), err))
+		return
+	}
+	// Read-only file, nothing to report on close.
+	defer func() { _ = file.Close() }()
+
 	lockKey := icon.LockKey()
 	path := icon.CreatePath()
 	self.client.Mutex.Lock(ctx, lockKey)
 	defer self.client.Mutex.Unlock(ctx, lockKey)
-	response, err := self.client.R(path).SetFile("file", icon.Path.ValueString()).Post(path)
+	response, err := self.client.R(path).
+		SetMultipartField("file", filepath.Base(iconPath), IconMIMEType(iconPath), file).
+		Post(path)
 	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -105,7 +133,7 @@ func (self *IconResource) Create(
 	}
 
 	// Save updated icon into Terraform state
-	icon.Hash = types.StringValue(fmt.Sprintf("%x", sha256.Sum256(response.Body())))
+	icon.ContentHash = types.StringValue(fmt.Sprintf("%x", sha256.Sum256(response.Body())))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &icon)...)
 	tflog.Debug(ctx, fmt.Sprintf("Refreshed %s successfully", icon.String()))
 
@@ -144,7 +172,7 @@ func (self *IconResource) Read(
 	}
 
 	// Save updated icon into Terraform state
-	icon.Hash = types.StringValue(fmt.Sprintf("%x", sha256.Sum256(response.Body())))
+	icon.ContentHash = types.StringValue(fmt.Sprintf("%x", sha256.Sum256(response.Body())))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &icon)...)
 }
 

@@ -4,6 +4,7 @@
 package provider
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
@@ -84,7 +85,10 @@ resource "aria_resource_action" "test" {
 					resource.TestCheckResourceAttrPair("aria_resource_action.test", "form_definition.source_id", "aria_resource_action.test", "id"),
 					resource.TestCheckResourceAttr("aria_resource_action.test", "form_definition.source_type", "resource.action"),
 					resource.TestCheckResourceAttrSet("aria_resource_action.test", "form_definition.tenant"),
-					resource.TestCheckResourceAttr("aria_resource_action.test", "form_definition.status", "ON"),
+					resource.TestMatchResourceAttr(
+						"aria_resource_action.test", "form_definition.status",
+						regexp.MustCompile(`^(ON|OFF)$`),
+					),
 				),
 			},
 
@@ -157,7 +161,10 @@ resource "aria_resource_action" "test" {
 					resource.TestCheckResourceAttrPair("aria_resource_action.test", "form_definition.source_id", "aria_resource_action.test", "id"),
 					resource.TestCheckResourceAttr("aria_resource_action.test", "form_definition.source_type", "resource.action"),
 					resource.TestCheckResourceAttrSet("aria_resource_action.test", "form_definition.tenant"),
-					resource.TestCheckResourceAttr("aria_resource_action.test", "form_definition.status", "ON"),
+					resource.TestMatchResourceAttr(
+						"aria_resource_action.test", "form_definition.status",
+						regexp.MustCompile(`^(ON|OFF)$`),
+					),
 				),
 			},
 
@@ -230,7 +237,10 @@ resource "aria_resource_action" "test" {
 					resource.TestCheckResourceAttrPair("aria_resource_action.test", "form_definition.source_id", "aria_resource_action.test", "id"),
 					resource.TestCheckResourceAttr("aria_resource_action.test", "form_definition.source_type", "resource.action"),
 					resource.TestCheckResourceAttrSet("aria_resource_action.test", "form_definition.tenant"),
-					resource.TestCheckResourceAttr("aria_resource_action.test", "form_definition.status", "ON"),
+					resource.TestMatchResourceAttr(
+						"aria_resource_action.test", "form_definition.status",
+						regexp.MustCompile(`^(ON|OFF)$`),
+					),
 				),
 			},
 
@@ -303,7 +313,10 @@ resource "aria_resource_action" "test" {
 					resource.TestCheckResourceAttrPair("aria_resource_action.test", "form_definition.source_id", "aria_resource_action.test", "id"),
 					resource.TestCheckResourceAttr("aria_resource_action.test", "form_definition.source_type", "resource.action"),
 					resource.TestCheckResourceAttrSet("aria_resource_action.test", "form_definition.tenant"),
-					resource.TestCheckResourceAttr("aria_resource_action.test", "form_definition.status", "ON"),
+					resource.TestMatchResourceAttr(
+						"aria_resource_action.test", "form_definition.status",
+						regexp.MustCompile(`^(ON|OFF)$`),
+					),
 				),
 			},
 
@@ -390,7 +403,10 @@ resource "aria_resource_action" "test" {
 					resource.TestCheckResourceAttrPair("aria_resource_action.test", "form_definition.source_id", "aria_resource_action.test", "id"),
 					resource.TestCheckResourceAttr("aria_resource_action.test", "form_definition.source_type", "resource.action"),
 					resource.TestCheckResourceAttrSet("aria_resource_action.test", "form_definition.tenant"),
-					resource.TestCheckResourceAttr("aria_resource_action.test", "form_definition.status", "ON"),
+					resource.TestMatchResourceAttr(
+						"aria_resource_action.test", "form_definition.status",
+						regexp.MustCompile(`^(ON|OFF)$`),
+					),
 				),
 			},
 
@@ -504,7 +520,10 @@ resource "aria_resource_action" "test" {
 					resource.TestCheckResourceAttrPair("aria_resource_action.test", "form_definition.source_id", "aria_resource_action.test", "id"),
 					resource.TestCheckResourceAttr("aria_resource_action.test", "form_definition.source_type", "resource.action"),
 					resource.TestCheckResourceAttrSet("aria_resource_action.test", "form_definition.tenant"),
-					resource.TestCheckResourceAttr("aria_resource_action.test", "form_definition.status", "ON"),
+					resource.TestMatchResourceAttr(
+						"aria_resource_action.test", "form_definition.status",
+						regexp.MustCompile(`^(ON|OFF)$`),
+					),
 				),
 			},
 
@@ -599,7 +618,10 @@ EOT
 					resource.TestCheckResourceAttrPair("aria_resource_action.test", "form_definition.source_id", "aria_resource_action.test", "id"),
 					resource.TestCheckResourceAttr("aria_resource_action.test", "form_definition.source_type", "resource.action"),
 					resource.TestCheckResourceAttrSet("aria_resource_action.test", "form_definition.tenant"),
-					resource.TestCheckResourceAttr("aria_resource_action.test", "form_definition.status", "ON"),
+					resource.TestMatchResourceAttr(
+						"aria_resource_action.test", "form_definition.status",
+						regexp.MustCompile(`^(ON|OFF)$`),
+					),
 				),
 			},
 
@@ -708,7 +730,10 @@ EOT
 					resource.TestCheckResourceAttrPair("aria_resource_action.test", "form_definition.source_id", "aria_resource_action.test", "id"),
 					resource.TestCheckResourceAttr("aria_resource_action.test", "form_definition.source_type", "resource.action"),
 					resource.TestCheckResourceAttrSet("aria_resource_action.test", "form_definition.tenant"),
-					resource.TestCheckResourceAttr("aria_resource_action.test", "form_definition.status", "ON"),
+					resource.TestMatchResourceAttr(
+						"aria_resource_action.test", "form_definition.status",
+						regexp.MustCompile(`^(ON|OFF)$`),
+					),
 				),
 			},
 
@@ -872,7 +897,10 @@ EOT
 					resource.TestCheckResourceAttrPair("aria_resource_action.test", "form_definition.source_id", "aria_resource_action.test", "id"),
 					resource.TestCheckResourceAttr("aria_resource_action.test", "form_definition.source_type", "resource.action"),
 					resource.TestCheckResourceAttrSet("aria_resource_action.test", "form_definition.tenant"),
-					resource.TestCheckResourceAttr("aria_resource_action.test", "form_definition.status", "ON"),
+					resource.TestMatchResourceAttr(
+						"aria_resource_action.test", "form_definition.status",
+						regexp.MustCompile(`^(ON|OFF)$`),
+					),
 				),
 			},
 

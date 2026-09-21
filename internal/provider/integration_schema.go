@@ -66,8 +66,10 @@ func IntegrationDataSourceSchema() dataschema.Schema {
 				},
 			},
 			"name": dataschema.StringAttribute{
-				MarkdownDescription: "Integration name",
-				Computed:            true,
+				MarkdownDescription: "Integration name, required to disambiguate when the " +
+					"platform exposes more than one integration of this type",
+				Optional: true,
+				Computed: true,
 			},
 			"endpoint_configuration_link": dataschema.StringAttribute{
 				MarkdownDescription: "Integration endpoint configuration link",

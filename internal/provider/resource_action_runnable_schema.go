@@ -7,7 +7,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-jsontypes/jsontypes"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringdefault"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 )
 
@@ -40,6 +42,13 @@ func ResourceActionRunnableSchema(description string) schema.SingleNestedAttribu
 				CustomType:          jsontypes.NormalizedType{},
 				Computed:            true,
 				Optional:            true,
+				PlanModifiers: []planmodifier.String{
+					// The value must stay whatever the state holds, null included, when the
+					// configuration leaves it unset. The framework turns a computed attribute with
+					// a null configuration value into "known after apply" otherwise, and the plan
+					// of an unchanged resource is then never empty.
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"input_parameters": schema.ListNestedAttribute{
 				Required: true,

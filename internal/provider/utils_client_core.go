@@ -26,6 +26,24 @@ type AriaClient struct {
 	// Host must be a the URL to the base of the API.
 	Host string
 
+	// VROHost is the URL to the base of a standalone Orchestrator's API, e.g.
+	// https://vro.example.net. Leave it empty when Orchestrator is embedded in Aria Automation:
+	// the platform then serves vco/api itself. When set, every vco/api call is addressed to that
+	// host instead, see ClientForPath.
+	VROHost string
+
+	// VROIntegrationName is the name of the Orchestrator integration to address, an alternative to
+	// spelling its URL out in VROHost. Init resolves it against the integrations of the
+	// organization and fills VROHost with the endpoint the platform reports. The two are mutually
+	// exclusive.
+	VROIntegrationName string
+
+	// Tenant is the VCF 9 organization (tenant) name the refresh token belongs to.
+	// When set, RefreshToken is exchanged for an access token using the VCF 9 API token flow
+	// (POST tm/oauth/tenant/{tenant}/token) instead of the legacy Aria Automation 8.x flow
+	// (POST iaas/api/login).
+	Tenant string
+
 	RefreshToken string `datapolicy:"token"`
 	AccessToken  string `datapolicy:"token"`
 
@@ -42,6 +60,9 @@ type AriaClient struct {
 
 	Client *resty.Client
 
+	// VROClient is the client addressing VROHost, nil when Orchestrator is embedded.
+	VROClient *resty.Client
+
 	// Named read-write mutexes for managing resources
 	Mutex *RWMutexKV
 }
@@ -51,6 +72,12 @@ type AccessTokenResponse struct {
 	Token     string `json:"token"`
 }
 
+// VCFAccessTokenResponse is the response of the VCF 9 API token exchange
+// (POST tm/oauth/tenant/{tenant}/token).
+type VCFAccessTokenResponse struct {
+	AccessToken string `json:"access_token"`
+}
+
 func (self *AriaClient) Init() diag.Diagnostics {
 
 	diags := self.CheckConfig()
@@ -58,20 +85,77 @@ func (self *AriaClient) Init() diag.Diagnostics {
 		return diags
 	}
 
-	client := resty.New()
-	client.SetBaseURL(self.Host)
-	client.SetTimeout(300 * time.Second)
-	client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: self.Insecure})
-	if len(self.AccessToken) > 0 {
-		client.SetAuthToken(self.AccessToken)
-	}
-	self.Client = client
+	self.Client = self.NewRestyClient(self.Host)
 
 	diags.Append(self.GetAccessToken()...)
+	if !diags.HasError() {
+		// Resolving an integration name is itself an API call, the access token has to be there.
+		diags.Append(self.InitVROClient()...)
+	}
 
 	self.Mutex = NewRWMutexKV()
 
 	return diags
+}
+
+// Build the client addressing the standalone Orchestrator, when one is configured. An integration
+// name is resolved here rather than at configuration time, which is what lets a configuration name
+// the Orchestrator instead of spelling its URL out.
+func (self *AriaClient) InitVROClient() diag.Diagnostics {
+	diags := diag.Diagnostics{}
+
+	// Neither a host nor an integration name is the embedded Orchestrator, served by Aria itself.
+	if len(self.VROHost) == 0 && len(self.VROIntegrationName) == 0 {
+		return diags
+	}
+
+	if len(self.VROIntegrationName) > 0 {
+		integration, someDiags := self.ReadOrchestratorIntegration(self.VROIntegrationName)
+		diags.Append(someDiags...)
+		if diags.HasError() {
+			return diags
+		}
+		self.Debug(
+			"Orchestrator integration %q is served at %s",
+			integration.Name, integration.EndpointURI)
+		someDiags = CheckOrchestratorHost(
+			integration.EndpointURI,
+			fmt.Sprintf("Integration %q reports", integration.Name))
+		diags.Append(someDiags...)
+		if diags.HasError() {
+			return diags
+		}
+		self.VROHost = integration.EndpointURI
+	}
+
+	self.VROClient = self.NewRestyClient(self.VROHost)
+
+	// A standalone Orchestrator shares Aria Automation's identity provider, the very same access
+	// token authenticates against both.
+	self.VROClient.SetAuthToken(self.AccessToken)
+
+	return diags
+}
+
+// Return the Orchestrator integration named name, of the integrations of the organization.
+func (self *AriaClient) ReadOrchestratorIntegration(
+	name string,
+) (IntegrationAPIModel, diag.Diagnostics) {
+	description := fmt.Sprintf("Orchestrator integration %q", name)
+	entries, diags := ReadIntegrations(self, description)
+	if diags.HasError() {
+		return IntegrationAPIModel{}, diags
+	}
+	return SelectIntegration(entries, ORCHESTRATOR_INTEGRATION_TYPE, name, description)
+}
+
+// Return a client addressing host, configured like every other client of this provider.
+func (self AriaClient) NewRestyClient(host string) *resty.Client {
+	client := resty.New()
+	client.SetBaseURL(host)
+	client.SetTimeout(300 * time.Second)
+	client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: self.Insecure})
+	return client
 }
 
 func (self *AriaClient) CheckConfig() diag.Diagnostics {
@@ -79,8 +163,33 @@ func (self *AriaClient) CheckConfig() diag.Diagnostics {
 	if len(self.Host) == 0 {
 		diags.AddError("Missing host", "Host is required to request the API")
 	}
+	if len(self.VROHost) > 0 && len(self.VROIntegrationName) > 0 {
+		diags.AddError(
+			"Conflicting Orchestrator configuration",
+			"Set either the Orchestrator host or the name of its integration, not both.")
+	}
+	diags.Append(CheckOrchestratorHost(self.VROHost, "Orchestrator host is")...)
 	if len(self.RefreshToken) == 0 && len(self.AccessToken) == 0 {
 		diags.AddError("Missing token", "Either refresh or access token is required")
+	}
+	return diags
+}
+
+// Return the diagnostics of an Orchestrator host the client would be unable to address. An empty
+// host is the embedded Orchestrator and is not diagnosed. Origin names where the value comes from.
+func CheckOrchestratorHost(host string, origin string) diag.Diagnostics {
+	diags := diag.Diagnostics{}
+	if len(host) == 0 {
+		return diags
+	}
+	parsed, err := url.Parse(host)
+	if err != nil || len(parsed.Host) == 0 ||
+		(parsed.Scheme != "http" && parsed.Scheme != "https") {
+		diags.AddError(
+			"Invalid Orchestrator host",
+			fmt.Sprintf(
+				"%s %q, an absolute URL, scheme included, is required, "+
+					"e.g. https://vro.your-company.net", origin, host))
 	}
 	return diags
 }
@@ -92,37 +201,87 @@ func (self *AriaClient) GetAccessToken() diag.Diagnostics {
 	if len(self.RefreshToken) > 0 && len(self.AccessToken) == 0 {
 		self.Debug("Requesting a new API access token at %s", self.Host)
 
-		var token AccessTokenResponse
-		path := "iaas/api/login"
-		response, err := self.R(path).
-			SetHeader("Content-Type", "application/json").
-			SetBody(map[string]string{"refreshToken": self.RefreshToken}).
-			SetResult(&token).
-			Post(path)
-		err = self.HandleAPIResponse(response, err, []int{200})
+		var token string
+		var err error
+
+		if len(self.Tenant) > 0 {
+			token, err = self.getVCFAccessToken()
+		} else {
+			token, err = self.getLegacyAccessToken()
+		}
 		if err != nil {
 			diags.AddError("Unable to retrieve a valid access token", err.Error())
 			return diags
 		}
 
-		self.AccessToken = token.Token
+		self.AccessToken = token
 	}
 
 	if len(self.AccessToken) == 0 {
 		diags.AddError(
 			"Empty Access Token",
 			"Access Token is empty, will be unable to make API calls")
+		return diags
 	}
+
+	self.Client.SetAuthToken(self.AccessToken)
 
 	return diags
 }
 
+// getLegacyAccessToken exchanges RefreshToken for an access token using the Aria Automation 8.x
+// two-step flow, see https://kb.vmware.com/s/article/89129.
+func (self *AriaClient) getLegacyAccessToken() (string, error) {
+	var token AccessTokenResponse
+	path := "iaas/api/login"
+	response, err := self.R(path).
+		SetHeader("Content-Type", "application/json").
+		SetBody(map[string]string{"refreshToken": self.RefreshToken}).
+		SetResult(&token).
+		Post(path)
+	if err := self.HandleAPIResponse(response, err, []int{200}); err != nil {
+		return "", err
+	}
+	return token.Token, nil
+}
+
+// getVCFAccessToken exchanges RefreshToken (a VCF 9 API token) for an access token scoped to
+// Tenant, using the VCF 9 "Authenticate using API token" flow. The endpoint is not versioned
+// per-service like the rest of the API, so it bypasses R() and calls the underlying client
+// directly.
+func (self *AriaClient) getVCFAccessToken() (string, error) {
+	var token VCFAccessTokenResponse
+	path := fmt.Sprintf("tm/oauth/tenant/%s/token", self.Tenant)
+	response, err := self.Client.R().
+		SetFormData(map[string]string{
+			"grant_type":    "refresh_token",
+			"refresh_token": self.RefreshToken,
+		}).
+		SetResult(&token).
+		Post(path)
+	if err := self.HandleAPIResponse(response, err, []int{200}); err != nil {
+		return "", err
+	}
+	return token.AccessToken, nil
+}
+
+// Return the client serving path. Orchestrator's own API (vco) is served by the standalone
+// Orchestrator when one is configured. The vro paths belong to Aria Automation's Orchestrator
+// gateway, a service of the platform rather than of Orchestrator, and stay on the main client.
+func (self AriaClient) ClientForPath(path string) *resty.Client {
+	if self.VROClient != nil && strings.HasPrefix(path, "vco") {
+		return self.VROClient
+	}
+	return self.Client
+}
+
 // Return a new request insance with apiVersion header set, based on path.
 func (self AriaClient) R(path string) *resty.Request {
+	client := self.ClientForPath(path)
 	if version := self.GetVersionFromPath(path); len(version) > 0 {
-		return self.Client.R().SetQueryParam("apiVersion", version)
+		return client.R().SetQueryParam("apiVersion", version)
 	}
-	return self.Client.R()
+	return client.R()
 }
 
 func (self AriaClient) CreateIt(
@@ -319,9 +478,11 @@ func (self AriaClient) HandleAPIResponse(
 
 // Sensitive JSON keys whose values must be redacted in logs.
 var sensitiveJSONKeys = map[string]bool{
+	"access_token":      true,
+	"refresh_token":     true,
 	"refreshToken":      true,
-	"token":             true,
 	"systemCredentials": true,
+	"token":             true,
 }
 
 // redactSensitiveKeys walks a JSON structure and replaces sensitive values with "<REDACTED>".

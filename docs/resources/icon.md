@@ -35,11 +35,15 @@ resource "aria_icon" "shared_example" {
 
 ### Optional
 
-- `hash` (String) Content SHA-256 (force recreation on change)
+- `hash` (String) Checksum of the file at `path`, of your choosing. (force recreation on change)
+Set it to `filesha256(...)` to replace the icon whenever its content changes, the provider itself never reads the value.
+Compare with `content_hash` for what the platform stores back.
 - `keep_on_destroy` (Boolean) Keep the icon on destroy?
 This can help preventing issues if sharing the same icon for multiple catalog items.
 Default value is false.
 
 ### Read-Only
 
+- `content_hash` (String) SHA-256 of the content stored by the platform.
+This is not always the checksum of the file at `path`: the platform rewrites some formats, SVG among them.
 - `id` (String) Identifier (Aria seem to compute it from content)

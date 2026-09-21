@@ -83,8 +83,12 @@ func (self *CustomFormResource) Create(
 	form.GenerateId(formFromFetchAPI.Id)
 
 	// Then create (or update) it
+	var formFromCreateAPI CustomFormAPIModel
 	path = form.CreatePath()
-	response, err = self.client.R(path).SetBody(form.ToAPI()).Post(path)
+	response, err = self.client.R(path).
+		SetBody(form.ToAPI()).
+		SetResult(&formFromCreateAPI).
+		Post(path)
 	err = self.client.HandleAPIResponse(response, err, []int{201})
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -93,11 +97,21 @@ func (self *CustomFormResource) Create(
 		return
 	}
 
+	form.AdoptId(formFromCreateAPI.Id)
+
 	// Read (using API) to retrieve the custom form content (and not empty stuff)
 	var formFromAPI CustomFormAPIModel
 	found, _, readDiags := self.client.ReadIt(&form, &formFromAPI)
 	resp.Diagnostics.Append(readDiags...)
-	if !found || resp.Diagnostics.HasError() {
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	// Terraform requires a state, an error is the only way out when the form cannot be read back.
+	if !found {
+		resp.Diagnostics.AddError(
+			"Client error",
+			fmt.Sprintf("Unable to read %s back after having created it.", form.String()))
 		return
 	}
 
