@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework-timetypes/timetypes"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -22,7 +23,8 @@ type CatalogSourceModel struct {
 	TypeId      types.String `tfsdk:"type_id"`
 	Global      types.Bool   `tfsdk:"global"`
 
-	Config CatalogSourceConfigModel `tfsdk:"config"`
+	// Of type CatalogSourceConfigModel
+	Config types.Object `tfsdk:"config"`
 
 	CreatedAt             timetypes.RFC3339 `tfsdk:"created_at"`
 	CreatedBy             types.String      `tfsdk:"created_by"`
@@ -110,9 +112,14 @@ func (self *CatalogSourceModel) FromAPI(
 	self.ItemsFound = types.Int32Value(raw.ItemsFound)
 	self.ProjectId = types.StringValue(raw.ProjectId)
 
-	diags := self.Config.FromAPI(ctx, raw.Config)
-
+	diags := diag.Diagnostics{}
 	var someDiags diag.Diagnostics
+
+	// Convert config from raw and then to object
+	config := CatalogSourceConfigModel{}
+	diags.Append(config.FromAPI(ctx, raw.Config)...)
+	self.Config, someDiags = types.ObjectValueFrom(ctx, config.AttributeTypes(ctx), config)
+	diags.Append(someDiags...)
 
 	self.CreatedAt, someDiags = timetypes.NewRFC3339Value(raw.CreatedAt)
 	diags.Append(someDiags...)
@@ -141,7 +148,26 @@ func (self *CatalogSourceModel) FromAPI(
 func (self CatalogSourceModel) ToAPI(
 	ctx context.Context,
 ) (CatalogSourceAPIModel, diag.Diagnostics) {
-	configRaw, diags := self.Config.ToAPI(ctx, self.String())
+
+	diags := diag.Diagnostics{}
+	configRaw := CatalogSourceConfigAPIModel{}
+
+	// https://developer.hashicorp.com/terraform/plugin/framework/handling-data/types/object
+	if self.Config.IsNull() || self.Config.IsUnknown() {
+		diags.AddError(
+			"Configuration error",
+			fmt.Sprintf(
+				"Unable to manage %s, integration is either null or unknown",
+				self.String()))
+	} else {
+		// Convert config from object to raw
+		var someDiags diag.Diagnostics
+		config := CatalogSourceConfigModel{}
+		diags.Append(self.Config.As(ctx, &config, basetypes.ObjectAsOptions{})...)
+		configRaw, someDiags = config.ToAPI(ctx, self.String())
+		diags.Append(someDiags...)
+	}
+
 	return CatalogSourceAPIModel{
 		Id:          self.Id.ValueString(),
 		Name:        self.Name.ValueString(),
