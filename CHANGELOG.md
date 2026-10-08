@@ -1,6 +1,15 @@
 # Changelog
 
 
+## Release v0.8.1 (2026-10-08)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.8.0...v0.8.1
+
+### DevOps
+
+* Fix build matrix by skipping win32/arm combination
+
+
 ## Release v0.8.0 (2026-10-08)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.7.4...v0.8.0
