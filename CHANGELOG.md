@@ -1,6 +1,87 @@
 # Changelog
 
 
+## Release v0.8.0 (2026-10-08)
+
+Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.7.4...v0.8.0
+
+### Minor compatibility breaks
+
+Resources:
+
+* Stop computing `aria_icon`'s `hash`
+    * A configuration leaving it unset now reads it as null
+    * The checksum of the stored content moves to the new `content_hash` attribute
+
+Data sources:
+
+* Make `aria_integration` fail when several integrations of the type match
+    * It used to return the first one
+    * Set `name` to pick one
+
+### Features
+
+Provider:
+
+* Add `tenant` attribute to authenticate against VCF 9
+    * `refresh_token` then holds the tenant API token
+    * Leave `tenant` unset to keep the Aria Automation 8.x flow
+* Add `vro_host` attribute to serve the `aria_orchestrator_*` resources from a standalone Orchestrator
+* Add `vro_integration_name` attribute as an alternative to `vro_host`
+    * The provider looks the Orchestrator's URI up from its integration
+
+Resources:
+
+* Add `aria_icon`'s `content_hash` attribute, the SHA-256 of the content stored by the platform
+
+Data sources:
+
+* Add `aria_integration`'s optional `name` attribute to select one among several integrations of the same type
+
+### Fix and enhancements
+
+Provider:
+
+* Fix authenticating with `refresh_token` alone
+    * The exchanged access token was never sent with the API requests
+* Redact `access_token` and `refresh_token` from request/response logs
+
+Resources:
+
+* Fix creating an SVG `aria_icon` on VCF 9
+    * The API rejected the `text/xml` MIME type sniffed from its content
+* Fix the "Provider produced inconsistent result" error when applying an `aria_icon`
+    * It happened whenever the platform rewrites the content, as it does for SVG
+* Fix creating an `aria_custom_form` when the API assigns its own identifier
+* Fix the endless diff on `aria_custom_resource` and `aria_resource_action` actions without `input_bindings`
+* Fix `aria_orchestrator_workflow` reporting an unknown `integration` instead of the import timeout
+* Detail the `aria_orchestrator_environment` wait timeout error
+    * Report the environment's status
+    * Report its validation message
+    * Report its dependencies install execution
+
+Dependencies:
+
+* Require Go 1.26 to build from source
+* Bump `golang.org/x/text` from `0.41.0` to `0.42.0`
+* Bump `google.golang.org/grpc` from `1.82.1` to `1.83.2`
+
+Tests and tooling:
+
+* Add a `tests/setup` Terraform configuration creating the acceptance tests prerequisites
+    * `make testacc-setup` creates them
+    * `make testacc-destroy` tears them down
+    * `make testacc-all` creates them, then runs the acceptance tests
+    * `DEV=1` runs it against the provider built from the worktree
+* Write the `TF_VAR_test_*` exports to `tests/setup/env.sh`
+    * `make testacc` and `make cleanup` load it when present
+* Add `make cleanup` to build and run the `cleanup` binary
+* Add `TEST_RUN` to narrow `make test` to selected tests
+* Add `TESTACC_RUN` to narrow `make testacc` to selected tests
+* Support VCF 9 tenants in the acceptance tests and the `cleanup` binary
+* Support a standalone Orchestrator in the acceptance tests and the `cleanup` binary
+
+
 ## Release v0.7.4 (2026-08-24)
 
 Diff: https://github.com/davidfischer-ch/terraform-provider-aria/compare/v0.7.3...v0.7.4
