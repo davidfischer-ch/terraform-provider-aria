@@ -13,8 +13,8 @@ _This provider is built on the [Terraform Plugin Framework](https://github.com/h
 
 ## Requirements
 
-- [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.0
-- [Go](https://golang.org/doc/install) >= 1.25
+- [Terraform](https://developer.hashicorp.com/terraform/downloads) >= 1.0, >= 1.11 for `aria_secret` (its write-only `value`)
+- [Go](https://golang.org/doc/install) >= 1.26
 
 
 ## Building The Provider
