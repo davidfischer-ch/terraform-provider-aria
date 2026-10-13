@@ -43,11 +43,12 @@ jobs:
         with:
           go-version-file: 'go.mod'
           cache: true
-      # Temporarily download Terraform 1.8 prerelease for function documentation support.
-      # When Terraform 1.8.0 final is released, this can be removed.
+      # The docs are generated from the schema Terraform reports, use the newest release of the
+      # test matrix below. Terraform before 1.11 does not know write-only attributes
+      # (aria_secret's value), their label would be missing.
       - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
         with:
-          terraform_version: '1.9.8'
+          terraform_version: '1.14.*'
           terraform_wrapper: false
       - run: go generate ./...
       - name: git diff
@@ -66,9 +67,9 @@ jobs:
       matrix:
         # list whatever Terraform versions here you would like to support
         terraform:
-          - '1.8.*'
-          - '1.9.*'
-          - '1.10.*'
+          - '1.12.*'
+          - '1.13.*'
+          - '1.14.*'
     steps:
       - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
       - uses: actions/setup-go@cdcb36043654635271a94b9a6d1392de5bb323a7 # v5.0.1
