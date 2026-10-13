@@ -181,6 +181,7 @@ func main() {
 		runner.ABXActions(projectID)
 	}
 	runner.ABXConstants()
+	runner.Secrets()
 
 	// --- IaaS ---
 	runner.CustomNamings()

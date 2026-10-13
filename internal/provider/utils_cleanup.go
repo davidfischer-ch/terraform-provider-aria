@@ -310,6 +310,13 @@ func (r *CleanupRunner) ABXConstants() {
 	)
 }
 
+// Secrets deletes platform secrets whose name starts with TestPrefix.
+func (r *CleanupRunner) Secrets() {
+	r.applyCleanups(
+		r.contentCleanupsByPrefix("platform/api/secrets", "name"),
+	)
+}
+
 // Tags deletes iaas tags whose key starts with TestPrefix.
 // When Force is true, ?ignoreUsage=true is appended to delete tags even if still in use.
 func (r *CleanupRunner) Tags() {
