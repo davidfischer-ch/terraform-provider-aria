@@ -14,7 +14,10 @@ const ORCHESTRATOR_API_VERSION = ""
 const ORCHESTRATOR_GATEWAY_API_VERSION = "" // 0.8.0-snapshot ?
 const POLICY_API_VERSION = "2020-08-25"
 const PROJECT_API_VERSION = "2019-01-15"
-const PLATFORM_API_VERSION = ""
+
+// Needed for secrets to be scoped by `orgScoped` and `projectIds`, older versions only know
+// `projectId`. Platform's secrets are the only API called under this prefix.
+const PLATFORM_API_VERSION = "2023-01-01"
 
 // Where the integrations of the organization are listed.
 const INTEGRATIONS_PATH = "iaas/api/integrations"

@@ -377,6 +377,7 @@ func (self *AriaProvider) Resources(ctx context.Context) []func() resource.Resou
 		NewProjectResource,
 		NewPropertyGroupResource,
 		NewResourceActionResource,
+		NewSecretResource,
 		NewSubscriptionResource,
 		NewTagResource,
 	}

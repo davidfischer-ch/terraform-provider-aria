@@ -52,7 +52,7 @@ func (self *SecretDataSource) Read(
 	resp *datasource.ReadResponse,
 ) {
 	// Read Terraform configuration data into the model
-	var secret SecretModel
+	var secret SecretDataSourceModel
 	resp.Diagnostics.Append(req.Config.Get(ctx, &secret)...)
 	if resp.Diagnostics.HasError() {
 		return
