@@ -12,7 +12,7 @@ in the root [README](../../README.md#acceptance-tests).
 | ABX action | `aria_abx_action` | `test_abx_action_id`, `test_org_id` |
 | Icon | `aria_icon` | `test_icon_id` |
 | Cloud template, its released version and a catalog source | `vra_blueprint`, `vra_blueprint_version`, `vra_catalog_source_blueprint` | `test_catalog_item_id`, `test_catalog_item_type` |
-| Secret | `restful_resource` on `platform/api/secrets` | `test_secret_id` |
+| Secret | `aria_secret` | `test_secret_id` |
 | Orchestrator environment | `aria_orchestrator_environment` | `test_environment_id`, `test_environment_name`, `test_runtime` |
 | Orchestrator category and workflow | `aria_orchestrator_category`, `aria_orchestrator_workflow` | `test_workflow_id`, `test_workflow_name` |
 
@@ -20,9 +20,9 @@ Nothing is created for `test_approver_name`, the approval policy tests approve o
 account comes from `/csp/gateway/am/api/loggedin/user` and is stripped of its domain, matching the
 `USER:TOTO` form.
 
-The secret goes through the `restful` provider because neither the aria provider (data source only)
-nor the vra provider exposes a secret resource. An `aria_secret` resource would remove that provider
-and the three variables it needs.
+The secret is organization scoped, so it does not depend on the fixture projects. Its `value` is
+write-only: Terraform never stores it, the provider tracks it through `value_checksum`.
+`aria_secret` is not in a released provider yet, apply with `DEV=1` until it is.
 
 The environment is built on the runtime of the platform, `python:3.11` on VCF 9 and `python:3.10`
 on Aria Automation 8.x. The runtimes an appliance offers differ from one version to another, and an
